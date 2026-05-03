@@ -9,27 +9,27 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 
-	legacy "github.com/hashicorp/terraform/internal/legacy/terraform"
+	legacy "github.com/dumb-hashicorp/dumb-terraform/internal/legacy/dumb-terraform"
 )
 
-func testCountHookResourceID(addr addrs.AbsResourceInstance) terraform.HookResourceIdentity {
-	return terraform.HookResourceIdentity{
+func testCountHookResourceID(addr addrs.AbsResourceInstance) dumb-terraform.HookResourceIdentity {
+	return dumb-terraform.HookResourceIdentity{
 		Addr: addr,
 		ProviderAddr: addrs.Provider{
 			Type:      "test",
-			Namespace: "hashicorp",
+			Namespace: "dumb-hashicorp",
 			Hostname:  "example.com",
 		},
 	}
 }
 
 func TestCountHook_impl(t *testing.T) {
-	var _ terraform.Hook = new(countHook)
+	var _ dumb-terraform.Hook = new(countHook)
 }
 
 func TestCountHookPostDiff_DestroyDeposed(t *testing.T) {

@@ -8,23 +8,23 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var (
@@ -73,10 +73,10 @@ func (r *RemovedComponentInstance) ModuleTreePlan(ctx context.Context) (*plans.P
 					// The instance we're planning to remove is also targeted
 					// by a component block. We won't remove it, and we'll
 					// report a diagnostic to that effect.
-					return nil, diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					return nil, diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Cannot remove component instance",
-						Detail:   fmt.Sprintf("The component instance %s is targeted by a component block and cannot be removed. The relevant component is defined at %s.", r.Addr(), component.config.config.DeclRange.ToHCL()),
+						Detail:   fmt.Sprintf("The component instance %s is targeted by a component block and cannot be removed. The relevant component is defined at %s.", r.Addr(), component.config.config.DeclRange.ToDUMB_HCL()),
 						Subject:  r.DeclRange(),
 					})
 				}
@@ -87,8 +87,8 @@ func (r *RemovedComponentInstance) ModuleTreePlan(ctx context.Context) (*plans.P
 		if moreDiags.HasErrors() {
 			// We won't actually add the diagnostics here, they should be
 			// exposed via a different return path.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Cannot plan component",
 				Detail:   fmt.Sprintf("Cannot generate a plan for %s because its provider configuration assignments are invalid.", r.Addr()),
 				Subject:  r.DeclRange(),
@@ -128,7 +128,7 @@ func (r *RemovedComponentInstance) ModuleTreePlan(ctx context.Context) (*plans.P
 
 		plantimestamp := r.main.PlanTimestamp()
 		forget := !r.call.config.config.Destroy
-		opts := &terraform.PlanOpts{
+		opts := &dumb-terraform.PlanOpts{
 			Mode:                       mode,
 			SetVariables:               r.PlanPrevInputs(),
 			ExternalProviders:          providerClients,
@@ -144,8 +144,8 @@ func (r *RemovedComponentInstance) ModuleTreePlan(ctx context.Context) (*plans.P
 		h := hooksFromContext(ctx)
 		hookSingle(ctx, h.PendingComponentInstancePlan, r.Addr())
 		seq, ctx := hookBegin(ctx, h.BeginComponentInstancePlan, h.ContextAttach, r.Addr())
-		plan, moreDiags := PlanComponentInstance(ctx, r.main, r.PlanPrevState(), opts, []terraform.Hook{
-			&componentInstanceTerraformHook{
+		plan, moreDiags := PlanComponentInstance(ctx, r.main, r.PlanPrevState(), opts, []dumb-terraform.Hook{
+			&componentInstanceDumb TerraformHook{
 				ctx:   ctx,
 				seq:   seq,
 				hooks: hooksFromContext(ctx),
@@ -184,14 +184,14 @@ func (r *RemovedComponentInstance) PlanPrevDependents() collections.Set[stackadd
 	return r.main.PlanPrevState().DependentsForComponent(r.Addr())
 }
 
-func (r *RemovedComponentInstance) PlanPrevInputs() terraform.InputValues {
+func (r *RemovedComponentInstance) PlanPrevInputs() dumb-terraform.InputValues {
 	variables := r.main.PlanPrevState().InputsForComponent(r.Addr())
 
-	inputs := make(terraform.InputValues, len(variables))
+	inputs := make(dumb-terraform.InputValues, len(variables))
 	for k, v := range variables {
-		inputs[k.Name] = &terraform.InputValue{
+		inputs[k.Name] = &dumb-terraform.InputValue{
 			Value:      v,
-			SourceType: terraform.ValueFromPlan,
+			SourceType: dumb-terraform.ValueFromPlan,
 		}
 	}
 	return inputs
@@ -242,7 +242,7 @@ func (r *RemovedComponentInstance) ApplyResult(ctx context.Context) (*ComponentI
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Component instance apply not scheduled",
-			fmt.Sprintf("Terraform needs the result from applying changes to %s, but that apply was apparently not scheduled to run: %s. This is a bug in Terraform.", r.Addr(), err),
+			fmt.Sprintf("Dumb Terraform needs the result from applying changes to %s, but that apply was apparently not scheduled to run: %s. This is a bug in Dumb Terraform.", r.Addr(), err),
 		))
 	}
 	return applyResult, diags
@@ -326,8 +326,8 @@ func (r *RemovedComponentInstance) ModuleTree(ctx context.Context) *configs.Conf
 }
 
 // DeclRange implements ConfigComponentExpressionScope.
-func (r *RemovedComponentInstance) DeclRange() *hcl.Range {
-	return r.call.config.config.DeclRange.ToHCL().Ptr()
+func (r *RemovedComponentInstance) DeclRange() *dumb-hcl.Range {
+	return r.call.config.config.DeclRange.ToDUMB_HCL().Ptr()
 }
 
 // StackConfig implements ConfigComponentExpressionScope
@@ -349,7 +349,7 @@ func (r *RemovedComponentInstance) ResourceSchema(ctx context.Context, providerT
 	// This should not be able to fail with an error because we should
 	// be retrieving the same schema that was already used to encode
 	// the object we're working with. The error handling here is for
-	// robustness but any error here suggests a bug in Terraform.
+	// robustness but any error here suggests a bug in Dumb Terraform.
 
 	providerType := r.main.ProviderType(providerTypeAddr)
 	providerSchema, err := providerType.Schema(ctx)

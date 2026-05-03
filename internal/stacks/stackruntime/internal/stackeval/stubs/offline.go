@@ -4,12 +4,12 @@
 package stubs
 
 import (
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // offlineProvider is a stub provider that is used in place of a provider that
-// is not configured  and should never be configured by the current Terraform
+// is not configured  and should never be configured by the current Dumb Terraform
 // configuration.
 //
 // The only functionality that should be called on an offlineProvider are
@@ -42,7 +42,7 @@ func (o *offlineProvider) ValidateProviderConfig(_ providers.ValidateProviderCon
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ValidateProviderConfig on an unconfigured provider",
-		"Cannot validate provider configuration because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot validate provider configuration because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ValidateProviderConfigResponse{
@@ -55,7 +55,7 @@ func (o *offlineProvider) ValidateResourceConfig(_ providers.ValidateResourceCon
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ValidateResourceConfig on an unconfigured provider",
-		"Cannot validate resource configuration because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot validate resource configuration because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ValidateResourceConfigResponse{
@@ -68,7 +68,7 @@ func (o *offlineProvider) ValidateDataResourceConfig(_ providers.ValidateDataRes
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ValidateDataResourceConfig on an unconfigured provider",
-		"Cannot validate data source configuration because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot validate data source configuration because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ValidateDataResourceConfigResponse{
@@ -82,7 +82,7 @@ func (p *offlineProvider) ValidateEphemeralResourceConfig(providers.ValidateEphe
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ValidateEphemeralResourceConfig on an unconfigured provider",
-		"Cannot validate this resource config because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot validate this resource config because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ValidateEphemeralResourceConfigResponse{
@@ -96,7 +96,7 @@ func (p *offlineProvider) ValidateListResourceConfig(providers.ValidateListResou
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ValidateListResourceConfig on an unconfigured provider",
-		"Cannot validate this resource config because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot validate this resource config because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ValidateListResourceConfigResponse{
@@ -109,7 +109,7 @@ func (o *offlineProvider) UpgradeResourceState(_ providers.UpgradeResourceStateR
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called UpgradeResourceState on an unconfigured provider",
-		"Cannot upgrade the state of this resource because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot upgrade the state of this resource because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.UpgradeResourceStateResponse{
@@ -122,7 +122,7 @@ func (o *offlineProvider) UpgradeResourceIdentity(_ providers.UpgradeResourceIde
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called UpgradeResourceIdentity on an unconfigured provider",
-		"Cannot upgrade the state of this resource because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot upgrade the state of this resource because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.UpgradeResourceIdentityResponse{
@@ -135,7 +135,7 @@ func (o *offlineProvider) ConfigureProvider(_ providers.ConfigureProviderRequest
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ConfigureProvider on an unconfigured provider",
-		"Cannot configure this provider because it is not configured. This is a bug in Terraform - please report it.",
+		"Cannot configure this provider because it is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ConfigureProviderResponse{
@@ -153,7 +153,7 @@ func (o *offlineProvider) ReadResource(_ providers.ReadResourceRequest) provider
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ReadResource on an unconfigured provider",
-		"Cannot read from this resource because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot read from this resource because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ReadResourceResponse{
@@ -171,7 +171,7 @@ func (o *offlineProvider) PlanResourceChange(_ providers.PlanResourceChangeReque
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called PlanResourceChange on an unconfigured provider",
-		"Cannot plan changes to this resource because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot plan changes to this resource because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.PlanResourceChangeResponse{
@@ -184,7 +184,7 @@ func (o *offlineProvider) ApplyResourceChange(_ providers.ApplyResourceChangeReq
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ApplyResourceChange on an unconfigured provider",
-		"Cannot apply changes to this resource because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot apply changes to this resource because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ApplyResourceChangeResponse{
@@ -197,7 +197,7 @@ func (o *offlineProvider) ImportResourceState(_ providers.ImportResourceStateReq
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ImportResourceState on an unconfigured provider",
-		"Cannot import an existing object into this resource because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot import an existing object into this resource because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ImportResourceStateResponse{
@@ -214,7 +214,7 @@ func (o *offlineProvider) ReadDataSource(_ providers.ReadDataSourceRequest) prov
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ReadDataSource on an unconfigured provider",
-		"Cannot read from this data source because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot read from this data source because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ReadDataSourceResponse{
@@ -228,7 +228,7 @@ func (u *offlineProvider) OpenEphemeralResource(providers.OpenEphemeralResourceR
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called OpenEphemeralResource on an unconfigured provider",
-		"Cannot open this resource instance because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot open this resource instance because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.OpenEphemeralResourceResponse{
@@ -259,7 +259,7 @@ func (o *offlineProvider) ListResource(providers.ListResourceRequest) providers.
 	resp.Diagnostics = resp.Diagnostics.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ListResource on an unconfigured provider",
-		"Cannot list this resource because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot list this resource because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return resp
@@ -271,7 +271,7 @@ func (o *offlineProvider) ValidateStateStoreConfig(providers.ValidateStateStoreC
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ValidateStateStoreConfig on an unconfigured provider",
-		"Cannot validate state store because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot validate state store because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ValidateStateStoreConfigResponse{
@@ -285,7 +285,7 @@ func (o *offlineProvider) ConfigureStateStore(providers.ConfigureStateStoreReque
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ConfigureStateStore on an unconfigured provider",
-		"Cannot configure state store because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot configure state store because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ConfigureStateStoreResponse{
@@ -299,7 +299,7 @@ func (o *offlineProvider) ReadStateBytes(providers.ReadStateBytesRequest) provid
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ReadStateBytes on an unconfigured provider",
-		"Cannot read from state store because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot read from state store because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ReadStateBytesResponse{
@@ -313,7 +313,7 @@ func (o *offlineProvider) WriteStateBytes(providers.WriteStateBytesRequest) prov
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called WriteStateBytes on an unconfigured provider",
-		"Cannot write to state store because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot write to state store because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.WriteStateBytesResponse{
@@ -327,7 +327,7 @@ func (o *offlineProvider) GetStates(providers.GetStatesRequest) providers.GetSta
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called GetStates on an unconfigured provider",
-		"Cannot list states managed by this state store because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot list states managed by this state store because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.GetStatesResponse{
@@ -341,7 +341,7 @@ func (o *offlineProvider) DeleteState(providers.DeleteStateRequest) providers.De
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called DeleteState on an unconfigured provider",
-		"Cannot use this state store to delete a state because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot use this state store to delete a state because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.DeleteStateResponse{
@@ -354,7 +354,7 @@ func (o *offlineProvider) LockState(providers.LockStateRequest) providers.LockSt
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called LockState on an unconfigured provider",
-		"Cannot use this state store to lock a state because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot use this state store to lock a state because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.LockStateResponse{
@@ -367,7 +367,7 @@ func (o *offlineProvider) UnlockState(providers.UnlockStateRequest) providers.Un
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called UnlockState on an unconfigured provider",
-		"Cannot use this state store to unlock a state because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot use this state store to unlock a state because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.UnlockStateResponse{
@@ -381,7 +381,7 @@ func (o *offlineProvider) PlanAction(request providers.PlanActionRequest) provid
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called PlanAction on an unconfigured provider",
-		"Cannot plan this action because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot plan this action because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.PlanActionResponse{
@@ -395,7 +395,7 @@ func (o *offlineProvider) InvokeAction(request providers.InvokeActionRequest) pr
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called InvokeAction on an unconfigured provider",
-		"Cannot invoke this action because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot invoke this action because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.InvokeActionResponse{
@@ -409,7 +409,7 @@ func (o *offlineProvider) ValidateActionConfig(request providers.ValidateActionC
 	diags = diags.Append(tfdiags.AttributeValue(
 		tfdiags.Error,
 		"Called ValidateActionConfig on an unconfigured provider",
-		"Cannot invoke this action because this provider is not configured. This is a bug in Terraform - please report it.",
+		"Cannot invoke this action because this provider is not configured. This is a bug in Dumb Terraform - please report it.",
 		nil, // nil attribute path means the overall configuration block
 	))
 	return providers.ValidateActionConfigResponse{

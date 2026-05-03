@@ -8,11 +8,11 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type ActionInvocationInstance struct {
@@ -148,7 +148,7 @@ func (ai *ActionInvocationInstance) Encode(schema *providers.ActionSchema) (*Act
 		unmarkedConfigValue, pvms := ai.ConfigValue.UnmarkDeepWithPaths()
 		sensitivePaths, otherMarks := marks.PathsWithMark(pvms, marks.Sensitive)
 		if len(otherMarks) > 0 {
-			return nil, fmt.Errorf("%s: error serializing action invocation with unexpected marks on config value: %#v. This is a bug in Terraform.", tfdiags.FormatCtyPath(otherMarks[0].Path), otherMarks[0].Marks)
+			return nil, fmt.Errorf("%s: error serializing action invocation with unexpected marks on config value: %#v. This is a bug in Dumb Terraform.", tfdiags.FormatCtyPath(otherMarks[0].Path), otherMarks[0].Marks)
 		}
 
 		var err error

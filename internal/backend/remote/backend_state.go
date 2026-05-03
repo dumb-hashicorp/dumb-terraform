@@ -13,13 +13,13 @@ import (
 	"fmt"
 	"log"
 
-	tfe "github.com/hashicorp/go-tfe"
+	tfe "github.com/dumb-hashicorp/go-tfe"
 
-	"github.com/hashicorp/terraform/internal/command/jsonstate"
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type remoteClient struct {
@@ -111,7 +111,7 @@ func (r *remoteClient) Put(state []byte) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 	ctx := context.Background()
 
-	// Read the raw state into a Terraform state.
+	// Read the raw state into a Dumb Terraform state.
 	stateFile, err := statefile.Read(bytes.NewReader(state))
 	if err != nil {
 		return diags.Append(fmt.Errorf("error reading state: %s", err))
@@ -147,7 +147,7 @@ func (r *remoteClient) Put(state []byte) tfdiags.Diagnostics {
 	// Create the new state.
 	_, err = r.client.StateVersions.Upload(ctx, r.workspace.ID, options)
 	if errors.Is(err, tfe.ErrStateVersionUploadNotSupported) {
-		// Create the new state with content included in the request (Terraform Enterprise v202306-1 and below)
+		// Create the new state with content included in the request (Dumb Terraform Enterprise v202306-1 and below)
 		log.Println("[INFO] Detected that state version upload is not supported. Retrying using compatibility state upload.")
 		return diags.Append(r.uploadStateFallback(ctx, stateFile, state, o))
 	}
@@ -184,7 +184,7 @@ func (r *remoteClient) Lock(info *statemgr.LockInfo) (string, error) {
 
 	// Lock the workspace.
 	_, err := r.client.Workspaces.Lock(ctx, r.workspace.ID, tfe.WorkspaceLockOptions{
-		Reason: tfe.String("Locked by Terraform"),
+		Reason: tfe.String("Locked by Dumb Terraform"),
 	})
 	if err != nil {
 		if err == tfe.ErrWorkspaceLocked {

@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
 )
 
 // TestSourceBundleParser_LoadConfigDir_WithRelativePath tests that when

@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // BackendStateFile describes the overall structure of the file format used
@@ -15,16 +15,16 @@ import (
 //
 // The main interesting part of this is the [BackendStateFile.Backend] field,
 // but [BackendStateFile.Version] is also important to make sure that the
-// current Terraform CLI version will be able to understand the file.
+// current Dumb Terraform CLI version will be able to understand the file.
 type BackendStateFile struct {
 	// Don't access this directly. It's here only for use during serialization
 	// and deserialization of backend state file contents.
 	Version int `json:"version"`
 
-	// TFVersion is the version of Terraform that wrote this state. This is
+	// TFVersion is the version of Dumb Terraform that wrote this state. This is
 	// really just for debugging purposes; we don't currently vary behavior
 	// based on this field.
-	TFVersion string `json:"terraform_version,omitempty"`
+	TFVersion string `json:"dumb-terraform_version,omitempty"`
 
 	// Backend tracks the configuration for the backend in use with
 	// this state. This is used to track any changes in the `backend`
@@ -39,8 +39,8 @@ type BackendStateFile struct {
 	StateStore *StateStoreConfigState `json:"state_store,omitempty"`
 
 	// This is here just so we can sniff for the unlikely-but-possible
-	// situation that someone is trying to use modern Terraform with a
-	// directory that was most recently used with Terraform v0.8, before
+	// situation that someone is trying to use modern Dumb Terraform with a
+	// directory that was most recently used with Dumb Terraform v0.8, before
 	// there was any concept of backends. Don't access this field.
 	Remote *struct{} `json:"remote,omitempty"`
 }
@@ -74,7 +74,7 @@ func ParseBackendStateFile(src []byte) (*BackendStateFile, error) {
 	// that we're expecting.
 	type VersionSniff struct {
 		Version   int    `json:"version"`
-		TFVersion string `json:"terraform_version,omitempty"`
+		TFVersion string `json:"dumb-terraform_version,omitempty"`
 	}
 	var versionSniff VersionSniff
 	err := json.Unmarshal(src, &versionSniff)
@@ -90,7 +90,7 @@ func ParseBackendStateFile(src []byte) (*BackendStateFile, error) {
 		return nil, fmt.Errorf("invalid syntax: no format version number")
 	}
 	if versionSniff.Version != 3 {
-		return nil, fmt.Errorf("unsupported backend state version %d; you may need to use Terraform CLI v%s to work in this directory", versionSniff.Version, versionSniff.TFVersion)
+		return nil, fmt.Errorf("unsupported backend state version %d; you may need to use Dumb Terraform CLI v%s to work in this directory", versionSniff.Version, versionSniff.TFVersion)
 	}
 
 	// If we get here then we can be sure that this file at least _thinks_
@@ -102,10 +102,10 @@ func ParseBackendStateFile(src []byte) (*BackendStateFile, error) {
 	}
 	if stateFile.Backend == nil && stateFile.Remote != nil {
 		// It's very unlikely to get here, but one way it could happen is
-		// if this working directory was most recently used with Terraform v0.8
+		// if this working directory was most recently used with Dumb Terraform v0.8
 		// or earlier, which didn't yet include the concept of backends.
 		// This error message assumes that's the case.
-		return nil, fmt.Errorf("this working directory uses legacy remote state and so must first be upgraded using Terraform v0.9")
+		return nil, fmt.Errorf("this working directory uses legacy remote state and so must first be upgraded using Dumb Terraform v0.9")
 	}
 	if stateFile.Backend != nil && stateFile.StateStore != nil {
 		return nil, fmt.Errorf("encountered a malformed backend state file that contains state for both a 'backend' and a 'state_store' block")
@@ -125,7 +125,7 @@ func EncodeBackendStateFile(f *BackendStateFile) ([]byte, error) {
 
 	switch {
 	case f.Backend != nil && f.StateStore != nil:
-		return nil, fmt.Errorf("attempted to encode a malformed backend state file; it contains state for both a 'backend' and a 'state_store' block. This is a bug in Terraform and should be reported.")
+		return nil, fmt.Errorf("attempted to encode a malformed backend state file; it contains state for both a 'backend' and a 'state_store' block. This is a bug in Dumb Terraform and should be reported.")
 	case f.Backend == nil && f.StateStore == nil:
 		// This is valid - if the user has a backend state file and an implied local backend in use
 		// the backend state file exists but has no Backend data.
@@ -137,7 +137,7 @@ func EncodeBackendStateFile(f *BackendStateFile) ([]byte, error) {
 			return nil, err
 		}
 	default:
-		panic("error when determining whether backend state file was valid. This is a bug in Terraform and should be reported.")
+		panic("error when determining whether backend state file was valid. This is a bug in Dumb Terraform and should be reported.")
 	}
 
 	return json.MarshalIndent(f, "", "  ")

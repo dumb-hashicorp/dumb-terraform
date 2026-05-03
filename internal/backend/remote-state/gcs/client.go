@@ -13,9 +13,9 @@ import (
 
 	"cloud.google.com/go/storage"
 
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // remoteClient is used by "state/remote".State to read and write

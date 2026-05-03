@@ -11,15 +11,15 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/command/format"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/computed"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/computed/renderers"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/differ"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/structured"
-	"github.com/hashicorp/terraform/internal/command/jsonplan"
-	"github.com/hashicorp/terraform/internal/command/jsonprovider"
-	"github.com/hashicorp/terraform/internal/command/jsonstate"
-	"github.com/hashicorp/terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/computed"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/computed/renderers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/differ"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/structured"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonprovider"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
 )
 
 const (
@@ -109,7 +109,7 @@ func (plan Plan) renderHuman(renderer Renderer, mode plans.Mode, opts ...plans.Q
 				renderer.Streams.Println()
 			}
 			renderer.Streams.Print(
-				renderer.Colorize.Color("\n[reset][bold][red]Planning failed.[reset][bold] Terraform encountered an error while generating this plan.[reset]\n\n"),
+				renderer.Colorize.Color("\n[reset][bold][red]Planning failed.[reset][bold] Dumb Terraform encountered an error while generating this plan.[reset]\n\n"),
 			)
 		} else if len(diffs.deferred) > 0 {
 			// We had no current changes, but deferred changes
@@ -132,7 +132,7 @@ func (plan Plan) renderHuman(renderer Renderer, mode plans.Mode, opts ...plans.Q
 
 				renderer.Streams.Print(renderer.Colorize.Color("\n[reset][bold][green]No changes.[reset][bold] Your infrastructure still matches the configuration.[reset]\n\n"))
 				renderer.Streams.Println(format.WordWrap(
-					"Terraform has checked that the real remote objects still match the result of your most recent changes, and found no differences.",
+					"Dumb Terraform has checked that the real remote objects still match the result of your most recent changes, and found no differences.",
 					renderer.Streams.Stdout.Columns()))
 			case plans.DestroyMode:
 				if haveRefreshChanges {
@@ -141,7 +141,7 @@ func (plan Plan) renderHuman(renderer Renderer, mode plans.Mode, opts ...plans.Q
 				}
 				renderer.Streams.Print(renderer.Colorize.Color("\n[reset][bold][green]No changes.[reset][bold] No objects need to be destroyed.[reset]\n\n"))
 				renderer.Streams.Println(format.WordWrap(
-					"Either you have not created any objects yet or the existing objects were already deleted outside of Terraform.",
+					"Either you have not created any objects yet or the existing objects were already deleted outside of Dumb Terraform.",
 					renderer.Streams.Stdout.Columns()))
 			default:
 				if haveRefreshChanges {
@@ -170,10 +170,10 @@ func (plan Plan) renderHuman(renderer Renderer, mode plans.Mode, opts ...plans.Q
 						suggestion := "."
 						if !renderer.RunningInAutomation {
 							// The normal message includes a specific command line to run.
-							suggestion = ":\n  terraform apply -refresh-only"
+							suggestion = ":\n  dumb-terraform apply -refresh-only"
 						}
 						renderer.Streams.Println(format.WordWrap(
-							"Your configuration already matches the changes detected above. If you'd like to update the Terraform state to match, create and apply a refresh-only plan"+suggestion,
+							"Your configuration already matches the changes detected above. If you'd like to update the Dumb Terraform state to match, create and apply a refresh-only plan"+suggestion,
 							renderer.Streams.Stdout.Columns(),
 						))
 					}
@@ -183,7 +183,7 @@ func (plan Plan) renderHuman(renderer Renderer, mode plans.Mode, opts ...plans.Q
 				// If we get down here then we're just in the simple situation where
 				// the plan isn't applyable at all.
 				renderer.Streams.Println(format.WordWrap(
-					"Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed.",
+					"Dumb Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed.",
 					renderer.Streams.Stdout.Columns(),
 				))
 			}
@@ -203,7 +203,7 @@ func (plan Plan) renderHuman(renderer Renderer, mode plans.Mode, opts ...plans.Q
 
 	if willPrintResourceChanges {
 		renderer.Streams.Println(format.WordWrap(
-			"\nTerraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:",
+			"\nDumb Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:",
 			renderer.Streams.Stdout.Columns()))
 		if counts[plans.Create] > 0 {
 			renderer.Streams.Println(renderer.Colorize.Color(actionDescription(plans.Create)))
@@ -227,9 +227,9 @@ func (plan Plan) renderHuman(renderer Renderer, mode plans.Mode, opts ...plans.Q
 
 	if len(changes) > 0 || actionCount > 0 {
 		if checkOpts(plans.Errored) {
-			renderer.Streams.Printf("\nTerraform planned the following actions, but then encountered a problem:\n")
+			renderer.Streams.Printf("\nDumb Terraform planned the following actions, but then encountered a problem:\n")
 		} else {
-			renderer.Streams.Printf("\nTerraform will perform the following actions:\n")
+			renderer.Streams.Printf("\nDumb Terraform will perform the following actions:\n")
 		}
 
 		for _, change := range changes {
@@ -260,7 +260,7 @@ func (plan Plan) renderHuman(renderer Renderer, mode plans.Mode, opts ...plans.Q
 	}
 
 	if len(actions) > 0 {
-		renderer.Streams.Print(renderer.Colorize.Color("\nTerraform will invoke the following action(s):\n\n"))
+		renderer.Streams.Print(renderer.Colorize.Color("\nDumb Terraform will invoke the following action(s):\n\n"))
 		renderer.Streams.Printf("%s\n", actions)
 	}
 
@@ -274,7 +274,7 @@ func (plan Plan) renderHuman(renderer Renderer, mode plans.Mode, opts ...plans.Q
 			// so we need some extra context about what it would mean to
 			// apply a change that _only_ includes output changes.
 			renderer.Streams.Println(format.WordWrap(
-				"\nYou can apply this plan to save these new output values to the Terraform state, without changing any real infrastructure.",
+				"\nYou can apply this plan to save these new output values to the Dumb Terraform state, without changing any real infrastructure.",
 				renderer.Streams.Stdout.Columns()))
 		}
 	}
@@ -333,10 +333,10 @@ func renderHumanDiffDrift(renderer Renderer, diffs diffs, mode plans.Mode) bool 
 		return false
 	}
 
-	renderer.Streams.Print(renderer.Colorize.Color("\n[bold][cyan]Note:[reset][bold] Objects have changed outside of Terraform\n"))
+	renderer.Streams.Print(renderer.Colorize.Color("\n[bold][cyan]Note:[reset][bold] Objects have changed outside of Dumb Terraform\n"))
 	renderer.Streams.Println()
 	renderer.Streams.Print(format.WordWrap(
-		"Terraform detected the following changes made outside of Terraform since the last \"terraform apply\" which may have affected this plan:\n",
+		"Dumb Terraform detected the following changes made outside of Dumb Terraform since the last \"dumb-terraform apply\" which may have affected this plan:\n",
 		renderer.Streams.Stdout.Columns()))
 
 	for _, drift := range drs {
@@ -350,7 +350,7 @@ func renderHumanDiffDrift(renderer Renderer, diffs diffs, mode plans.Mode) bool 
 	switch mode {
 	case plans.RefreshOnlyMode:
 		renderer.Streams.Println(format.WordWrap(
-			"\n\nThis is a refresh-only plan, so Terraform will not take any actions to undo these. If you were expecting these changes then you can apply this plan to record the updated values in the Terraform state without changing any remote objects.",
+			"\n\nThis is a refresh-only plan, so Dumb Terraform will not take any actions to undo these. If you were expecting these changes then you can apply this plan to record the updated values in the Dumb Terraform state without changing any remote objects.",
 			renderer.Streams.Stdout.Columns(),
 		))
 	default:
@@ -564,10 +564,10 @@ func resourceChangeComment(resource jsonplan.ResourceChange, action plans.Action
 		buf.WriteString("\n # (destroy = false is set in the configuration)")
 	case plans.Forget:
 		if len(resource.Deposed) > 0 {
-			buf.WriteString(fmt.Sprintf("[bold] # %s[reset] will be removed from Terraform state, but [bold][red]will not be destroyed[reset]", dispAddr))
+			buf.WriteString(fmt.Sprintf("[bold] # %s[reset] will be removed from Dumb Terraform state, but [bold][red]will not be destroyed[reset]", dispAddr))
 			buf.WriteString("\n[bold] # (left over from a partially-failed replacement of this instance)")
 		} else {
-			buf.WriteString(fmt.Sprintf("[bold] # %s[reset] will no longer be managed by Terraform, but [bold][red]will not be destroyed[reset]", dispAddr))
+			buf.WriteString(fmt.Sprintf("[bold] # %s[reset] will no longer be managed by Dumb Terraform, but [bold][red]will not be destroyed[reset]", dispAddr))
 		}
 		buf.WriteString("\n # (destroy = false is set in the configuration)")
 	case plans.Delete:
@@ -593,7 +593,7 @@ func resourceChangeComment(resource jsonplan.ResourceChange, action plans.Action
 			// FIXME: Ideally we'd truncate addr.Module to reflect the earliest
 			// step that doesn't exist, so it's clearer which call this refers
 			// to, but we don't have enough information out here in the UI layer
-			// to decide that; only the "expander" in Terraform Core knows
+			// to decide that; only the "expander" in Dumb Terraform Core knows
 			// which module instance keys are actually declared.
 			buf.WriteString(fmt.Sprintf("\n  # (because %s is not in configuration)", resource.ModuleAddress))
 		case jsonplan.ResourceInstanceDeleteBecauseWrongRepetition:

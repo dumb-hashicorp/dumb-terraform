@@ -9,21 +9,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig/stackconfigtypes"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/stackconfigtypes"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ProviderConfig represents a single "provider" block in a stack configuration.
@@ -55,14 +55,14 @@ func (p *ProviderConfig) InstRefValueType() cty.Type {
 	return providerInstanceRefType(decl.ProviderAddr)
 }
 
-func (p *ProviderConfig) ProviderArgsDecoderSpec(ctx context.Context) (hcldec.Spec, error) {
+func (p *ProviderConfig) ProviderArgsDecoderSpec(ctx context.Context) (dumb-hcldec.Spec, error) {
 	providerType := p.ProviderType()
 	schema, err := providerType.Schema(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if schema.Provider.Body == nil {
-		return hcldec.ObjectSpec{}, nil
+		return dumb-hcldec.ObjectSpec{}, nil
 	}
 	return schema.Provider.Body.DecoderSpec(), nil
 }
@@ -76,17 +76,17 @@ func (p *ProviderConfig) ProviderArgs(ctx context.Context, phase EvalPhase) cty.
 	return v
 }
 
-func CheckProviderInLockfile(locks depsfile.Locks, providerType *ProviderType, declRange *hcl.Range) (diags tfdiags.Diagnostics) {
+func CheckProviderInLockfile(locks depsfile.Locks, providerType *ProviderType, declRange *dumb-hcl.Range) (diags tfdiags.Diagnostics) {
 	if !depsfile.ProviderIsLockable(providerType.Addr()) {
 		return diags
 	}
 
 	if p := locks.Provider(providerType.Addr()); p == nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider missing from lockfile",
 			Detail: fmt.Sprintf(
-				"Provider %q is not in the lockfile. This provider must be in the lockfile to be used in the configuration. Please run `terraform stacks providers lock` to update the lockfile and run this operation again with an updated configuration.",
+				"Provider %q is not in the lockfile. This provider must be in the lockfile to be used in the configuration. Please run `dumb-terraform stacks providers lock` to update the lockfile and run this operation again with an updated configuration.",
 				providerType.Addr(),
 			),
 			Subject: declRange,
@@ -108,7 +108,7 @@ func (p *ProviderConfig) CheckProviderArgs(ctx context.Context, phase EvalPhase)
 			if depLocks != nil {
 				// Check if the provider is in the lockfile,
 				// if it is not we can not read the provider schema
-				lockfileDiags := CheckProviderInLockfile(*depLocks, providerType, decl.DeclRange.ToHCL().Ptr())
+				lockfileDiags := CheckProviderInLockfile(*depLocks, providerType, decl.DeclRange.ToDUMB_HCL().Ptr())
 				if lockfileDiags.HasErrors() {
 					return cty.DynamicVal, lockfileDiags
 				}
@@ -117,30 +117,30 @@ func (p *ProviderConfig) CheckProviderArgs(ctx context.Context, phase EvalPhase)
 
 			spec, err := p.ProviderArgsDecoderSpec(ctx)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Failed to read provider schema",
 					Detail: fmt.Sprintf(
 						"Error while reading the schema for %q: %s.",
 						providerType.Addr(), err,
 					),
-					Subject: decl.DeclRange.ToHCL().Ptr(),
+					Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 				return cty.DynamicVal, diags
 			}
 
 			client, err := providerType.UnconfiguredClient()
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Failed to initialize provider",
 					Detail: fmt.Sprintf(
 						"Error initializing %q to validate %s: %s.",
 						providerType.Addr(), p.addr, err,
 					),
-					Subject: decl.DeclRange.ToHCL().Ptr(),
+					Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 				})
-				return cty.UnknownVal(hcldec.ImpliedType(spec)), diags
+				return cty.UnknownVal(dumb-hcldec.ImpliedType(spec)), diags
 			}
 
 			body := decl.Config
@@ -148,13 +148,13 @@ func (p *ProviderConfig) CheckProviderArgs(ctx context.Context, phase EvalPhase)
 				// A provider with no configuration is valid (just means no
 				// attributes or blocks), but we need to pass an empty body to
 				// the evaluator to avoid a panic.
-				body = hcl.EmptyBody()
+				body = dumb-hcl.EmptyBody()
 			}
 
 			configVal, moreDiags := EvalBody(ctx, body, spec, phase, p)
 			diags = diags.Append(moreDiags)
 			if moreDiags.HasErrors() {
-				return cty.UnknownVal(hcldec.ImpliedType(spec)), diags
+				return cty.UnknownVal(dumb-hcldec.ImpliedType(spec)), diags
 			}
 			// We unmark the config before making the RPC call, but will still
 			// return the original possibly-marked config if successful.
@@ -164,7 +164,7 @@ func (p *ProviderConfig) CheckProviderArgs(ctx context.Context, phase EvalPhase)
 			})
 			diags = diags.Append(validateResp.Diagnostics)
 			if validateResp.Diagnostics.HasErrors() {
-				return cty.UnknownVal(hcldec.ImpliedType(spec)), diags
+				return cty.UnknownVal(dumb-hcldec.ImpliedType(spec)), diags
 			}
 
 			return configVal, diags
@@ -189,11 +189,11 @@ func (p *ProviderConfig) ResolveExpressionReference(ctx context.Context, ref sta
 	if _, ok := ret.(*ProviderConfig); ok {
 		// We can't reference other providers from anywhere inside a provider
 		// configuration block.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   fmt.Sprintf("The object %s is not in scope at this location.", ref.Target.String()),
-			Subject:  ref.SourceRange.ToHCL().Ptr(),
+			Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 		})
 	}
 

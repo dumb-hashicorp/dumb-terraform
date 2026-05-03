@@ -4,36 +4,36 @@
 package configs
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	hcljson "github.com/hashicorp/hcl/v2/json"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	dumb-hcljson "github.com/dumb-hashicorp/dumb-hcl/v2/json"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type Import struct {
-	ID hcl.Expression
+	ID dumb-hcl.Expression
 
-	Identity hcl.Expression
+	Identity dumb-hcl.Expression
 
-	To hcl.Expression
+	To dumb-hcl.Expression
 	// The To address may not be resolvable immediately if it contains dynamic
 	// index expressions, so we will extract the ConfigResource address and
 	// store it here for reference.
 	ToResource addrs.ConfigResource
 
-	ForEach hcl.Expression
+	ForEach dumb-hcl.Expression
 
 	ProviderConfigRef *ProviderConfigRef
 	Provider          addrs.Provider
 
-	DeclRange         hcl.Range
-	ProviderDeclRange hcl.Range
+	DeclRange         dumb-hcl.Range
+	ProviderDeclRange dumb-hcl.Range
 }
 
-func decodeImportBlock(block *hcl.Block) (*Import, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeImportBlock(block *dumb-hcl.Block) (*Import, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	imp := &Import{
 		DeclRange: block.DefRange,
 	}
@@ -59,11 +59,11 @@ func decodeImportBlock(block *hcl.Block) (*Import, hcl.Diagnostics) {
 		imp.To = toExpr
 
 		addr, toDiags := parseConfigResourceFromExpression(imp.To)
-		diags = diags.Extend(toDiags.ToHCL())
+		diags = diags.Extend(toDiags.ToDUMB_HCL())
 
 		if addr.Resource.Mode != addrs.ManagedResourceMode {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid import address",
 				Detail:   "Only managed resources can be imported.",
 				Subject:  attr.Range.Ptr(),
@@ -79,23 +79,23 @@ func decodeImportBlock(block *hcl.Block) (*Import, hcl.Diagnostics) {
 
 	if attr, exists := content.Attributes["provider"]; exists {
 		if len(imp.ToResource.Module) > 0 {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid import provider argument",
 				Detail:   "The provider argument can only be specified in import blocks that will generate configuration.\n\nUse the providers argument within the module block to configure providers for all resources within a module, including imported resources.",
 				Subject:  attr.Range.Ptr(),
 			})
 		}
 
-		var providerDiags hcl.Diagnostics
+		var providerDiags dumb-hcl.Diagnostics
 		imp.ProviderConfigRef, providerDiags = decodeProviderConfigRef(attr.Expr, "provider")
 		imp.ProviderDeclRange = attr.Range
 		diags = append(diags, providerDiags...)
 	}
 
 	if imp.ID == nil && imp.Identity == nil {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid import block",
 			Detail:   "At least one of 'id' or 'identity' must be specified.",
 			Subject:  block.DefRange.Ptr(),
@@ -103,8 +103,8 @@ func decodeImportBlock(block *hcl.Block) (*Import, hcl.Diagnostics) {
 	}
 
 	if imp.ID != nil && imp.Identity != nil {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid import block",
 			Detail:   "Only one of 'id' or 'identity' can be specified.",
 			Subject:  block.DefRange.Ptr(),
@@ -114,8 +114,8 @@ func decodeImportBlock(block *hcl.Block) (*Import, hcl.Diagnostics) {
 	return imp, diags
 }
 
-var importBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var importBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name: "provider",
 		},
@@ -140,7 +140,7 @@ var importBlockSchema = &hcl.BodySchema{
 // skipping an variable index expressions. This is used to connect an import
 // block's "to" to the configuration address before the full instance
 // expressions are evaluated.
-func parseConfigResourceFromExpression(expr hcl.Expression) (addrs.ConfigResource, tfdiags.Diagnostics) {
+func parseConfigResourceFromExpression(expr dumb-hcl.Expression) (addrs.ConfigResource, tfdiags.Diagnostics) {
 	traversal, hcdiags := exprToResourceTraversal(expr)
 	if hcdiags.HasErrors() {
 		return addrs.ConfigResource{}, tfdiags.Diagnostics(nil).Append(hcdiags)
@@ -155,16 +155,16 @@ func parseConfigResourceFromExpression(expr hcl.Expression) (addrs.ConfigResourc
 }
 
 // unwrapJSONRefExpr takes a string expression from a JSON configuration,
-// and re-evaluates the string as HCL. If the expression is not JSON, the
+// and re-evaluates the string as DUMB_HCL. If the expression is not JSON, the
 // original expression is returned directly.
-func unwrapJSONRefExpr(expr hcl.Expression) (hcl.Expression, hcl.Diagnostics) {
-	if !hcljson.IsJSONExpression(expr) {
+func unwrapJSONRefExpr(expr dumb-hcl.Expression) (dumb-hcl.Expression, dumb-hcl.Diagnostics) {
+	if !dumb-hcljson.IsJSONExpression(expr) {
 		return expr, nil
 	}
 
-	// We can abuse the hcl json api and rely on the fact that calling
+	// We can abuse the dumb-hcl json api and rely on the fact that calling
 	// Value on a json expression with no EvalContext will return the
-	// raw string. We can then parse that as normal hcl syntax, and
+	// raw string. We can then parse that as normal dumb-hcl syntax, and
 	// continue with the decoding.
 	v, diags := expr.Value(nil)
 	if diags.HasErrors() {
@@ -173,8 +173,8 @@ func unwrapJSONRefExpr(expr hcl.Expression) (hcl.Expression, hcl.Diagnostics) {
 
 	// the JSON representation can only be a string
 	if v.Type() != cty.String {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference expression",
 			Detail:   "A single reference string is required.",
 			Subject:  expr.Range().Ptr(),
@@ -184,7 +184,7 @@ func unwrapJSONRefExpr(expr hcl.Expression) (hcl.Expression, hcl.Diagnostics) {
 	}
 
 	rng := expr.Range()
-	expr, ds := hclsyntax.ParseExpression([]byte(v.AsString()), rng.Filename, rng.Start)
+	expr, ds := dumb-hclsyntax.ParseExpression([]byte(v.AsString()), rng.Filename, rng.Start)
 	diags = diags.Extend(ds)
 	return expr, diags
 }
@@ -193,22 +193,22 @@ func unwrapJSONRefExpr(expr hcl.Expression) (hcl.Expression, hcl.Diagnostics) {
 // which must be a resource instance, but may contain limited variables with
 // index expressions. Since we only need the ConfigResource to connect the
 // import to the configuration, we skip any index expressions.
-func exprToResourceTraversal(expr hcl.Expression) (hcl.Traversal, hcl.Diagnostics) {
-	var trav hcl.Traversal
-	var diags hcl.Diagnostics
+func exprToResourceTraversal(expr dumb-hcl.Expression) (dumb-hcl.Traversal, dumb-hcl.Diagnostics) {
+	var trav dumb-hcl.Traversal
+	var diags dumb-hcl.Diagnostics
 
 	switch e := expr.(type) {
-	case *hclsyntax.RelativeTraversalExpr:
+	case *dumb-hclsyntax.RelativeTraversalExpr:
 		t, d := exprToResourceTraversal(e.Source)
 		diags = diags.Extend(d)
 		trav = append(trav, t...)
 		trav = append(trav, e.Traversal...)
 
-	case *hclsyntax.ScopeTraversalExpr:
+	case *dumb-hclsyntax.ScopeTraversalExpr:
 		// a static reference, we can just append the traversal
 		trav = append(trav, e.Traversal...)
 
-	case *hclsyntax.IndexExpr:
+	case *dumb-hclsyntax.IndexExpr:
 		// Get the collection from the index expression, we don't need the
 		// index for a ConfigResource
 		t, d := exprToResourceTraversal(e.Collection)
@@ -222,7 +222,7 @@ func exprToResourceTraversal(expr hcl.Expression) (hcl.Traversal, hcl.Diagnostic
 		// if we don't recognise the expression type (which means we are likely
 		// dealing with a test mock), try and interpret this as an absolute
 		// traversal
-		t, d := hcl.AbsTraversalForExpr(e)
+		t, d := dumb-hcl.AbsTraversalForExpr(e)
 		diags = diags.Extend(d)
 		trav = append(trav, t...)
 	}
@@ -234,7 +234,7 @@ func exprToResourceTraversal(expr hcl.Expression) (hcl.Traversal, hcl.Diagnostic
 // statically to get the resource address. This returns false when the address
 // cannot be parsed, which is usually a result of dynamic index expressions
 // using for_each.
-func parseImportToStatic(expr hcl.Expression) (addrs.AbsResourceInstance, bool) {
+func parseImportToStatic(expr dumb-hcl.Expression) (addrs.AbsResourceInstance, bool) {
 	// we may have a nil expression in some error cases, which we can just
 	// false to avoid the parsing
 	if expr == nil {
@@ -242,7 +242,7 @@ func parseImportToStatic(expr hcl.Expression) (addrs.AbsResourceInstance, bool) 
 	}
 
 	var toDiags tfdiags.Diagnostics
-	traversal, hd := hcl.AbsTraversalForExpr(expr)
+	traversal, hd := dumb-hcl.AbsTraversalForExpr(expr)
 	toDiags = toDiags.Append(hd)
 	to, td := addrs.ParseAbsResourceInstance(traversal)
 	toDiags = toDiags.Append(td)

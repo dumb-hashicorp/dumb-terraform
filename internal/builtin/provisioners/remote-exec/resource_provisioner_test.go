@@ -14,10 +14,10 @@ import (
 
 	"strings"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/communicator"
-	"github.com/hashicorp/terraform/internal/communicator/remote"
-	"github.com/hashicorp/terraform/internal/provisioners"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/communicator"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/communicator/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/provisioners"
 	"github.com/zclconf/go-cty/cty"
 )
 

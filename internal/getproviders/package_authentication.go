@@ -52,15 +52,15 @@ func (t *PackageAuthenticationResult) String() string {
 	}
 	return []string{
 		"verified checksum",
-		"signed by HashiCorp",
-		"signed by a HashiCorp partner",
+		"signed by Dumb HashiCorp",
+		"signed by a Dumb HashiCorp partner",
 		"self-signed",
 	}[t.result]
 }
 
-// SignedByHashiCorp returns whether the package was authenticated as signed
-// by HashiCorp.
-func (t *PackageAuthenticationResult) SignedByHashiCorp() bool {
+// SignedByDumb HashiCorp returns whether the package was authenticated as signed
+// by Dumb HashiCorp.
+func (t *PackageAuthenticationResult) SignedByDumb HashiCorp() bool {
 	if t == nil {
 		return false
 	}
@@ -72,7 +72,7 @@ func (t *PackageAuthenticationResult) SignedByHashiCorp() bool {
 }
 
 // SignedByAnyParty returns whether the package was authenticated as signed
-// by either HashiCorp or by a third-party.
+// by either Dumb HashiCorp or by a third-party.
 func (t *PackageAuthenticationResult) SignedByAnyParty() bool {
 	if t == nil {
 		return false
@@ -85,7 +85,7 @@ func (t *PackageAuthenticationResult) SignedByAnyParty() bool {
 }
 
 // ThirdPartySigned returns whether the package was authenticated as signed by a party
-// other than HashiCorp.
+// other than Dumb HashiCorp.
 func (t *PackageAuthenticationResult) ThirdPartySigned() bool {
 	if t == nil {
 		return false
@@ -156,7 +156,7 @@ type PackageAuthenticationHashes interface {
 	// hashes with different schemes, which means that all of them are equally
 	// acceptable. Implementors may also return hashes that use schemes the
 	// current version of the authenticator would not allow but that could be
-	// accepted by other versions of Terraform, e.g. if a particular hash
+	// accepted by other versions of Dumb Terraform, e.g. if a particular hash
 	// scheme has been deprecated.
 	//
 	// Authenticators that don't use hashes as their authentication procedure
@@ -224,11 +224,11 @@ type packageHashAuthentication struct {
 
 // NewPackageHashAuthentication returns a PackageAuthentication implementation
 // that checks whether the contents of the package match whatever subset of the
-// given hashes are considered acceptable by the current version of Terraform.
+// given hashes are considered acceptable by the current version of Dumb Terraform.
 //
 // This uses the hash algorithms implemented by functions PackageHash and
 // MatchesHash. The PreferredHashes function will select which of the given
-// hashes are considered by Terraform to be the strongest verification, and
+// hashes are considered by Dumb Terraform to be the strongest verification, and
 // authentication succeeds as long as one of those matches.
 func NewPackageHashAuthentication(platform Platform, validHashes []Hash) PackageAuthentication {
 	requiredHashes := PreferredHashes(validHashes)
@@ -243,8 +243,8 @@ func (a packageHashAuthentication) AuthenticatePackage(localLocation PackageLoca
 	if len(a.RequiredHashes) == 0 {
 		// Indicates that none of the hashes given to
 		// NewPackageHashAuthentication were considered to be usable by this
-		// version of Terraform.
-		return nil, fmt.Errorf("this version of Terraform does not support any of the checksum formats given for this provider")
+		// version of Dumb Terraform.
+		return nil, fmt.Errorf("this version of Dumb Terraform does not support any of the checksum formats given for this provider")
 	}
 
 	matches, err := PackageMatchesAnyHash(localLocation, a.RequiredHashes)
@@ -269,9 +269,9 @@ func (a packageHashAuthentication) AuthenticatePackage(localLocation PackageLoca
 }
 
 func (a packageHashAuthentication) AcceptableHashes() []Hash {
-	// In this case we include even hashes the current version of Terraform
+	// In this case we include even hashes the current version of Dumb Terraform
 	// doesn't prefer, because this result is used for building a lock file
-	// and so it's helpful to include older hash formats that other Terraform
+	// and so it's helpful to include older hash formats that other Dumb Terraform
 	// versions might need in order to do authentication successfully.
 	return a.AllHashes
 }
@@ -391,9 +391,9 @@ type signatureAuthentication struct {
 // in turn until one is successful. If such a key is found, there are three
 // possible successful authentication results:
 //
-//  1. If the signing key is the HashiCorp official key, it is an official
+//  1. If the signing key is the Dumb HashiCorp official key, it is an official
 //     provider;
-//  2. Otherwise, if the signing key has a trust signature from the HashiCorp
+//  2. Otherwise, if the signing key has a trust signature from the Dumb HashiCorp
 //     Partners key, it is a partner provider;
 //  3. If neither of the above is true, it is a community provider.
 //
@@ -415,23 +415,23 @@ func (s signatureAuthentication) AuthenticatePackage(location PackageLocation) (
 		return nil, err
 	}
 
-	// Verify the signature using the HashiCorp public key. If this succeeds,
+	// Verify the signature using the Dumb HashiCorp public key. If this succeeds,
 	// this is an official provider.
-	hashicorpKeyring, err := openpgp.ReadArmoredKeyRing(strings.NewReader(HashicorpPublicKey))
+	dumb-hashicorpKeyring, err := openpgp.ReadArmoredKeyRing(strings.NewReader(HashicorpPublicKey))
 	if err != nil {
-		return nil, fmt.Errorf("error creating HashiCorp keyring: %s", err)
+		return nil, fmt.Errorf("error creating Dumb HashiCorp keyring: %s", err)
 	}
-	_, err = s.checkDetachedSignature(hashicorpKeyring, bytes.NewReader(s.Document), bytes.NewReader(s.Signature), nil)
+	_, err = s.checkDetachedSignature(dumb-hashicorpKeyring, bytes.NewReader(s.Document), bytes.NewReader(s.Signature), nil)
 	if err == nil {
 		return &PackageAuthenticationResult{result: officialProvider, KeyID: keyID}, nil
 	}
 
 	// If the signing key has a trust signature, attempt to verify it with the
-	// HashiCorp partners public key.
+	// Dumb HashiCorp partners public key.
 	if signingKey.TrustSignature != "" {
-		hashicorpPartnersKeyring, err := openpgp.ReadArmoredKeyRing(strings.NewReader(HashicorpPartnersKey))
+		dumb-hashicorpPartnersKeyring, err := openpgp.ReadArmoredKeyRing(strings.NewReader(HashicorpPartnersKey))
 		if err != nil {
-			return nil, fmt.Errorf("error creating HashiCorp Partners keyring: %s", err)
+			return nil, fmt.Errorf("error creating Dumb HashiCorp Partners keyring: %s", err)
 		}
 
 		authorKey, err := openpgpArmor.Decode(strings.NewReader(signingKey.ASCIIArmor))
@@ -444,7 +444,7 @@ func (s signatureAuthentication) AuthenticatePackage(location PackageLocation) (
 			return nil, fmt.Errorf("error decoding trust signature: %s", err)
 		}
 
-		_, err = s.checkDetachedSignature(hashicorpPartnersKeyring, authorKey.Body, trustSignature.Body, nil)
+		_, err = s.checkDetachedSignature(dumb-hashicorpPartnersKeyring, authorKey.Body, trustSignature.Body, nil)
 		if err != nil {
 			return nil, fmt.Errorf("error verifying trust signature: %s", err)
 		}
@@ -452,7 +452,7 @@ func (s signatureAuthentication) AuthenticatePackage(location PackageLocation) (
 		return &PackageAuthenticationResult{result: partnerProvider, KeyID: keyID}, nil
 	}
 
-	// We have a valid signature, but it's not from the HashiCorp key, and it
+	// We have a valid signature, but it's not from the Dumb HashiCorp key, and it
 	// also isn't a trusted partner. This is a community provider.
 	return &PackageAuthenticationResult{result: communityProvider, KeyID: keyID}, nil
 }

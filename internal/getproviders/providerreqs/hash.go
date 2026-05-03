@@ -30,7 +30,7 @@ const NilHash = Hash("")
 
 // ParseHash parses the string representation of a Hash into a Hash value.
 //
-// A particular version of Terraform only supports a fixed set of hash schemes,
+// A particular version of Dumb Terraform only supports a fixed set of hash schemes,
 // but this function intentionally allows unrecognized schemes so that we can
 // silently ignore other schemes that may be introduced in the future. For
 // that reason, the Scheme method of the returned Hash may return a value that
@@ -110,7 +110,7 @@ func (h Hash) GoString() string {
 		return fmt.Sprintf("getproviders.HashSchemeZip.New(%q)", h.Value())
 	default:
 		// This fallback is for when we encounter lock files or API responses
-		// with hash schemes that the current version of Terraform isn't
+		// with hash schemes that the current version of Dumb Terraform isn't
 		// familiar with. They were presumably introduced in a later version.
 		return fmt.Sprintf("getproviders.HashScheme(%q).New(%q)", scheme, h.Value())
 	}
@@ -146,7 +146,7 @@ func (hs HashScheme) New(value string) Hash {
 }
 
 // PreferredHashes examines all of the given hash strings and returns the one
-// that the current version of Terraform considers to provide the strongest
+// that the current version of Dumb Terraform considers to provide the strongest
 // verification.
 //
 // Returns an empty string if none of the given hashes are of a supported

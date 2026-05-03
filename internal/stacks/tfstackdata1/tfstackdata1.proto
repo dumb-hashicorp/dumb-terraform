@@ -16,33 +16,33 @@ import "google/protobuf/any.proto";
 ///////////// PLAN SEQUENCE MESSAGES
 //
 // A "stack plan" consists of a sequence of messages emitted gradually from
-// the streaming Stacks.PlanStackChanges RPC in the Terraform Core RPC API.
+// the streaming Stacks.PlanStackChanges RPC in the Dumb Terraform Core RPC API.
 //
 // From the perspective of that protocol the objects in the sequence are
 // opaque and to be preserved byte-for-byte without any external interpretation,
-// in the same order they were emitted from Terraform Core.
+// in the same order they were emitted from Dumb Terraform Core.
 //
 // Internally, we decode each one based on the type field of google.protobuf.Any,
 // treating each one as some kind of mutation of our in-memory plan data
 // structure.
 //
-// These message types only cover the data that Terraform needs to apply the
-// plan, and so don't cover any information that Terraform Core might emit
+// These message types only cover the data that Dumb Terraform needs to apply the
+// plan, and so don't cover any information that Dumb Terraform Core might emit
 // only for the caller's benefit.
 //////////////
 
 // Appears early in a raw plan sequence to capture some metadata that we need
 // to process subsequent messages, or to abort if we're being asked to decode
-// a plan created by a different version of Terraform.
+// a plan created by a different version of Dumb Terraform.
 message PlanHeader {
-    // The canonical version string for the version of Terraform that created
+    // The canonical version string for the version of Dumb Terraform that created
     // the plan sequence that this message belongs to.
     //
     // The raw plan sequence loader will fail if it finds a message of this
-    // type with a version string that disagrees with the version of Terraform
+    // type with a version string that disagrees with the version of Dumb Terraform
     // decoding the message, because we always expect plans to be applied by
-    // the same version of Terraform that created them.
-    string terraform_version = 1;
+    // the same version of Dumb Terraform that created them.
+    string dumb-terraform_version = 1;
 }
 
 // Captures one element from the raw prior state that was provided when
@@ -281,7 +281,7 @@ message PlanDeferredActionInvocation {
 //
 // This situation arises if the previous state (given as input to the apply
 // phase) contains keys that are of a type unrecognized by the current
-// version of Terraform and that are marked as "discard if unrecognized",
+// version of Dumb Terraform and that are marked as "discard if unrecognized",
 // suggesting that their content is likely to become somehow invalid if
 // other parts of the state were to get updated.
 message PlanDiscardStateMapKeys {
@@ -296,7 +296,7 @@ message PlanDiscardStateMapKeys {
 //
 // A "stack state snapshot" is a mapping from arbitrary keys to messages
 // emitted gradually from the streaming Stacks.ApplyStackChanges RPC in the
-// Terraform Core RPC API.
+// Dumb Terraform Core RPC API.
 //
 // From the perspective of that protocol the keys and values in the map are
 // opaque and to be preserved verbatim without any external interpretation,
@@ -306,16 +306,16 @@ message PlanDiscardStateMapKeys {
 // treating each one as some kind of mutation of our in-memory plan data
 // structure.
 //
-// These message types only cover the data that Terraform needs to produce
+// These message types only cover the data that Dumb Terraform needs to produce
 // a future plan based on this snapshot, and don't cover any information that
-// Terraform Core might emit only for the caller's benefit.
+// Dumb Terraform Core might emit only for the caller's benefit.
 //
 // Because state messages survive from one run to the next, all top-level
 // messages used for state snapshots have a format version suffix that is
 // currently always 1. The functions that load a state map into the in-memory
 // state structure will fail if any of the messages are of an unknown type, so
 // we should increment the format version only as a last resort because this
-// will prevent users from downgrading to an earlier version of Terraform once
+// will prevent users from downgrading to an earlier version of Dumb Terraform once
 // they've got at least one state map message that is of a newer version.
 //////////////
 
@@ -380,7 +380,7 @@ message StateResourceInstanceObjectV1 {
     // MessagePack to JSON once we decode this because we won't know the
     // schema that the value was encoded with.
     //
-    // This is a pragmatic exception for this particular quirk of Terraform's
+    // This is a pragmatic exception for this particular quirk of Dumb Terraform's
     // provider API design. Other parts of this format and associated protocol
     // should use tfplan.DynamicValue and MessagePack encoding for consistency.
     bytes value_json = 1;

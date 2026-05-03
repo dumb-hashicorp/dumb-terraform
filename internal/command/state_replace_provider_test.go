@@ -9,16 +9,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
 )
 
 func TestStateReplaceProvider(t *testing.T) {
@@ -90,7 +90,7 @@ func TestStateReplaceProvider(t *testing.T) {
 
 		args := []string{
 			"-state", statePath,
-			"hashicorp/aws",
+			"dumb-hashicorp/aws",
 			"acmecorp/aws",
 		}
 		if code := c.Run(args); code != 0 {
@@ -126,7 +126,7 @@ func TestStateReplaceProvider(t *testing.T) {
 		args := []string{
 			"-state", statePath,
 			"-auto-approve",
-			"hashicorp/aws",
+			"dumb-hashicorp/aws",
 			"acmecorp/aws",
 		}
 		if code := c.Run(args); code != 0 {
@@ -162,7 +162,7 @@ func TestStateReplaceProvider(t *testing.T) {
 
 		args := []string{
 			"-state", statePath,
-			"hashicorp/aws",
+			"dumb-hashicorp/aws",
 			"acmecorp/aws",
 		}
 		if code := c.Run(args); code != 0 {
@@ -193,7 +193,7 @@ func TestStateReplaceProvider(t *testing.T) {
 
 		args := []string{
 			"-state", statePath,
-			"hashicorp/google",
+			"dumb-hashicorp/google",
 			"acmecorp/google",
 		}
 		if code := c.Run(args); code != 0 {
@@ -222,7 +222,7 @@ func TestStateReplaceProvider(t *testing.T) {
 
 		args := []string{
 			"-invalid",
-			"hashicorp/google",
+			"dumb-hashicorp/google",
 			"acmecorp/google",
 		}
 		if code := c.Run(args); code == 0 {
@@ -269,7 +269,7 @@ func TestStateReplaceProvider(t *testing.T) {
 		}
 
 		args := []string{
-			"hashicorp/google_cloud",
+			"dumb-hashicorp/google_cloud",
 			"-/-/google",
 		}
 		if code := c.Run(args); code == 0 {
@@ -278,7 +278,7 @@ func TestStateReplaceProvider(t *testing.T) {
 
 		got := ui.ErrorWriter.String()
 		msgs := []string{
-			`Invalid "from" provider "hashicorp/google_cloud"`,
+			`Invalid "from" provider "dumb-hashicorp/google_cloud"`,
 			"Invalid provider type",
 			`Invalid "to" provider "-/-/google"`,
 			"Invalid provider source hostname",
@@ -362,7 +362,7 @@ func TestStateReplaceProvider_stateStore(t *testing.T) {
 	inputBuf.WriteString("yes\n")
 
 	args := []string{
-		"hashicorp/test",
+		"dumb-hashicorp/test",
 		"testing-corp/test",
 	}
 	if code := c.Run(args); code != 0 {
@@ -371,7 +371,7 @@ func TestStateReplaceProvider_stateStore(t *testing.T) {
 
 	// For the two resources in the mocked state, we expect them both to be changed.
 	expectedOutputMsgs := []string{
-		"- registry.terraform.io/hashicorp/test\n    + registry.terraform.io/testing-corp/test\n",
+		"- registry.dumb-terraform.io/dumb-hashicorp/test\n    + registry.dumb-terraform.io/testing-corp/test\n",
 		"Successfully replaced provider for 2 resources.",
 	}
 	for _, msg := range expectedOutputMsgs {
@@ -402,7 +402,7 @@ func TestStateReplaceProvider_constVariable(t *testing.T) {
 
 		args := []string{
 			"-auto-approve",
-			"hashicorp/test",
+			"dumb-hashicorp/test",
 			"testing-corp/test",
 		}
 		if code := c.Run(args); code == 0 {
@@ -435,20 +435,20 @@ func TestStateReplaceProvider_constVariable(t *testing.T) {
 		args := []string{
 			"-auto-approve",
 			"-var", "module_name=child",
-			"hashicorp/test",
+			"dumb-hashicorp/test",
 			"testing-corp/test",
 		}
 		if code := c.Run(args); code != 0 {
 			t.Fatalf("return code: %d\n\n%s", code, ui.ErrorWriter.String())
 		}
 
-		actual := strings.TrimSpace(testStateRead(t, "terraform.tfstate").String())
+		actual := strings.TrimSpace(testStateRead(t, "dumb-terraform.tfstate").String())
 		expected := strings.TrimSpace(`
 <no state>
 module.child:
   test_instance.test:
     ID = 
-    provider = provider["registry.terraform.io/testing-corp/test"]
+    provider = provider["registry.dumb-terraform.io/testing-corp/test"]
 `)
 		if diff := cmp.Diff(expected, actual); diff != "" {
 			t.Fatalf("unexpected state output\n%s", diff)
@@ -480,20 +480,20 @@ module.child:
 
 		args := []string{
 			"-auto-approve",
-			"hashicorp/test",
+			"dumb-hashicorp/test",
 			"testing-corp/test",
 		}
 		if code := c.Run(args); code != 0 {
 			t.Fatalf("return code: %d\n\n%s", code, ui.ErrorWriter.String())
 		}
 
-		actual := strings.TrimSpace(testStateRead(t, "terraform.tfstate").String())
+		actual := strings.TrimSpace(testStateRead(t, "dumb-terraform.tfstate").String())
 		expected := strings.TrimSpace(`
 <no state>
 module.child:
   test_instance.test:
     ID = 
-    provider = provider["registry.terraform.io/testing-corp/test"]
+    provider = provider["registry.dumb-terraform.io/testing-corp/test"]
 `)
 		if diff := cmp.Diff(expected, actual); diff != "" {
 			t.Fatalf("unexpected state output\n%s", diff)
@@ -504,7 +504,7 @@ module.child:
 func TestStateReplaceProvider_docs(t *testing.T) {
 	c := &StateReplaceProviderCommand{}
 
-	if got, want := c.Help(), "Usage: terraform [global options] state replace-provider"; !strings.Contains(got, want) {
+	if got, want := c.Help(), "Usage: dumb-terraform [global options] state replace-provider"; !strings.Contains(got, want) {
 		t.Fatalf("unexpected help text\nwant: %s\nfull output:\n%s", want, got)
 	}
 
@@ -586,7 +586,7 @@ func TestStateReplaceProvider_checkRequiredVersion(t *testing.T) {
 
 	args := []string{
 		"-state", statePath,
-		"hashicorp/aws",
+		"dumb-hashicorp/aws",
 		"acmecorp/aws",
 	}
 	if code := c.Run(args); code != 1 {
@@ -609,33 +609,33 @@ func TestStateReplaceProvider_checkRequiredVersion(t *testing.T) {
 const testStateReplaceProviderOutputOriginal = `
 aws_instance.alpha:
   ID = alpha
-  provider = provider["registry.terraform.io/hashicorp/aws"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/aws"]
   bar = value
   foo = value
 aws_instance.beta:
   ID = beta
-  provider = provider["registry.terraform.io/hashicorp/aws"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/aws"]
   bar = value
   foo = value
 azurerm_virtual_machine.gamma:
   ID = gamma
-  provider = provider["registry.terraform.io/-/azurerm"]
+  provider = provider["registry.dumb-terraform.io/-/azurerm"]
   baz = value
 `
 
 const testStateReplaceProviderOutput = `
 aws_instance.alpha:
   ID = alpha
-  provider = provider["registry.terraform.io/acmecorp/aws"]
+  provider = provider["registry.dumb-terraform.io/acmecorp/aws"]
   bar = value
   foo = value
 aws_instance.beta:
   ID = beta
-  provider = provider["registry.terraform.io/acmecorp/aws"]
+  provider = provider["registry.dumb-terraform.io/acmecorp/aws"]
   bar = value
   foo = value
 azurerm_virtual_machine.gamma:
   ID = gamma
-  provider = provider["registry.terraform.io/-/azurerm"]
+  provider = provider["registry.dumb-terraform.io/-/azurerm"]
   baz = value
 `

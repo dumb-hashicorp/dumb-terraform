@@ -7,17 +7,17 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	hcljson "github.com/hashicorp/hcl/v2/json"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	dumb-hcljson "github.com/dumb-hashicorp/dumb-hcl/v2/json"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const initialLanguageEdition = "TFStack2023"
 
-// File represents the content of a single .tfcomponent.hcl or .tfcomponent.json
+// File represents the content of a single .tfcomponent.dumb-hcl or .tfcomponent.json
 // file before it's been merged with its siblings in the same directory to
 // produce the overall [Stack] object.
 type File struct {
@@ -30,7 +30,7 @@ type File struct {
 }
 
 // DecodeFileBody takes a body that is assumed to represent the root of a
-// .tfcomponent.hcl or .tfcomponent.json file and decodes the declarations
+// .tfcomponent.dumb-hcl or .tfcomponent.json file and decodes the declarations
 // inside.
 //
 // If you have a []byte containing source code then consider using [ParseFile]
@@ -41,15 +41,15 @@ type File struct {
 // configuration tree. Some fields of the objects representing declarations in
 // the configuration will be unpopulated when loading through this entry point.
 // Prefer [LoadConfigDir] in most cases.
-func DecodeFileBody(body hcl.Body, fileAddr sourceaddrs.FinalSource) (*File, tfdiags.Diagnostics) {
+func DecodeFileBody(body dumb-hcl.Body, fileAddr sourceaddrs.FinalSource) (*File, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	ret := &File{
 		SourceAddr:   fileAddr,
 		Declarations: makeDeclarations(),
 	}
 
-	content, hclDiags := body.Content(rootConfigSchema)
-	diags = diags.Append(hclDiags)
+	content, dumb-hclDiags := body.Content(rootConfigSchema)
+	diags = diags.Append(dumb-hclDiags)
 	if content == nil {
 		return ret, diags
 	}
@@ -63,14 +63,14 @@ func DecodeFileBody(body hcl.Body, fileAddr sourceaddrs.FinalSource) (*File, tfd
 		// editions later then we'll probably need to move the check for this
 		// up into LoadSingleStackConfig so we can make sure that all of the
 		// files in a directory agree on a language edition to use.
-		editionKW := hcl.ExprAsKeyword(langAttr.Expr)
+		editionKW := dumb-hcl.ExprAsKeyword(langAttr.Expr)
 		if editionKW != initialLanguageEdition {
 			var extra string
 			if strings.HasPrefix(editionKW, "TFStack") {
-				extra = "\n\nThis stack configuration might be intended for a newer version of Terraform."
+				extra = "\n\nThis stack configuration might be intended for a newer version of Dumb Terraform."
 			}
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid language edition",
 				Detail: fmt.Sprintf(
 					"If you declare an explicit language edition then it must currently be the keyword %s, because no other editions are supported.%s",
@@ -156,39 +156,39 @@ func DecodeFileBody(body hcl.Body, fileAddr sourceaddrs.FinalSource) (*File, tfd
 }
 
 // ParseFileSource parses the given source code as the content of either a
-// .tfcomponent.hcl or .tfcomponent.json file, and then delegates the result to
+// .tfcomponent.dumb-hcl or .tfcomponent.json file, and then delegates the result to
 // [DecodeFileBody] for analysis, returning that final result.
 //
 // ParseFileSource chooses between native vs. JSON syntax based on the suffix
 // of the filename in the given source address, which must be either
-// ".tfcomponent.hcl" or ".tfcomponent.json".
+// ".tfcomponent.dumb-hcl" or ".tfcomponent.json".
 func ParseFileSource(src []byte, fileAddr sourceaddrs.FinalSource) (*File, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	filename := sourceaddrs.FinalSourceFilename(fileAddr)
 
-	var body hcl.Body
+	var body dumb-hcl.Body
 	switch validFilenameSuffix(filename) {
-	case ".tfcomponent.hcl":
-		hclFile, hclDiags := hclsyntax.ParseConfig(src, fileAddr.String(), hcl.InitialPos)
-		diags = diags.Append(hclDiags)
+	case ".tfcomponent.dumb-hcl":
+		dumb-hclFile, dumb-hclDiags := dumb-hclsyntax.ParseConfig(src, fileAddr.String(), dumb-hcl.InitialPos)
+		diags = diags.Append(dumb-hclDiags)
 		if diags.HasErrors() {
 			return nil, diags
 		}
-		body = hclFile.Body
+		body = dumb-hclFile.Body
 	case ".tfcomponent.json":
-		hclFile, hclDiags := hcljson.Parse(src, fileAddr.String())
-		diags = diags.Append(hclDiags)
+		dumb-hclFile, dumb-hclDiags := dumb-hcljson.Parse(src, fileAddr.String())
+		diags = diags.Append(dumb-hclDiags)
 		if diags.HasErrors() {
 			return nil, diags
 		}
-		body = hclFile.Body
+		body = dumb-hclFile.Body
 	default:
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Unsupported file type",
 			fmt.Sprintf(
-				"Cannot load %s as a stack configuration file: filename must have either a .tfcomponent.hcl or .tfcomponent.json suffix.",
+				"Cannot load %s as a stack configuration file: filename must have either a .tfcomponent.dumb-hcl or .tfcomponent.json suffix.",
 				fileAddr,
 			),
 		))
@@ -200,11 +200,11 @@ func ParseFileSource(src []byte, fileAddr sourceaddrs.FinalSource) (*File, tfdia
 	return ret, diags
 }
 
-// validFilenameSuffix returns ".tfcomponent.hcl" or ".tfcomponent.json" if the
+// validFilenameSuffix returns ".tfcomponent.dumb-hcl" or ".tfcomponent.json" if the
 // given filename ends with that suffix, and otherwise returns an empty
 // string to indicate that the suffix was invalid.
 func validFilenameSuffix(filename string) string {
-	const nativeSuffix = ".tfcomponent.hcl"
+	const nativeSuffix = ".tfcomponent.dumb-hcl"
 	const jsonSuffix = ".tfcomponent.json"
 
 	switch {
@@ -217,11 +217,11 @@ func validFilenameSuffix(filename string) string {
 	}
 }
 
-var rootConfigSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var rootConfigSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "language"},
 	},
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "stack", LabelNames: []string{"name"}},
 		{Type: "component", LabelNames: []string{"name"}},
 		{Type: "variable", LabelNames: []string{"name"}},

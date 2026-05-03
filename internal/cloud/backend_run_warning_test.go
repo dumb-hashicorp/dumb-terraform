@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/go-tfe"
-	tfemocks "github.com/hashicorp/go-tfe/mocks"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/go-tfe"
+	tfemocks "github.com/dumb-hashicorp/go-tfe/mocks"
 	"go.uber.org/mock/gomock"
 )
 

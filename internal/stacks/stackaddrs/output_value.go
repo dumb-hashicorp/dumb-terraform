@@ -4,11 +4,11 @@
 package stackaddrs
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type OutputValue struct {
@@ -37,8 +37,8 @@ type AbsOutputValue = InStackInstance[OutputValue]
 
 func ParseAbsOutputValueStr(s string) (AbsOutputValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	traversal, hclDiags := hclsyntax.ParseTraversalAbs([]byte(s), "", hcl.InitialPos)
-	diags = diags.Append(hclDiags)
+	traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(s), "", dumb-hcl.InitialPos)
+	diags = diags.Append(dumb-hclDiags)
 	if diags.HasErrors() {
 		return AbsOutputValue{}, diags
 	}
@@ -47,7 +47,7 @@ func ParseAbsOutputValueStr(s string) (AbsOutputValue, tfdiags.Diagnostics) {
 	return ret, diags.Append(moreDiags)
 }
 
-func ParseAbsOutputValue(traversal hcl.Traversal) (AbsOutputValue, tfdiags.Diagnostics) {
+func ParseAbsOutputValue(traversal dumb-hcl.Traversal) (AbsOutputValue, tfdiags.Diagnostics) {
 	if traversal.IsRelative() {
 		// This is always a caller bug: caller must only pass absolute
 		// traversals in here.
@@ -61,27 +61,27 @@ func ParseAbsOutputValue(traversal hcl.Traversal) (AbsOutputValue, tfdiags.Diagn
 
 	if len(remain) != 2 {
 		// it must be output.name, no more and no less.
-		return AbsOutputValue{}, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return AbsOutputValue{}, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid output address",
 			Detail:   "The output address must be the keyword \"output\" followed by an output name.",
 			Subject:  traversal.SourceRange().Ptr(),
 		})
 	}
 
-	if kwStep, ok := remain[0].(hcl.TraverseAttr); !ok || kwStep.Name != "output" {
-		return AbsOutputValue{}, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+	if kwStep, ok := remain[0].(dumb-hcl.TraverseAttr); !ok || kwStep.Name != "output" {
+		return AbsOutputValue{}, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid output address",
 			Detail:   "The output address must be the keyword \"output\" followed by an output name.",
 			Subject:  remain[0].SourceRange().Ptr(),
 		})
 	}
 
-	nameStep, ok := remain[1].(hcl.TraverseAttr)
+	nameStep, ok := remain[1].(dumb-hcl.TraverseAttr)
 	if !ok {
-		return AbsOutputValue{}, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return AbsOutputValue{}, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid output address",
 			Detail:   "The output address must be the keyword \"output\" followed by an output name.",
 			Subject:  remain[1].SourceRange().Ptr(),

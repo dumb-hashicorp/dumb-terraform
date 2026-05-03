@@ -7,17 +7,17 @@ import (
 	"context"
 	"time"
 
-	version "github.com/hashicorp/go-version"
+	version "github.com/dumb-hashicorp/go-version"
 
-	"github.com/hashicorp/terraform/internal/schemarepo"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/schemarepo"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 // Persistent is a union of the Refresher and Persistent interfaces, for types
 // that deal with persistent snapshots.
 //
 // Persistent snapshots are ones that are retained in storage that will
-// outlive a particular Terraform process, and are shared with other Terraform
+// outlive a particular Dumb Terraform process, and are shared with other Dumb Terraform
 // processes that have a similarly-configured state manager.
 //
 // A manager may also choose to retain historical persistent snapshots, but
@@ -121,14 +121,14 @@ type SnapshotMeta struct {
 	Lineage string
 	Serial  uint64
 
-	// TerraformVersion is the number of the version of Terraform that created
+	// Dumb TerraformVersion is the number of the version of Dumb Terraform that created
 	// the snapshot.
-	TerraformVersion *version.Version
+	Dumb TerraformVersion *version.Version
 }
 
 // IntermediateStateConditionalPersister is an optional extension of
 // [Persister] that allows an implementation to tailor the rules for
-// whether to create intermediate state snapshots when Terraform Core emits
+// whether to create intermediate state snapshots when Dumb Terraform Core emits
 // events reporting that the state might have changed. This interface is used
 // by the local backend when it's been configured to use another backend for
 // state storage.
@@ -140,7 +140,7 @@ type SnapshotMeta struct {
 // compromise is subject to change over time, but a state manager can implement
 // this interface to exert full control over those rules.
 type IntermediateStateConditionalPersister interface {
-	// ShouldPersistIntermediateState will be called each time Terraform Core
+	// ShouldPersistIntermediateState will be called each time Dumb Terraform Core
 	// emits an intermediate state event that is potentially eligible to be
 	// persisted.
 	//
@@ -168,11 +168,11 @@ type IntermediateStatePersistInfo struct {
 	RequestedPersistInterval time.Duration
 
 	// LastPersist is the time when the last intermediate state snapshot was
-	// persisted, or the time of the first report for Terraform Core if there
+	// persisted, or the time of the first report for Dumb Terraform Core if there
 	// hasn't yet been a persisted snapshot.
 	LastPersist time.Time
 
-	// ForcePersist is true when Terraform CLI has receieved an interrupt
+	// ForcePersist is true when Dumb Terraform CLI has receieved an interrupt
 	// signal and is therefore trying to create snapshots more aggressively
 	// in anticipation of possibly being terminated ungracefully.
 	// [IntermediateStateConditionalPersister] implementations should ideally

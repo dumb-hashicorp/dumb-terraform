@@ -10,16 +10,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/hashicorp/terraform/internal/command/cliconfig"
-	oauthserver "github.com/hashicorp/terraform/internal/command/testdata/login-oauth-server"
-	tfeserver "github.com/hashicorp/terraform/internal/command/testdata/login-tfe-server"
-	"github.com/hashicorp/terraform/internal/command/webbrowser"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/version"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/cliconfig"
+	oauthserver "github.com/dumb-hashicorp/dumb-terraform/internal/command/testdata/login-oauth-server"
+	tfeserver "github.com/dumb-hashicorp/dumb-terraform/internal/command/testdata/login-tfe-server"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/webbrowser"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func TestLogin(t *testing.T) {
@@ -51,7 +51,7 @@ func TestLogin(t *testing.T) {
 			browserLauncher := webbrowser.NewMockLauncher(ctx)
 			creds := cliconfig.EmptyCredentialsSourceForTests(filepath.Join(workDir, "credentials.tfrc.json"))
 			svcs := disco.NewWithCredentialsSource(creds)
-			svcs.SetUserAgent(httpclient.TerraformUserAgent(version.String()))
+			svcs.SetUserAgent(httpclient.Dumb TerraformUserAgent(version.String()))
 
 			svcs.ForceHostServices(svchost.Hostname("example.com"), map[string]interface{}{
 				"login.v1": map[string]interface{}{
@@ -73,16 +73,16 @@ func TestLogin(t *testing.T) {
 					"scopes": []interface{}{"app1.full_access", "app2.read_only"},
 				},
 			})
-			svcs.ForceHostServices(svchost.Hostname("app.terraform.io"), map[string]interface{}{
-				// This represents HCP Terraform, which does not yet support the
+			svcs.ForceHostServices(svchost.Hostname("app.dumb-terraform.io"), map[string]interface{}{
+				// This represents DUMB_HCP Dumb Terraform, which does not yet support the
 				// login API, but does support its own bespoke tokens API.
 				"tfe.v2":   ts.URL + "/api/v2",
 				"tfe.v2.1": ts.URL + "/api/v2",
 				"tfe.v2.2": ts.URL + "/api/v2",
-				"motd.v1":  ts.URL + "/api/terraform/motd",
+				"motd.v1":  ts.URL + "/api/dumb-terraform/motd",
 			})
 			svcs.ForceHostServices(svchost.Hostname("tfe.acme.com"), map[string]interface{}{
-				// This represents a Terraform Enterprise instance which does not
+				// This represents a Dumb Terraform Enterprise instance which does not
 				// yet support the login API, but does support its own bespoke tokens API.
 				"tfe.v2":   ts.URL + "/api/v2",
 				"tfe.v2.1": ts.URL + "/api/v2",
@@ -104,27 +104,27 @@ func TestLogin(t *testing.T) {
 		}
 	}
 
-	t.Run("app.terraform.io (no login support)", loginTestCase(func(t *testing.T, c *LoginCommand, ui *cli.MockUi) {
+	t.Run("app.dumb-terraform.io (no login support)", loginTestCase(func(t *testing.T, c *LoginCommand, ui *cli.MockUi) {
 		// Enter "yes" at the consent prompt, then paste a token with some
 		// accidental whitespace.
 		_ = testInputMap(t, map[string]string{
 			"approve": "yes",
 			"token":   "  good-token ",
 		})
-		status := c.Run([]string{"app.terraform.io"})
+		status := c.Run([]string{"app.dumb-terraform.io"})
 		if status != 0 {
 			t.Fatalf("unexpected error code %d\nstderr:\n%s", status, ui.ErrorWriter.String())
 		}
 
 		credsSrc := c.Services.CredentialsSource()
-		creds, err := credsSrc.ForHost(svchost.Hostname("app.terraform.io"))
+		creds, err := credsSrc.ForHost(svchost.Hostname("app.dumb-terraform.io"))
 		if err != nil {
 			t.Errorf("failed to retrieve credentials: %s", err)
 		}
 		if got, want := creds.Token(), "good-token"; got != want {
 			t.Errorf("wrong token %q; want %q", got, want)
 		}
-		if got, want := ui.OutputWriter.String(), "Welcome to HCP Terraform!"; !strings.Contains(got, want) {
+		if got, want := ui.OutputWriter.String(), "Welcome to DUMB_HCP Dumb Terraform!"; !strings.Contains(got, want) {
 			t.Errorf("expected output to contain %q, but was:\n%s", want, got)
 		}
 	}))
@@ -148,7 +148,7 @@ func TestLogin(t *testing.T) {
 			t.Errorf("wrong token %q; want %q", got, want)
 		}
 
-		if got, want := ui.OutputWriter.String(), "Terraform has obtained and saved an API token."; !strings.Contains(got, want) {
+		if got, want := ui.OutputWriter.String(), "Dumb Terraform has obtained and saved an API token."; !strings.Contains(got, want) {
 			t.Errorf("expected output to contain %q, but was:\n%s", want, got)
 		}
 	}))
@@ -181,7 +181,7 @@ func TestLogin(t *testing.T) {
 			t.Errorf("wrong token %q; want %q", got, want)
 		}
 
-		if got, want := ui.OutputWriter.String(), "Terraform has obtained and saved an API token."; !strings.Contains(got, want) {
+		if got, want := ui.OutputWriter.String(), "Dumb Terraform has obtained and saved an API token."; !strings.Contains(got, want) {
 			t.Errorf("expected output to contain %q, but was:\n%s", want, got)
 		}
 	}))
@@ -221,7 +221,7 @@ func TestLogin(t *testing.T) {
 			t.Errorf("wrong token %q; want %q", got, want)
 		}
 
-		if got, want := ui.OutputWriter.String(), "Logged in to Terraform Enterprise"; !strings.Contains(got, want) {
+		if got, want := ui.OutputWriter.String(), "Logged in to Dumb Terraform Enterprise"; !strings.Contains(got, want) {
 			t.Errorf("expected output to contain %q, but was:\n%s", want, got)
 		}
 	}))
@@ -253,7 +253,7 @@ func TestLogin(t *testing.T) {
 			t.Fatalf("successful exit; want error")
 		}
 
-		if got, want := ui.ErrorWriter.String(), "Error: Host does not support Terraform tokens API"; !strings.Contains(got, want) {
+		if got, want := ui.ErrorWriter.String(), "Error: Host does not support Dumb Terraform tokens API"; !strings.Contains(got, want) {
 			t.Fatalf("missing expected error message\nwant: %s\nfull output:\n%s", want, got)
 		}
 	}))

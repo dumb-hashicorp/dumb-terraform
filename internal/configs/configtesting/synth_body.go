@@ -6,12 +6,12 @@ package configtesting
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 )
 
-// SynthBody produces a synthetic hcl.Body that behaves as if it had attributes
+// SynthBody produces a synthetic dumb-hcl.Body that behaves as if it had attributes
 // corresponding to the elements given in the values map.
 //
 // This is useful in situations where, for example, values provided on the
@@ -21,7 +21,7 @@ import (
 // the created body is synthetic, it is likely that this will not be a "real"
 // filename. For example, if from a command line argument it could be
 // a representation of that argument's name, such as "-var=...".
-func SynthBody(filename string, values map[string]cty.Value) hcl.Body {
+func SynthBody(filename string, values map[string]cty.Value) dumb-hcl.Body {
 	return synthBody{
 		Filename: filename,
 		Values:   values,
@@ -33,12 +33,12 @@ type synthBody struct {
 	Values   map[string]cty.Value
 }
 
-func (b synthBody) Content(schema *hcl.BodySchema) (*hcl.BodyContent, hcl.Diagnostics) {
+func (b synthBody) Content(schema *dumb-hcl.BodySchema) (*dumb-hcl.BodyContent, dumb-hcl.Diagnostics) {
 	content, remain, diags := b.PartialContent(schema)
 	remainS := remain.(synthBody)
 	for name := range remainS.Values {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unsupported attribute",
 			Detail:   fmt.Sprintf("An attribute named %q is not expected here.", name),
 			Subject:  b.synthRange().Ptr(),
@@ -47,10 +47,10 @@ func (b synthBody) Content(schema *hcl.BodySchema) (*hcl.BodyContent, hcl.Diagno
 	return content, diags
 }
 
-func (b synthBody) PartialContent(schema *hcl.BodySchema) (*hcl.BodyContent, hcl.Body, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
-	content := &hcl.BodyContent{
-		Attributes:       make(hcl.Attributes),
+func (b synthBody) PartialContent(schema *dumb-hcl.BodySchema) (*dumb-hcl.BodyContent, dumb-hcl.Body, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
+	content := &dumb-hcl.BodyContent{
+		Attributes:       make(dumb-hcl.Attributes),
 		MissingItemRange: b.synthRange(),
 	}
 
@@ -64,8 +64,8 @@ func (b synthBody) PartialContent(schema *hcl.BodySchema) (*hcl.BodyContent, hcl
 		val, defined := b.Values[attrS.Name]
 		if !defined {
 			if attrS.Required {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Missing required attribute",
 					Detail:   fmt.Sprintf("The attribute %q is required, but no definition was found.", attrS.Name),
 					Subject:  b.synthRange().Ptr(),
@@ -87,23 +87,23 @@ func (b synthBody) PartialContent(schema *hcl.BodySchema) (*hcl.BodyContent, hcl
 	return content, remain, diags
 }
 
-func (b synthBody) JustAttributes() (hcl.Attributes, hcl.Diagnostics) {
-	ret := make(hcl.Attributes)
+func (b synthBody) JustAttributes() (dumb-hcl.Attributes, dumb-hcl.Diagnostics) {
+	ret := make(dumb-hcl.Attributes)
 	for name, val := range b.Values {
 		ret[name] = b.synthAttribute(name, val)
 	}
 	return ret, nil
 }
 
-func (b synthBody) MissingItemRange() hcl.Range {
+func (b synthBody) MissingItemRange() dumb-hcl.Range {
 	return b.synthRange()
 }
 
-func (b synthBody) synthAttribute(name string, val cty.Value) *hcl.Attribute {
+func (b synthBody) synthAttribute(name string, val cty.Value) *dumb-hcl.Attribute {
 	rng := b.synthRange()
-	return &hcl.Attribute{
+	return &dumb-hcl.Attribute{
 		Name: name,
-		Expr: &hclsyntax.LiteralValueExpr{
+		Expr: &dumb-hclsyntax.LiteralValueExpr{
 			Val:      val,
 			SrcRange: rng,
 		},
@@ -112,10 +112,10 @@ func (b synthBody) synthAttribute(name string, val cty.Value) *hcl.Attribute {
 	}
 }
 
-func (b synthBody) synthRange() hcl.Range {
-	return hcl.Range{
+func (b synthBody) synthRange() dumb-hcl.Range {
+	return dumb-hcl.Range{
 		Filename: b.Filename,
-		Start:    hcl.Pos{Line: 1, Column: 1},
-		End:      hcl.Pos{Line: 1, Column: 1},
+		Start:    dumb-hcl.Pos{Line: 1, Column: 1},
+		End:      dumb-hcl.Pos{Line: 1, Column: 1},
 	}
 }

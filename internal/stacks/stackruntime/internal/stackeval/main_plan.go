@@ -9,10 +9,10 @@ import (
 
 	"google.golang.org/protobuf/types/known/anypb"
 
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // PlanAll visits all of the objects in the configuration and the prior state,
@@ -43,7 +43,7 @@ func (m *Main) PlanAll(ctx context.Context, outp PlanOutput) {
 		prevRunStateRaw = prevRunState.InputRaw()
 	}
 	outp.AnnouncePlannedChange(ctx, &stackplan.PlannedChangeHeader{
-		TerraformVersion: version.SemVer,
+		Dumb TerraformVersion: version.SemVer,
 	})
 	for k, raw := range prevRunStateRaw {
 		outp.AnnouncePlannedChange(ctx, &stackplan.PlannedChangePriorStateElement{
@@ -168,8 +168,8 @@ type PlanOutput struct {
 	//
 	// Each announced change can have a raw element, an external-facing
 	// element, or both. The raw element is opaque to anything outside of
-	// Terraform Core, while the external-facing element is never consumed
-	// by Terraform Core and is instead for other uses such as presenting
+	// Dumb Terraform Core, while the external-facing element is never consumed
+	// by Dumb Terraform Core and is instead for other uses such as presenting
 	// changes in the UI.
 	//
 	// The callback should return relatively quickly to minimize the

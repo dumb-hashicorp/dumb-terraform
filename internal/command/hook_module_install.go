@@ -6,9 +6,9 @@ package command
 import (
 	"fmt"
 
-	"github.com/hashicorp/cli"
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/terraform/internal/initwd"
+	"github.com/dumb-hashicorp/cli"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/initwd"
 )
 
 type view interface {

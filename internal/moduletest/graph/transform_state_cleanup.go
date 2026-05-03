@@ -6,10 +6,10 @@ package graph
 import (
 	"slices"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/dag"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dag"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 var (
@@ -25,7 +25,7 @@ type Subgrapher interface {
 // resources defined in the state files created by the test runs.
 type TeardownSubgraph struct {
 	opts   *graphOptions
-	parent *terraform.Graph
+	parent *dumb-terraform.Graph
 	mode   moduletest.CommandMode
 }
 
@@ -55,11 +55,11 @@ func (b *TeardownSubgraph) Execute(ctx *EvalContext) {
 	}
 
 	// Create a new graph for the cleanup nodes
-	g, diags := (&terraform.BasicGraphBuilder{
-		Steps: []terraform.GraphTransformer{
+	g, diags := (&dumb-terraform.BasicGraphBuilder{
+		Steps: []dumb-terraform.GraphTransformer{
 			&TestStateCleanupTransformer{opts: b.opts, runStateRefs: runRefMap},
 			&CloseTestGraphTransformer{},
-			&terraform.TransitiveReductionTransformer{},
+			&dumb-terraform.TransitiveReductionTransformer{},
 		},
 		Name: "TeardownSubgraph",
 	}).Build(addrs.RootModuleInstance)
@@ -82,7 +82,7 @@ type TestStateCleanupTransformer struct {
 	runStateRefs map[addrs.Run][]string
 }
 
-func (t *TestStateCleanupTransformer) Transform(g *terraform.Graph) error {
+func (t *TestStateCleanupTransformer) Transform(g *dumb-terraform.Graph) error {
 	cleanupMap := make(map[string]*NodeStateCleanup)
 	arr := make([]*NodeStateCleanup, 0, len(t.opts.File.Runs))
 
@@ -119,7 +119,7 @@ func (t *TestStateCleanupTransformer) Transform(g *terraform.Graph) error {
 	return nil
 }
 
-func (t *TestStateCleanupTransformer) depthFirstTraverse(g *terraform.Graph, node *NodeStateCleanup, visited map[string]bool, cleanupNodes map[string]*NodeStateCleanup, depStateKeys map[string][]string) {
+func (t *TestStateCleanupTransformer) depthFirstTraverse(g *dumb-terraform.Graph, node *NodeStateCleanup, visited map[string]bool, cleanupNodes map[string]*NodeStateCleanup, depStateKeys map[string][]string) {
 	if visited[node.stateKey] {
 		return
 	}

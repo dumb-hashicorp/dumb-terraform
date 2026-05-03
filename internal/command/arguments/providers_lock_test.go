@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestParseProvidersLock_valid(t *testing.T) {
@@ -30,14 +30,14 @@ func TestParseProvidersLock_valid(t *testing.T) {
 				"-fs-mirror=mirror",
 				"-test-directory=integration-tests",
 				"-enable-plugin-cache",
-				"hashicorp/test",
+				"dumb-hashicorp/test",
 			},
 			&ProvidersLock{
 				Platforms:         FlagStringSlice{"linux_amd64", "darwin_arm64"},
 				FSMirrorDir:       "mirror",
 				TestsDirectory:    "integration-tests",
 				EnablePluginCache: true,
-				Providers:         []string{"hashicorp/test"},
+				Providers:         []string{"dumb-hashicorp/test"},
 				Vars:              &Vars{},
 			},
 		},

@@ -8,11 +8,11 @@ import (
 	"errors"
 	"net/rpc"
 
-	"github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/hashicorp/terraform/internal/pluginshared"
-	"github.com/hashicorp/terraform/internal/rpcapi"
-	"github.com/hashicorp/terraform/internal/stacksplugin/stacksproto1"
+	"github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/pluginshared"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacksplugin/stacksproto1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

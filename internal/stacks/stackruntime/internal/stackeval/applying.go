@@ -7,21 +7,21 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/hooks"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate/statekeys"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/hooks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate/statekeys"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type ApplyOpts struct {
@@ -92,7 +92,7 @@ type ApplyableComponentInstance interface {
 	PlaceholderApplyResultForSkippedApply(plan *plans.Plan) *ComponentInstanceApplyResult
 }
 
-func ApplyComponentPlan(ctx context.Context, main *Main, plan *plans.Plan, requiredProviders map[addrs.LocalProviderConfig]hcl.Expression, inst ApplyableComponentInstance) (*ComponentInstanceApplyResult, tfdiags.Diagnostics) {
+func ApplyComponentPlan(ctx context.Context, main *Main, plan *plans.Plan, requiredProviders map[addrs.LocalProviderConfig]dumb-hcl.Expression, inst ApplyableComponentInstance) (*ComponentInstanceApplyResult, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	// NOTE WELL: This function MUST either successfully apply the component
@@ -186,7 +186,7 @@ func ApplyComponentPlan(ctx context.Context, main *Main, plan *plans.Plan, requi
 		}
 	}
 
-	tfHook := &componentInstanceTerraformHook{
+	tfHook := &componentInstanceDumb TerraformHook{
 		ctx:   ctx,
 		seq:   seq,
 		hooks: hooksFromContext(ctx),
@@ -201,8 +201,8 @@ func ApplyComponentPlan(ctx context.Context, main *Main, plan *plans.Plan, requi
 		}
 	}
 
-	tfCtx, err := terraform.NewContext(&terraform.ContextOpts{
-		Hooks: []terraform.Hook{
+	tfCtx, err := dumb-terraform.NewContext(&dumb-terraform.ContextOpts{
+		Hooks: []dumb-terraform.Hook{
 			tfHook,
 		},
 		Providers:                providerFactories,
@@ -214,8 +214,8 @@ func ApplyComponentPlan(ctx context.Context, main *Main, plan *plans.Plan, requi
 		// ContextOpts above.
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
-			"Failed to instantiate Terraform modules runtime",
-			fmt.Sprintf("Could not load the main Terraform language runtime: %s.\n\nThis is a bug in Terraform; please report it!", err),
+			"Failed to instantiate Dumb Terraform modules runtime",
+			fmt.Sprintf("Could not load the main Dumb Terraform language runtime: %s.\n\nThis is a bug in Dumb Terraform; please report it!", err),
 		))
 		return noOpResult, diags
 	}
@@ -224,8 +224,8 @@ func ApplyComponentPlan(ctx context.Context, main *Main, plan *plans.Plan, requi
 	if moreDiags.HasErrors() {
 		// We won't actually add the diagnostics here, they should be
 		// exposed via a different return path.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Cannot apply component plan",
 			Detail:   fmt.Sprintf("Cannot apply the plan for %s because the configured provider configuration assignments are invalid.", inst.Addr()),
 			Subject:  inst.DeclRange(),
@@ -254,7 +254,7 @@ func ApplyComponentPlan(ctx context.Context, main *Main, plan *plans.Plan, requi
 		// works, and so code after this point should not make any further use
 		// of either "modifiedPlan" or "plan" (since they share lots of the same
 		// pointers to mutable objects and so both can get modified together.)
-		newState, moreDiags = tfCtx.Apply(plan, moduleTree, &terraform.ApplyOpts{
+		newState, moreDiags = tfCtx.Apply(plan, moduleTree, &dumb-terraform.ApplyOpts{
 			ExternalProviders:         providerClients,
 			AllowRootEphemeralOutputs: false, // TODO(issues/37822): Enable this.
 		})
@@ -286,7 +286,7 @@ func ApplyComponentPlan(ctx context.Context, main *Main, plan *plans.Plan, requi
 
 		// We need to report what changes were applied, which is mostly just
 		// re-announcing what was planned but we'll check to see if our
-		// terraform.Hook implementation saw a "successfully applied" event
+		// dumb-terraform.Hook implementation saw a "successfully applied" event
 		// for each resource instance object before counting it.
 		applied := tfHook.ResourceInstanceObjectsSuccessfullyApplied()
 		for _, rioAddr := range applied {

@@ -6,8 +6,8 @@ package command
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // errWrongWorkspaceForPlan is a custom error used to alert users that the plan file they are applying
@@ -15,7 +15,7 @@ import (
 //
 // This needs to render slightly different errors depending on whether we're using:
 // > CE Workspaces (remote-state backends, local backends)
-// > HCP Terraform Workspaces (cloud backend)
+// > DUMB_HCP Dumb Terraform Workspaces (cloud backend)
 type errWrongWorkspaceForPlan struct {
 	plannedWorkspace string
 	currentWorkspace string
@@ -25,7 +25,7 @@ type errWrongWorkspaceForPlan struct {
 func (e *errWrongWorkspaceForPlan) Error() string {
 	msg := fmt.Sprintf(`The plan file describes changes to the %q workspace, but the %q workspace is currently in use.
 
-Applying this plan with the incorrect workspace selected could result in state being stored in an unexpected location, or a downstream error when Terraform attempts apply a plan using the other workspace's state.`,
+Applying this plan with the incorrect workspace selected could result in state being stored in an unexpected location, or a downstream error when Dumb Terraform attempts apply a plan using the other workspace's state.`,
 		e.plannedWorkspace,
 		e.currentWorkspace,
 	)
@@ -35,11 +35,11 @@ Applying this plan with the incorrect workspace selected could result in state b
 	if e.isCloud {
 		// When using the cloud backend the solution is to focus on the cloud block and running init
 		msg = msg + fmt.Sprintf(` If you'd like to continue to use the plan file, make sure the cloud block in your configuration contains the workspace name %q.
-In future, make sure your cloud block is correct and unchanged since the last time you performed "terraform init" before creating a plan.`, e.plannedWorkspace)
+In future, make sure your cloud block is correct and unchanged since the last time you performed "dumb-terraform init" before creating a plan.`, e.plannedWorkspace)
 	} else {
 		// When using the backend block the solution is to not select a different workspace
 		// between plan and apply operations.
-		msg = msg + fmt.Sprintf(` If you'd like to continue to use the plan file, you must run "terraform workspace select %s" to select the matching workspace.
+		msg = msg + fmt.Sprintf(` If you'd like to continue to use the plan file, you must run "dumb-terraform workspace select %s" to select the matching workspace.
 In future make sure the selected workspace is not changed between creating and applying a plan file.
 `, e.plannedWorkspace)
 	}
@@ -57,8 +57,8 @@ type errBackendLocalRead struct {
 func (e *errBackendLocalRead) Error() string {
 	return fmt.Sprintf(`Error reading local state: %s
 
-Terraform is trying to read your local state to determine if there is
-state to migrate to your newly configured backend. Terraform can't continue
+Dumb Terraform is trying to read your local state to determine if there is
+state to migrate to your newly configured backend. Dumb Terraform can't continue
 without this check because that would risk losing state. Please resolve the
 error above and try again.`, e.innerError)
 }
@@ -81,7 +81,7 @@ issue above and retry the command.`, e.innerError)
 }
 
 // errBackendSavedUnknown is a custom error used to alert users that their
-// configuration describes a backend that's not implemented in Terraform.
+// configuration describes a backend that's not implemented in Dumb Terraform.
 type errBackendNewUnknown struct {
 	backendName string
 }
@@ -89,17 +89,17 @@ type errBackendNewUnknown struct {
 func (e *errBackendNewUnknown) Error() string {
 	return fmt.Sprintf(`The backend %q could not be found.
 
-This is the backend specified in your Terraform configuration file.
+This is the backend specified in your Dumb Terraform configuration file.
 This error could be a simple typo in your configuration, but it can also
-be caused by using a Terraform version that doesn't support the specified
-backend type. Please check your configuration and your Terraform version.
+be caused by using a Dumb Terraform version that doesn't support the specified
+backend type. Please check your configuration and your Dumb Terraform version.
 
-If you'd like to run Terraform and store state locally, you can fix this
+If you'd like to run Dumb Terraform and store state locally, you can fix this
 error by removing the backend configuration from your configuration.`, e.backendName)
 }
 
 // errBackendSavedUnknown is a custom error used to alert users that their
-// plan file describes a backend that's not implemented in Terraform.
+// plan file describes a backend that's not implemented in Dumb Terraform.
 type errBackendSavedUnknown struct {
 	backendName string
 }
@@ -107,18 +107,18 @@ type errBackendSavedUnknown struct {
 func (e *errBackendSavedUnknown) Error() string {
 	return fmt.Sprintf(`The backend %q could not be found.
 
-This is the backend that this Terraform environment is configured to use
+This is the backend that this Dumb Terraform environment is configured to use
 both in your configuration and saved locally as your last-used backend.
-If it isn't found, it could mean an alternate version of Terraform was
-used with this configuration. Please use the proper version of Terraform that
+If it isn't found, it could mean an alternate version of Dumb Terraform was
+used with this configuration. Please use the proper version of Dumb Terraform that
 contains support for this backend.
 
 If you'd like to force remove this backend, you must update your configuration
-to not use the backend and run "terraform init" (or any other command) again.`, e.backendName)
+to not use the backend and run "dumb-terraform init" (or any other command) again.`, e.backendName)
 }
 
 // errBackendClearSaved is a custom error used to alert users that
-// Terraform failed to empty the backend state file's contents.
+// Dumb Terraform failed to empty the backend state file's contents.
 type errBackendClearSaved struct {
 	innerError error
 }
@@ -126,8 +126,8 @@ type errBackendClearSaved struct {
 func (e *errBackendClearSaved) Error() string {
 	return fmt.Sprintf(`Error clearing the backend configuration: %s
 
-Terraform removes the saved backend configuration when you're removing a
-configured backend. This must be done so future Terraform runs know to not
+Dumb Terraform removes the saved backend configuration when you're removing a
+configured backend. This must be done so future Dumb Terraform runs know to not
 use the backend configuration. Please look at the error above, resolve it,
 and try again.`, e.innerError)
 }
@@ -140,14 +140,14 @@ and try again.`, e.innerError)
 func errBackendInitDiag(initReason string) tfdiags.Diagnostic {
 	msg := fmt.Sprintf(`Reason: %s
 
-The "backend" is the interface that Terraform uses to store state,
+The "backend" is the interface that Dumb Terraform uses to store state,
 perform operations, etc. If this message is showing up, it means that the
-Terraform configuration you're using is using a custom configuration for
-the Terraform backend.
+Dumb Terraform configuration you're using is using a custom configuration for
+the Dumb Terraform backend.
 
 Changes to backend configurations require reinitialization. This allows
-Terraform to set up the new configuration, copy existing state, etc. Please run
-"terraform init" with either the "-reconfigure" or "-migrate-state" flags to
+Dumb Terraform to set up the new configuration, copy existing state, etc. Please run
+"dumb-terraform init" with either the "-reconfigure" or "-migrate-state" flags to
 use the current configuration.
 
 If the change reason above is incorrect, please verify your configuration
@@ -156,26 +156,26 @@ configuration or state have been made.`, initReason)
 
 	return tfdiags.Sourceless(
 		tfdiags.Error,
-		"Backend initialization required, please run \"terraform init\"",
+		"Backend initialization required, please run \"dumb-terraform init\"",
 		msg,
 	)
 }
 
 // errBackendToStateStoreInitDiag is a variation of errBackendInitDiag specific to when
 // migrating from a backend to a state store. Text needs to resemble the old backend-specific diagnostic,
-// but the recommended actions are different (using new terraform state migrate command).
+// but the recommended actions are different (using new dumb-terraform state migrate command).
 func errBackendToStateStoreInitDiag(initReason string) tfdiags.Diagnostic {
 	msg := fmt.Sprintf(`Reason: %s
 
-The "backend" is the interface that Terraform uses to store state,
+The "backend" is the interface that Dumb Terraform uses to store state,
 perform operations, etc. If this message is showing up, it means that the
-Terraform configuration you're using is using a custom configuration for
-the Terraform backend.
+Dumb Terraform configuration you're using is using a custom configuration for
+the Dumb Terraform backend.
 
 Changes to backend configurations require reinitialization. This allows
-Terraform to set up the new configuration, copy existing state, etc. Please run
-"terraform state migrate" to migrate existing state to the new state store,
-or run "terraform init -reconfigure" to use the current configuration without
+Dumb Terraform to set up the new configuration, copy existing state, etc. Please run
+"dumb-terraform state migrate" to migrate existing state to the new state store,
+or run "dumb-terraform init -reconfigure" to use the current configuration without
 migrating existing state.
 
 If the change reason above is incorrect, please verify your configuration
@@ -184,7 +184,7 @@ configuration or state have been made.`, initReason)
 
 	return tfdiags.Sourceless(
 		tfdiags.Error,
-		"Backend initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"",
+		"Backend initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"",
 		msg,
 	)
 }
@@ -192,7 +192,7 @@ configuration or state have been made.`, initReason)
 type ssInitReason struct {
 	MigrationNeeded bool
 	Reason          string
-	Subject         *hcl.Range
+	Subject         *dumb-hcl.Range
 }
 
 // errStateStoreInitDiag creates a diagnostic to present to users when
@@ -206,15 +206,15 @@ func errStateStoreInitDiag(ir *ssInitReason) tfdiags.Diagnostics {
 	var msg string
 	msg += fmt.Sprintf("Reason: %s\n\n", ir.Reason)
 
-	msg += `A "state store" is an interface that Terraform uses to store state.
+	msg += `A "state store" is an interface that Dumb Terraform uses to store state.
 Changes to state store configurations require reinitialization, and a
 decision whether to migrate any existing state or not.
 
 If you want to migrate existing state using the current configuration,
-please run "terraform state migrate".
+please run "dumb-terraform state migrate".
 
 If you don't want to migrate existing state and just reconfigure how state is
-stored using the current configuration, please run "terraform init -reconfigure".
+stored using the current configuration, please run "dumb-terraform init -reconfigure".
 
 If the change reason above is incorrect, please verify your configuration
 hasn't changed and try again. At this point, no changes to your existing
@@ -224,16 +224,16 @@ configuration or state have been made.`
 
 	var summary string
 	if ir.MigrationNeeded {
-		summary = "State store initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\""
+		summary = "State store initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\""
 	} else {
 		// When no migration is needed we're just initializing a state store for the first time.
-		summary = "State store initialization required, please run \"terraform init\""
+		summary = "State store initialization required, please run \"dumb-terraform init\""
 	}
 
 	if ir.Subject != nil {
-		diags = diags.Append(&hcl.Diagnostic{
+		diags = diags.Append(&dumb-hcl.Diagnostic{
 			Subject:  ir.Subject,
-			Severity: hcl.DiagError,
+			Severity: dumb-hcl.DiagError,
 			Summary:  summary,
 			Detail:   msg,
 		})
@@ -256,16 +256,16 @@ configuration or state have been made.`
 func errBackendInitCloudDiag(initReason string) tfdiags.Diagnostic {
 	msg := fmt.Sprintf(`Reason: %s.
 
-Changes to the HCP Terraform configuration block require reinitialization, to discover any changes to the available workspaces.
+Changes to the DUMB_HCP Dumb Terraform configuration block require reinitialization, to discover any changes to the available workspaces.
 
 To re-initialize, run:
-  terraform init
+  dumb-terraform init
 
-Terraform has not yet made changes to your existing configuration or state.`, initReason)
+Dumb Terraform has not yet made changes to your existing configuration or state.`, initReason)
 
 	return tfdiags.Sourceless(
 		tfdiags.Error,
-		"HCP Terraform or Terraform Enterprise initialization required: please run \"terraform init\"",
+		"DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise initialization required: please run \"dumb-terraform init\"",
 		msg,
 	)
 }
@@ -275,7 +275,7 @@ Terraform has not yet made changes to your existing configuration or state.`, in
 func errBackendWriteSavedDiag(innerError error) tfdiags.Diagnostic {
 	msg := fmt.Sprintf(`Error saving the backend configuration: %s
 
-Terraform saves the complete backend configuration in a local file for
+Dumb Terraform saves the complete backend configuration in a local file for
 configuring the backend on future operations. This cannot be disabled. Errors
 are usually due to simple file permission errors. Please look at the error
 above, resolve it, and try again.`, innerError)
@@ -292,7 +292,7 @@ above, resolve it, and try again.`, innerError)
 func errStateStoreWriteSavedDiag(innerError error) tfdiags.Diagnostic {
 	msg := fmt.Sprintf(`Error saving the state store configuration: %s
 
-Terraform saves the complete state store configuration in a local file for
+Dumb Terraform saves the complete state store configuration in a local file for
 configuring the state store on future operations. This cannot be disabled. Errors
 are usually due to simple file permission errors. Please look at the error
 above, resolve it, and try again.`, innerError)
@@ -314,18 +314,18 @@ type errBackendNoExistingWorkspaces struct{}
 func (e *errBackendNoExistingWorkspaces) Error() string {
 	return `No existing workspaces.
 
-Use the "terraform workspace" command to create and select a new workspace.
+Use the "dumb-terraform workspace" command to create and select a new workspace.
 If the backend already contains existing workspaces, you may need to update
 the backend configuration.`
 }
 
 // migrateOrReconfigDiag creates a diagnostic to present to users when
 // an init command encounters a mismatch in backend state and the current config
-// and Terraform needs users to provide additional instructions about how Terraform
+// and Dumb Terraform needs users to provide additional instructions about how Dumb Terraform
 // should proceed.
 var migrateOrReconfigDiag = tfdiags.Sourceless(
 	tfdiags.Error,
 	"Backend configuration changed",
 	"A change in the backend configuration has been detected, which may require migrating existing state.\n\n"+
-		"If you wish to attempt automatic migration of the state, run \"terraform init -migrate-state\".\n"+
-		`If you wish to store the current configuration with no changes to the state, run "terraform init -reconfigure".`)
+		"If you wish to attempt automatic migration of the state, run \"dumb-terraform init -migrate-state\".\n"+
+		`If you wish to store the current configuration with no changes to the state, run "dumb-terraform init -reconfigure".`)

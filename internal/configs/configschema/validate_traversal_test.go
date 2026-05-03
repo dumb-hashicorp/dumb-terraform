@@ -6,8 +6,8 @@ package configschema
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -228,7 +228,7 @@ func TestStaticValidateTraversal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Traversal, func(t *testing.T) {
-			traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(test.Traversal), "", hcl.Pos{Line: 1, Column: 1})
+			traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(test.Traversal), "", dumb-hcl.Pos{Line: 1, Column: 1})
 			for _, diag := range parseDiags {
 				t.Error(diag.Error())
 			}

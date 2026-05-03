@@ -4,7 +4,7 @@
 package states
 
 import (
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // Module is a container for the states of objects within a particular module.

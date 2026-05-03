@@ -6,8 +6,8 @@ package views
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type StateMigrate interface {

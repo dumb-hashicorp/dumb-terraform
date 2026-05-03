@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/spf13/afero"
 )
 
@@ -18,12 +18,12 @@ import (
 type ConfigFileSet struct {
 	Primary  []string // Regular .tf and .tf.json files
 	Override []string // Override files (override.tf or *_override.tf)
-	Tests    []string // Test files (.tftest.hcl or .tftest.json)
-	Queries  []string // Query files (.tfquery.hcl)
+	Tests    []string // Test files (.tftest.dumb-hcl or .tftest.json)
+	Queries  []string // Query files (.tfquery.dumb-hcl)
 }
 
 // FileMatcher is an interface for components that can match and process specific file types
-// in a Terraform module directory.
+// in a Dumb Terraform module directory.
 
 type FileMatcher interface {
 	// Matches returns true if the given filename should be processed by this matcher
@@ -31,7 +31,7 @@ type FileMatcher interface {
 
 	// DirFiles allows the matcher to process files in a directory
 	// only relevant to its type.
-	DirFiles(dir string, cfg *parserConfig, fileSet *ConfigFileSet) hcl.Diagnostics
+	DirFiles(dir string, cfg *parserConfig, fileSet *ConfigFileSet) dumb-hcl.Diagnostics
 }
 
 // Option is a functional option type for configuring the parser
@@ -43,13 +43,13 @@ type parserConfig struct {
 	fs            afero.Afero
 }
 
-// dirFileSet finds Terraform configuration files within directory dir
+// dirFileSet finds Dumb Terraform configuration files within directory dir
 // and returns a ConfigFileSet containing the found files.
 // It uses the given options to determine which types of files to look for
 // and how to process them. The returned ConfigFileSet contains the paths
 // to the found files, categorized by their type (primary, override, test, query).
-func (p *Parser) dirFileSet(dir string, opts ...Option) (ConfigFileSet, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func (p *Parser) dirFileSet(dir string, opts ...Option) (ConfigFileSet, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	fileSet := ConfigFileSet{
 		Primary:  []string{},
 		Override: []string{},
@@ -86,14 +86,14 @@ func (p *Parser) dirFileSet(dir string, opts ...Option) (ConfigFileSet, hcl.Diag
 
 // rootFiles scans the main directory for configuration files
 // and categorizes them using the appropriate file matchers.
-func (p *Parser) rootFiles(dir string, matchers []FileMatcher, fileSet *ConfigFileSet) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (p *Parser) rootFiles(dir string, matchers []FileMatcher, fileSet *ConfigFileSet) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	// Read main directory files
 	infos, err := p.fs.ReadDir(dir)
 	if err != nil {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Failed to read module directory",
 			Detail:   fmt.Sprintf("Module directory %s does not exist or cannot be read.", dir),
 		})
@@ -131,7 +131,7 @@ func (p *Parser) rootFiles(dir string, matchers []FileMatcher, fileSet *ConfigFi
 	return diags
 }
 
-// MatchTestFiles adds a matcher for Terraform test files (.tftest.hcl and .tftest.json)
+// MatchTestFiles adds a matcher for Dumb Terraform test files (.tftest.dumb-hcl and .tftest.json)
 func MatchTestFiles(dir string) Option {
 	return func(o *parserConfig) {
 		o.testDirectory = dir
@@ -139,14 +139,14 @@ func MatchTestFiles(dir string) Option {
 	}
 }
 
-// MatchQueryFiles adds a matcher for Terraform query files (.tfquery.hcl and .tfquery.json)
+// MatchQueryFiles adds a matcher for Dumb Terraform query files (.tfquery.dumb-hcl and .tfquery.json)
 func MatchQueryFiles() Option {
 	return func(o *parserConfig) {
 		o.matchers = append(o.matchers, &queryFiles{})
 	}
 }
 
-// moduleFiles matches regular Terraform configuration files (.tf and .tf.json)
+// moduleFiles matches regular Dumb Terraform configuration files (.tf and .tf.json)
 type moduleFiles struct{}
 
 func (m *moduleFiles) Matches(name string) bool {
@@ -169,19 +169,19 @@ func (m *moduleFiles) isOverride(name string) bool {
 	return isOverride
 }
 
-func (m *moduleFiles) DirFiles(dir string, options *parserConfig, fileSet *ConfigFileSet) hcl.Diagnostics {
+func (m *moduleFiles) DirFiles(dir string, options *parserConfig, fileSet *ConfigFileSet) dumb-hcl.Diagnostics {
 	return nil
 }
 
-// testFiles matches Terraform test files (.tftest.hcl and .tftest.json)
+// testFiles matches Dumb Terraform test files (.tftest.dumb-hcl and .tftest.json)
 type testFiles struct{}
 
 func (t *testFiles) Matches(name string) bool {
-	return strings.HasSuffix(name, ".tftest.hcl") || strings.HasSuffix(name, ".tftest.json")
+	return strings.HasSuffix(name, ".tftest.dumb-hcl") || strings.HasSuffix(name, ".tftest.json")
 }
 
-func (t *testFiles) DirFiles(dir string, opts *parserConfig, fileSet *ConfigFileSet) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (t *testFiles) DirFiles(dir string, opts *parserConfig, fileSet *ConfigFileSet) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	testPath := path.Join(dir, opts.testDirectory)
 	testInfos, err := opts.fs.ReadDir(testPath)
@@ -198,8 +198,8 @@ func (t *testFiles) DirFiles(dir string, opts *parserConfig, fileSet *ConfigFile
 				// default has been requested. If the user is just loading
 				// the default directory then we have no expectation that
 				// it should actually exist.
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Test directory does not exist",
 					Detail:   fmt.Sprintf("Requested test directory %s does not exist.", testPath),
 				})
@@ -207,8 +207,8 @@ func (t *testFiles) DirFiles(dir string, opts *parserConfig, fileSet *ConfigFile
 		} else {
 			// Then there is some other reason we couldn't load. We will
 			// treat this as a full error.
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Failed to read test directory",
 				Detail:   fmt.Sprintf("Test directory %s could not be read: %v.", testPath, err),
 			})
@@ -232,13 +232,13 @@ func (t *testFiles) DirFiles(dir string, opts *parserConfig, fileSet *ConfigFile
 	return diags
 }
 
-// queryFiles matches Terraform query files (.tfquery.hcl and .tfquery.json)
+// queryFiles matches Dumb Terraform query files (.tfquery.dumb-hcl and .tfquery.json)
 type queryFiles struct{}
 
 func (q *queryFiles) Matches(name string) bool {
-	return strings.HasSuffix(name, ".tfquery.hcl") || strings.HasSuffix(name, ".tfquery.json")
+	return strings.HasSuffix(name, ".tfquery.dumb-hcl") || strings.HasSuffix(name, ".tfquery.json")
 }
 
-func (q *queryFiles) DirFiles(dir string, options *parserConfig, fileSet *ConfigFileSet) hcl.Diagnostics {
+func (q *queryFiles) DirFiles(dir string, options *parserConfig, fileSet *ConfigFileSet) dumb-hcl.Diagnostics {
 	return nil
 }

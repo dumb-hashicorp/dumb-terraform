@@ -6,25 +6,25 @@ package configload
 import (
 	"fmt"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
 )
 
 // LoadRootModule reads the root module using the loader's parser options.
-func (l *Loader) LoadRootModule(rootDir string) (*configs.Module, hcl.Diagnostics) {
+func (l *Loader) LoadRootModule(rootDir string) (*configs.Module, dumb-hcl.Diagnostics) {
 	return l.parser.LoadConfigDir(rootDir, l.parserOpts...)
 }
 
 // LoadRootModuleWithTests reads the root module and includes test files from the given directory.
-func (l *Loader) LoadRootModuleWithTests(rootDir string, testDir string) (*configs.Module, hcl.Diagnostics) {
+func (l *Loader) LoadRootModuleWithTests(rootDir string, testDir string) (*configs.Module, dumb-hcl.Diagnostics) {
 	return l.parser.LoadConfigDir(rootDir, append(l.parserOpts, configs.MatchTestFiles(testDir))...)
 }
 
 // LoadExternalMockData reads the external mock data files for the given
 // provider, if they are present.
-func (l *Loader) LoadExternalMockData(provider *configs.Provider) (*configs.MockData, hcl.Diagnostics) {
+func (l *Loader) LoadExternalMockData(provider *configs.Provider) (*configs.MockData, dumb-hcl.Diagnostics) {
 	if len(provider.MockDataExternalSource) == 0 {
 		// We have no external mock data, so don't do anything.
 		return nil, nil
@@ -36,54 +36,54 @@ func (l *Loader) LoadExternalMockData(provider *configs.Provider) (*configs.Mock
 
 // moduleWalkerLoad is a configs.ModuleWalkerFunc for loading modules that
 // are presumed to have already been installed.
-func (l *Loader) moduleWalkerLoad(req *configs.ModuleRequest) (*configs.Module, *version.Version, hcl.Diagnostics) {
+func (l *Loader) moduleWalkerLoad(req *configs.ModuleRequest) (*configs.Module, *version.Version, dumb-hcl.Diagnostics) {
 	// Since we're just loading here, we expect that all referenced modules
 	// will be already installed and described in our manifest. However, we
 	// do verify that the manifest and the configuration are in agreement
-	// so that we can prompt the user to run "terraform init" if not.
+	// so that we can prompt the user to run "dumb-terraform init" if not.
 
 	key := l.modules.manifest.ModuleKey(req.Path)
 	record, exists := l.modules.manifest[key]
 
 	if !exists {
-		return nil, nil, hcl.Diagnostics{
+		return nil, nil, dumb-hcl.Diagnostics{
 			{
-				Severity: hcl.DiagError,
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Module not installed",
-				Detail:   "This module is not yet installed. Run \"terraform init\" to install all modules required by this configuration.",
+				Detail:   "This module is not yet installed. Run \"dumb-terraform init\" to install all modules required by this configuration.",
 				Subject:  &req.CallRange,
 			},
 		}
 	}
 
-	var diags hcl.Diagnostics
+	var diags dumb-hcl.Diagnostics
 
 	// Check for inconsistencies between manifest and config.
 
 	// We ignore a nil SourceAddr here, which represents a failure during
 	// configuration parsing, and will be reported in a diagnostic elsewhere.
 	if req.SourceAddr != nil && req.SourceAddr.String() != record.SourceAddr {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Module source has changed",
-			Detail:   "The source address was changed since this module was installed. Run \"terraform init\" to install all modules required by this configuration.",
+			Detail:   "The source address was changed since this module was installed. Run \"dumb-terraform init\" to install all modules required by this configuration.",
 			Subject:  &req.SourceAddrRange,
 		})
 	}
 	if len(req.VersionConstraint.Required) > 0 && record.Version == nil {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Module version requirements have changed",
-			Detail:   "The version requirements have changed since this module was installed and the installed version is no longer acceptable. Run \"terraform init\" to install all modules required by this configuration.",
+			Detail:   "The version requirements have changed since this module was installed and the installed version is no longer acceptable. Run \"dumb-terraform init\" to install all modules required by this configuration.",
 			Subject:  &req.SourceAddrRange,
 		})
 	}
 	if record.Version != nil && !req.VersionConstraint.Required.Check(record.Version) {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Module version requirements have changed",
 			Detail: fmt.Sprintf(
-				"The version requirements have changed since this module was installed and the installed version (%s) is no longer acceptable. Run \"terraform init\" to install all modules required by this configuration.",
+				"The version requirements have changed since this module was installed and the installed version (%s) is no longer acceptable. Run \"dumb-terraform init\" to install all modules required by this configuration.",
 				record.Version,
 			),
 			Subject: &req.SourceAddrRange,
@@ -97,11 +97,11 @@ func (l *Loader) moduleWalkerLoad(req *configs.ModuleRequest) (*configs.Module, 
 		// cannot be read, so in this case we'll discard any generic diagnostics
 		// returned from LoadConfigDir and produce our own context-sensitive
 		// error message.
-		return nil, nil, hcl.Diagnostics{
+		return nil, nil, dumb-hcl.Diagnostics{
 			{
-				Severity: hcl.DiagError,
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Module not installed",
-				Detail:   fmt.Sprintf("This module's local cache directory %s could not be read. Run \"terraform init\" to install all modules required by this configuration.", record.Dir),
+				Detail:   fmt.Sprintf("This module's local cache directory %s could not be read. Run \"dumb-terraform init\" to install all modules required by this configuration.", record.Dir),
 				Subject:  &req.CallRange,
 			},
 		}

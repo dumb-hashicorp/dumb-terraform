@@ -13,26 +13,26 @@ import (
 	"sort"
 
 	"github.com/apparentlymart/go-versions/versions"
-	plugin "github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
-	"github.com/hashicorp/terraform-svchost/disco"
+	plugin "github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	terraformProvider "github.com/hashicorp/terraform/internal/builtin/providers/terraform"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/logging"
-	tfplugin "github.com/hashicorp/terraform/internal/plugin"
-	tfplugin6 "github.com/hashicorp/terraform/internal/plugin6"
-	"github.com/hashicorp/terraform/internal/providercache"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/dependencies"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	dumb-terraformProvider "github.com/dumb-hashicorp/dumb-terraform/internal/builtin/providers/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	tfplugin "github.com/dumb-hashicorp/dumb-terraform/internal/plugin"
+	tfplugin6 "github.com/dumb-hashicorp/dumb-terraform/internal/plugin6"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providercache"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/dependencies"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 type dependenciesServer struct {
@@ -161,7 +161,7 @@ func (s *dependenciesServer) GetLockedProviderDependencies(ctx context.Context, 
 	}
 
 	providers := locks.AllProviders()
-	protoProviders := make([]*terraform1.ProviderPackage, 0, len(providers))
+	protoProviders := make([]*dumb-terraform1.ProviderPackage, 0, len(providers))
 	for _, lock := range providers {
 		hashes := lock.PreferredHashes()
 		var hashStrs []string
@@ -171,7 +171,7 @@ func (s *dependenciesServer) GetLockedProviderDependencies(ctx context.Context, 
 		for i, hash := range hashes {
 			hashStrs[i] = hash.String()
 		}
-		protoProviders = append(protoProviders, &terraform1.ProviderPackage{
+		protoProviders = append(protoProviders, &dumb-terraform1.ProviderPackage{
 			SourceAddr: lock.Provider().String(),
 			Version:    lock.Version().String(),
 			Hashes:     hashStrs,
@@ -305,7 +305,7 @@ func (s *dependenciesServer) BuildProviderPluginCache(req *dependencies.BuildPro
 						tfdiags.Error,
 						"Built-in provider unavailable",
 						fmt.Sprintf(
-							"Terraform v%s does not support the provider %q.",
+							"Dumb Terraform v%s does not support the provider %q.",
 							version.SemVer.String(), provider.ForDisplay(),
 						),
 					)),
@@ -378,14 +378,14 @@ func (s *dependenciesServer) BuildProviderPluginCache(req *dependencies.BuildPro
 			if authResult != nil {
 				keyID = authResult.KeyID
 				switch {
-				case authResult.SignedByHashiCorp():
+				case authResult.SignedByDumb HashiCorp():
 					protoAuthResult = dependencies.BuildProviderPluginCache_Event_FetchComplete_OFFICIAL_SIGNED
 				default:
 					// TODO: The getproviders.PackageAuthenticationResult type
 					// only exposes the full detail of the signing outcome as
 					// a string intended for direct display in the UI, which
 					// means we can't populate this in full detail. For now
-					// we'll treat anything signed by a non-HashiCorp key as
+					// we'll treat anything signed by a non-Dumb HashiCorp key as
 					// "unknown" and then rationalize this later.
 					protoAuthResult = dependencies.BuildProviderPluginCache_Event_FetchComplete_UNKNOWN
 				}
@@ -486,7 +486,7 @@ func (s *dependenciesServer) GetCachedProviders(ctx context.Context, req *depend
 	}
 
 	avail := cacheDir.AllAvailablePackages()
-	ret := make([]*terraform1.ProviderPackage, 0, len(avail))
+	ret := make([]*dumb-terraform1.ProviderPackage, 0, len(avail))
 	for addr, pkgs := range avail {
 		for _, pkg := range pkgs {
 			hash, err := pkg.Hash()
@@ -500,7 +500,7 @@ func (s *dependenciesServer) GetCachedProviders(ctx context.Context, req *depend
 				protoHashes = append(protoHashes, hash.String())
 			}
 
-			ret = append(ret, &terraform1.ProviderPackage{
+			ret = append(ret, &dumb-terraform1.ProviderPackage{
 				SourceAddr: addr.String(),
 				Version:    pkg.Version.String(),
 				Hashes:     protoHashes,
@@ -514,9 +514,9 @@ func (s *dependenciesServer) GetCachedProviders(ctx context.Context, req *depend
 }
 
 func (s *dependenciesServer) GetBuiltInProviders(ctx context.Context, req *dependencies.GetBuiltInProviders_Request) (*dependencies.GetBuiltInProviders_Response, error) {
-	ret := make([]*terraform1.ProviderPackage, 0, len(builtinProviders))
+	ret := make([]*dumb-terraform1.ProviderPackage, 0, len(builtinProviders))
 	for typeName := range builtinProviders {
-		ret = append(ret, &terraform1.ProviderPackage{
+		ret = append(ret, &dumb-terraform1.ProviderPackage{
 			SourceAddr: addrs.NewBuiltInProvider(typeName).ForDisplay(),
 		})
 	}
@@ -574,7 +574,7 @@ func (s *dependenciesServer) GetProviderSchema(ctx context.Context, req *depende
 	}, nil
 }
 
-func resolveFinalSourceAddr(protoSourceAddr *terraform1.SourceAddress, sources *sourcebundle.Bundle) (sourceaddrs.FinalSource, error) {
+func resolveFinalSourceAddr(protoSourceAddr *dumb-terraform1.SourceAddress, sources *sourcebundle.Bundle) (sourceaddrs.FinalSource, error) {
 	sourceAddr, err := sourceaddrs.ParseSource(protoSourceAddr.Source)
 	if err != nil {
 		return nil, fmt.Errorf("invalid location: %w", err)
@@ -605,27 +605,27 @@ func resolveFinalSourceAddr(protoSourceAddr *terraform1.SourceAddress, sources *
 		// Should not get here; if sourceaddrs gets any new non-final source
 		// types in future then we ought to add a cases for them above at the
 		// same time as upgrading the go-slug dependency.
-		return nil, fmt.Errorf("unsupported source address type %T (this is a bug in Terraform)", sourceAddr)
+		return nil, fmt.Errorf("unsupported source address type %T (this is a bug in Dumb Terraform)", sourceAddr)
 	}
 }
 
 // builtinProviders provides the instantiation functions for each of the
-// built-in providers that are available when using Terraform Core through
+// built-in providers that are available when using Dumb Terraform Core through
 // its RPC API.
 //
 // TODO: Prior to the RPC API the built-in providers were architecturally
-// the responsibility of Terraform CLI, which is a bit strange and means
+// the responsibility of Dumb Terraform CLI, which is a bit strange and means
 // we can't readily share this definition with the CLI-driven usage patterns.
 // In future it would be nice to factor out the table of built-in providers
-// into a common location that both can share, or ideally change Terraform CLI
+// into a common location that both can share, or ideally change Dumb Terraform CLI
 // to consume this RPC API through an internal API bridge so that the
 // architectural divide between CLI and Core is more explicit.
 var builtinProviders map[string]func() providers.Interface
 
 func init() {
 	builtinProviders = map[string]func() providers.Interface{
-		"terraform": func() providers.Interface {
-			return terraformProvider.NewProvider()
+		"dumb-terraform": func() providers.Interface {
+			return dumb-terraformProvider.NewProvider()
 		},
 	}
 }

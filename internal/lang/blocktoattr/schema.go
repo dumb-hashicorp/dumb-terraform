@@ -4,8 +4,8 @@
 package blocktoattr
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -23,8 +23,8 @@ func ambiguousNames(schema *configschema.Block) map[string]struct{} {
 	return ambiguousNames
 }
 
-func effectiveSchema(given *hcl.BodySchema, body hcl.Body, ambiguousNames map[string]struct{}, dynamicExpanded bool) *hcl.BodySchema {
-	ret := &hcl.BodySchema{}
+func effectiveSchema(given *dumb-hcl.BodySchema, body dumb-hcl.Body, ambiguousNames map[string]struct{}, dynamicExpanded bool) *dumb-hcl.BodySchema {
+	ret := &dumb-hcl.BodySchema{}
 
 	appearsAsBlock := make(map[string]struct{})
 	{
@@ -35,11 +35,11 @@ func effectiveSchema(given *hcl.BodySchema, body hcl.Body, ambiguousNames map[st
 		// interpretation and so JSON will always answer yes to both of
 		// these questions and we want to prefer the attribute interpretation
 		// in that case.
-		var probeSchema hcl.BodySchema
+		var probeSchema dumb-hcl.BodySchema
 
 		for name := range ambiguousNames {
-			probeSchema = hcl.BodySchema{
-				Attributes: []hcl.AttributeSchema{
+			probeSchema = dumb-hcl.BodySchema{
+				Attributes: []dumb-hcl.AttributeSchema{
 					{
 						Name: name,
 					},
@@ -50,8 +50,8 @@ func effectiveSchema(given *hcl.BodySchema, body hcl.Body, ambiguousNames map[st
 				// Can decode as an attribute, so we'll go with that.
 				continue
 			}
-			probeSchema = hcl.BodySchema{
-				Blocks: []hcl.BlockHeaderSchema{
+			probeSchema = dumb-hcl.BodySchema{
+				Blocks: []dumb-hcl.BlockHeaderSchema{
 					{
 						Type: name,
 					},
@@ -69,8 +69,8 @@ func effectiveSchema(given *hcl.BodySchema, body hcl.Body, ambiguousNames map[st
 		if !dynamicExpanded {
 			// If we're deciding for a context where dynamic blocks haven't
 			// been expanded yet then we need to probe for those too.
-			probeSchema = hcl.BodySchema{
-				Blocks: []hcl.BlockHeaderSchema{
+			probeSchema = dumb-hcl.BodySchema{
+				Blocks: []dumb-hcl.BlockHeaderSchema{
 					{
 						Type:       "dynamic",
 						LabelNames: []string{"type"},
@@ -88,7 +88,7 @@ func effectiveSchema(given *hcl.BodySchema, body hcl.Body, ambiguousNames map[st
 
 	for _, attrS := range given.Attributes {
 		if _, exists := appearsAsBlock[attrS.Name]; exists {
-			ret.Blocks = append(ret.Blocks, hcl.BlockHeaderSchema{
+			ret.Blocks = append(ret.Blocks, dumb-hcl.BlockHeaderSchema{
 				Type: attrS.Name,
 			})
 		} else {

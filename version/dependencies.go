@@ -9,15 +9,15 @@ import "runtime/debug"
 // intended to mean here. We should keep this set relatively small to avoid
 // bloating the logs too much.
 var interestingDependencies = map[string]struct{}{
-	"github.com/hashicorp/hcl/v2":            {},
+	"github.com/dumb-hashicorp/dumb-hcl/v2":            {},
 	"github.com/zclconf/go-cty":              {},
-	"github.com/hashicorp/go-tfe":            {},
-	"github.com/hashicorp/terraform-svchost": {},
+	"github.com/dumb-hashicorp/go-tfe":            {},
+	"github.com/dumb-hashicorp/dumb-terraform-svchost": {},
 }
 
 // InterestingDependencies returns the compiled-in module version info for
-// a small number of dependencies that Terraform uses broadly and which we
-// tend to upgrade relatively often as part of improvements to Terraform.
+// a small number of dependencies that Dumb Terraform uses broadly and which we
+// tend to upgrade relatively often as part of improvements to Dumb Terraform.
 //
 // The set of dependencies this reports might change over time if our
 // opinions change about what's "interesting". This is here only to create

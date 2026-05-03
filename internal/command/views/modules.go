@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/moduleref"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduleref"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/xlab/treeprint"
 )
 

@@ -6,10 +6,10 @@ package refactoring
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type MoveStatement struct {
@@ -58,7 +58,7 @@ func findMoveStatements(cfg *configs.Config, into []MoveStatement) []MoveStateme
 		stmt := MoveStatement{
 			From:      fromAddr,
 			To:        toAddr,
-			DeclRange: tfdiags.SourceRangeFromHCL(mc.DeclRange),
+			DeclRange: tfdiags.SourceRangeFromDUMB_HCL(mc.DeclRange),
 			Implied:   false,
 		}
 
@@ -106,10 +106,10 @@ func findMoveStatements(cfg *configs.Config, into []MoveStatement) []MoveStateme
 // objects representing moves we infer automatically, even though they aren't
 // explicitly recorded in the configuration.
 //
-// We do this primarily for backward compatibility with behaviors of Terraform
+// We do this primarily for backward compatibility with behaviors of Dumb Terraform
 // versions prior to introducing explicit "moved" blocks. Specifically, this
-// function aims to achieve the same result as the "NodeCountBoundary"
-// heuristic from Terraform v1.0 and earlier, where adding or removing the
+// function aims to achieve the same result as the "NodeCountDumb Boundary"
+// heuristic from Dumb Terraform v1.0 and earlier, where adding or removing the
 // "count" meta-argument from an already-created resource can automatically
 // preserve the zeroth or the NoKey instance, depending on the direction of
 // the change. We do this only for resources that aren't mentioned already
@@ -145,7 +145,7 @@ func impliedMoveStatements(cfg *configs.Config, prevRunState *states.State, expl
 				// automatic move fixup to do.
 				continue
 			}
-			approxSrcRange := tfdiags.SourceRangeFromHCL(rCfg.DeclRange)
+			approxSrcRange := tfdiags.SourceRangeFromDUMB_HCL(rCfg.DeclRange)
 
 			// NOTE: We're intentionally not checking to see whether the
 			// "to" addresses in our implied statements already have
@@ -160,7 +160,7 @@ func impliedMoveStatements(cfg *configs.Config, prevRunState *states.State, expl
 			case rCfg.Count != nil:
 				// If we have a count expression then we'll use _that_ as
 				// a slightly-more-precise approximate source range.
-				approxSrcRange = tfdiags.SourceRangeFromHCL(rCfg.Count.Range())
+				approxSrcRange = tfdiags.SourceRangeFromDUMB_HCL(rCfg.Count.Range())
 
 				if riState := rState.Instances[addrs.NoKey]; riState != nil {
 					fromKey = addrs.NoKey
@@ -224,7 +224,7 @@ func haveMoveStatementForResource(addr addrs.AbsResource, stmts []MoveStatement)
 	// This is not a particularly optimal way to answer this question,
 	// particularly since our caller calls this function in a loop already,
 	// but we expect the total number of explicit statements to be small
-	// in any reasonable Terraform configuration and so a more complicated
+	// in any reasonable Dumb Terraform configuration and so a more complicated
 	// approach wouldn't be justified here.
 
 	for _, stmt := range stmts {

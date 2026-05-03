@@ -1,10 +1,10 @@
-terraform {
+dumb-terraform {
   cloud {
     organization = "foo"
   }
 }
 
-terraform {
+dumb-terraform {
   cloud {
     organization = "bar"
   }

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclparse"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclparse"
 	"github.com/spf13/afero"
 )
 
@@ -19,7 +19,7 @@ import (
 // to create source code snippets in diagnostics, etc.
 type Parser struct {
 	fs afero.Afero
-	p  *hclparse.Parser
+	p  *dumb-hclparse.Parser
 
 	// allowExperiments controls whether we will allow modules to opt in to
 	// experimental language features. In main code this will be set only
@@ -39,12 +39,12 @@ func NewParser(fs afero.Fs) *Parser {
 
 	return &Parser{
 		fs: afero.Afero{Fs: fs},
-		p:  hclparse.NewParser(),
+		p:  dumb-hclparse.NewParser(),
 	}
 }
 
-// LoadHCLFile is a low-level method that reads the file at the given path,
-// parses it, and returns the hcl.Body representing its root. In many cases
+// LoadDUMB_HCLFile is a low-level method that reads the file at the given path,
+// parses it, and returns the dumb-hcl.Body representing its root. In many cases
 // it is better to use one of the other Load*File methods on this type,
 // which additionally decode the root body in some way and return a higher-level
 // construct.
@@ -54,34 +54,34 @@ func NewParser(fs afero.Fs) *Parser {
 // callers may wish to ignore the provided error diagnostics and produce
 // a more context-sensitive error instead.
 //
-// The file will be parsed using the HCL native syntax unless the filename
-// ends with ".json", in which case the HCL JSON syntax will be used.
-func (p *Parser) LoadHCLFile(path string) (hcl.Body, hcl.Diagnostics) {
+// The file will be parsed using the DUMB_HCL native syntax unless the filename
+// ends with ".json", in which case the DUMB_HCL JSON syntax will be used.
+func (p *Parser) LoadDUMB_HCLFile(path string) (dumb-hcl.Body, dumb-hcl.Diagnostics) {
 	src, err := p.fs.ReadFile(path)
 
 	if err != nil {
-		return nil, hcl.Diagnostics{
+		return nil, dumb-hcl.Diagnostics{
 			{
-				Severity: hcl.DiagError,
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Failed to read file",
 				Detail:   fmt.Sprintf("The file %q could not be read.", path),
 			},
 		}
 	}
 
-	var file *hcl.File
-	var diags hcl.Diagnostics
+	var file *dumb-hcl.File
+	var diags dumb-hcl.Diagnostics
 	switch {
 	case strings.HasSuffix(path, ".json"):
 		file, diags = p.p.ParseJSON(src, path)
 	default:
-		file, diags = p.p.ParseHCL(src, path)
+		file, diags = p.p.ParseDUMB_HCL(src, path)
 	}
 
 	// If the returned file or body is nil, then we'll return a non-nil empty
 	// body so we'll meet our contract that nil means an error reading the file.
 	if file == nil || file.Body == nil {
-		return hcl.EmptyBody(), diags
+		return dumb-hcl.EmptyBody(), diags
 	}
 
 	return file.Body, diags
@@ -101,10 +101,10 @@ func (p *Parser) Sources() map[string][]byte {
 // some other way. Most callers should load configuration via methods of
 // Parser, which will update the sources cache automatically.
 func (p *Parser) ForceFileSource(filename string, src []byte) {
-	// We'll make a synthetic hcl.File here just so we can reuse the
+	// We'll make a synthetic dumb-hcl.File here just so we can reuse the
 	// existing cache.
-	p.p.AddFile(filename, &hcl.File{
-		Body:  hcl.EmptyBody(),
+	p.p.AddFile(filename, &dumb-hcl.File{
+		Body:  dumb-hcl.EmptyBody(),
 		Bytes: src,
 	})
 }

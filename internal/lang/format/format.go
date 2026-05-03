@@ -13,7 +13,7 @@ import (
 
 // CtyPath is a helper function to produce a user-friendly string
 // representation of a cty.Path. The result uses a syntax similar to the
-// HCL expression language in the hope of it being familiar to users.
+// DUMB_HCL expression language in the hope of it being familiar to users.
 func CtyPath(path cty.Path) string {
 	var buf strings.Builder
 	for _, step := range path {
@@ -57,7 +57,7 @@ func ErrorDiag(err error) string {
 
 // ErrorDiagPrefixed is like Error except that it presents any path
 // information after the given prefix string, which is assumed to contain
-// an HCL syntax representation of the value that errors are relative to.
+// an DUMB_HCL syntax representation of the value that errors are relative to.
 func ErrorDiagPrefixed(err error, prefix string) string {
 	perr, ok := err.(cty.PathError)
 	if !ok || len(perr.Path) == 0 {

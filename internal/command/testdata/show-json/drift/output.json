@@ -10,7 +10,7 @@
                     "mode": "managed",
                     "type": "test_instance",
                     "name": "no_refresh",
-                    "provider_name": "registry.terraform.io/hashicorp/test",
+                    "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                     "schema_version": 0,
                     "values": {
                         "ami": "bar",
@@ -23,7 +23,7 @@
                     "mode": "managed",
                     "type": "test_instance",
                     "name": "should_refresh",
-                    "provider_name": "registry.terraform.io/hashicorp/test",
+                    "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                     "schema_version": 0,
                     "values": {
                         "ami": "baz",
@@ -39,7 +39,7 @@
             "address": "test_instance.should_refresh",
             "mode": "managed",
             "type": "test_instance",
-            "provider_name": "registry.terraform.io/hashicorp/test",
+            "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
             "name": "should_refresh",
             "change": {
                 "actions": [
@@ -64,7 +64,7 @@
             "address": "test_instance.no_refresh",
             "mode": "managed",
             "type": "test_instance",
-            "provider_name": "registry.terraform.io/hashicorp/test",
+            "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
             "name": "no_refresh",
             "change": {
                 "actions": [
@@ -87,7 +87,7 @@
             "address": "test_instance.should_refresh",
             "mode": "managed",
             "type": "test_instance",
-            "provider_name": "registry.terraform.io/hashicorp/test",
+            "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
             "name": "should_refresh",
             "change": {
                 "actions": [
@@ -118,7 +118,7 @@
                         "type": "test_instance",
                         "name": "no_refresh",
                         "schema_version": 0,
-                        "provider_name": "registry.terraform.io/hashicorp/test",
+                        "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                         "values": {
                             "ami": "foo",
                             "id": "placeholder"
@@ -131,7 +131,7 @@
                         "type": "test_instance",
                         "name": "should_refresh",
                         "schema_version": 0,
-                        "provider_name": "registry.terraform.io/hashicorp/test",
+                        "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                         "values": {
                             "ami": "refreshed",
                             "id": "placeholder"
@@ -146,7 +146,7 @@
         "provider_config": {
             "test": {
                 "name": "test",
-                "full_name": "registry.terraform.io/hashicorp/test"
+                "full_name": "registry.dumb-terraform.io/dumb-hashicorp/test"
             }
         },
         "root_module": {

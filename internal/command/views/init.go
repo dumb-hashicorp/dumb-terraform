@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // The Init view is used for the init command.
@@ -97,7 +97,7 @@ func (v *InitJSON) Output(messageCode InitMessageCode, params ...any) {
 
 	// Logged data includes by default:
 	// @level as "info"
-	// @module as "terraform.ui" (See NewJSONView)
+	// @module as "dumb-terraform.ui" (See NewJSONView)
 	// @timestamp formatted in the default way
 	//
 	// In the method below we:
@@ -175,9 +175,9 @@ var MessageRegistry map[InitMessageCode]InitMessage = map[InitMessageCode]InitMe
 		HumanValue: "[reset][bold]Initializing modules...",
 		JSONValue:  "Initializing modules...",
 	},
-	"initializing_terraform_cloud_message": {
-		HumanValue: "\n[reset][bold]Initializing HCP Terraform...",
-		JSONValue:  "Initializing HCP Terraform...",
+	"initializing_dumb-terraform_cloud_message": {
+		HumanValue: "\n[reset][bold]Initializing DUMB_HCP Dumb Terraform...",
+		JSONValue:  "Initializing DUMB_HCP Dumb Terraform...",
 	},
 	"initializing_backend_message": {
 		HumanValue: "\n[reset][bold]Initializing the backend...",
@@ -212,8 +212,8 @@ var MessageRegistry map[InitMessageCode]InitMessage = map[InitMessageCode]InitMe
 		JSONValue:  "%s v%s: Using previously-installed provider version",
 	},
 	"built_in_provider_available_message": {
-		HumanValue: "- %s is built in to Terraform",
-		JSONValue:  "%s is built in to Terraform",
+		HumanValue: "- %s is built in to Dumb Terraform",
+		JSONValue:  "%s is built in to Dumb Terraform",
 	},
 	"reusing_previous_version_info": {
 		HumanValue: "- Reusing previous version of %s from the dependency lock file",
@@ -256,8 +256,8 @@ var MessageRegistry map[InitMessageCode]InitMessage = map[InitMessageCode]InitMe
 		JSONValue:  errInitConfigErrorJSON,
 	},
 	"state_store_unset": {
-		HumanValue: "[reset][green]\n\nSuccessfully unset the state store %q. Terraform will now operate locally.",
-		JSONValue:  "Successfully unset the state store %q. Terraform will now operate locally.",
+		HumanValue: "[reset][green]\n\nSuccessfully unset the state store %q. Dumb Terraform will now operate locally.",
+		JSONValue:  "Successfully unset the state store %q. Dumb Terraform will now operate locally.",
 	},
 	"state_store_migrate_backend": {
 		HumanValue: "Migrating from %q state store to %q backend.",
@@ -272,16 +272,16 @@ var MessageRegistry map[InitMessageCode]InitMessage = map[InitMessageCode]InitMe
 		JSONValue:  backendConfiguredUnsetJSON,
 	},
 	"backend_migrate_to_cloud": {
-		HumanValue: "Migrating from backend %q to HCP Terraform.",
-		JSONValue:  "Migrating from backend %q to HCP Terraform.",
+		HumanValue: "Migrating from backend %q to DUMB_HCP Dumb Terraform.",
+		JSONValue:  "Migrating from backend %q to DUMB_HCP Dumb Terraform.",
 	},
 	"backend_migrate_from_cloud": {
-		HumanValue: "Migrating from HCP Terraform to backend %q.",
-		JSONValue:  "Migrating from HCP Terraform to backend %q.",
+		HumanValue: "Migrating from DUMB_HCP Dumb Terraform to backend %q.",
+		JSONValue:  "Migrating from DUMB_HCP Dumb Terraform to backend %q.",
 	},
 	"backend_cloud_change_in_place": {
-		HumanValue: "HCP Terraform configuration has changed.",
-		JSONValue:  "HCP Terraform configuration has changed.",
+		HumanValue: "DUMB_HCP Dumb Terraform configuration has changed.",
+		JSONValue:  "DUMB_HCP Dumb Terraform configuration has changed.",
 	},
 	"backend_migrate_type_change": {
 		HumanValue: backendMigrateTypeChangeHuman,
@@ -296,12 +296,12 @@ var MessageRegistry map[InitMessageCode]InitMessage = map[InitMessageCode]InitMe
 		JSONValue:  backendMigrateLocalJSON,
 	},
 	"backend_cloud_migrate_local": {
-		HumanValue: "Migrating from HCP Terraform or Terraform Enterprise to local state.",
-		JSONValue:  "Migrating from HCP Terraform or Terraform Enterprise to local state.",
+		HumanValue: "Migrating from DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise to local state.",
+		JSONValue:  "Migrating from DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise to local state.",
 	},
 	"backend_cloud_migrate_state_store": {
-		HumanValue: "Migrating from HCP Terraform Terraform Enterprise to state store %q.",
-		JSONValue:  "Migrating from HCP Terraform Terraform Enterprise to state store %q.",
+		HumanValue: "Migrating from DUMB_HCP Dumb Terraform Dumb Terraform Enterprise to state store %q.",
+		JSONValue:  "Migrating from DUMB_HCP Dumb Terraform Dumb Terraform Enterprise to state store %q.",
 	},
 	"backend_migrate_state_store": {
 		HumanValue: "Migrating from backend %q to state store %q.",
@@ -335,7 +335,7 @@ const (
 	OutputInitSuccessCLIMessage                 InitMessageCode = "output_init_success_cli_message"
 	OutputInitSuccessCLICloudMessage            InitMessageCode = "output_init_success_cli_cloud_message"
 	UpgradingModulesMessage                     InitMessageCode = "upgrading_modules_message"
-	InitializingTerraformCloudMessage           InitMessageCode = "initializing_terraform_cloud_message"
+	InitializingDumb TerraformCloudMessage           InitMessageCode = "initializing_dumb-terraform_cloud_message"
 	InitializingModulesMessage                  InitMessageCode = "initializing_modules_message"
 	InitializingBackendMessage                  InitMessageCode = "initializing_backend_message"
 	InitializingStateStoreMessage               InitMessageCode = "initializing_state_store_message"
@@ -353,11 +353,11 @@ const (
 	BackendConfiguredSuccessMessage InitMessageCode = "backend_configured_success"
 	// BackendConfiguredUnsetMessage indicates successful backend unsetting
 	BackendConfiguredUnsetMessage InitMessageCode = "backend_configured_unset"
-	// BackendMigrateToCloudMessage indicates migration to HCP Terraform
+	// BackendMigrateToCloudMessage indicates migration to DUMB_HCP Dumb Terraform
 	BackendMigrateToCloudMessage InitMessageCode = "backend_migrate_to_cloud"
-	// BackendMigrateFromCloudMessage indicates migration from HCP Terraform
+	// BackendMigrateFromCloudMessage indicates migration from DUMB_HCP Dumb Terraform
 	BackendMigrateFromCloudMessage InitMessageCode = "backend_migrate_from_cloud"
-	// BackendCloudChangeInPlaceMessage indicates HCP Terraform configuration change
+	// BackendCloudChangeInPlaceMessage indicates DUMB_HCP Dumb Terraform configuration change
 	BackendCloudChangeInPlaceMessage InitMessageCode = "backend_cloud_change_in_place"
 	// BackendMigrateTypeChangeMessage indicates backend type change
 	BackendMigrateTypeChangeMessage InitMessageCode = "backend_migrate_type_change"
@@ -375,7 +375,7 @@ const (
 	StateMigrateLocalMessage InitMessageCode = "state_store_migrate_local"
 	// StateStoreMigrationMessage indicates migration from state store to state store
 	StateStoreMigrationMessage InitMessageCode = "state_store_migrate_state_store"
-	// FindingMatchingVersionMessage indicates that Terraform is looking for a provider version that matches the constraint during installation
+	// FindingMatchingVersionMessage indicates that Dumb Terraform is looking for a provider version that matches the constraint during installation
 	FindingMatchingVersionMessage InitMessageCode = "finding_matching_version_message"
 	// InstalledProviderVersionInfo describes a successfully installed provider along with its version
 	InstalledProviderVersionInfo InitMessageCode = "installed_provider_version_info"
@@ -389,7 +389,7 @@ const (
 	KeyID InitMessageCode = "key_id"
 	// InstallingProviderMessage indicates that a provider is being installed (from a remote location)
 	InstallingProviderMessage InitMessageCode = "installing_provider_message"
-	// FindingLatestVersionMessage indicates that Terraform is looking for the latest version of a provider during installation (no constraint was supplied)
+	// FindingLatestVersionMessage indicates that Dumb Terraform is looking for the latest version of a provider during installation (no constraint was supplied)
 	FindingLatestVersionMessage InitMessageCode = "finding_latest_version_message"
 	// UsingProviderFromCacheDirInfo indicates that a provider is being linked from a system-wide cache
 	UsingProviderFromCacheDirInfo InitMessageCode = "using_provider_from_cache_dir_info"
@@ -398,141 +398,141 @@ const (
 )
 
 const outputInitEmpty = `
-[reset][bold]Terraform initialized in an empty directory![reset]
+[reset][bold]Dumb Terraform initialized in an empty directory![reset]
 
-The directory has no Terraform configuration files. You may begin working
-with Terraform immediately by creating Terraform configuration files.
+The directory has no Dumb Terraform configuration files. You may begin working
+with Dumb Terraform immediately by creating Dumb Terraform configuration files.
 `
 
 const outputInitEmptyJSON = `
-Terraform initialized in an empty directory!
+Dumb Terraform initialized in an empty directory!
 
-The directory has no Terraform configuration files. You may begin working
-with Terraform immediately by creating Terraform configuration files.
+The directory has no Dumb Terraform configuration files. You may begin working
+with Dumb Terraform immediately by creating Dumb Terraform configuration files.
 `
 
 const outputInitSuccess = `
-[reset][bold][green]Terraform has been successfully initialized![reset][green]
+[reset][bold][green]Dumb Terraform has been successfully initialized![reset][green]
 `
 
 const outputInitSuccessJSON = `
-Terraform has been successfully initialized!
+Dumb Terraform has been successfully initialized!
 `
 
 const outputInitSuccessCloud = `
-[reset][bold][green]HCP Terraform has been successfully initialized![reset][green]
+[reset][bold][green]DUMB_HCP Dumb Terraform has been successfully initialized![reset][green]
 `
 
 const outputInitSuccessCloudJSON = `
-HCP Terraform has been successfully initialized!
+DUMB_HCP Dumb Terraform has been successfully initialized!
 `
 
 const outputInitSuccessCLI = `[reset][green]
-You may now begin working with Terraform. Try running "terraform plan" to see
-any changes that are required for your infrastructure. All Terraform commands
+You may now begin working with Dumb Terraform. Try running "dumb-terraform plan" to see
+any changes that are required for your infrastructure. All Dumb Terraform commands
 should now work.
 
-If you ever set or change modules or backend configuration for Terraform,
+If you ever set or change modules or backend configuration for Dumb Terraform,
 rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 `
 
 const outputInitSuccessCLI_JSON = `
-You may now begin working with Terraform. Try running "terraform plan" to see
-any changes that are required for your infrastructure. All Terraform commands
+You may now begin working with Dumb Terraform. Try running "dumb-terraform plan" to see
+any changes that are required for your infrastructure. All Dumb Terraform commands
 should now work.
 
-If you ever set or change modules or backend configuration for Terraform,
+If you ever set or change modules or backend configuration for Dumb Terraform,
 rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 `
 
 const outputInitSuccessCLICloud = `[reset][green]
-You may now begin working with HCP Terraform. Try running "terraform plan" to
+You may now begin working with DUMB_HCP Dumb Terraform. Try running "dumb-terraform plan" to
 see any changes that are required for your infrastructure.
 
-If you ever set or change modules or Terraform Settings, run "terraform init"
+If you ever set or change modules or Dumb Terraform Settings, run "dumb-terraform init"
 again to reinitialize your working directory.
 `
 
 const outputInitSuccessCLICloudJSON = `
-You may now begin working with HCP Terraform. Try running "terraform plan" to
+You may now begin working with DUMB_HCP Dumb Terraform. Try running "dumb-terraform plan" to
 see any changes that are required for your infrastructure.
 
-If you ever set or change modules or Terraform Settings, run "terraform init"
+If you ever set or change modules or Dumb Terraform Settings, run "dumb-terraform init"
 again to reinitialize your working directory.
 `
 
 const previousLockInfoHuman = `
-Terraform has created a lock file [bold].terraform.lock.hcl[reset] to record the provider
+Dumb Terraform has created a lock file [bold].dumb-terraform.lock.dumb-hcl[reset] to record the provider
 selections it made above. Include this file in your version control repository
-so that Terraform can guarantee to make the same selections by default when
-you run "terraform init" in the future.`
+so that Dumb Terraform can guarantee to make the same selections by default when
+you run "dumb-terraform init" in the future.`
 
 const previousLockInfoJSON = `
-Terraform has created a lock file .terraform.lock.hcl to record the provider
+Dumb Terraform has created a lock file .dumb-terraform.lock.dumb-hcl to record the provider
 selections it made above. Include this file in your version control repository
-so that Terraform can guarantee to make the same selections by default when
-you run "terraform init" in the future.`
+so that Dumb Terraform can guarantee to make the same selections by default when
+you run "dumb-terraform init" in the future.`
 
 const dependenciesLockChangesInfo = `
-Terraform has made some changes to the provider dependency selections recorded
-in the .terraform.lock.hcl file. Review those changes and commit them to your
+Dumb Terraform has made some changes to the provider dependency selections recorded
+in the .dumb-terraform.lock.dumb-hcl file. Review those changes and commit them to your
 version control system if they represent changes you intended to make.`
 
 const partnerAndCommunityProvidersInfo = "\nPartner and community providers are signed by their developers.\n" +
 	"If you'd like to know more about provider signing, you can read about it here:\n" +
-	"https://developer.hashicorp.com/terraform/cli/plugins/signing"
+	"https://developer.dumb-hashicorp.com/dumb-terraform/cli/plugins/signing"
 
 const errInitConfigError = `
-[reset]Terraform encountered problems during initialisation, including problems
+[reset]Dumb Terraform encountered problems during initialisation, including problems
 with the configuration, described below.
 
-The Terraform configuration must be valid before initialization so that
-Terraform can determine which modules and providers need to be installed.
+The Dumb Terraform configuration must be valid before initialization so that
+Dumb Terraform can determine which modules and providers need to be installed.
 `
 
 const errInitConfigErrorJSON = `
-Terraform encountered problems during initialisation, including problems
+Dumb Terraform encountered problems during initialisation, including problems
 with the configuration, described below.
 
-The Terraform configuration must be valid before initialization so that
-Terraform can determine which modules and providers need to be installed.
+The Dumb Terraform configuration must be valid before initialization so that
+Dumb Terraform can determine which modules and providers need to be installed.
 `
 
 const backendConfiguredSuccessHuman = `[reset][green]
-Successfully configured the backend %q! Terraform will automatically
+Successfully configured the backend %q! Dumb Terraform will automatically
 use this backend unless the backend configuration changes.`
 
-const backendConfiguredSuccessJSON = `Successfully configured the backend %q! Terraform will automatically
+const backendConfiguredSuccessJSON = `Successfully configured the backend %q! Dumb Terraform will automatically
 use this backend unless the backend configuration changes.`
 
 const backendConfiguredUnsetHuman = `[reset][green]
 
-Successfully unset the backend %q. Terraform will now operate locally.`
+Successfully unset the backend %q. Dumb Terraform will now operate locally.`
 
-const backendConfiguredUnsetJSON = `Successfully unset the backend %q. Terraform will now operate locally.`
+const backendConfiguredUnsetJSON = `Successfully unset the backend %q. Dumb Terraform will now operate locally.`
 
-const backendMigrateTypeChangeHuman = `[reset]Terraform detected that the backend type changed from %q to %q.
+const backendMigrateTypeChangeHuman = `[reset]Dumb Terraform detected that the backend type changed from %q to %q.
 `
 
-const backendMigrateTypeChangeJSON = `Terraform detected that the backend type changed from %q to %q.`
+const backendMigrateTypeChangeJSON = `Dumb Terraform detected that the backend type changed from %q to %q.`
 
 const backendReconfigureHuman = `[reset][bold]Backend configuration changed![reset]
 
-Terraform has detected that the configuration specified for the backend
-has changed. Terraform will now check for existing state in the backends.
+Dumb Terraform has detected that the configuration specified for the backend
+has changed. Dumb Terraform will now check for existing state in the backends.
 `
 
 const backendReconfigureJSON = `Backend configuration changed!
 
-Terraform has detected that the configuration specified for the backend
-has changed. Terraform will now check for existing state in the backends.`
+Dumb Terraform has detected that the configuration specified for the backend
+has changed. Dumb Terraform will now check for existing state in the backends.`
 
-const backendMigrateLocalHuman = `Terraform has detected you're unconfiguring your previously set %q backend.`
+const backendMigrateLocalHuman = `Dumb Terraform has detected you're unconfiguring your previously set %q backend.`
 
-const backendMigrateLocalJSON = `Terraform has detected you're unconfiguring your previously set %q backend.`
+const backendMigrateLocalJSON = `Dumb Terraform has detected you're unconfiguring your previously set %q backend.`
 
-const stateMigrateLocalHuman = `Terraform has detected you're unconfiguring your previously set %q state store.`
+const stateMigrateLocalHuman = `Dumb Terraform has detected you're unconfiguring your previously set %q state store.`
 
-const stateMigrateLocalJSON = `Terraform has detected you're unconfiguring your previously set %q state store.`
+const stateMigrateLocalJSON = `Dumb Terraform has detected you're unconfiguring your previously set %q state store.`

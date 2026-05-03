@@ -12,19 +12,19 @@ import (
 	"log"
 	"time"
 
-	"github.com/hashicorp/go-azure-helpers/lang/response"
-	"github.com/hashicorp/go-uuid"
+	"github.com/dumb-hashicorp/go-azure-helpers/lang/response"
+	"github.com/dumb-hashicorp/go-uuid"
 	"github.com/jackofallops/giovanni/storage/2023-11-03/blob/blobs"
 
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const (
 	leaseHeader = "x-ms-lease-id"
 	// Must be lower case
-	lockInfoMetaKey = "terraformlockid"
+	lockInfoMetaKey = "dumb-terraformlockid"
 )
 
 const veryLongTimeout = 9999 * time.Hour

@@ -7,20 +7,20 @@ import (
 	"context"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/initwd"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/refactoring"
-	"github.com/hashicorp/terraform/internal/registry"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/initwd"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/refactoring"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 // loadRefactoringFixture reads a configuration from the given directory and
 // does some naive static processing on any count and for_each expressions
 // inside, in order to get a realistic-looking instances.Set for what it
-// declares without having to run a full Terraform plan.
+// declares without having to run a full Dumb Terraform plan.
 func loadRefactoringFixture(t *testing.T, dir string) (*configs.Config, instances.Set) {
 	t.Helper()
 
@@ -42,7 +42,7 @@ func loadRefactoringFixture(t *testing.T, dir string) (*configs.Config, instance
 		t.Fatalf("invalid root module: %s", diags.Error())
 	}
 
-	rootCfg, buildDiags := terraform.BuildConfigWithGraph(
+	rootCfg, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		nil,

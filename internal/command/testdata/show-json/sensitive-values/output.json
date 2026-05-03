@@ -22,7 +22,7 @@
                     "mode": "managed",
                     "type": "test_instance",
                     "name": "test",
-                    "provider_name": "registry.terraform.io/hashicorp/test",
+                    "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                     "schema_version": 0,
                     "values": {
                         "ami": "boop"
@@ -39,7 +39,7 @@
             "address": "test_instance.test",
             "mode": "managed",
             "type": "test_instance",
-            "provider_name": "registry.terraform.io/hashicorp/test",
+            "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
             "name": "test",
             "change": {
                 "actions": [
@@ -88,7 +88,7 @@
         "provider_config": {
             "test": {
                 "name": "test",
-                "full_name": "registry.terraform.io/hashicorp/test"
+                "full_name": "registry.dumb-terraform.io/dumb-hashicorp/test"
             }
         },
         "root_module": {

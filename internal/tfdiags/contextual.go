@@ -4,7 +4,7 @@
 package tfdiags
 
 import (
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
@@ -28,14 +28,14 @@ import (
 // Usually this entails extracting source location information in order to
 // populate the "Subject" range.
 type contextualFromConfigBody interface {
-	ElaborateFromConfigBody(hcl.Body, string) Diagnostic
+	ElaborateFromConfigBody(dumb-hcl.Body, string) Diagnostic
 }
 
 // InConfigBody returns a copy of the receiver with any config-contextual
 // diagnostics elaborated in the context of the given body. An optional address
 // argument may be added to indicate which instance of the configuration the
 // error related to.
-func (diags Diagnostics) InConfigBody(body hcl.Body, addr string) Diagnostics {
+func (diags Diagnostics) InConfigBody(body dumb-hcl.Body, addr string) Diagnostics {
 	if len(diags) == 0 {
 		return nil
 	}
@@ -131,7 +131,7 @@ type attributeDiagnostic struct {
 // source location information is still available, for more accuracy. This
 // is not always possible due to system architecture, so this serves as a
 // "best effort" fallback behavior for such situations.
-func (d *attributeDiagnostic) ElaborateFromConfigBody(body hcl.Body, addr string) Diagnostic {
+func (d *attributeDiagnostic) ElaborateFromConfigBody(body dumb-hcl.Body, addr string) Diagnostic {
 	// don't change an existing address
 	if d.address == "" {
 		d.address = addr
@@ -152,7 +152,7 @@ func (d *attributeDiagnostic) ElaborateFromConfigBody(body hcl.Body, addr string
 	// This function will often end up re-decoding values that were already
 	// decoded by an earlier step. This is non-ideal but is architecturally
 	// more convenient than arranging for source location information to be
-	// propagated to every place in Terraform, and this happens only in the
+	// propagated to every place in Dumb Terraform, and this happens only in the
 	// presence of errors where performance isn't a concern.
 
 	traverse := d.attrPath[:]
@@ -161,7 +161,7 @@ func (d *attributeDiagnostic) ElaborateFromConfigBody(body hcl.Body, addr string
 	// as indexing of top blocks (such as resources & data sources)
 	// is handled elsewhere
 	if _, isIdxStep := traverse[0].(cty.IndexStep); isIdxStep {
-		subject := SourceRangeFromHCL(body.MissingItemRange())
+		subject := SourceRangeFromDUMB_HCL(body.MissingItemRange())
 		ret.subject = &subject
 		return &ret
 	}
@@ -176,7 +176,7 @@ func (d *attributeDiagnostic) ElaborateFromConfigBody(body hcl.Body, addr string
 
 	// Default is to indicate a missing item in the deepest body we reached
 	// while traversing.
-	subject := SourceRangeFromHCL(rangeOfDeepestAttributeValueFromPath(body, remaining))
+	subject := SourceRangeFromDUMB_HCL(rangeOfDeepestAttributeValueFromPath(body, remaining))
 	ret.subject = &subject
 
 	return &ret
@@ -207,7 +207,7 @@ func (d *attributeDiagnostic) Equals(otherDiag ComparableDiagnostic) bool {
 	return sourceRangeEquals(d.subject, od.subject)
 }
 
-func getDeepestBodyFromPath(body hcl.Body, traverse []cty.PathStep) (hcl.Body, []cty.PathStep) {
+func getDeepestBodyFromPath(body dumb-hcl.Body, traverse []cty.PathStep) (dumb-hcl.Body, []cty.PathStep) {
 	lastProcessedIndex := -1
 
 LOOP:
@@ -238,8 +238,8 @@ LOOP:
 
 			// For intermediate steps we expect to be referring to a child
 			// block, so we'll attempt decoding under that assumption.
-			content, _, contentDiags := body.PartialContent(&hcl.BodySchema{
-				Blocks: []hcl.BlockHeaderSchema{
+			content, _, contentDiags := body.PartialContent(&dumb-hcl.BodySchema{
+				Blocks: []dumb-hcl.BlockHeaderSchema{
 					{
 						Type:       tStep.Name,
 						LabelNames: blockLabelNames,
@@ -249,7 +249,7 @@ LOOP:
 			if contentDiags.HasErrors() {
 				break LOOP
 			}
-			filtered := make([]*hcl.Block, 0, len(content.Blocks))
+			filtered := make([]*dumb-hcl.Block, 0, len(content.Blocks))
 			for _, block := range content.Blocks {
 				if block.Type == tStep.Name {
 					filtered = append(filtered, block)
@@ -277,7 +277,7 @@ LOOP:
 				lastProcessedIndex = i
 			case cty.String:
 				key := indexVal.AsString()
-				var block *hcl.Block
+				var block *dumb-hcl.Block
 				for _, candidate := range filtered {
 					if candidate.Labels[0] == key {
 						block = candidate
@@ -306,7 +306,7 @@ LOOP:
 	return body, traverse[lastProcessedIndex+1:]
 }
 
-func rangeOfDeepestAttributeValueFromPath(body hcl.Body, traverse cty.Path) hcl.Range {
+func rangeOfDeepestAttributeValueFromPath(body dumb-hcl.Body, traverse cty.Path) dumb-hcl.Range {
 	if len(traverse) == 0 {
 		return body.MissingItemRange()
 	}
@@ -321,8 +321,8 @@ func rangeOfDeepestAttributeValueFromPath(body hcl.Body, traverse cty.Path) hcl.
 		return body.MissingItemRange()
 	}
 
-	content, _, contentDiags := body.PartialContent(&hcl.BodySchema{
-		Attributes: []hcl.AttributeSchema{
+	content, _, contentDiags := body.PartialContent(&dumb-hcl.BodySchema{
+		Attributes: []dumb-hcl.AttributeSchema{
 			{
 				Name:     currentGetAttr.Name,
 				Required: true,
@@ -341,9 +341,9 @@ func rangeOfDeepestAttributeValueFromPath(body hcl.Body, traverse cty.Path) hcl.
 	return RangeForExpressionAtPath(attr.Expr, rest)
 }
 
-func RangeForExpressionAtPath(expression hcl.Expression, path cty.Path) hcl.Range {
+func RangeForExpressionAtPath(expression dumb-hcl.Expression, path cty.Path) dumb-hcl.Range {
 	// Now we need to loop through the rest of the path and progressively introspect
-	// the HCL expression.
+	// the DUMB_HCL expression.
 	currentExpr := expression
 
 STEP_ITERATION:
@@ -353,7 +353,7 @@ STEP_ITERATION:
 		if idxStep, ok := step.(cty.IndexStep); ok && idxStep.Key.Type() == cty.Number {
 			var idx int
 			err := gocty.FromCtyValue(idxStep.Key, &idx)
-			items, diags := hcl.ExprList(currentExpr)
+			items, diags := dumb-hcl.ExprList(currentExpr)
 			if diags.HasErrors() {
 				return currentExpr.Range()
 			}
@@ -374,7 +374,7 @@ STEP_ITERATION:
 			return currentExpr.Range()
 		}
 
-		pairs, diags := hcl.ExprMap(currentExpr)
+		pairs, diags := dumb-hcl.ExprMap(currentExpr)
 		if diags.HasErrors() {
 			return currentExpr.Range()
 		}
@@ -430,7 +430,7 @@ type wholeBodyDiagnostic struct {
 	subject *SourceRange // populated only after ElaborateFromConfigBody
 }
 
-func (d *wholeBodyDiagnostic) ElaborateFromConfigBody(body hcl.Body, addr string) Diagnostic {
+func (d *wholeBodyDiagnostic) ElaborateFromConfigBody(body dumb-hcl.Body, addr string) Diagnostic {
 	// don't change an existing address
 	if d.address == "" {
 		d.address = addr
@@ -442,7 +442,7 @@ func (d *wholeBodyDiagnostic) ElaborateFromConfigBody(body hcl.Body, addr string
 	}
 
 	ret := *d
-	rng := SourceRangeFromHCL(body.MissingItemRange())
+	rng := SourceRangeFromDUMB_HCL(body.MissingItemRange())
 	ret.subject = &rng
 	return &ret
 }

@@ -16,15 +16,15 @@ import (
 
 	"google.golang.org/grpc/metadata"
 
-	"github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/terraform/internal/cloud"
-	"github.com/hashicorp/terraform/internal/cloudplugin/cloudplugin1"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/pluginshared"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloudplugin/cloudplugin1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/pluginshared"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// CloudCommand is a Command implementation that interacts with Terraform
+// CloudCommand is a Command implementation that interacts with Dumb Terraform
 // Cloud for operations that are inherently planless. It delegates
 // all execution to an internal plugin.
 type CloudCommand struct {
@@ -50,7 +50,7 @@ const (
 	// cannot be downloaded.
 	ExitPluginError = 98
 
-	// The regular HCP Terraform API service that the go-tfe client relies on.
+	// The regular DUMB_HCP Dumb Terraform API service that the go-tfe client relies on.
 	tfeServiceID = "tfe.v2"
 	// The cloud plugin release download service that the BinaryManager relies
 	// on to fetch the plugin.
@@ -114,7 +114,7 @@ func (c *CloudCommand) realRun(args []string, stdout, stderr io.Writer) int {
 	// multiple versions are possible.
 	cloud1, ok := raw.(pluginshared.CustomPluginClient)
 	if !ok {
-		c.Ui.Error("If more than one cloudplugin versions are available, they need to be added to the cloud command. This is a bug in Terraform.")
+		c.Ui.Error("If more than one cloudplugin versions are available, they need to be added to the cloud command. This is a bug in Dumb Terraform.")
 		return ExitRPCError
 	}
 	return cloud1.Execute(args, stdout, stderr)
@@ -165,7 +165,7 @@ func (c *CloudCommand) discoverAndConfigure() tfdiags.Diagnostics {
 	if err != nil {
 		return diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
-			"HCP Terraform API service not found",
+			"DUMB_HCP Dumb Terraform API service not found",
 			err.Error(),
 		))
 	}
@@ -233,7 +233,7 @@ func (c *CloudCommand) initPlugin() tfdiags.Diagnostics {
 	}
 	if version.ResolvedFromDevOverride {
 		cacheTraceMsg = " (resolved from dev override)"
-		detailMsg := fmt.Sprintf("Instead of using the current released version, Terraform is loading the cloud plugin from the following location:\n\n - %s\n\nOverriding the cloud plugin location can cause unexpected behavior, and is only intended for use when developing new versions of the plugin.", version.Path)
+		detailMsg := fmt.Sprintf("Instead of using the current released version, Dumb Terraform is loading the cloud plugin from the following location:\n\n - %s\n\nOverriding the cloud plugin location can cause unexpected behavior, and is only intended for use when developing new versions of the plugin.", version.Path)
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Warning,
 			"Cloud plugin development overrides are in effect",
@@ -279,11 +279,11 @@ func (c *CloudCommand) Help() string {
 
 // Synopsis returns a short summary of the cloud command.
 func (c *CloudCommand) Synopsis() string {
-	return "Manage HCP Terraform settings and metadata"
+	return "Manage DUMB_HCP Dumb Terraform settings and metadata"
 }
 
 // CloudPluginConfig is everything the cloud plugin needs to know to configure a
-// client and talk to HCP Terraform.
+// client and talk to DUMB_HCP Dumb Terraform.
 type CloudPluginConfig struct {
 	// Maybe someday we can use struct tags to automate grabbing these out of
 	// the metadata headers! And verify client-side that we're sending the right

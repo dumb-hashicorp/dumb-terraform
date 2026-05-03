@@ -6,7 +6,7 @@ package statekeys
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
 )
 
 type ComponentInstance struct {

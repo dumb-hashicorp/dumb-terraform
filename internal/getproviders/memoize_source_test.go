@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func TestMemoizeSource(t *testing.T) {

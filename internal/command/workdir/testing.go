@@ -6,9 +6,9 @@ package workdir
 import (
 	"testing"
 
-	version "github.com/hashicorp/go-version"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	svchost "github.com/hashicorp/terraform-svchost"
+	version "github.com/dumb-hashicorp/go-version"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
 )
 
 // getTestProviderState is a test helper that returns a state representation

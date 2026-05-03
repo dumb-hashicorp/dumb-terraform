@@ -8,10 +8,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // validateProviderConfigsForTests performs the same role as
@@ -33,7 +33,7 @@ import (
 // expected by validateProviderConfigs but since we're just using it for
 // validation we'll still get the correct error messages, and we can make the
 // declaration ranges line up sensibly so we'll even get good diagnostics.
-func validateProviderConfigsForTests(cfg *Config) (diags hcl.Diagnostics) {
+func validateProviderConfigsForTests(cfg *Config) (diags dumb-hcl.Diagnostics) {
 
 	for name, test := range cfg.Module.Tests {
 		for _, run := range test.Runs {
@@ -60,8 +60,8 @@ func validateProviderConfigsForTests(cfg *Config) (diags hcl.Diagnostics) {
 						}
 
 						if !childType.Equals(parentType) {
-							diags = append(diags, &hcl.Diagnostic{
-								Severity: hcl.DiagError,
+							diags = append(diags, &dumb-hcl.Diagnostic{
+								Severity: dumb-hcl.DiagError,
 								Summary:  "Provider type mismatch",
 								Detail: fmt.Sprintf(
 									"The local name %q in %s represents provider %q, but %q in the root module represents %q.\n\nThis means the provider definition for %q within %s, or other provider definitions with the same name, have been referenced by multiple run blocks and assigned to different provider types.",
@@ -88,8 +88,8 @@ func validateProviderConfigsForTests(cfg *Config) (diags hcl.Diagnostics) {
 						}
 
 						if !providerType.Equals(requirement.Type) {
-							diags = append(diags, &hcl.Diagnostic{
-								Severity: hcl.DiagError,
+							diags = append(diags, &dumb-hcl.Diagnostic{
+								Severity: dumb-hcl.DiagError,
 								Summary:  "Provider type mismatch",
 								Detail: fmt.Sprintf(
 									"The provider %q in %s represents provider %q, but %q in the root module represents %q.\n\nThis means the provider definition for %q within %s, or other provider definitions with the same name, have been referenced by multiple run blocks and assigned to different provider types.",
@@ -108,8 +108,8 @@ func validateProviderConfigsForTests(cfg *Config) (diags hcl.Diagnostics) {
 							}
 
 							if !providerType.Equals(requirement.Type) {
-								diags = append(diags, &hcl.Diagnostic{
-									Severity: hcl.DiagError,
+								diags = append(diags, &dumb-hcl.Diagnostic{
+									Severity: dumb-hcl.DiagError,
 									Summary:  "Provider type mismatch",
 									Detail: fmt.Sprintf(
 										"The provider %q in %s represents provider %q, but %q in the root module represents %q.\n\nThis means the provider definition for %q within %s, or other provider definitions with the same name, have been referenced by multiple run blocks and assigned to different provider types.",
@@ -136,8 +136,8 @@ func validateProviderConfigsForTests(cfg *Config) (diags hcl.Diagnostics) {
 						}
 
 						if !providerType.Equals(testProviderType) {
-							diags = append(diags, &hcl.Diagnostic{
-								Severity: hcl.DiagError,
+							diags = append(diags, &dumb-hcl.Diagnostic{
+								Severity: dumb-hcl.DiagError,
 								Summary:  "Provider type mismatch",
 								Detail: fmt.Sprintf(
 									"The provider %q in %s represents provider %q, but %q in the root module represents %q.\n\nThis means the provider definition for %q within %s has been referenced by multiple run blocks and assigned to different provider types.",
@@ -254,8 +254,8 @@ func validateProviderConfigsForTests(cfg *Config) (diags hcl.Diagnostics) {
 
 				// Let's make a little fake module call that we can use to call
 				// into validateProviderConfigs.
-				sourceExpr := hcl.StaticExpr(cty.StringVal(run.Module.Source.String()), run.Module.SourceDeclRange)
-				versionExpr := hcl.StaticExpr(cty.StringVal(run.Module.Version.Required.String()), run.Module.Version.DeclRange)
+				sourceExpr := dumb-hcl.StaticExpr(cty.StringVal(run.Module.Source.String()), run.Module.SourceDeclRange)
+				versionExpr := dumb-hcl.StaticExpr(cty.StringVal(run.Module.Version.Required.String()), run.Module.Version.DeclRange)
 				mc := &ModuleCall{
 					Name:        run.Name,
 					SourceExpr:  sourceExpr,
@@ -277,7 +277,7 @@ func validateProviderConfigsForTests(cfg *Config) (diags hcl.Diagnostics) {
 // provider configuration, required_providers values, and module call providers
 // mappings.
 //
-// To retain compatibility with previous terraform versions, empty "proxy
+// To retain compatibility with previous dumb-terraform versions, empty "proxy
 // provider blocks" are still allowed within modules, though they will
 // generate warnings when the configuration is loaded. The new validation
 // however will generate an error if a suitable provider configuration is not
@@ -291,10 +291,10 @@ func validateProviderConfigsForTests(cfg *Config) (diags hcl.Diagnostics) {
 //
 // Set parentCall to nil when analyzing the root module. In that case the
 // given configuration is allowed to require passed-in provider configurations
-// without that being an error at this layer, although Terraform Core itself
+// without that being an error at this layer, although Dumb Terraform Core itself
 // will raise an error if asked to plan such a configuration without the caller
 // passing in suitable pre-configured providers to use.
-func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConfigRange *hcl.Range) (diags hcl.Diagnostics) {
+func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConfigRange *dumb-hcl.Range) (diags dumb-hcl.Diagnostics) {
 	mod := cfg.Module
 	analyzingRootModule := (parentCall == nil)
 
@@ -326,11 +326,11 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 
 	// the set of empty configurations that could be proxy configurations, with
 	// the source range of the empty configuration block.
-	emptyConfigs := map[string]hcl.Range{}
+	emptyConfigs := map[string]dumb-hcl.Range{}
 
 	// the set of provider with a defined configuration, with the source range
 	// of the configuration block declaration.
-	configured := map[string]hcl.Range{}
+	configured := map[string]dumb-hcl.Range{}
 
 	// the set of configuration_aliases defined in the required_providers
 	// block, with the fully qualified provider type.
@@ -343,7 +343,7 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 	for _, pc := range mod.ProviderConfigs {
 		name := providerName(pc.Name, pc.Alias)
 		// Validate the config against an empty schema to see if it's empty.
-		_, pcConfigDiags := pc.Config.Content(&hcl.BodySchema{})
+		_, pcConfigDiags := pc.Config.Content(&dumb-hcl.BodySchema{})
 		if pcConfigDiags.HasErrors() || pc.Version.Required != nil {
 			configured[name] = pc.DeclRange
 		} else {
@@ -367,8 +367,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 					}
 				}
 
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Duplicate required provider",
 					Detail: fmt.Sprintf(
 						"Provider %s with the local name %q was previously required as %q. A provider can only be required once within required_providers.",
@@ -384,8 +384,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 				// We have to search through the configs for a match, since the keys contains any aliases.
 				for _, pc := range mod.ProviderConfigs {
 					if pc.Name == impliedLocalName && req.Name != impliedLocalName {
-						diags = append(diags, &hcl.Diagnostic{
-							Severity: hcl.DiagWarning,
+						diags = append(diags, &dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagWarning,
 							Summary:  "Duplicate required provider",
 							Detail: fmt.Sprintf(
 								"Provider %s with the local name %q was implicitly required via a configuration block as %q. The provider configuration block name must match the name used in required_providers.",
@@ -426,8 +426,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 
 			_, err := addrs.ParseProviderPart(localName)
 			if err != nil {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid provider local name",
 					Detail:   fmt.Sprintf("%q is an invalid implied provider local name: %s", localName, err),
 					Subject:  r.DeclRange.Ptr(),
@@ -446,8 +446,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 			// different name.
 			for prevLocalName, addr := range localNames {
 				if addr.Equals(defAddr) {
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagWarning,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagWarning,
 						Summary:  "Duplicate required provider",
 						Detail: fmt.Sprintf(
 							"Provider %q was implicitly required via resource %q, but listed in required_providers as %q. Either the local name in required_providers must match the resource name, or the %q provider must be assigned within the resource block.",
@@ -503,11 +503,11 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 			// already produce a warning.
 			if !(confOK || localOK) {
 				defAddr := addrs.NewDefaultProvider(name)
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Reference to undefined provider",
 					Detail: fmt.Sprintf(
-						"There is no explicit declaration for local provider name %q in %s, so Terraform is assuming you mean to pass a configuration for provider %q.\n\nTo clarify your intent and silence this warning, add to %s a required_providers entry named %q with source = %q, or a different source address if appropriate.",
+						"There is no explicit declaration for local provider name %q in %s, so Dumb Terraform is assuming you mean to pass a configuration for provider %q.\n\nTo clarify your intent and silence this warning, add to %s a required_providers entry named %q with source = %q, or a different source address if appropriate.",
 						name, moduleText, defAddr.ForDisplay(),
 						parentModuleText, name, defAddr.ForDisplay(),
 					),
@@ -521,8 +521,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 			// parent module did not pass one in.
 			if !cfg.Path.IsRoot() && !(confOK || passedOK) {
 				defAddr := addrs.NewDefaultProvider(name)
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Missing required provider configuration",
 					Detail: fmt.Sprintf(
 						"The configuration for %s expects to inherit a configuration for provider %s with local name %q, but %s doesn't pass a configuration under that name.\n\nTo satisfy this requirement, add an entry for %q to the \"providers\" argument in the module %q block.",
@@ -547,8 +547,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 		// recipient of this message is more likely to be the author of the
 		// calling module (trying to use an older module that hasn't been
 		// updated yet) than of the called module.
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Module is incompatible with count, for_each, and depends_on",
 			Detail: fmt.Sprintf(
 				"The module at %s is a legacy module which contains its own local provider configurations, and so calls to it may not use the count, for_each, or depends_on arguments.\n\nIf you also control the module %q, consider updating this module to instead expect provider configurations to be passed by its caller.",
@@ -561,8 +561,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 	// now check that the user is not attempting to override a config
 	for name := range configured {
 		if passed, ok := passedIn[name]; ok {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Cannot override provider configuration",
 				Detail: fmt.Sprintf(
 					"The configuration of %s has its own local configuration for %s, and so it cannot accept an overridden configuration provided by %s.",
@@ -575,7 +575,7 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 
 	// A declared alias requires either a matching configuration within the
 	// module, or one must be passed in, unless we're analyzing the root
-	// module. For the root module it's up to Terraform Core to check if
+	// module. For the root module it's up to Dumb Terraform Core to check if
 	// it's being given the required provider configurations as part of the
 	// options when creating a plan.
 	if !analyzingRootModule {
@@ -587,8 +587,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 				continue
 			}
 
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing required provider configuration",
 				Detail: fmt.Sprintf(
 					"The child module requires an additional configuration for provider %s, with the local name %q.\n\nRefer to the module's documentation to understand the intended purpose of this additional provider configuration, and then add an entry for %s in the \"providers\" meta-argument in the module block to choose which provider configuration the module should use for that purpose.",
@@ -633,19 +633,19 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 
 			// we still allow default configs, so switch to a warning if the incoming provider is a default
 			if addrs.IsDefaultProvider(providerAddr.Provider) {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Reference to undefined provider",
 					Detail: fmt.Sprintf(
-						"There is no explicit declaration for local provider name %q in %s, so Terraform is assuming you mean to pass a configuration for %q.\n\nIf you also control the child module, add a required_providers entry named %q with the source address %q.",
+						"There is no explicit declaration for local provider name %q in %s, so Dumb Terraform is assuming you mean to pass a configuration for %q.\n\nIf you also control the child module, add a required_providers entry named %q with the source address %q.",
 						name, moduleText, providerAddr.Provider.ForDisplay(),
 						name, providerAddr.Provider.ForDisplay(),
 					),
 					Subject: &passed.InChild.NameRange,
 				})
 			} else {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Reference to undefined provider",
 					Detail: fmt.Sprintf(
 						"The child module does not declare any provider requirement with the local name %q.\n\nIf you also control the child module, you can add a required_providers entry named %q with the source address %q to accept this provider configuration.",
@@ -693,8 +693,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 
 			const errSummary = "Provider type mismatch"
 			if otherLocalName != "" {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  errSummary,
 					Detail: fmt.Sprintf(
 						"The assigned configuration is for provider %q, but local name %q in %s represents %q.\n\nTo pass this configuration to the child module, use the local name %q instead.",
@@ -709,8 +709,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 				// caller is trying to pass under any name then we'll instead
 				// report it as an unsuitable configuration to pass into the
 				// child module's provider configuration slot.
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  errSummary,
 					Detail: fmt.Sprintf(
 						"The local name %q in %s represents provider %q, but %q in %s represents %q.\n\nEach provider has its own distinct configuration schema and provider types, so this module's %q can be assigned only a configuration for %s, which is not required by %s.",
@@ -732,7 +732,7 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 	// example of what the replacement should look like.
 	type ProviderReqSuggestion struct {
 		SourceAddr      addrs.Provider
-		SourceRanges    []hcl.Range
+		SourceRanges    []dumb-hcl.Range
 		RequiredConfigs []string
 		AliasCount      int
 	}
@@ -769,7 +769,7 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 
 		fmt.Fprintf(
 			&buf,
-			"Earlier versions of Terraform used empty provider blocks (\"proxy provider configurations\") for child modules to declare their need to be passed a provider configuration by their callers. That approach was ambiguous and is now deprecated.\n\nIf you control this module, you can migrate to the new declaration syntax by removing all of the empty provider %q blocks and then adding or updating an entry like the following to the required_providers block of %s:\n",
+			"Earlier versions of Dumb Terraform used empty provider blocks (\"proxy provider configurations\") for child modules to declare their need to be passed a provider configuration by their callers. That approach was ambiguous and is now deprecated.\n\nIf you control this module, you can migrate to the new declaration syntax by removing all of the empty provider %q blocks and then adding or updating an entry like the following to the required_providers block of %s:\n",
 			name, moduleText,
 		)
 		fmt.Fprintf(&buf, "    %s = {\n", name)
@@ -794,8 +794,8 @@ func validateProviderConfigs(parentCall *ModuleCall, cfg *Config, noProviderConf
 		sort.Slice(suggestion.SourceRanges, func(i, j int) bool {
 			return suggestion.SourceRanges[i].String() < suggestion.SourceRanges[j].String()
 		})
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Redundant empty provider block",
 			Detail:   buf.String(),
 			Subject:  suggestion.SourceRanges[0].Ptr(),

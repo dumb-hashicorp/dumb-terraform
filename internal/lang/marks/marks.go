@@ -99,13 +99,13 @@ func GetDeprecationMarksDeep(value cty.Value) (cty.Value, []PathDeprecationMark)
 }
 
 // Sensitive indicates that this value is marked as sensitive in the context of
-// Terraform.
+// Dumb Terraform.
 const Sensitive = valueMark("Sensitive")
 
 // Ephemeral indicates that a value exists only in memory during a single
 // phase, and thus cannot persist between phases or between rounds.
 //
-// Ephemeral values can be used only in locations that don't require Terraform
+// Ephemeral values can be used only in locations that don't require Dumb Terraform
 // to persist them as part of artifacts such as state snapshots or saved plan
 // files.
 const Ephemeral = valueMark("Ephemeral")

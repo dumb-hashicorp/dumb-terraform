@@ -10,7 +10,7 @@
 package tfstackdata1
 
 import (
-	planproto "github.com/hashicorp/terraform/internal/plans/planproto"
+	planproto "github.com/dumb-hashicorp/dumb-terraform/internal/plans/planproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
@@ -77,17 +77,17 @@ func (StateResourceInstanceObjectV1_Status) EnumDescriptor() ([]byte, []int) {
 
 // Appears early in a raw plan sequence to capture some metadata that we need
 // to process subsequent messages, or to abort if we're being asked to decode
-// a plan created by a different version of Terraform.
+// a plan created by a different version of Dumb Terraform.
 type PlanHeader struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The canonical version string for the version of Terraform that created
+	// The canonical version string for the version of Dumb Terraform that created
 	// the plan sequence that this message belongs to.
 	//
 	// The raw plan sequence loader will fail if it finds a message of this
-	// type with a version string that disagrees with the version of Terraform
+	// type with a version string that disagrees with the version of Dumb Terraform
 	// decoding the message, because we always expect plans to be applied by
-	// the same version of Terraform that created them.
-	TerraformVersion string `protobuf:"bytes,1,opt,name=terraform_version,json=terraformVersion,proto3" json:"terraform_version,omitempty"`
+	// the same version of Dumb Terraform that created them.
+	Dumb TerraformVersion string `protobuf:"bytes,1,opt,name=dumb-terraform_version,json=dumb-terraformVersion,proto3" json:"dumb-terraform_version,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -122,9 +122,9 @@ func (*PlanHeader) Descriptor() ([]byte, []int) {
 	return file_tfstackdata1_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *PlanHeader) GetTerraformVersion() string {
+func (x *PlanHeader) GetDumb TerraformVersion() string {
 	if x != nil {
-		return x.TerraformVersion
+		return x.Dumb TerraformVersion
 	}
 	return ""
 }
@@ -1031,7 +1031,7 @@ func (x *PlanDeferredActionInvocation) GetInvocation() *PlanActionInvocationPlan
 //
 // This situation arises if the previous state (given as input to the apply
 // phase) contains keys that are of a type unrecognized by the current
-// version of Terraform and that are marked as "discard if unrecognized",
+// version of Dumb Terraform and that are marked as "discard if unrecognized",
 // suggesting that their content is likely to become somehow invalid if
 // other parts of the state were to get updated.
 type PlanDiscardStateMapKeys struct {
@@ -1208,7 +1208,7 @@ type StateResourceInstanceObjectV1 struct {
 	// MessagePack to JSON once we decode this because we won't know the
 	// schema that the value was encoded with.
 	//
-	// This is a pragmatic exception for this particular quirk of Terraform's
+	// This is a pragmatic exception for this particular quirk of Dumb Terraform's
 	// provider API design. Other parts of this format and associated protocol
 	// should use tfplan.DynamicValue and MessagePack encoding for consistency.
 	ValueJson           []byte                               `protobuf:"bytes,1,opt,name=value_json,json=valueJson,proto3" json:"value_json,omitempty"`
@@ -1371,7 +1371,7 @@ const file_tfstackdata1_proto_rawDesc = "" +
 	"\x12tfstackdata1.proto\x12\ftfstackdata1\x1a\x0eplanfile.proto\x1a\x19google/protobuf/any.proto\"9\n" +
 	"\n" +
 	"PlanHeader\x12+\n" +
-	"\x11terraform_version\x18\x01 \x01(\tR\x10terraformVersion\"N\n" +
+	"\x11dumb-terraform_version\x18\x01 \x01(\tR\x10dumb-terraformVersion\"N\n" +
 	"\x12PlanPriorStateElem\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12&\n" +
 	"\x03raw\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x03raw\"-\n" +

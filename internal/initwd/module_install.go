@@ -14,20 +14,20 @@ import (
 	"strings"
 
 	"github.com/apparentlymart/go-versions/versions"
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/getmodules"
-	"github.com/hashicorp/terraform/internal/getmodules/moduleaddrs"
-	"github.com/hashicorp/terraform/internal/modsdir"
-	"github.com/hashicorp/terraform/internal/registry"
-	"github.com/hashicorp/terraform/internal/registry/regsrc"
-	"github.com/hashicorp/terraform/internal/registry/response"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getmodules"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getmodules/moduleaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/modsdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry/regsrc"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry/response"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type Initializer func(rootMod *configs.Module, walker configs.ModuleWalker) (*configs.Config, tfdiags.Diagnostics)
@@ -111,7 +111,7 @@ func (i *ModuleInstaller) InstallModules(ctx context.Context, rootDir, testsDir 
 	} else if vDiags := rootMod.CheckCoreVersionRequirements(nil, nil); vDiags.HasErrors() {
 		// If the core version requirements are not met, we drop any other
 		// diagnostics, as they may reflect language changes from future
-		// Terraform versions.
+		// Dumb Terraform versions.
 		diags = diags.Append(vDiags)
 	} else {
 		diags = diags.Append(mDiags)
@@ -173,8 +173,8 @@ func (i *ModuleInstaller) InstallModules(ctx context.Context, rootDir, testsDir 
 
 func (i *ModuleInstaller) moduleInstallWalker(ctx context.Context, manifest modsdir.Manifest, upgrade bool, hooks ModuleInstallHooks, fetcher *getmodules.PackageFetcher) configs.ModuleWalker {
 	return configs.ModuleWalkerFunc(
-		func(req *configs.ModuleRequest) (*configs.Module, *version.Version, hcl.Diagnostics) {
-			var diags hcl.Diagnostics
+		func(req *configs.ModuleRequest) (*configs.Module, *version.Version, dumb-hcl.Diagnostics) {
+			var diags dumb-hcl.Diagnostics
 
 			if req.SourceAddr == nil {
 				// If the parent module failed to parse the module source
@@ -192,7 +192,7 @@ func (i *ModuleInstaller) moduleInstallWalker(ctx context.Context, manifest mods
 				return nil, nil, diags
 			}
 
-			if !hclsyntax.ValidIdentifier(req.Name) {
+			if !dumb-hclsyntax.ValidIdentifier(req.Name) {
 				// A module with an invalid name shouldn't be installed at all. This is
 				// mostly a concern for remote modules, since we need to be able to convert
 				// the name to a valid path.
@@ -251,11 +251,11 @@ func (i *ModuleInstaller) moduleInstallWalker(ctx context.Context, manifest mods
 				err := os.RemoveAll(instPath)
 				if err != nil && !os.IsNotExist(err) {
 					log.Printf("[TRACE] ModuleInstaller: failed to remove %s: %s", key, err)
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Failed to remove local module cache",
 						Detail: fmt.Sprintf(
-							"Terraform tried to remove %s in order to reinstall this module, but encountered an error: %s",
+							"Dumb Terraform tried to remove %s in order to reinstall this module, but encountered an error: %s",
 							instPath, err,
 						),
 					})
@@ -275,7 +275,7 @@ func (i *ModuleInstaller) moduleInstallWalker(ctx context.Context, manifest mods
 					} else if vDiags := mod.CheckCoreVersionRequirements(req.Path, req.SourceAddr); vDiags.HasErrors() {
 						// If the core version requirements are not met, we drop any other
 						// diagnostics, as they may reflect language changes from future
-						// Terraform versions.
+						// Dumb Terraform versions.
 						diags = diags.Extend(vDiags)
 					} else {
 						diags = diags.Extend(mDiags)
@@ -330,10 +330,10 @@ func (i *ModuleInstaller) installDescendantModules(rootMod *configs.Module, inst
 	// happens in the ModuleWalkFunc callback while building the config, we
 	// need to create a closure to capture the installation diagnostics
 	// separately.
-	var instDiags hcl.Diagnostics
+	var instDiags dumb-hcl.Diagnostics
 	walker := installWalker
 	if installErrsOnly {
-		walker = configs.ModuleWalkerFunc(func(req *configs.ModuleRequest) (*configs.Module, *version.Version, hcl.Diagnostics) {
+		walker = configs.ModuleWalkerFunc(func(req *configs.ModuleRequest) (*configs.Module, *version.Version, dumb-hcl.Diagnostics) {
 			mod, version, diags := installWalker.LoadModule(req)
 			instDiags = instDiags.Extend(diags)
 			return mod, version, diags
@@ -363,8 +363,8 @@ func (i *ModuleInstaller) installDescendantModules(rootMod *configs.Module, inst
 	return cfg, diags
 }
 
-func (i *ModuleInstaller) installLocalModule(req *configs.ModuleRequest, key string, manifest modsdir.Manifest, hooks ModuleInstallHooks) (*configs.Module, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func (i *ModuleInstaller) installLocalModule(req *configs.ModuleRequest, key string, manifest modsdir.Manifest, hooks ModuleInstallHooks) (*configs.Module, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	parentKey := manifest.ModuleKey(req.Parent.Path)
 	parentRecord, recorded := manifest[parentKey]
@@ -374,8 +374,8 @@ func (i *ModuleInstaller) installLocalModule(req *configs.ModuleRequest, key str
 	}
 
 	if len(req.VersionConstraint.Required) != 0 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid version constraint",
 			Detail:   fmt.Sprintf("Cannot apply a version constraint to module %q (at %s:%d) because it has a relative local path.", req.Name, req.CallRange.Filename, req.CallRange.Start.Line),
 			Subject:  req.CallRange.Ptr(),
@@ -391,8 +391,8 @@ func (i *ModuleInstaller) installLocalModule(req *configs.ModuleRequest, key str
 	// it is possible that the local directory is a symlink
 	newDir, err := filepath.EvalSymlinks(newDir)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unreadable module directory",
 			Detail:   fmt.Sprintf("Unable to evaluate directory symlink: %s", err.Error()),
 		})
@@ -404,15 +404,15 @@ func (i *ModuleInstaller) installLocalModule(req *configs.ModuleRequest, key str
 		// nil indicates missing or unreadable directory, so we'll
 		// discard the returned diags and return a more specific
 		// error message here.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unreadable module directory",
 			Detail:   fmt.Sprintf("The directory %s could not be read for module %q at %s:%d.", newDir, req.Name, req.CallRange.Filename, req.CallRange.Start.Line),
 		})
 	} else if vDiags := mod.CheckCoreVersionRequirements(req.Path, req.SourceAddr); vDiags.HasErrors() {
 		// If the core version requirements are not met, we drop any other
 		// diagnostics, as they may reflect language changes from future
-		// Terraform versions.
+		// Dumb Terraform versions.
 		diags = diags.Extend(vDiags)
 	} else {
 		diags = diags.Extend(mDiags)
@@ -430,8 +430,8 @@ func (i *ModuleInstaller) installLocalModule(req *configs.ModuleRequest, key str
 	return mod, diags
 }
 
-func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *configs.ModuleRequest, key string, instPath string, addr addrs.ModuleSourceRegistry, manifest modsdir.Manifest, hooks ModuleInstallHooks, fetcher *getmodules.PackageFetcher) (*configs.Module, *version.Version, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *configs.ModuleRequest, key string, instPath string, addr addrs.ModuleSourceRegistry, manifest modsdir.Manifest, hooks ModuleInstallHooks, fetcher *getmodules.PackageFetcher) (*configs.Module, *version.Version, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	hostname := addr.Package.Host
 	reg := i.reg
@@ -456,21 +456,21 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 		resp, err = reg.ModuleVersions(ctx, regsrcAddr)
 		if err != nil {
 			if registry.IsModuleNotFound(err) {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Module not found",
 					Detail:   fmt.Sprintf("Module %q (from %s:%d) cannot be found in the module registry at %s.", req.Name, req.CallRange.Filename, req.CallRange.Start.Line, hostname),
 					Subject:  req.CallRange.Ptr(),
 				})
 			} else if errors.Is(err, context.Canceled) {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Module installation was interrupted",
 					Detail:   fmt.Sprintf("Received interrupt signal while retrieving available versions for module %q.", req.Name),
 				})
 			} else {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Error accessing remote module registry",
 					Detail:   fmt.Sprintf("Failed to retrieve available versions for module %q (%s:%d) from %s: %s.", req.Name, req.CallRange.Filename, req.CallRange.Start.Line, hostname, err),
 					Subject:  req.CallRange.Ptr(),
@@ -488,10 +488,10 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 	if len(resp.Modules) < 1 {
 		// Should never happen, but since this is a remote service that may
 		// be implemented by third-parties we will handle it gracefully.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid response from remote module registry",
-			Detail:   fmt.Sprintf("The registry at %s returned an invalid response when Terraform requested available versions for module %q (%s:%d).", hostname, req.Name, req.CallRange.Filename, req.CallRange.Start.Line),
+			Detail:   fmt.Sprintf("The registry at %s returned an invalid response when Dumb Terraform requested available versions for module %q (%s:%d).", hostname, req.Name, req.CallRange.Filename, req.CallRange.Start.Line),
 			Subject:  req.CallRange.Ptr(),
 		})
 		return nil, nil, diags
@@ -507,10 +507,10 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 			// Should never happen if the registry server is compliant with
 			// the protocol, but we'll warn if not to assist someone who
 			// might be developing a module registry server.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagWarning,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagWarning,
 				Summary:  "Invalid response from remote module registry",
-				Detail:   fmt.Sprintf("The registry at %s returned an invalid version string %q for module %q (%s:%d), which Terraform ignored.", hostname, mv.Version, req.Name, req.CallRange.Filename, req.CallRange.Start.Line),
+				Detail:   fmt.Sprintf("The registry at %s returned an invalid version string %q for module %q (%s:%d), which Dumb Terraform ignored.", hostname, mv.Version, req.Name, req.CallRange.Filename, req.CallRange.Start.Line),
 				Subject:  req.CallRange.Ptr(),
 			})
 			continue
@@ -571,8 +571,8 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 	}
 
 	if latestVersion == nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Module has no versions",
 			Detail:   fmt.Sprintf("Module %q (%s:%d) has no versions available on %s.", addr, req.CallRange.Filename, req.CallRange.Start.Line, hostname),
 			Subject:  req.CallRange.Ptr(),
@@ -581,8 +581,8 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 	}
 
 	if latestMatch == nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unresolvable module version constraint",
 			Detail:   fmt.Sprintf("There is no available version of module %q (%s:%d) which matches the given version constraint. The newest available version is %s.", addr, req.CallRange.Filename, req.CallRange.Start.Line, latestVersion),
 			Subject:  req.CallRange.Ptr(),
@@ -603,8 +603,8 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 		realAddrRaw, err := reg.ModuleLocation(ctx, regsrcAddr, latestMatch.String())
 		if err != nil {
 			log.Printf("[ERROR] %s from %s %s: %s", key, addr, latestMatch, err)
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Error accessing remote module registry",
 				Detail:   fmt.Sprintf("Failed to retrieve a download URL for %s %s from %s: %s", addr, latestMatch, hostname, err),
 			})
@@ -612,8 +612,8 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 		}
 		realAddr, err := moduleaddrs.ParseModuleSource(realAddrRaw)
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid package location from module registry",
 				Detail:   fmt.Sprintf("Module registry %s returned invalid source location %q for %s %s: %s.", hostname, realAddrRaw, addr, latestMatch, err),
 			})
@@ -627,8 +627,8 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 		case addrs.ModuleSourceRemote:
 			i.registryPackageSources[moduleAddr] = realAddr
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid package location from module registry",
 				Detail:   fmt.Sprintf("Module registry %s returned invalid source location %q for %s %s: must be a direct remote package address.", hostname, realAddrRaw, addr, latestMatch),
 			})
@@ -642,8 +642,8 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 
 	err := fetcher.FetchPackage(ctx, instPath, dlAddr.Package.String())
 	if errors.Is(err, context.Canceled) {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Module download was interrupted",
 			Detail:   fmt.Sprintf("Interrupt signal received when downloading module %s.", addr),
 		})
@@ -655,8 +655,8 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 		// we have no way to recognize any specific errors to improve them
 		// and masking the error entirely would hide valuable diagnostic
 		// information from the user.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Failed to download module",
 			Detail:   fmt.Sprintf("Could not download module %q (%s:%d) source code from %q: %s.", req.Name, req.CallRange.Filename, req.CallRange.Start.Line, dlAddr, err),
 			Subject:  req.CallRange.Ptr(),
@@ -679,11 +679,11 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 	mod, mDiags := i.loader.Parser().LoadConfigDir(modDir)
 	if mod == nil {
 		// a nil module indicates a missing or unreadable directory, typically
-		// this would indicate that Terraform has done something wrong.
+		// this would indicate that Dumb Terraform has done something wrong.
 		// However, if the subDir is not empty then it is possible that the
 		// module was properly downloaded but the user is trying to read a
 		// subdirectory that doesn't exist. In this case, it's not a problem
-		// with Terraform.
+		// with Dumb Terraform.
 		if len(subDir) > 0 {
 			// Let's make this error message as precise as possible.
 			_, instErr := os.Stat(instPath)
@@ -693,34 +693,34 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 				// be loaded fine, but the subdirectory does not exist. This
 				// definitely means the user is trying to read a subdirectory
 				// that doesn't exist.
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Unreadable module subdirectory",
 					Detail:   fmt.Sprintf("The directory %s does not exist. The target submodule %s does not exist within the target module.", modDir, subDir),
 				})
 			} else {
 				// There's something else gone wrong here, so we'll report it
-				// as a bug in Terraform.
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				// as a bug in Dumb Terraform.
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Unreadable module directory",
-					Detail:   fmt.Sprintf("The directory %s could not be read. This is a bug in Terraform and should be reported.", modDir),
+					Detail:   fmt.Sprintf("The directory %s could not be read. This is a bug in Dumb Terraform and should be reported.", modDir),
 				})
 			}
 		} else {
 			// If there is no subDir, then somehow the module was downloaded but
 			// could not be read even at the root directory it was downloaded into.
-			// This is definitely something that Terraform is doing wrong.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			// This is definitely something that Dumb Terraform is doing wrong.
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Unreadable module directory",
-				Detail:   fmt.Sprintf("The directory %s could not be read. This is a bug in Terraform and should be reported.", modDir),
+				Detail:   fmt.Sprintf("The directory %s could not be read. This is a bug in Dumb Terraform and should be reported.", modDir),
 			})
 		}
 	} else if vDiags := mod.CheckCoreVersionRequirements(req.Path, req.SourceAddr); vDiags.HasErrors() {
 		// If the core version requirements are not met, we drop any other
 		// diagnostics, as they may reflect language changes from future
-		// Terraform versions.
+		// Dumb Terraform versions.
 		diags = diags.Extend(vDiags)
 	} else {
 		diags = diags.Extend(mDiags)
@@ -739,8 +739,8 @@ func (i *ModuleInstaller) installRegistryModule(ctx context.Context, req *config
 	return mod, latestMatch, diags
 }
 
-func (i *ModuleInstaller) installGoGetterModule(ctx context.Context, req *configs.ModuleRequest, key string, instPath string, manifest modsdir.Manifest, hooks ModuleInstallHooks, fetcher *getmodules.PackageFetcher) (*configs.Module, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func (i *ModuleInstaller) installGoGetterModule(ctx context.Context, req *configs.ModuleRequest, key string, instPath string, manifest modsdir.Manifest, hooks ModuleInstallHooks, fetcher *getmodules.PackageFetcher) (*configs.Module, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	// Report up to the caller that we're about to start downloading.
 	addr := req.SourceAddr.(addrs.ModuleSourceRemote)
@@ -748,8 +748,8 @@ func (i *ModuleInstaller) installGoGetterModule(ctx context.Context, req *config
 	hooks.Download(key, packageAddr.String(), nil)
 
 	if len(req.VersionConstraint.Required) != 0 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid version constraint",
 			Detail:   fmt.Sprintf("Cannot apply a version constraint to module %q (at %s:%d) because it doesn't come from a module registry.", req.Name, req.CallRange.Filename, req.CallRange.Start.Line),
 			Subject:  req.CallRange.Ptr(),
@@ -766,8 +766,8 @@ func (i *ModuleInstaller) installGoGetterModule(ctx context.Context, req *config
 				"[TRACE] ModuleInstaller: %s looks like a local path but is missing ./ or ../",
 				req.SourceAddr,
 			)
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Module not found",
 				Detail: fmt.Sprintf(
 					"The module address %q could not be resolved.\n\n"+
@@ -783,8 +783,8 @@ func (i *ModuleInstaller) installGoGetterModule(ctx context.Context, req *config
 			// we have no way to recognize any specific errors to improve them
 			// and masking the error entirely would hide valuable diagnostic
 			// information from the user.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Failed to download module",
 				Detail:   fmt.Sprintf("Could not download module %q (%s:%d) source code from %q: %s", req.Name, req.CallRange.Filename, req.CallRange.Start.Line, packageAddr, err),
 				Subject:  req.CallRange.Ptr(),
@@ -795,8 +795,8 @@ func (i *ModuleInstaller) installGoGetterModule(ctx context.Context, req *config
 
 	modDir, err := moduleaddrs.ExpandSubdirGlobs(instPath, addr.Subdir)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Failed to expand subdir globs",
 			Detail:   err.Error(),
 		})
@@ -813,15 +813,15 @@ func (i *ModuleInstaller) installGoGetterModule(ctx context.Context, req *config
 		// error message here. For go-getter modules this actually
 		// indicates a bug in the code above, since it's not the
 		// user's responsibility to create the directory in this case.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unreadable module directory",
-			Detail:   fmt.Sprintf("The directory %s could not be read. This is a bug in Terraform and should be reported.", modDir),
+			Detail:   fmt.Sprintf("The directory %s could not be read. This is a bug in Dumb Terraform and should be reported.", modDir),
 		})
 	} else if vDiags := mod.CheckCoreVersionRequirements(req.Path, req.SourceAddr); vDiags.HasErrors() {
 		// If the core version requirements are not met, we drop any other
 		// diagnostics, as they may reflect language changes from future
-		// Terraform versions.
+		// Dumb Terraform versions.
 		diags = diags.Extend(vDiags)
 	} else {
 		diags = diags.Extend(mDiags)
@@ -852,7 +852,7 @@ func (i *ModuleInstaller) packageInstallPath(modulePath addrs.Module) string {
 //
 // This function's behavior is only reasonable for errors returned from the
 // ModuleInstaller.installLocalModule function.
-func maybeImproveLocalInstallError(req *configs.ModuleRequest, diags hcl.Diagnostics) hcl.Diagnostics {
+func maybeImproveLocalInstallError(req *configs.ModuleRequest, diags dumb-hcl.Diagnostics) dumb-hcl.Diagnostics {
 	if !diags.HasErrors() {
 		return diags
 	}
@@ -931,11 +931,11 @@ func maybeImproveLocalInstallError(req *configs.ModuleRequest, diags hcl.Diagnos
 		if !strings.HasPrefix(nextPath, prefix) { // ESCAPED!
 			escapeeAddr := step.Path.String()
 
-			var newDiags hcl.Diagnostics
+			var newDiags dumb-hcl.Diagnostics
 
 			// First we'll copy over any non-error diagnostics from the source diags
 			for _, diag := range diags {
-				if diag.Severity != hcl.DiagError {
+				if diag.Severity != dumb-hcl.DiagError {
 					newDiags = newDiags.Append(diag)
 				}
 			}
@@ -943,15 +943,15 @@ func maybeImproveLocalInstallError(req *configs.ModuleRequest, diags hcl.Diagnos
 			// ...but we'll replace any errors with this more precise error.
 			var suggestion string
 			if strings.HasPrefix(packageAddr, "/") || filepath.VolumeName(packageAddr) != "" {
-				// It might be somewhat surprising that Terraform treats
+				// It might be somewhat surprising that Dumb Terraform treats
 				// absolute filesystem paths as "external" even though it
 				// treats relative paths as local, so if it seems like that's
 				// what the user was doing then we'll add an additional note
 				// about it.
-				suggestion = "\n\nTerraform treats absolute filesystem paths as external modules which establish a new module package. To treat this directory as part of the same package as its caller, use a local path starting with either \"./\" or \"../\"."
+				suggestion = "\n\nDumb Terraform treats absolute filesystem paths as external modules which establish a new module package. To treat this directory as part of the same package as its caller, use a local path starting with either \"./\" or \"../\"."
 			}
-			newDiags = newDiags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			newDiags = newDiags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Local module path escapes module package",
 				Detail: fmt.Sprintf(
 					"The given source directory for %s would be outside of its containing package %q. Local source addresses starting with \"../\" must stay within the same package that the calling module belongs to.%s",

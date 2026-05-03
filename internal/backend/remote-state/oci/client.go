@@ -13,10 +13,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/go-dumb-hclog"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/oracle/oci-go-sdk/v65/common"
 	"github.com/oracle/oci-go-sdk/v65/objectstorage"
 )
@@ -49,7 +49,7 @@ func (c *RemoteClient) Get() (*remote.Payload, tfdiags.Diagnostics) {
 }
 
 func (c *RemoteClient) getObject(ctx context.Context) (*remote.Payload, error) {
-	logger := ctx.Value("logger").(hclog.Logger)
+	logger := ctx.Value("logger").(dumb-hclog.Logger)
 	headRequest := objectstorage.HeadObjectRequest{
 		NamespaceName: common.String(c.namespace),
 		ObjectName:    common.String(c.path),
@@ -68,7 +68,7 @@ func (c *RemoteClient) getObject(ctx context.Context) (*remote.Payload, error) {
 	if headErr != nil {
 		var ociHeadErr common.ServiceError
 		if errors.As(headErr, &ociHeadErr) && ociHeadErr.GetHTTPStatusCode() == 404 {
-			logger.Debug(" State file '%s' not found. Initializing Terraform state...", c.path)
+			logger.Debug(" State file '%s' not found. Initializing Dumb Terraform state...", c.path)
 			return &remote.Payload{}, nil
 		} else {
 			return nil, fmt.Errorf("failed to access object '%s' in bucket '%s': %w", c.path, c.bucketName, headErr)
@@ -159,7 +159,7 @@ func (c *RemoteClient) Put(data []byte) tfdiags.Diagnostics {
 }
 
 func (c *RemoteClient) uploadSinglePartObject(ctx context.Context, data, sum []byte) error {
-	logger := ctx.Value("logger").(hclog.Logger).Named("singlePartUpload")
+	logger := ctx.Value("logger").(dumb-hclog.Logger).Named("singlePartUpload")
 	logger.Info("Uploading single part object")
 	if len(data) == 0 {
 		return fmt.Errorf("uploadSinglePartObject: data is empty")

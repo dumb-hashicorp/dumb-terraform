@@ -4,17 +4,17 @@
 package cloud
 
 import (
-	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclwrite"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-func allowedSourceType(source terraform.ValueSourceType) bool {
-	return source == terraform.ValueFromNamedFile || source == terraform.ValueFromCLIArg || source == terraform.ValueFromEnvVar
+func allowedSourceType(source dumb-terraform.ValueSourceType) bool {
+	return source == dumb-terraform.ValueFromNamedFile || source == dumb-terraform.ValueFromCLIArg || source == dumb-terraform.ValueFromEnvVar
 }
 
 // ParseCloudRunVariables accepts a mapping of unparsed values and a mapping of variable
@@ -38,8 +38,8 @@ func ParseCloudRunVariables(vv map[string]arguments.UnparsedVariableValue, decls
 			continue
 		}
 
-		// RunVariables are always expressed as HCL strings
-		tokens := hclwrite.TokensForValue(v.Value)
+		// RunVariables are always expressed as DUMB_HCL strings
+		tokens := dumb-hclwrite.TokensForValue(v.Value)
 		ret[name] = string(tokens.Bytes())
 	}
 
@@ -68,7 +68,7 @@ func ParseCloudRunTestVariables(globals map[string]arguments.UnparsedVariableVal
 			continue
 		}
 
-		tokens := hclwrite.TokensForValue(variable.Value)
+		tokens := dumb-hclwrite.TokensForValue(variable.Value)
 		ret[name] = string(tokens.Bytes())
 	}
 

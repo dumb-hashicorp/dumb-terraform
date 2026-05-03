@@ -13,8 +13,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/spf13/afero"
 )
 
@@ -43,7 +43,7 @@ func testParser(files map[string]string) *Parser {
 
 // testModuleConfigFrom File reads a single file from the given path as a
 // module and returns its configuration. This is a helper for use in unit tests.
-func testModuleConfigFromFile(filename string) (*Config, hcl.Diagnostics) {
+func testModuleConfigFromFile(filename string) (*Config, dumb-hcl.Diagnostics) {
 	parser := NewParser(nil)
 	f, diags := parser.LoadConfigFile(filename)
 	mod, modDiags := NewModule([]*File{f}, nil)
@@ -54,7 +54,7 @@ func testModuleConfigFromFile(filename string) (*Config, hcl.Diagnostics) {
 
 // testModuleFromFileWithExperiments File reads a single file from the given path as a
 // module and returns its configuration. This is a helper for use in unit tests.
-func testModuleFromFileWithExperiments(filename string) (*Config, hcl.Diagnostics) {
+func testModuleFromFileWithExperiments(filename string) (*Config, dumb-hcl.Diagnostics) {
 	parser := NewParser(nil)
 	parser.AllowLanguageExperiments(true)
 	f, diags := parser.LoadConfigFile(filename)
@@ -66,7 +66,7 @@ func testModuleFromFileWithExperiments(filename string) (*Config, hcl.Diagnostic
 
 // testModuleFromDir reads configuration from the given directory path as
 // a module and returns it. This is a helper for use in unit tests.
-func testModuleFromDir(path string) (*Module, hcl.Diagnostics) {
+func testModuleFromDir(path string) (*Module, dumb-hcl.Diagnostics) {
 	parser := NewParser(nil)
 	return parser.LoadConfigDir(path)
 }
@@ -74,7 +74,7 @@ func testModuleFromDir(path string) (*Module, hcl.Diagnostics) {
 // testModuleFromDirWithExperiments reads configuration from the given directory
 // path as a module and returns it. The parser is configured to allow language
 // experiments. This is a helper for use in unit tests.
-func testModuleFromDirWithExperiments(path string) (*Module, hcl.Diagnostics) {
+func testModuleFromDirWithExperiments(path string) (*Module, dumb-hcl.Diagnostics) {
 	parser := NewParser(nil)
 	parser.AllowLanguageExperiments(true)
 	return parser.LoadConfigDir(path)
@@ -82,7 +82,7 @@ func testModuleFromDirWithExperiments(path string) (*Module, hcl.Diagnostics) {
 
 // testModuleFromDir reads configuration from the given directory path as a
 // module and returns its configuration. This is a helper for use in unit tests.
-func testModuleConfigFromDir(path string) (*Config, hcl.Diagnostics) {
+func testModuleConfigFromDir(path string) (*Config, dumb-hcl.Diagnostics) {
 	parser := NewParser(nil)
 	mod, diags := parser.LoadConfigDir(path)
 	cfg, moreDiags := BuildConfig(mod, nil, nil)
@@ -91,7 +91,7 @@ func testModuleConfigFromDir(path string) (*Config, hcl.Diagnostics) {
 
 // testNestedModuleConfigFromDirWithTests matches testNestedModuleConfigFromDir
 // except it also loads any test files within the directory.
-func testNestedModuleConfigFromDirWithTests(t *testing.T, path string) (*Config, hcl.Diagnostics) {
+func testNestedModuleConfigFromDirWithTests(t *testing.T, path string) (*Config, dumb-hcl.Diagnostics) {
 	t.Helper()
 
 	parser := NewParser(nil)
@@ -109,7 +109,7 @@ func testNestedModuleConfigFromDirWithTests(t *testing.T, path string) (*Config,
 // testNestedModuleConfigFromDir reads configuration from the given directory path as
 // a module with (optional) submodules and returns its configuration. This is a
 // helper for use in unit tests.
-func testNestedModuleConfigFromDir(t *testing.T, path string) (*Config, hcl.Diagnostics) {
+func testNestedModuleConfigFromDir(t *testing.T, path string) (*Config, dumb-hcl.Diagnostics) {
 	t.Helper()
 
 	parser := NewParser(nil)
@@ -124,14 +124,14 @@ func testNestedModuleConfigFromDir(t *testing.T, path string) (*Config, hcl.Diag
 	return cfg, diags
 }
 
-func buildNestedModuleConfig(mod *Module, path string, parser *Parser) (*Config, hcl.Diagnostics) {
+func buildNestedModuleConfig(mod *Module, path string, parser *Parser) (*Config, dumb-hcl.Diagnostics) {
 	versionI := 0
 	return BuildConfig(mod, ModuleWalkerFunc(
-		func(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics) {
+		func(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics) {
 			// For the sake of this test we're going to just treat our
 			// SourceAddr as a path relative to the calling module.
 			// A "real" implementation of ModuleWalker should accept the
-			// various different source address syntaxes Terraform supports.
+			// various different source address syntaxes Dumb Terraform supports.
 
 			// Build a full path by walking up the module tree, prepending each
 			// source address path until we hit the root
@@ -147,18 +147,18 @@ func buildNestedModuleConfig(mod *Module, path string, parser *Parser) (*Config,
 			versionI++
 			return mod, version, diags
 		}),
-		MockDataLoaderFunc(func(provider *Provider) (*MockData, hcl.Diagnostics) {
+		MockDataLoaderFunc(func(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 			return nil, nil
 		}),
 	)
 }
 
-func assertNoDiagnostics(t *testing.T, diags hcl.Diagnostics) bool {
+func assertNoDiagnostics(t *testing.T, diags dumb-hcl.Diagnostics) bool {
 	t.Helper()
 	return assertDiagnosticCount(t, diags, 0)
 }
 
-func assertDiagnosticCount(t *testing.T, diags hcl.Diagnostics, want int) bool {
+func assertDiagnosticCount(t *testing.T, diags dumb-hcl.Diagnostics, want int) bool {
 	t.Helper()
 	if len(diags) != want {
 		t.Errorf("wrong number of diagnostics %d; want %d", len(diags), want)
@@ -170,7 +170,7 @@ func assertDiagnosticCount(t *testing.T, diags hcl.Diagnostics, want int) bool {
 	return false
 }
 
-func assertDiagnosticSummary(t *testing.T, diags hcl.Diagnostics, want string) bool {
+func assertDiagnosticSummary(t *testing.T, diags dumb-hcl.Diagnostics, want string) bool {
 	t.Helper()
 
 	for _, diag := range diags {
@@ -186,7 +186,7 @@ func assertDiagnosticSummary(t *testing.T, diags hcl.Diagnostics, want string) b
 	return true
 }
 
-func assertExactDiagnostics(t *testing.T, diags hcl.Diagnostics, want []string) bool {
+func assertExactDiagnostics(t *testing.T, diags dumb-hcl.Diagnostics, want []string) bool {
 	t.Helper()
 
 	gotDiags := map[string]bool{}

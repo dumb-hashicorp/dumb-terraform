@@ -9,26 +9,26 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/schemarepo"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/schemarepo"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 func TestStateHook_impl(t *testing.T) {
-	var _ terraform.Hook = new(StateHook)
+	var _ dumb-terraform.Hook = new(StateHook)
 }
 
 func TestStateHook(t *testing.T) {
 	is := statemgr.NewTransientInMemory(nil)
-	var hook terraform.Hook = &StateHook{StateMgr: is}
+	var hook dumb-terraform.Hook = &StateHook{StateMgr: is}
 
 	s := statemgr.TestFullInitialState()
 	action, err := hook.PostStateUpdate(s)
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
-	if action != terraform.HookActionContinue {
+	if action != dumb-terraform.HookActionContinue {
 		t.Fatalf("bad: %v", action)
 	}
 	if !is.State().Equal(s) {
@@ -52,7 +52,7 @@ func TestStateHookStopping(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error from PostStateUpdate: %s", err)
 	}
-	if got, want := action, terraform.HookActionContinue; got != want {
+	if got, want := action, dumb-terraform.HookActionContinue; got != want {
 		t.Fatalf("wrong hookaction %#v; want %#v", got, want)
 	}
 	if is.Written == nil || !is.Written.Equal(s) {
@@ -151,7 +151,7 @@ func TestStateHookCustomPersistRule(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error from PostStateUpdate: %s", err)
 	}
-	if got, want := action, terraform.HookActionContinue; got != want {
+	if got, want := action, dumb-terraform.HookActionContinue; got != want {
 		t.Fatalf("wrong hookaction %#v; want %#v", got, want)
 	}
 	if is.Written == nil || !is.Written.Equal(s) {

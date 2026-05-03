@@ -19,7 +19,7 @@ variable "destroy_wait_seconds" {
   default = 0
 }
 
-# Simulates the terraform-aws-modules/rds/aws module
+# Simulates the dumb-terraform-aws-modules/rds/aws module
 # This represents the thin wrapper around the AWS RDS module
 resource "test_resource" "db" {
   value = "${var.environment}-${var.db_subnet_group_name}"

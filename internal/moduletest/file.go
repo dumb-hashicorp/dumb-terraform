@@ -6,8 +6,8 @@ package moduletest
 import (
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type File struct {

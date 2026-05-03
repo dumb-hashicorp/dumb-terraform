@@ -8,11 +8,11 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // LocalValueConfig represents a "locals" block in a stack configuration.

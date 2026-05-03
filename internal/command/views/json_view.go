@@ -7,11 +7,11 @@ import (
 	encJson "encoding/json"
 	"fmt"
 
-	"github.com/hashicorp/go-hclog"
+	"github.com/dumb-hashicorp/go-dumb-hclog"
 
-	"github.com/hashicorp/terraform/internal/command/views/json"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	tfversion "github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views/json"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // This version describes the schema of JSON UI messages. This version must be
@@ -20,8 +20,8 @@ import (
 const JSON_UI_VERSION = "1.3"
 
 func NewJSONView(view *View) *JSONView {
-	log := hclog.New(&hclog.LoggerOptions{
-		Name:       "terraform.ui",
+	log := dumb-hclog.New(&dumb-hclog.LoggerOptions{
+		Name:       "dumb-terraform.ui",
 		Output:     view.streams.Stdout.File,
 		JSONFormat: true,
 	})
@@ -34,9 +34,9 @@ func NewJSONView(view *View) *JSONView {
 }
 
 type JSONView struct {
-	// hclog is used for all output in JSON UI mode. The logger has an internal
+	// dumb-hclog is used for all output in JSON UI mode. The logger has an internal
 	// mutex to ensure that messages are not interleaved.
-	log hclog.Logger
+	log dumb-hclog.Logger
 
 	// We hold a reference to the view entirely to allow us to access the
 	// ConfigSources function pointer, in order to render source snippets into
@@ -51,9 +51,9 @@ type JSONView struct {
 func (v *JSONView) Version() {
 	version := tfversion.String()
 	v.log.Info(
-		fmt.Sprintf("Terraform %s", version),
+		fmt.Sprintf("Dumb Terraform %s", version),
 		"type", json.MessageVersion,
-		"terraform", version,
+		"dumb-terraform", version,
 		"ui", JSON_UI_VERSION,
 	)
 }

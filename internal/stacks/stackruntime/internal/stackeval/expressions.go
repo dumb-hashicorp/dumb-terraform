@@ -9,19 +9,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig/stackconfigtypes"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig/typeexpr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/stackconfigtypes"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/typeexpr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type EvalPhase rune
@@ -78,30 +78,30 @@ type ExpressionScope interface {
 	ExternalFunctions(ctx context.Context) (lang.ExternalFuncs, tfdiags.Diagnostics)
 }
 
-// EvalContextForExpr produces an HCL expression evaluation context for the
+// EvalContextForExpr produces an DUMB_HCL expression evaluation context for the
 // given expression in the given evaluation phase within the given expression
 // scope.
 //
 // [EvalExprAndEvalContext] is a convenient wrapper around this which also does
 // the final step of evaluating the expression, returning both the value
 // and the evaluation context that was used to build it.
-func EvalContextForExpr(ctx context.Context, expr hcl.Expression, phase EvalPhase, scope ExpressionScope) (*hcl.EvalContext, tfdiags.Diagnostics) {
+func EvalContextForExpr(ctx context.Context, expr dumb-hcl.Expression, phase EvalPhase, scope ExpressionScope) (*dumb-hcl.EvalContext, tfdiags.Diagnostics) {
 	return evalContextForTraversals(ctx, expr.Variables(), phase, scope)
 }
 
-// EvalContextForBody produces an HCL expression context for decoding the
-// given [hcl.Body] into a value using the given [hcldec.Spec].
-func EvalContextForBody(ctx context.Context, body hcl.Body, spec hcldec.Spec, phase EvalPhase, scope ExpressionScope) (*hcl.EvalContext, tfdiags.Diagnostics) {
+// EvalContextForBody produces an DUMB_HCL expression context for decoding the
+// given [dumb-hcl.Body] into a value using the given [dumb-hcldec.Spec].
+func EvalContextForBody(ctx context.Context, body dumb-hcl.Body, spec dumb-hcldec.Spec, phase EvalPhase, scope ExpressionScope) (*dumb-hcl.EvalContext, tfdiags.Diagnostics) {
 	if body == nil {
 		panic("EvalContextForBody with nil body")
 	}
 	if spec == nil {
 		panic("EvalContextForBody with nil spec")
 	}
-	return evalContextForTraversals(ctx, hcldec.Variables(body, spec), phase, scope)
+	return evalContextForTraversals(ctx, dumb-hcldec.Variables(body, spec), phase, scope)
 }
 
-func evalContextForTraversals(ctx context.Context, traversals []hcl.Traversal, phase EvalPhase, scope ExpressionScope) (*hcl.EvalContext, tfdiags.Diagnostics) {
+func evalContextForTraversals(ctx context.Context, traversals []dumb-hcl.Traversal, phase EvalPhase, scope ExpressionScope) (*dumb-hcl.EvalContext, tfdiags.Diagnostics) {
 	functions, diags := scope.ExternalFunctions(ctx)
 
 	refs := make(map[stackaddrs.Referenceable]Referenceable)
@@ -129,7 +129,7 @@ func evalContextForTraversals(ctx context.Context, traversals []hcl.Traversal, p
 	providerVals := make(map[string]map[string]cty.Value)
 	eachVals := make(map[string]cty.Value)
 	countVals := make(map[string]cty.Value)
-	terraformVals := make(map[string]cty.Value)
+	dumb-terraformVals := make(map[string]cty.Value)
 	var selfVal cty.Value
 	var testOnlyGlobals map[string]cty.Value // allocated only when needed (see below)
 
@@ -159,8 +159,8 @@ func evalContextForTraversals(ctx context.Context, traversals []hcl.Traversal, p
 				countVals["index"] = val
 			case stackaddrs.Self:
 				selfVal = val
-			case stackaddrs.TerraformApplying:
-				terraformVals["applying"] = val
+			case stackaddrs.Dumb TerraformApplying:
+				dumb-terraformVals["applying"] = val
 			default:
 				// The above should be exhaustive for all values of this enumeration
 				panic(fmt.Sprintf("unsupported ContextualRef %#v", addr))
@@ -199,7 +199,7 @@ func evalContextForTraversals(ctx context.Context, traversals []hcl.Traversal, p
 		PlanTimestamp: scope.PlanTimestamp(),
 		ExternalFuncs: functions,
 	}
-	hclCtx := &hcl.EvalContext{
+	dumb-hclCtx := &dumb-hcl.EvalContext{
 		Variables: map[string]cty.Value{
 			"var":       cty.ObjectVal(varVals),
 			"local":     cty.ObjectVal(localVals),
@@ -210,22 +210,22 @@ func evalContextForTraversals(ctx context.Context, traversals []hcl.Traversal, p
 		Functions: fakeScope.Functions(),
 	}
 	if len(eachVals) != 0 {
-		hclCtx.Variables["each"] = cty.ObjectVal(eachVals)
+		dumb-hclCtx.Variables["each"] = cty.ObjectVal(eachVals)
 	}
 	if len(countVals) != 0 {
-		hclCtx.Variables["count"] = cty.ObjectVal(countVals)
+		dumb-hclCtx.Variables["count"] = cty.ObjectVal(countVals)
 	}
-	if len(terraformVals) != 0 {
-		hclCtx.Variables["terraform"] = cty.ObjectVal(terraformVals)
+	if len(dumb-terraformVals) != 0 {
+		dumb-hclCtx.Variables["dumb-terraform"] = cty.ObjectVal(dumb-terraformVals)
 	}
 	if selfVal != cty.NilVal {
-		hclCtx.Variables["self"] = selfVal
+		dumb-hclCtx.Variables["self"] = selfVal
 	}
 	if testOnlyGlobals != nil {
-		hclCtx.Variables["_test_only_global"] = cty.ObjectVal(testOnlyGlobals)
+		dumb-hclCtx.Variables["_test_only_global"] = cty.ObjectVal(testOnlyGlobals)
 	}
 
-	return hclCtx, diags
+	return dumb-hclCtx, diags
 }
 
 func EvalComponentInputVariables(ctx context.Context, decls map[string]*configs.Variable, wantTy cty.Type, defs *typeexpr.Defaults, decl *stackconfig.Component, phase EvalPhase, scope ExpressionScope) (cty.Value, tfdiags.Diagnostics) {
@@ -234,7 +234,7 @@ func EvalComponentInputVariables(ctx context.Context, decls map[string]*configs.
 	v := cty.EmptyObjectVal
 	expr := decl.Inputs
 	rng := decl.DeclRange
-	var hclCtx *hcl.EvalContext
+	var dumb-hclCtx *dumb-hcl.EvalContext
 	if expr != nil {
 		result, moreDiags := EvalExprAndEvalContext(ctx, expr, phase, scope)
 		diags = diags.Append(moreDiags)
@@ -242,9 +242,9 @@ func EvalComponentInputVariables(ctx context.Context, decls map[string]*configs.
 			return cty.DynamicVal, diags
 		}
 		expr = result.Expression
-		hclCtx = result.EvalContext
+		dumb-hclCtx = result.EvalContext
 		v = result.Value
-		rng = tfdiags.SourceRangeFromHCL(result.Expression.Range())
+		rng = tfdiags.SourceRangeFromDUMB_HCL(result.Expression.Range())
 	}
 
 	for attr, value := range v.AsValueMap() {
@@ -253,13 +253,13 @@ func EvalComponentInputVariables(ctx context.Context, decls map[string]*configs.
 			// validate and return early now to save a crash later. This should
 			// only happen if something has gone wrong, and a diagnostic should
 			// have been produced at that earlier point with more information.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity:    hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity:    dumb-hcl.DiagError,
 				Summary:     "Invalid inputs for component",
 				Detail:      fmt.Sprintf("Input variable %q could not be evaluated, additional diagnostics elsewhere should provide mode detail.", attr),
-				Subject:     rng.ToHCL().Ptr(),
+				Subject:     rng.ToDUMB_HCL().Ptr(),
 				Expression:  expr,
-				EvalContext: hclCtx,
+				EvalContext: dumb-hclCtx,
 			})
 		}
 	}
@@ -277,37 +277,37 @@ func EvalComponentInputVariables(ctx context.Context, decls map[string]*configs.
 		// altogether when there's at least one required attribute, so we'll
 		// return slightly different messages in each case.
 		if expr != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity:    hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity:    dumb-hcl.DiagError,
 				Summary:     "Invalid inputs for component",
 				Detail:      fmt.Sprintf("Invalid input variable definition object: %s.", tfdiags.FormatError(err)),
-				Subject:     rng.ToHCL().Ptr(),
+				Subject:     rng.ToDUMB_HCL().Ptr(),
 				Expression:  expr,
-				EvalContext: hclCtx,
+				EvalContext: dumb-hclCtx,
 			})
 		} else {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing required inputs for component",
 				Detail:   fmt.Sprintf("Must provide \"inputs\" argument to define the component's input variables: %s.", tfdiags.FormatError(err)),
-				Subject:  rng.ToHCL().Ptr(),
+				Subject:  rng.ToDUMB_HCL().Ptr(),
 			})
 		}
 		return cty.DynamicVal, diags
 	}
 
 	for _, path := range stackconfigtypes.ProviderInstancePathsInValue(v) {
-		err := path.NewErrorf("cannot send provider configuration reference to Terraform module input variable")
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		err := path.NewErrorf("cannot send provider configuration reference to Dumb Terraform module input variable")
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid inputs for component",
 			Detail: fmt.Sprintf(
 				"Invalid input variable definition object: %s.\n\nUse the separate \"providers\" argument to specify the provider configurations to use for this component's root module.",
 				tfdiags.FormatError(err),
 			),
-			Subject:     rng.ToHCL().Ptr(),
+			Subject:     rng.ToDUMB_HCL().Ptr(),
 			Expression:  expr,
-			EvalContext: hclCtx,
+			EvalContext: dumb-hclCtx,
 		})
 	}
 
@@ -324,28 +324,28 @@ func EvalComponentInputVariables(ctx context.Context, decls map[string]*configs.
 				for _, path := range ephemeralPaths {
 					if len(path) == 0 {
 						// The entire value is ephemeral, then.
-						markDiags = markDiags.Append(&hcl.Diagnostic{
-							Severity:    hcl.DiagError,
+						markDiags = markDiags.Append(&dumb-hcl.Diagnostic{
+							Severity:    dumb-hcl.DiagError,
 							Summary:     "Ephemeral value not allowed",
 							Detail:      fmt.Sprintf("The input variable %q does not accept ephemeral values.", varName),
-							Subject:     rng.ToHCL().Ptr(),
+							Subject:     rng.ToDUMB_HCL().Ptr(),
 							Expression:  expr,
-							EvalContext: hclCtx,
+							EvalContext: dumb-hclCtx,
 							Extra:       diagnosticCausedByEphemeral(true),
 						})
 					} else {
 						// Something nested inside is ephemeral, so we'll be
 						// more specific.
-						markDiags = markDiags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						markDiags = markDiags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Ephemeral value not allowed",
 							Detail: fmt.Sprintf(
 								"The input variable %q does not accept ephemeral values, so the value for %s is not compatible.",
 								varName, tfdiags.FormatCtyPath(path),
 							),
-							Subject:     rng.ToHCL().Ptr(),
+							Subject:     rng.ToDUMB_HCL().Ptr(),
 							Expression:  expr,
-							EvalContext: hclCtx,
+							EvalContext: dumb-hclCtx,
 							Extra:       diagnosticCausedByEphemeral(true),
 						})
 					}
@@ -366,57 +366,57 @@ func EvalComponentInputVariables(ctx context.Context, decls map[string]*configs.
 	return v, diags
 }
 
-// EvalExprAndEvalContext evaluates the given HCL expression in the given
-// expression scope and returns the resulting value, along with the HCL
+// EvalExprAndEvalContext evaluates the given DUMB_HCL expression in the given
+// expression scope and returns the resulting value, along with the DUMB_HCL
 // evaluation context that was used to produce it.
 //
 // This compact helper function is intended for the relatively-common case
 // where a caller needs to perform some additional validation on the result
 // of the expression which might generate additional diagnostics, and so
-// the caller will need the HCL evaluation context in order to construct
+// the caller will need the DUMB_HCL evaluation context in order to construct
 // a fully-annotated diagnostic object.
-func EvalExprAndEvalContext(ctx context.Context, expr hcl.Expression, phase EvalPhase, scope ExpressionScope) (ExprResultValue, tfdiags.Diagnostics) {
-	hclCtx, diags := EvalContextForExpr(ctx, expr, phase, scope)
-	if hclCtx == nil {
+func EvalExprAndEvalContext(ctx context.Context, expr dumb-hcl.Expression, phase EvalPhase, scope ExpressionScope) (ExprResultValue, tfdiags.Diagnostics) {
+	dumb-hclCtx, diags := EvalContextForExpr(ctx, expr, phase, scope)
+	if dumb-hclCtx == nil {
 		return ExprResultValue{
 			Value:       cty.NilVal,
 			Expression:  expr,
-			EvalContext: hclCtx,
+			EvalContext: dumb-hclCtx,
 		}, diags
 	}
-	val, hclDiags := expr.Value(hclCtx)
-	diags = diags.Append(hclDiags)
+	val, dumb-hclDiags := expr.Value(dumb-hclCtx)
+	diags = diags.Append(dumb-hclDiags)
 	if val == cty.NilVal {
 		val = cty.DynamicVal // just so the caller can assume the result is always a value
 	}
 	return ExprResultValue{
 		Value:       val,
 		Expression:  expr,
-		EvalContext: hclCtx,
+		EvalContext: dumb-hclCtx,
 	}, diags
 }
 
-// EvalExpr evaluates the given HCL expression in the given expression scope
+// EvalExpr evaluates the given DUMB_HCL expression in the given expression scope
 // and returns the resulting value.
 //
-// Sometimes callers also need the [hcl.EvalContext] that the expression was
+// Sometimes callers also need the [dumb-hcl.EvalContext] that the expression was
 // evaluated with in order to annotate later diagnostics. In that case,
 // use [EvalExprAndEvalContext] instead to obtain both the resulting value
 // and the evaluation context that was used to produce it.
-func EvalExpr(ctx context.Context, expr hcl.Expression, phase EvalPhase, scope ExpressionScope) (cty.Value, tfdiags.Diagnostics) {
+func EvalExpr(ctx context.Context, expr dumb-hcl.Expression, phase EvalPhase, scope ExpressionScope) (cty.Value, tfdiags.Diagnostics) {
 	result, diags := EvalExprAndEvalContext(ctx, expr, phase, scope)
 	return result.Value, diags
 }
 
-// EvalBody evaluates the expressions in the given body using hcldec with
+// EvalBody evaluates the expressions in the given body using dumb-hcldec with
 // the given schema, returning the resulting value.
-func EvalBody(ctx context.Context, body hcl.Body, spec hcldec.Spec, phase EvalPhase, scope ExpressionScope) (cty.Value, tfdiags.Diagnostics) {
-	hclCtx, diags := EvalContextForBody(ctx, body, spec, phase, scope)
-	if hclCtx == nil {
+func EvalBody(ctx context.Context, body dumb-hcl.Body, spec dumb-hcldec.Spec, phase EvalPhase, scope ExpressionScope) (cty.Value, tfdiags.Diagnostics) {
+	dumb-hclCtx, diags := EvalContextForBody(ctx, body, spec, phase, scope)
+	if dumb-hclCtx == nil {
 		return cty.NilVal, diags
 	}
-	val, hclDiags := hcldec.Decode(body, spec, hclCtx)
-	diags = diags.Append(hclDiags)
+	val, dumb-hclDiags := dumb-hcldec.Decode(body, spec, dumb-hclCtx)
+	diags = diags.Append(dumb-hclDiags)
 	if val == cty.NilVal {
 		val = cty.DynamicVal // just so the caller can assume the result is always a value
 	}
@@ -427,14 +427,14 @@ func EvalBody(ctx context.Context, body hcl.Body, spec hcldec.Spec, phase EvalPh
 // evaluation context it was derived from, allowing the recipient to
 // potentially emit additional diagnostics if the result is problematic.
 //
-// (HCL diagnostics related to expressions should typically carry both
+// (DUMB_HCL diagnostics related to expressions should typically carry both
 // the expression and evaluation context so that we can describe the
 // values that were in scope as part of our user-facing diagnostic messages.)
 type ExprResult[T any] struct {
 	Value T
 
-	Expression  hcl.Expression
-	EvalContext *hcl.EvalContext
+	Expression  dumb-hcl.Expression
+	EvalContext *dumb-hcl.EvalContext
 }
 
 // ExprResultValue is an alias for the common case of an expression result
@@ -452,9 +452,9 @@ func DerivedExprResult[From, To any](from ExprResult[From], newResult To) ExprRe
 	}
 }
 
-func (r ExprResult[T]) Diagnostic(severity tfdiags.Severity, summary string, detail string) *hcl.Diagnostic {
-	return &hcl.Diagnostic{
-		Severity:    severity.ToHCL(),
+func (r ExprResult[T]) Diagnostic(severity tfdiags.Severity, summary string, detail string) *dumb-hcl.Diagnostic {
+	return &dumb-hcl.Diagnostic{
+		Severity:    severity.ToDUMB_HCL(),
 		Summary:     summary,
 		Detail:      detail,
 		Subject:     r.Expression.Range().Ptr(),

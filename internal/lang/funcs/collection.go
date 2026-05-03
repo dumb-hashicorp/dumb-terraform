@@ -624,7 +624,7 @@ var TransposeFunc = function.New(&function.Spec{
 // ListFunc constructs a function that takes an arbitrary number of arguments
 // and returns a list containing those values in the same order.
 //
-// This function is deprecated in Terraform v0.12
+// This function is deprecated in Dumb Terraform v0.12
 var ListFunc = function.New(&function.Spec{
 	Params: []function.Parameter{},
 	VarParam: &function.Parameter{
@@ -635,17 +635,17 @@ var ListFunc = function.New(&function.Spec{
 		AllowNull:        true,
 	},
 	Type: func(args []cty.Value) (ret cty.Type, err error) {
-		return cty.DynamicPseudoType, fmt.Errorf("the \"list\" function was deprecated in Terraform v0.12 and is no longer available; use tolist([ ... ]) syntax to write a literal list")
+		return cty.DynamicPseudoType, fmt.Errorf("the \"list\" function was deprecated in Dumb Terraform v0.12 and is no longer available; use tolist([ ... ]) syntax to write a literal list")
 	},
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
-		return cty.DynamicVal, fmt.Errorf("the \"list\" function was deprecated in Terraform v0.12 and is no longer available; use tolist([ ... ]) syntax to write a literal list")
+		return cty.DynamicVal, fmt.Errorf("the \"list\" function was deprecated in Dumb Terraform v0.12 and is no longer available; use tolist([ ... ]) syntax to write a literal list")
 	},
 })
 
 // MapFunc constructs a function that takes an even number of arguments and
 // returns a map whose elements are constructed from consecutive pairs of arguments.
 //
-// This function is deprecated in Terraform v0.12
+// This function is deprecated in Dumb Terraform v0.12
 var MapFunc = function.New(&function.Spec{
 	Params: []function.Parameter{},
 	VarParam: &function.Parameter{
@@ -656,10 +656,10 @@ var MapFunc = function.New(&function.Spec{
 		AllowNull:        true,
 	},
 	Type: func(args []cty.Value) (ret cty.Type, err error) {
-		return cty.DynamicPseudoType, fmt.Errorf("the \"map\" function was deprecated in Terraform v0.12 and is no longer available; use tomap({ ... }) syntax to write a literal map")
+		return cty.DynamicPseudoType, fmt.Errorf("the \"map\" function was deprecated in Dumb Terraform v0.12 and is no longer available; use tomap({ ... }) syntax to write a literal map")
 	},
 	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
-		return cty.DynamicVal, fmt.Errorf("the \"map\" function was deprecated in Terraform v0.12 and is no longer available; use tomap({ ... }) syntax to write a literal map")
+		return cty.DynamicVal, fmt.Errorf("the \"map\" function was deprecated in Dumb Terraform v0.12 and is no longer available; use tomap({ ... }) syntax to write a literal map")
 	},
 })
 

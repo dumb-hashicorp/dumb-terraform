@@ -7,20 +7,20 @@ import (
 	"fmt"
 	"log"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
-// StateStore represents a "state_store" block inside a "terraform" block
+// StateStore represents a "state_store" block inside a "dumb-terraform" block
 // in a module or file.
 type StateStore struct {
 	// Type is a state store type name
@@ -29,25 +29,25 @@ type StateStore struct {
 	// Config is the full configuration of the state_store block, including the
 	// nested provider block. The nested provider block config is accessible
 	// in isolation via (StateStore).Provider.Config
-	Config hcl.Body
+	Config dumb-hcl.Body
 
 	Provider *Provider
 	// ProviderAddr contains the FQN of the provider used for pluggable state storage.
-	// This is required for accessing provider factories during Terraform command logic,
+	// This is required for accessing provider factories during Dumb Terraform command logic,
 	// and is used in diagnostics
 	ProviderAddr tfaddr.Provider
 
-	// ProviderSupplyMode describes how the provider used for state storage was supplied to Terraform.
+	// ProviderSupplyMode describes how the provider used for state storage was supplied to Dumb Terraform.
 	// This is needed when handling provider version data; unmanaged and builtin providers have no version data available.
 	// This value is ultimately recorded in the backend state file alongside the provider version data (which may be nil).
 	ProviderSupplyMode getproviders.ProviderSupplyMode
 
-	TypeRange hcl.Range
-	DeclRange hcl.Range
+	TypeRange dumb-hcl.Range
+	DeclRange dumb-hcl.Range
 }
 
-func decodeStateStoreBlock(block *hcl.Block) (*StateStore, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeStateStoreBlock(block *dumb-hcl.Block) (*StateStore, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	ss := &StateStore{
 		Type:      block.Labels[0],
 		TypeRange: block.LabelRanges[0],
@@ -60,16 +60,16 @@ func decodeStateStoreBlock(block *hcl.Block) (*StateStore, hcl.Diagnostics) {
 	ss.Config = remain
 
 	if len(content.Blocks) == 0 {
-		return nil, append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Missing provider block",
 			Detail:   "A 'provider' block is required in 'state_store' blocks",
 			Subject:  block.Body.MissingItemRange().Ptr(),
 		})
 	}
 	if len(content.Blocks) > 1 {
-		return nil, append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate provider block",
 			Detail:   "Only one 'provider' block should be present in a 'state_store' block",
 			Subject:  &content.Blocks[1].DefRange,
@@ -84,8 +84,8 @@ func decodeStateStoreBlock(block *hcl.Block) (*StateStore, hcl.Diagnostics) {
 	}
 	if provider.AliasRange != nil {
 		// This block is in its own namespace in the state_store block; aliases are irrelevant
-		return nil, append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unexpected provider alias",
 			Detail:   "Aliases are disallowed in the 'provider' block in the 'state_store' block",
 			Subject:  provider.AliasRange,
@@ -99,8 +99,8 @@ func decodeStateStoreBlock(block *hcl.Block) (*StateStore, hcl.Diagnostics) {
 	return ss, diags
 }
 
-var StateStorageBlockSchema = &hcl.BodySchema{
-	Blocks: []hcl.BlockHeaderSchema{
+var StateStorageBlockSchema = &dumb-hcl.BodySchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{
 			Type:       "provider",
 			LabelNames: []string{"type"},
@@ -109,24 +109,24 @@ var StateStorageBlockSchema = &hcl.BodySchema{
 }
 
 // resolveStateStoreProviderType is used to obtain provider source data from required_providers data.
-// The only exception is the builtin terraform provider, which we return source data for without using required_providers.
+// The only exception is the builtin dumb-terraform provider, which we return source data for without using required_providers.
 // This code is reused in code for parsing config and modules.
-func resolveStateStoreProviderType(requiredProviders map[string]*RequiredProvider, stateStore StateStore) (tfaddr.Provider, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func resolveStateStoreProviderType(requiredProviders map[string]*RequiredProvider, stateStore StateStore) (tfaddr.Provider, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	// We intentionally don't look for entries in required_providers under different local names and match them
 	// Users should use the same local name in the nested provider block as in required_providers.
 	addr, foundReqProviderEntry := requiredProviders[stateStore.Provider.Name]
 	switch {
-	case !foundReqProviderEntry && stateStore.Provider.Name == "terraform":
+	case !foundReqProviderEntry && stateStore.Provider.Name == "dumb-terraform":
 		// We do not expect users to include built in providers in required_providers
-		// So, if we don't find an entry in required_providers under local name 'terraform' we assume
+		// So, if we don't find an entry in required_providers under local name 'dumb-terraform' we assume
 		// that the builtin provider is intended.
-		return addrs.NewBuiltInProvider("terraform"), nil
+		return addrs.NewBuiltInProvider("dumb-terraform"), nil
 	case !foundReqProviderEntry:
 		diags = diags.Append(
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing entry in required_providers",
 				Detail: fmt.Sprintf("The provider used for state storage must have a matching entry in required_providers. Please add an entry for provider %s",
 					stateStore.Provider.Name,
@@ -138,7 +138,7 @@ func resolveStateStoreProviderType(requiredProviders map[string]*RequiredProvide
 	default:
 		// We've got a required_providers entry to use
 		// This code path is used for both re-attached providers
-		// providers that are fully managed by Terraform.
+		// providers that are fully managed by Dumb Terraform.
 		return addr.Type, nil
 	}
 }
@@ -146,20 +146,20 @@ func resolveStateStoreProviderType(requiredProviders map[string]*RequiredProvide
 // VerifyDependencySelection checks whether the provider used for state storage has a valid version in the
 // dependency lock file that matches the constraints in required_providers.
 // There is also special handling for providers that cannot be represented in the lock file (built-in providers, dev overrides)
-// and also special handling when the provider is re-attached and not managed by Terraform.
+// and also special handling when the provider is re-attached and not managed by Dumb Terraform.
 func (ss *StateStore) VerifyDependencySelection(depLocks *depsfile.Locks, reqs *RequiredProviders, supplyMode getproviders.ProviderSupplyMode) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 
 	// If we get nil arguments it suggests that there's a bug in the calling code.
 	if depLocks == nil {
-		panic("This run has no dependency lock information provided at all. This is a bug in Terraform and should be reported.")
+		panic("This run has no dependency lock information provided at all. This is a bug in Dumb Terraform and should be reported.")
 	}
 	if reqs == nil {
-		panic("This run has no required providers information provided at all. This is a bug in Terraform and should be reported.")
+		panic("This run has no required providers information provided at all. This is a bug in Dumb Terraform and should be reported.")
 	}
 
-	if supplyMode.NotManagedByTerraform() {
-		// If the provider is not managed by Terraform then it's not lockable.
+	if supplyMode.NotManagedByDumb Terraform() {
+		// If the provider is not managed by Dumb Terraform then it's not lockable.
 		// If the working directory was initialized in the same way then the PSS provider will not be reflected in the lock file.
 		// Skip them.
 		switch supplyMode {
@@ -168,16 +168,16 @@ func (ss *StateStore) VerifyDependencySelection(depLocks *depsfile.Locks, reqs *
 		case getproviders.DevOverride:
 			log.Printf("[DEBUG] StateStore.VerifyDependencySelection: skipping %s because it's supplied via developer overrides", ss.ProviderAddr)
 		case getproviders.Reattached:
-			log.Printf("[DEBUG] StateStore.VerifyDependencySelection: skipping %s because it's re-attached and not managed by Terraform", ss.ProviderAddr)
+			log.Printf("[DEBUG] StateStore.VerifyDependencySelection: skipping %s because it's re-attached and not managed by Dumb Terraform", ss.ProviderAddr)
 		default:
-			panic(fmt.Sprintf("State store provider %q (%s) has unknown supply mode %q. This is a bug in Terraform and should be reported.", ss.ProviderAddr.Type, ss.ProviderAddr.ForDisplay(), supplyMode))
+			panic(fmt.Sprintf("State store provider %q (%s) has unknown supply mode %q. This is a bug in Dumb Terraform and should be reported.", ss.ProviderAddr.Type, ss.ProviderAddr.ForDisplay(), supplyMode))
 		}
 		return diags
 	}
 
-	// From this point on the provider currently in use is managed by Terraform
+	// From this point on the provider currently in use is managed by Dumb Terraform
 	//
-	// When the PSS provider is managed, Terraform needs the state storage provider to be present in the lock file,
+	// When the PSS provider is managed, Dumb Terraform needs the state storage provider to be present in the lock file,
 	// and the lock file should not be empty or missing.
 	if depLocks.Empty() {
 		diags = diags.Append(tfdiags.Sourceless(
@@ -187,7 +187,7 @@ func (ss *StateStore) VerifyDependencySelection(depLocks *depsfile.Locks, reqs *
   - provider %s: required by this configuration but no version is selected
 
 To make the initial dependency selections that will initialize the dependency lock file, run:
-  terraform init`,
+  dumb-terraform init`,
 				ss.ProviderAddr,
 			),
 		))
@@ -199,7 +199,7 @@ To make the initial dependency selections that will initialize the dependency lo
 		// The provider used for state storage is not in the required providers list.
 		// This should have been identified when the block was parsed, so if we get here
 		// it suggests that upstream code is swallowing that error.
-		panic("State store provider is missing from required providers but this was not caught during config parsing, which is a bug in Terraform; please report it!")
+		panic("State store provider is missing from required providers but this was not caught during config parsing, which is a bug in Dumb Terraform; please report it!")
 	}
 
 	// Is the provider in the lock file, and is it an appropriate version matching the constraints in required_providers?
@@ -215,7 +215,7 @@ To make the initial dependency selections that will initialize the dependency lo
   - provider %s: required by this configuration but no version is selected
 
 To make the initial dependency selections that will initialize the dependency lock file, run:
-  terraform init`,
+  dumb-terraform init`,
 				ss.ProviderAddr,
 			),
 		))
@@ -236,7 +236,7 @@ To make the initial dependency selections that will initialize the dependency lo
   - provider %s: locked version selection %s doesn't match the updated version constraints %q
 
 To update the locked dependency selections to match a changed configuration, run:
-  terraform init -upgrade`,
+  dumb-terraform init -upgrade`,
 					ss.ProviderAddr,
 					selectedVersion.String(),
 					currentConstraints,
@@ -250,7 +250,7 @@ To update the locked dependency selections to match a changed configuration, run
   - provider %s: version constraints %q don't match the locked version selection %s
 
 To make the initial dependency selections that will initialize the dependency lock file, run:
-  terraform init`,
+  dumb-terraform init`,
 					ss.ProviderAddr,
 					selectedVersion.String(),
 					currentConstraints,
@@ -283,16 +283,16 @@ func (b *StateStore) Hash(stateStoreSchema *configschema.Block, providerSchema *
 
 	// The state store schema should not include a provider block or attr
 	if _, exists := stateStoreSchema.Attributes["provider"]; exists {
-		return 0, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return 0, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Protected argument name \"provider\" in state store schema",
 			Detail:   "Schemas for state stores cannot contain attributes or blocks called \"provider\", to avoid confusion with the provider block nested inside the state_store block. This is a bug in the provider used for state storage, which should be reported in the provider's own issue tracker.",
 			Context:  &b.Provider.DeclRange,
 		})
 	}
 	if _, exists := stateStoreSchema.BlockTypes["provider"]; exists {
-		return 0, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return 0, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Protected block name \"provider\" in state store schema",
 			Detail:   "Schemas for state stores cannot contain attributes or blocks called \"provider\", to avoid confusion with the provider block nested inside the state_store block. This is a bug in the provider used for state storage, which should be reported in the provider's own issue tracker.",
 			Context:  &b.Provider.DeclRange,
@@ -308,7 +308,7 @@ func (b *StateStore) Hash(stateStoreSchema *configschema.Block, providerSchema *
 	// so we need to ignore it. Decode will return errors about 'extra' attrs and blocks. We can ignore
 	// the diagnostic reporting the unexpected provider block, but we need to handle all other diagnostics.
 	// but we need to check that's the only thing being ignored.
-	ssVal, decodeDiags := hcldec.Decode(b.Config, spec, nil)
+	ssVal, decodeDiags := dumb-hcldec.Decode(b.Config, spec, nil)
 	if decodeDiags.HasErrors() {
 		for _, diag := range decodeDiags {
 			diags = diags.Append(diag)
@@ -326,7 +326,7 @@ func (b *StateStore) Hash(stateStoreSchema *configschema.Block, providerSchema *
 	// 2. Prepare the provider hash
 	schema = providerSchema.NoneRequired()
 	spec = schema.DecoderSpec()
-	pVal, decodeDiags := hcldec.Decode(b.Provider.Config, spec, nil)
+	pVal, decodeDiags := dumb-hcldec.Decode(b.Provider.Config, spec, nil)
 	if decodeDiags.HasErrors() {
 		diags = diags.Append(decodeDiags)
 		return 0, diags
@@ -341,18 +341,18 @@ func (b *StateStore) Hash(stateStoreSchema *configschema.Block, providerSchema *
 		// We expect to not have version information in these situations.
 		// We'll use an empty string for the hash.
 		providerVersionString = ""
-	case getproviders.ManagedByTerraform:
+	case getproviders.ManagedByDumb Terraform:
 		if stateStoreProviderVersion == nil {
 			// Lack of version information indicates a problem; error
-			return 0, diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			return 0, diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Unable to calculate hash of state store configuration",
-				Detail:   "Provider version data was missing during hash generation. This is a bug in Terraform and should be reported.",
+				Detail:   "Provider version data was missing during hash generation. This is a bug in Dumb Terraform and should be reported.",
 			})
 		}
 		providerVersionString = stateStoreProviderVersion.String()
 	default:
-		panic(fmt.Sprintf("State store provider %q (%s) has unknown supply mode %q. This is a bug in Terraform and should be reported.", b.ProviderAddr.Type, b.ProviderAddr.ForDisplay(), b.ProviderSupplyMode))
+		panic(fmt.Sprintf("State store provider %q (%s) has unknown supply mode %q. This is a bug in Dumb Terraform and should be reported.", b.ProviderAddr.Type, b.ProviderAddr.ForDisplay(), b.ProviderSupplyMode))
 	}
 
 	toHash := cty.TupleVal([]cty.Value{

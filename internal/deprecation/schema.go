@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/lang/format"
-	"github.com/hashicorp/terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
 	"github.com/zclconf/go-cty/cty"
 )
 

@@ -7,7 +7,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // MemoizeSource is a Source that wraps another Source and remembers its

@@ -6,9 +6,9 @@ package deprecation
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
 	"github.com/zclconf/go-cty/cty"
 )
 

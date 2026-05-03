@@ -4,8 +4,8 @@
 package remote
 
 import (
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Client is the interface that must be implemented for a remote state

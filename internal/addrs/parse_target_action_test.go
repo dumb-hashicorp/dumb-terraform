@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestParseTargetAction(t *testing.T) {
@@ -151,7 +151,7 @@ func TestParseTargetAction(t *testing.T) {
 	}
 	for _, test := range tcs {
 		t.Run(test.Input, func(t *testing.T) {
-			traversal, travDiags := hclsyntax.ParseTraversalAbs([]byte(test.Input), "", hcl.Pos{Line: 1, Column: 1})
+			traversal, travDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(test.Input), "", dumb-hcl.Pos{Line: 1, Column: 1})
 			if travDiags.HasErrors() {
 				t.Fatal(travDiags.Error())
 			}

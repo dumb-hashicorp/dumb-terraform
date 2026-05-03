@@ -7,8 +7,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
 	"github.com/zclconf/go-cty/cty"
 )
 

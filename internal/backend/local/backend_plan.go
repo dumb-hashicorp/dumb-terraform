@@ -9,15 +9,15 @@ import (
 	"io"
 	"log"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/genconfig"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/genconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func (b *Local) opPlan(
@@ -44,11 +44,11 @@ func (b *Local) opPlan(
 	if !op.HasConfig() {
 		switch {
 		case op.Query:
-			// Special diag for terraform query command
+			// Special diag for dumb-terraform query command
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"No configuration files",
-				"Query requires a query configuration to be present. Create a Terraform query configuration file (.tfquery.hcl file) and try again.",
+				"Query requires a query configuration to be present. Create a Dumb Terraform query configuration file (.tfquery.dumb-hcl file) and try again.",
 			))
 			op.ReportResult(runningOp, diags)
 			return
@@ -60,7 +60,7 @@ func (b *Local) opPlan(
 				"Plan requires configuration to be present. Planning without a configuration would "+
 					"mark everything for destruction, which is normally not what is desired. If you "+
 					"would like to destroy everything, run plan with the -destroy option. Otherwise, "+
-					"create a Terraform configuration file (.tf file) and try again.",
+					"create a Dumb Terraform configuration file (.tf file) and try again.",
 			))
 			op.ReportResult(runningOp, diags)
 			return
@@ -85,7 +85,7 @@ func (b *Local) opPlan(
 	}
 
 	if b.ContextOpts == nil {
-		b.ContextOpts = new(terraform.ContextOpts)
+		b.ContextOpts = new(dumb-terraform.ContextOpts)
 	}
 
 	// Set up backend and get our context
@@ -160,7 +160,7 @@ func (b *Local) opPlan(
 			// Even when there is no state_store or backend block in the configuration, there should be a PlanOutBackend
 			// describing the implied local backend.
 			diags = diags.Append(fmt.Errorf(
-				"PlanOutPath set without also setting PlanOutStateStore or PlanOutBackend (this is a bug in Terraform)"),
+				"PlanOutPath set without also setting PlanOutStateStore or PlanOutBackend (this is a bug in Dumb Terraform)"),
 			)
 			op.ReportResult(runningOp, diags)
 			return
@@ -177,7 +177,7 @@ func (b *Local) opPlan(
 		// there) and so we just use a stub state file header in this case.
 		// NOTE: This won't be exactly identical to the latest state snapshot
 		// in the backend because it's still been subject to state upgrading
-		// to make it consumable by the current Terraform version, and
+		// to make it consumable by the current Dumb Terraform version, and
 		// intentionally doesn't preserve the header info.
 		prevStateFile := &statefile.File{
 			State: plan.PrevRunState,
@@ -224,7 +224,7 @@ func (b *Local) opPlan(
 	// If we've accumulated any diagnostics along the way then we'll show them
 	// here just before we show the summary and next steps. This can potentially
 	// include errors, because we intentionally try to show a partial plan
-	// above even if Terraform Core encountered an error partway through
+	// above even if Dumb Terraform Core encountered an error partway through
 	// creating it.
 	op.ReportResult(runningOp, diags)
 

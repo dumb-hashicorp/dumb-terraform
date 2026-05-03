@@ -9,17 +9,17 @@ import (
 	"sort"
 
 	"github.com/apparentlymart/go-versions/versions"
-	"github.com/hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/go-plugin"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/logging"
-	tfplugin "github.com/hashicorp/terraform/internal/plugin"
-	tfplugin6 "github.com/hashicorp/terraform/internal/plugin6"
-	"github.com/hashicorp/terraform/internal/providercache"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/dependencies"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	tfplugin "github.com/dumb-hashicorp/dumb-terraform/internal/plugin"
+	tfplugin6 "github.com/dumb-hashicorp/dumb-terraform/internal/plugin6"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providercache"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/dependencies"
 )
 
 // This file contains helper functions and supporting logic for
@@ -119,16 +119,16 @@ func unconfiguredBuiltinProviderInstance(addr addrs.Provider) (providers.Interfa
 	}
 	factory, ok := builtinProviders[addr.Type]
 	if !ok {
-		return nil, fmt.Errorf("this version of Terraform does not support provider %s", addr)
+		return nil, fmt.Errorf("this version of Dumb Terraform does not support provider %s", addr)
 	}
 	return factory(), nil
 }
 
 func providerSchemaToProto(schemaResp providers.GetProviderSchemaResponse) *dependencies.ProviderSchema {
 	// Due to some historical poor design planning, the provider protocol uses
-	// different terminology than the user-facing terminology for Terraform
-	// Core and the Terraform language, and so part of our job here is to
-	// map between the two so that rpcapi uses Terraform Core's words
+	// different terminology than the user-facing terminology for Dumb Terraform
+	// Core and the Dumb Terraform language, and so part of our job here is to
+	// map between the two so that rpcapi uses Dumb Terraform Core's words
 	// rather than the provider protocol's words.
 	//
 	// This result currently includes only the subset of the schema information
@@ -137,7 +137,7 @@ func providerSchemaToProto(schemaResp providers.GetProviderSchemaResponse) *depe
 	// protocol schema model here would tightly couple the rpcapi to the
 	// provider protocol, forcing them to always change together, which is
 	// undesirable since each one has a different target audience and therefore
-	// will probably follow different evolutionary paths. For example, Terraform
+	// will probably follow different evolutionary paths. For example, Dumb Terraform
 	// can support multiple provider protocol versions concurrently but will
 	// probably not want to make a new rpcapi protocol major version each time
 	// a new provider protocol version is added or removed.

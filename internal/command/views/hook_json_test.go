@@ -13,26 +13,26 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
-func testJSONHookResourceID(addr addrs.AbsResourceInstance) terraform.HookResourceIdentity {
-	return terraform.HookResourceIdentity{
+func testJSONHookResourceID(addr addrs.AbsResourceInstance) dumb-terraform.HookResourceIdentity {
+	return dumb-terraform.HookResourceIdentity{
 		Addr: addr,
 		ProviderAddr: addrs.Provider{
 			Type:      "test",
-			Namespace: "hashicorp",
+			Namespace: "dumb-hashicorp",
 			Hostname:  "example.com",
 		},
 	}
 }
 
-func testJSONLifecycleHook(actionAddr addrs.AbsActionInstance, triggeringResourceAddr addrs.AbsResourceInstance, actionTriggerIndex int, actionsListIndex int) terraform.HookActionIdentity {
-	return terraform.HookActionIdentity{
+func testJSONLifecycleHook(actionAddr addrs.AbsActionInstance, triggeringResourceAddr addrs.AbsResourceInstance, actionTriggerIndex int, actionsListIndex int) dumb-terraform.HookActionIdentity {
+	return dumb-terraform.HookActionIdentity{
 		Addr: actionAddr,
 		ActionTrigger: &plans.ResourceActionTrigger{
 			TriggeringResourceAddr:  triggeringResourceAddr,
@@ -43,8 +43,8 @@ func testJSONLifecycleHook(actionAddr addrs.AbsActionInstance, triggeringResourc
 	}
 }
 
-func testJSONInvokeHook(actionAddr addrs.AbsActionInstance) terraform.HookActionIdentity {
-	return terraform.HookActionIdentity{
+func testJSONInvokeHook(actionAddr addrs.AbsActionInstance) dumb-terraform.HookActionIdentity {
+	return dumb-terraform.HookActionIdentity{
 		Addr:          actionAddr,
 		ActionTrigger: new(plans.InvokeActionTrigger),
 	}
@@ -139,7 +139,7 @@ func TestJSONHook_create(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Creating...",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "apply_start",
 			"hook": map[string]interface{}{
 				"action":   string("create"),
@@ -149,7 +149,7 @@ func TestJSONHook_create(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Provisioning with 'local-exec'...",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "provision_start",
 			"hook": map[string]interface{}{
 				"provisioner": "local-exec",
@@ -159,7 +159,7 @@ func TestJSONHook_create(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": `test_instance.boop: (local-exec): Executing: ["/bin/sh" "-c" "touch /etc/motd"]`,
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "provision_progress",
 			"hook": map[string]interface{}{
 				"output":      `Executing: ["/bin/sh" "-c" "touch /etc/motd"]`,
@@ -170,7 +170,7 @@ func TestJSONHook_create(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: (local-exec) Provisioning complete",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "provision_complete",
 			"hook": map[string]interface{}{
 				"provisioner": "local-exec",
@@ -180,7 +180,7 @@ func TestJSONHook_create(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Still creating... [10s elapsed]",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "apply_progress",
 			"hook": map[string]interface{}{
 				"action":          string("create"),
@@ -191,7 +191,7 @@ func TestJSONHook_create(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Still creating... [20s elapsed]",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "apply_progress",
 			"hook": map[string]interface{}{
 				"action":          string("create"),
@@ -202,7 +202,7 @@ func TestJSONHook_create(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Creation complete after 22s [id=test]",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "apply_complete",
 			"hook": map[string]interface{}{
 				"action":          string("create"),
@@ -270,7 +270,7 @@ func TestJSONHook_errors(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Destroying...",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "apply_start",
 			"hook": map[string]interface{}{
 				"action":   string("delete"),
@@ -280,7 +280,7 @@ func TestJSONHook_errors(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: (local-exec) Provisioning errored",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "provision_errored",
 			"hook": map[string]interface{}{
 				"provisioner": "local-exec",
@@ -290,7 +290,7 @@ func TestJSONHook_errors(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Destruction errored after 0s",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "apply_errored",
 			"hook": map[string]interface{}{
 				"action":          string("delete"),
@@ -338,7 +338,7 @@ func TestJSONHook_refresh(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "data.test_data_source.beep: Refreshing state... [id=honk]",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "refresh_start",
 			"hook": map[string]interface{}{
 				"resource": wantResource,
@@ -349,7 +349,7 @@ func TestJSONHook_refresh(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "data.test_data_source.beep: Refresh complete [id=honk]",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "refresh_complete",
 			"hook": map[string]interface{}{
 				"resource": wantResource,
@@ -382,7 +382,7 @@ func TestJSONHook_EphemeralOp(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Opening...",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "ephemeral_op_start",
 			"hook": map[string]interface{}{
 				"action": string("open"),
@@ -400,7 +400,7 @@ func TestJSONHook_EphemeralOp(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Opening complete after 0s",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "ephemeral_op_complete",
 			"hook": map[string]interface{}{
 				"action":          string("open"),
@@ -447,7 +447,7 @@ func TestJSONHook_EphemeralOp_progress(t *testing.T) {
 			{
 				"@level":   "info",
 				"@message": "test_instance.boop: Opening...",
-				"@module":  "terraform.ui",
+				"@module":  "dumb-terraform.ui",
 				"type":     "ephemeral_op_start",
 				"hook": map[string]interface{}{
 					"action": string("open"),
@@ -465,7 +465,7 @@ func TestJSONHook_EphemeralOp_progress(t *testing.T) {
 			{
 				"@level":   "info",
 				"@message": "test_instance.boop: Still opening... [1s elapsed]",
-				"@module":  "terraform.ui",
+				"@module":  "dumb-terraform.ui",
 				"type":     "ephemeral_op_progress",
 				"hook": map[string]interface{}{
 					"action":          string("open"),
@@ -484,7 +484,7 @@ func TestJSONHook_EphemeralOp_progress(t *testing.T) {
 			{
 				"@level":   "info",
 				"@message": "test_instance.boop: Still opening... [2s elapsed]",
-				"@module":  "terraform.ui",
+				"@module":  "dumb-terraform.ui",
 				"type":     "ephemeral_op_progress",
 				"hook": map[string]interface{}{
 					"action":          string("open"),
@@ -503,7 +503,7 @@ func TestJSONHook_EphemeralOp_progress(t *testing.T) {
 			{
 				"@level":   "info",
 				"@message": "test_instance.boop: Opening complete after 2s",
-				"@module":  "terraform.ui",
+				"@module":  "dumb-terraform.ui",
 				"type":     "ephemeral_op_complete",
 				"hook": map[string]interface{}{
 					"action":          string("open"),
@@ -545,7 +545,7 @@ func TestJSONHook_EphemeralOp_error(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Opening...",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "ephemeral_op_start",
 			"hook": map[string]interface{}{
 				"action": string("open"),
@@ -563,7 +563,7 @@ func TestJSONHook_EphemeralOp_error(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop: Opening errored after 0s",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "ephemeral_op_errored",
 			"hook": map[string]interface{}{
 				"action":          string("open"),
@@ -660,7 +660,7 @@ func TestJSONHook_actions(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop.trigger[0]: Action started: action.aws_lambda_invocation.notify_slack[42]",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "action_start",
 			"hook": map[string]interface{}{
 				"action": map[string]interface{}{
@@ -691,7 +691,7 @@ func TestJSONHook_actions(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop (0): action.aws_lambda_invocation.notify_slack[42] - Hello world from the lambda function",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "action_progress",
 			"hook": map[string]interface{}{
 				"action": map[string]interface{}{
@@ -723,7 +723,7 @@ func TestJSONHook_actions(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "module.childMod[\"infra\"].test_instance.boop.trigger[2]: Action started: module.childMod[\"infra\"].action.ansible_playbook.webserver",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "action_start",
 			"hook": map[string]interface{}{
 				"action": map[string]interface{}{
@@ -754,7 +754,7 @@ func TestJSONHook_actions(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "module.childMod[\"infra\"].test_instance.boop (2): module.childMod[\"infra\"].action.ansible_playbook.webserver - TASK: [hello]\n ok: [localhost] => (item=Hello world from the ansible playbook]",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "action_progress",
 			"hook": map[string]interface{}{
 				"action": map[string]interface{}{
@@ -786,7 +786,7 @@ func TestJSONHook_actions(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "module.childMod[\"infra\"].test_instance.boop (2): Action complete: module.childMod[\"infra\"].action.ansible_playbook.webserver",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "action_complete",
 			"hook": map[string]interface{}{
 				"action": map[string]interface{}{
@@ -817,7 +817,7 @@ func TestJSONHook_actions(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "test_instance.boop (0): Action errored: action.aws_lambda_invocation.notify_slack[42] - lambda terminated with exit code 1",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "action_errored",
 			"hook": map[string]interface{}{
 				"action": map[string]interface{}{
@@ -849,7 +849,7 @@ func TestJSONHook_actions(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "Action started: action.aws_lambda_invocation.invoke_me[42]",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "action_start",
 			"hook": map[string]interface{}{
 				"action": map[string]interface{}{
@@ -867,7 +867,7 @@ func TestJSONHook_actions(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "action.aws_lambda_invocation.invoke_me[42] - Hello world from the invoked action",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "action_progress",
 			"hook": map[string]interface{}{
 				"action": map[string]interface{}{
@@ -886,7 +886,7 @@ func TestJSONHook_actions(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "Action complete: action.aws_lambda_invocation.invoke_me[42]",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "action_complete",
 			"hook": map[string]interface{}{
 				"action": map[string]interface{}{
@@ -906,13 +906,13 @@ func TestJSONHook_actions(t *testing.T) {
 	testJSONViewOutputEquals(t, done(t).Stdout(), want)
 }
 
-func testHookReturnValues(t *testing.T, action terraform.HookAction, err error) {
+func testHookReturnValues(t *testing.T, action dumb-terraform.HookAction, err error) {
 	t.Helper()
 
 	if err != nil {
 		t.Fatal(err)
 	}
-	if action != terraform.HookActionContinue {
+	if action != dumb-terraform.HookActionContinue {
 		t.Fatalf("Expected hook to continue, given: %#v", action)
 	}
 }

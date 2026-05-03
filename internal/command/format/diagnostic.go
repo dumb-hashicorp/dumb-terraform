@@ -12,8 +12,8 @@ import (
 	"sort"
 	"strings"
 
-	viewsjson "github.com/hashicorp/terraform/internal/command/views/json"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	viewsjson "github.com/dumb-hashicorp/dumb-terraform/internal/command/views/json"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
 	"github.com/mitchellh/colorstring"
 	wordwrap "github.com/mitchellh/go-wordwrap"
@@ -69,7 +69,7 @@ func DiagnosticFromJSON(diag *viewsjson.Diagnostic, color *colorstring.Colorize,
 		leftRuleEnd = color.Color("[yellow]╵[reset]")
 		leftRuleWidth = 2
 	default:
-		// Clear out any coloring that might be applied by Terraform's UI helper,
+		// Clear out any coloring that might be applied by Dumb Terraform's UI helper,
 		// so our result is not context-sensitive.
 		buf.WriteString(color.Color("\n[reset]"))
 	}
@@ -127,7 +127,7 @@ func DiagnosticFromJSON(diag *viewsjson.Diagnostic, color *colorstring.Colorize,
 // virtual terminal formatting sequences.
 //
 // It is intended for use in automation and other contexts in which diagnostic
-// messages are parsed from the Terraform output.
+// messages are parsed from the Dumb Terraform output.
 func DiagnosticPlain(diag tfdiags.Diagnostic, sources map[string][]byte, width int) string {
 	return DiagnosticPlainFromJSON(viewsjson.NewDiagnostic(diag, sources), width)
 }
@@ -342,7 +342,7 @@ func (f *snippetFormatter) writeSnippet(snippet *viewsjson.DiagnosticSnippet, co
 		printValues := snippet.TestAssertionExpr == nil || snippet.TestAssertionExpr.ShowVerbose
 
 		// The diagnostic may also have information about failures from test assertions
-		// in a `terraform test` run. This is useful for understanding the values that
+		// in a `dumb-terraform test` run. This is useful for understanding the values that
 		// were being compared when the assertion failed.
 		// Also, we'll print a JSON diff of the two values to make it easier to see the
 		// differences.

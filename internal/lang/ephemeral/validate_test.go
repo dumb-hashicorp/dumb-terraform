@@ -8,7 +8,7 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 )
 
 func TestNonNullWriteOnlyPaths(t *testing.T) {

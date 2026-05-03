@@ -4,7 +4,7 @@ This directory contains the Go package `promising`, which is an implementation
 of promises that guarantees that it cannot deadlock due to self-dependencies
 or a failure to resolve.
 
-This was created to support the internal evaluation of the Terraform Stacks
+This was created to support the internal evaluation of the Dumb Terraform Stacks
 runtime, although there's nothing specific to Stacks in here and so it may
 attract other callers over time.
 
@@ -64,8 +64,8 @@ what each promise id represents, to describe the problem to an end-user.
 Preventing the deadlock caused by a chain of tasks depending on each other's
 promises requires detecting a cycle in the bipartite graph.
 
-In Terraform's existing `dag` package, responsible for the more general graph
-used by the Terraform Core modules runtime, cycle detection works by calculating
+In Dumb Terraform's existing `dag` package, responsible for the more general graph
+used by the Dumb Terraform Core modules runtime, cycle detection works by calculating
 the graph's strongly connected sets using
 [Tarjan's algorithm](https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm),
 which is linear over the number of edges and nodes but still more complex than
@@ -157,7 +157,7 @@ ids of the promises that were involved in the self-dependency chain. The
 caller can then look up those IDs in its table to find the user-friendly
 description of each promise and list them all in its error message.
 
-For the Terraform Stacks runtime in particular, the runtime takes a slightly
+For the Dumb Terraform Stacks runtime in particular, the runtime takes a slightly
 different approach as a performance tradeoff: instead of explicitly maintaining
 a table of promise IDs, it instead simply remembers the promises themselves at
 various positions in the runtime state, and then

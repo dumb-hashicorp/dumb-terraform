@@ -8,21 +8,21 @@ import (
 	"sort"
 	"testing"
 
-	uuid "github.com/hashicorp/go-uuid"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
+	uuid "github.com/dumb-hashicorp/go-uuid"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configtesting"
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configtesting"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // TestBackendConfig validates and configures the backend with the
 // given configuration.
-func TestBackendConfig(t *testing.T, b Backend, c hcl.Body) Backend {
+func TestBackendConfig(t *testing.T, b Backend, c dumb-hcl.Body) Backend {
 	t.Helper()
 
 	t.Logf("TestBackendConfig on %T with %#v", b, c)
@@ -33,12 +33,12 @@ func TestBackendConfig(t *testing.T, b Backend, c hcl.Body) Backend {
 	// (even though that's not normally valid) and just treat it as an empty
 	// body.
 	if c == nil {
-		c = hcl.EmptyBody()
+		c = dumb-hcl.EmptyBody()
 	}
 
 	schema := b.ConfigSchema()
 	spec := schema.DecoderSpec()
-	obj, decDiags := hcldec.Decode(c, spec, nil)
+	obj, decDiags := dumb-hcldec.Decode(c, spec, nil)
 	diags = diags.Append(decDiags)
 
 	newObj, valDiags := b.PrepareConfig(obj)
@@ -61,13 +61,13 @@ func TestBackendConfig(t *testing.T, b Backend, c hcl.Body) Backend {
 }
 
 // TestWrapConfig takes a raw data structure and converts it into a
-// synthetic hcl.Body to use for testing.
+// synthetic dumb-hcl.Body to use for testing.
 //
 // The given structure should only include values that can be accepted by
-// hcl2shim.HCL2ValueFromConfigValue. If incompatible values are given,
+// dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue. If incompatible values are given,
 // this function will panic.
-func TestWrapConfig(raw map[string]interface{}) hcl.Body {
-	obj := hcl2shim.HCL2ValueFromConfigValue(raw)
+func TestWrapConfig(raw map[string]interface{}) dumb-hcl.Body {
+	obj := dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(raw)
 	return configtesting.SynthBody("<TestWrapConfig>", obj.AsValueMap())
 }
 

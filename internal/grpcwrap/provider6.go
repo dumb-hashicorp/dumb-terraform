@@ -18,12 +18,12 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/hashicorp/terraform/internal/backend/pluggable/chunks"
-	proto6 "github.com/hashicorp/terraform/internal/tfplugin6"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/pluggable/chunks"
+	proto6 "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin6"
 
-	"github.com/hashicorp/terraform/internal/plugin6/convert"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfplugin6"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plugin6/convert"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin6"
 )
 
 // Provider6 wraps a providers.Interface to implement a grpc ProviderServer using
@@ -270,7 +270,7 @@ func (p *provider6) ConfigureProvider(_ context.Context, req *tfplugin6.Configur
 	}
 
 	configureResp := p.provider.ConfigureProvider(providers.ConfigureProviderRequest{
-		TerraformVersion: req.TerraformVersion,
+		Dumb TerraformVersion: req.Dumb TerraformVersion,
 		Config:           configVal,
 	})
 
@@ -1104,7 +1104,7 @@ func (p *provider6) WriteStateBytes(srv tfplugin6.Provider_WriteStateBytesServer
 
 	if totalReceivedBytes == 0 {
 		// Even an empty state file has content; no bytes is not valid
-		return errors.New("No state data received from Terraform: No state data was received from Terraform. This is a bug and should be reported.")
+		return errors.New("No state data received from Dumb Terraform: No state data was received from Dumb Terraform. This is a bug and should be reported.")
 	}
 
 	resp := p.provider.WriteStateBytes(providers.WriteStateBytesRequest{

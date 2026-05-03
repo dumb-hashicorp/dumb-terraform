@@ -8,22 +8,22 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	teststates "github.com/hashicorp/terraform/internal/moduletest/states"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	teststates "github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // testApply defines how to execute a run block representing an apply command
 //
 // See also: (n *NodeTestRun).testPlan
-func (n *NodeTestRun) testApply(ctx *EvalContext, variables terraform.InputValues, providers map[addrs.RootProviderConfig]providers.Interface, waiter *operationWaiter) {
+func (n *NodeTestRun) testApply(ctx *EvalContext, variables dumb-terraform.InputValues, providers map[addrs.RootProviderConfig]providers.Interface, waiter *operationWaiter) {
 	file, run := n.File(), n.run
 	config := run.ModuleConfig
 	key := n.run.Config.StateKey
@@ -34,9 +34,9 @@ func (n *NodeTestRun) testApply(ctx *EvalContext, variables terraform.InputValue
 	run.Diagnostics = run.Diagnostics.Append(setVariableDiags)
 
 	// ignore diags because validate has covered it
-	tfCtx, _ := terraform.NewContext(n.opts.ContextOpts)
+	tfCtx, _ := dumb-terraform.NewContext(n.opts.ContextOpts)
 
-	// execute the terraform plan operation
+	// execute the dumb-terraform plan operation
 	_, plan, planDiags := plan(ctx, tfCtx, file.Config, run.Config, run.ModuleConfig, setVariables, providers, waiter)
 
 	// Any error during the planning prevents our apply from
@@ -88,7 +88,7 @@ func (n *NodeTestRun) testApply(ctx *EvalContext, variables terraform.InputValue
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Warning,
 				"Failed to print verbose output",
-				fmt.Sprintf("Terraform failed to print the verbose output for %s, other diagnostics will contain more details as to why.", filepath.Join(file.Name, run.Name))))
+				fmt.Sprintf("Dumb Terraform failed to print the verbose output for %s, other diagnostics will contain more details as to why.", filepath.Join(file.Name, run.Name))))
 		} else {
 			run.Verbose = &moduletest.Verbose{
 				Plan:         nil, // We don't have a plan to show in apply mode.
@@ -118,7 +118,7 @@ func (n *NodeTestRun) testApply(ctx *EvalContext, variables terraform.InputValue
 	ctx.SetFileState(key, run, updated, teststates.StateReasonNone)
 }
 
-func apply(tfCtx *terraform.Context, run *configs.TestRun, module *configs.Config, plan *plans.Plan, progress moduletest.Progress, variables terraform.InputValues, providers map[addrs.RootProviderConfig]providers.Interface, waiter *operationWaiter) (*lang.Scope, *states.State, tfdiags.Diagnostics) {
+func apply(tfCtx *dumb-terraform.Context, run *configs.TestRun, module *configs.Config, plan *plans.Plan, progress moduletest.Progress, variables dumb-terraform.InputValues, providers map[addrs.RootProviderConfig]providers.Interface, waiter *operationWaiter) (*lang.Scope, *states.State, tfdiags.Diagnostics) {
 	log.Printf("[TRACE] TestFileRunner: called apply for %s", run.Name)
 
 	var diags tfdiags.Diagnostics
@@ -144,7 +144,7 @@ func apply(tfCtx *terraform.Context, run *configs.TestRun, module *configs.Confi
 
 	// We only need to pass ephemeral variables to the apply operation, as the
 	// plan has already been evaluated with the full set of variables.
-	ephemeralVariables := make(terraform.InputValues)
+	ephemeralVariables := make(dumb-terraform.InputValues)
 	for k, v := range module.Root.Module.Variables {
 		if v.EphemeralSet {
 			if value, ok := variables[k]; ok {
@@ -153,7 +153,7 @@ func apply(tfCtx *terraform.Context, run *configs.TestRun, module *configs.Confi
 		}
 	}
 
-	applyOpts := &terraform.ApplyOpts{
+	applyOpts := &dumb-terraform.ApplyOpts{
 		SetVariables:              ephemeralVariables,
 		ExternalProviders:         providers,
 		AllowRootEphemeralOutputs: true,

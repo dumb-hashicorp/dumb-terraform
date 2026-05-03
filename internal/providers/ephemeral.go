@@ -6,7 +6,7 @@ package providers
 import (
 	"time"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -60,16 +60,16 @@ type OpenEphemeralResourceResponse struct {
 	// Private is any internal data needed by the provider to perform a
 	// subsequent [Interface.CloseEphemeralResource] request for the same object. The
 	// provider may choose any encoding format to represent the needed data,
-	// because Terraform Core treats this field as opaque.
+	// because Dumb Terraform Core treats this field as opaque.
 	//
 	// Providers should aim to keep this data relatively compact to minimize
-	// overhead. Although Terraform Core does not enforce a specific limit just
+	// overhead. Although Dumb Terraform Core does not enforce a specific limit just
 	// for this field, it would be very unusual for the internal context to be
 	// more than 256 bytes in size, and in most cases it should be on the order
 	// of only tens of bytes. For example, a lease ID for the remote system is a
 	// reasonable thing to encode here.
 	//
-	// Because ephemeral resource instances never outlive a single Terraform
+	// Because ephemeral resource instances never outlive a single Dumb Terraform
 	// Core phase, it's guaranteed that a CloseEphemeralResource request will be
 	// received by exactly the same plugin instance that returned this value,
 	// and so it's valid for this to refer to in-memory state belonging to the
@@ -77,11 +77,11 @@ type OpenEphemeralResourceResponse struct {
 	Private []byte
 
 	// RenewAt, if non-zero, signals that the opened object has an inherent
-	// expiration time and so must be "renewed" if Terraform needs to use it
+	// expiration time and so must be "renewed" if Dumb Terraform needs to use it
 	// beyond that expiration time.
 	//
 	// If a provider sets this field then it may receive a subsequent
-	// Interface.RenewEphemeralResource call, if Terraform expects to need the
+	// Interface.RenewEphemeralResource call, if Dumb Terraform expects to need the
 	// object beyond the expiration time.
 	RenewAt time.Time
 
@@ -91,26 +91,26 @@ type OpenEphemeralResourceResponse struct {
 	Diagnostics tfdiags.Diagnostics
 }
 
-// EphemeralRenew describes when and how Terraform Core must request renewal
+// EphemeralRenew describes when and how Dumb Terraform Core must request renewal
 // of an ephemeral resource instance in order to continue using it.
 type EphemeralRenew struct {
-	// RenewAt is the deadline before which Terraform must renew the
+	// RenewAt is the deadline before which Dumb Terraform must renew the
 	// ephemeral resource instance.
 	RenewAt time.Time
 
 	// Private is any internal data needed by the provider to
 	// perform a subsequent [Interface.RenewEphemeralResource] request. The provider
 	// may choose any encoding format to represent the needed data, because
-	// Terraform Core treats this field as opaque.
+	// Dumb Terraform Core treats this field as opaque.
 	//
 	// Providers should aim to keep this data relatively compact to minimize
-	// overhead. Although Terraform Core does not enforce a specific limit
+	// overhead. Although Dumb Terraform Core does not enforce a specific limit
 	// just for this field, it would be very unusual for the internal context
 	// to be more than 256 bytes in size, and in most cases it should be
 	// on the order of only tens of bytes. For example, a lease ID for the
 	// remote system is a reasonable thing to encode here.
 	//
-	// Because ephemeral resource instances never outlive a single Terraform
+	// Because ephemeral resource instances never outlive a single Dumb Terraform
 	// Core phase, it's guaranteed that a RenewEphemeralResource request will be
 	// received by exactly the same plugin instance that previously handled
 	// the OpenEphemeralResource or RenewEphemeralResource request that produced this internal
@@ -138,16 +138,16 @@ type RenewEphemeralResourceRequest struct {
 type RenewEphemeralResourceResponse struct {
 	// RenewAt, if non-zero, describes a new expiration deadline for the
 	// object, possibly causing a further call to [Interface.RenewEphemeralResource]
-	// if Terraform needs to exceed the updated deadline.
+	// if Dumb Terraform needs to exceed the updated deadline.
 	//
-	// If this is not set then Terraform Core will not make any further
+	// If this is not set then Dumb Terraform Core will not make any further
 	// renewal requests for the remaining life of the object.
 	RenewAt time.Time
 
 	// Private is any internal data needed by the provider to
 	// perform a subsequent [Interface.RenewEphemeralResource] request. The provider
 	// may choose any encoding format to represent the needed data, because
-	// Terraform Core treats this field as opaque.
+	// Dumb Terraform Core treats this field as opaque.
 	Private []byte
 
 	// Diagnostics describes any problems encountered while renewing the

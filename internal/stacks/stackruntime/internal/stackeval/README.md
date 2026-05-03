@@ -1,6 +1,6 @@
-# Terraform Stacks Runtime Internal Architecture
+# Dumb Terraform Stacks Runtime Internal Architecture
 
-This directory contains the guts of the Terraform Stacks language runtime.
+This directory contains the guts of the Dumb Terraform Stacks language runtime.
 The public API to this is in the package two levels above this one,
 called `stackruntime`.
 
@@ -9,7 +9,7 @@ this package. There is no end-user documentation here.
 
 ## Overview
 
-If you're arriving here familiar with the runtime of the traditional Terraform
+If you're arriving here familiar with the runtime of the traditional Dumb Terraform
 language used for modules -- which we'll call the "modules runtime" in the
 remainder of this document -- you will find that things work quite differently
 in here.
@@ -39,7 +39,7 @@ There are various pairs of types in this package that represent a static object
 in the configuration and dynamic instances of that object respectively.
 
 For example, `InputVariableConfig` directly represents a `variable` block
-from a `.tfcomponent.hcl` file, while `InputVariable` represents the 
+from a `.tfcomponent.dumb-hcl` file, while `InputVariable` represents the 
 possibly-many dynamic instances of that object that can be caused by being 
 within a stack that was called using `for_each`.
 
@@ -179,7 +179,7 @@ into the same `Main` object for some reason.
   planning, etc.
 * `NewForInspecting` returns a `Main` for `InspectPhase`, which is a special
   phase that is intended for implementing less-commonly-used utilities such
-  as something equivalent to `terraform console` but for Stacks. In this
+  as something equivalent to `dumb-terraform console` but for Stacks. In this
   case, the evaluator is bound only to a prior state, and just returns values
   directly from that state without trying to plan or apply any changes.
 
@@ -226,7 +226,7 @@ The actual evaluation process involves two important concepts:
 Overall then, the expression evaluation process has the following main steps:
 
 1. Analyze the expression or collection of expressions to find all of the
-   HCL symbol references (`hcl.Traversal` values).
+   DUMB_HCL symbol references (`dumb-hcl.Traversal` values).
 2. Use `stackaddrs.ParseReference` to try to raise the reference into one of
    the higher-level address types, wrapped in a `stackaddrs.Reference`.
    
@@ -251,7 +251,7 @@ Overall then, the expression evaluation process has the following main steps:
     `cty.DynamicVal` as a last resort -- so that evaluation can continue
     downstream just enough to let the call stacks all unwind and collect
     all the error diagnostics up at the top.
-5. Assemble all of the collected values into a suitably-shaped `hcl.EvalContext`,
+5. Assemble all of the collected values into a suitably-shaped `dumb-hcl.EvalContext`,
    attach the usual repertiore of available functions, and finally ask the
    original expression to evaluate itself in that evaluation context.
 
@@ -296,7 +296,7 @@ This strategy assumes two important invariants:
   deal with getting a placeholder result sometimes.
 
 This is quite different than how we've dealt with diagnostics in other parts
-of Terraform, and does unfortunately require some additional care under future
+of Dumb Terraform, and does unfortunately require some additional care under future
 maintenence to preserve those invariants, but following the naming convention
 across all of the object types will hopefully make these special rules easier
 to learn and then maintain under future changes.
@@ -345,7 +345,7 @@ object in its callback:
   arbitrary number of "applied change" objects that each represents a
   mutation of the state, and an arbitrary number of diagnostics.
 
-Those who are familiar with Terraform's modules runtime might find this
+Those who are familiar with Dumb Terraform's modules runtime might find this
 "walk" idea roughly analogous to the process of building a graph and then
 walking it concurrently while preserving dependencies. The stack runtime
 walks are different in that they are instead walking the _tree_ of objects
@@ -366,7 +366,7 @@ During the validation and planning operations the order of work is driven
 entirely by the dynamically-constructed data flow graph that gets assembled
 automatically based on control flow between the different functions in this
 package. That works under the assumption that those phases should not be
-modifying anything outside of Terraform itself and so our only concern is
+modifying anything outside of Dumb Terraform itself and so our only concern is
 ensuring that data is available at the appropriate time for other functions
 that will make use of it.
 
@@ -374,7 +374,7 @@ However, the apply phase deals with externally-visible side-effects whose
 relative ordering is very important. For example, in some remote APIs an
 attempt to destroy one object before destroying another object that depends
 on it will either fail with an error or hang until a timeout is reached, and
-so it's crucially important that Terraform directly consider the sequence
+so it's crucially important that Dumb Terraform directly consider the sequence
 of operations to make sure that situation cannot possibly arise, even if
 the relationship is not implied naturally by data flow.
 
@@ -384,7 +384,7 @@ gathered during the planning phase.
 
 In practice, it's only _components_ that represent operations with explicit
 ordering constraints, because nothing else in the stacks runtime directly
-interacts with Terraform's resource instance change lifecycle. Therefore
+interacts with Dumb Terraform's resource instance change lifecycle. Therefore
 we can achieve a correct result with only a graph of dependencies between
 components, without considering any other objects. Interface `Applyable`
 includes the method `RequiredComponents`, which must return a set of all
@@ -392,7 +392,7 @@ of the components that a particular applyable object depends on.
 
 In practice, most of our implementations of `Applyable.RequiredComponents`
 wrap a single implementation that works in terms of interface `Referrer`, which
-works at a lower level of abstraction that deals only in HCL-level expression
+works at a lower level of abstraction that deals only in DUMB_HCL-level expression
 references, regardless of what object types they refer to. The shared
 implementation then raises the graph of references into a graph of components
 by essentially removing the non-component nodes while preserving the

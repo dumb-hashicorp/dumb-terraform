@@ -11,11 +11,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/experiments"
-	"github.com/hashicorp/terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/experiments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
@@ -23,7 +23,7 @@ import (
 )
 
 // TestFunctions tests that functions are callable through the functionality
-// in the langs package, via HCL.
+// in the langs package, via DUMB_HCL.
 //
 // These tests are primarily here to assert that the functions are properly
 // registered in the functions table, rather than to test all of the details
@@ -34,7 +34,7 @@ import (
 //
 // One exception to that is we can use this test mechanism to assert common
 // patterns that are used in real-world configurations which rely on behaviors
-// implemented either in this lang package or in HCL itself, such as automatic
+// implemented either in this lang package or in DUMB_HCL itself, such as automatic
 // type conversions. The function unit tests don't cover those things because
 // they call directly into the functions.
 //
@@ -142,7 +142,7 @@ func TestFunctions(t *testing.T) {
 				// Note: "can" only works with expressions that pass static
 				// validation, because it only gets an opportunity to run in
 				// that case. The following "works" (captures the error) because
-				// Terraform understands it as a reference to an attribute
+				// Dumb Terraform understands it as a reference to an attribute
 				// that does not exist during dynamic evaluation.
 				//
 				// "can" doesn't work with references that could never possibly
@@ -569,7 +569,7 @@ func TestFunctions(t *testing.T) {
 				cty.StringVal("{\"hello\":\"world\"}"),
 			},
 			// We are intentionally choosing to escape <, >, and & characters
-			// to preserve backwards compatibility with Terraform 0.11
+			// to preserve backwards compatibility with Dumb Terraform 0.11
 			{
 				`jsonencode({"hello"="<cats & kittens>"})`,
 				cty.StringVal("{\"hello\":\"\\u003ccats \\u0026 kittens\\u003e\"}"),
@@ -1130,7 +1130,7 @@ func TestFunctions(t *testing.T) {
 				// Note: "try" only works with expressions that pass static
 				// validation, because it only gets an opportunity to run in
 				// that case. The following "works" (captures the error) because
-				// Terraform understands it as a reference to an attribute
+				// Dumb Terraform understands it as a reference to an attribute
 				// that does not exist during dynamic evaluation.
 				//
 				// "try" doesn't work with references that could never possibly
@@ -1138,7 +1138,7 @@ func TestFunctions(t *testing.T) {
 				// as an expression like "foo" alone which would be understood
 				// as an invalid resource reference. That's okay because this
 				// function exists primarily to ease access to dynamically-typed
-				// structures that Terraform can't statically validate by
+				// structures that Dumb Terraform can't statically validate by
 				// definition.
 				`try({}.baz, "fallback")`,
 				cty.StringVal("fallback"),
@@ -1259,7 +1259,7 @@ func TestFunctions(t *testing.T) {
 	// We'll also register a few "external functions" so that we can
 	// verify that registering these works. The functions actually
 	// available in a real module will be determined dynamically by
-	// Terraform core based on declarations in that module, so here
+	// Dumb Terraform core based on declarations in that module, so here
 	// we're just aiming to test whether dispatching to these works
 	// at all, not to test that any particular functions work.
 	externalFuncs := ExternalFuncs{
@@ -1322,7 +1322,7 @@ func TestFunctions(t *testing.T) {
 							ExternalFuncs: externalFuncs,
 						}
 
-						expr, parseDiags := hclsyntax.ParseExpression([]byte(test.src), "test.hcl", hcl.Pos{Line: 1, Column: 1})
+						expr, parseDiags := dumb-hclsyntax.ParseExpression([]byte(test.src), "test.dumb-hcl", dumb-hcl.Pos{Line: 1, Column: 1})
 						if parseDiags.HasErrors() {
 							for _, diag := range parseDiags {
 								t.Error(diag.Error())
@@ -1365,7 +1365,7 @@ func TestFunctions(t *testing.T) {
 					}
 					prepareScope(t, scope)
 
-					expr, parseDiags := hclsyntax.ParseExpression([]byte(test.src), "test.hcl", hcl.Pos{Line: 1, Column: 1})
+					expr, parseDiags := dumb-hclsyntax.ParseExpression([]byte(test.src), "test.dumb-hcl", dumb-hcl.Pos{Line: 1, Column: 1})
 					if parseDiags.HasErrors() {
 						for _, diag := range parseDiags {
 							t.Error(diag.Error())
@@ -1393,7 +1393,7 @@ func TestFunctions(t *testing.T) {
 func TestPlanTimeStampUnknown(t *testing.T) {
 	// plantimestamp should return an unknown if there is no timestamp, which
 	// happens during validation
-	expr, parseDiags := hclsyntax.ParseExpression([]byte("plantimestamp()"), "test.hcl", hcl.Pos{Line: 1, Column: 1})
+	expr, parseDiags := dumb-hclsyntax.ParseExpression([]byte("plantimestamp()"), "test.dumb-hcl", dumb-hcl.Pos{Line: 1, Column: 1})
 	if parseDiags.HasErrors() {
 		t.Fatal(parseDiags)
 	}

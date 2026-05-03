@@ -8,19 +8,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	stackparser "github.com/hashicorp/terraform/internal/stacks/stackconfig/parser"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	stackparser "github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/parser"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var (
@@ -56,8 +56,8 @@ func (r *RemovedComponentConfig) Addr() stackaddrs.ConfigComponent {
 }
 
 // DeclRange implements ConfigComponentExpressionScope.
-func (r *RemovedComponentConfig) DeclRange() *hcl.Range {
-	return r.config.DeclRange.ToHCL().Ptr()
+func (r *RemovedComponentConfig) DeclRange() *dumb-hcl.Range {
+	return r.config.DeclRange.ToDUMB_HCL().Ptr()
 }
 
 // StackConfig implements ConfigComponentExpressionScope
@@ -92,25 +92,25 @@ func (r *RemovedComponentConfig) CheckModuleTree(ctx context.Context) (*configs.
 		parser.AllowLanguageExperiments(r.main.LanguageExperimentsAllowed())
 
 		if !parser.IsConfigDir(rootModuleSource) {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Can't load module for removed component",
-				Detail:   fmt.Sprintf("The source location %s does not contain a Terraform module.", rootModuleSource),
-				Subject:  decl.SourceAddrRange.ToHCL().Ptr(),
+				Detail:   fmt.Sprintf("The source location %s does not contain a Dumb Terraform module.", rootModuleSource),
+				Subject:  decl.SourceAddrRange.ToDUMB_HCL().Ptr(),
 			})
 			return nil, diags
 		}
 
-		rootMod, hclDiags := parser.LoadConfigDir(rootModuleSource)
-		diags = diags.Append(hclDiags)
-		if hclDiags.HasErrors() {
+		rootMod, dumb-hclDiags := parser.LoadConfigDir(rootModuleSource)
+		diags = diags.Append(dumb-hclDiags)
+		if dumb-hclDiags.HasErrors() {
 			return nil, diags
 		}
 
 		walker := stackparser.NewSourceBundleModuleWalker(rootModuleSource, sources, parser)
-		configRoot, hclDiags := configs.BuildConfig(rootMod, walker, nil)
-		diags = diags.Append(hclDiags)
-		if hclDiags.HasErrors() {
+		configRoot, dumb-hclDiags := configs.BuildConfig(rootMod, walker, nil)
+		diags = diags.Append(dumb-hclDiags)
+		if dumb-hclDiags.HasErrors() {
 			return nil, diags
 		}
 
@@ -149,7 +149,7 @@ func (r *RemovedComponentConfig) CheckValid(ctx context.Context, phase EvalPhase
 			return diags, nil
 		}
 
-		tfCtx, err := terraform.NewContext(&terraform.ContextOpts{
+		tfCtx, err := dumb-terraform.NewContext(&dumb-terraform.ContextOpts{
 			PreloadedProviderSchemas: providerSchemas,
 			Provisioners:             r.main.availableProvisioners(),
 		})
@@ -158,16 +158,16 @@ func (r *RemovedComponentConfig) CheckValid(ctx context.Context, phase EvalPhase
 			// ContextOpts above.
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
-				"Failed to instantiate Terraform modules runtime",
-				fmt.Sprintf("Could not load the main Terraform language runtime: %s.\n\nThis is a bug in Terraform; please report it!", err),
+				"Failed to instantiate Dumb Terraform modules runtime",
+				fmt.Sprintf("Could not load the main Dumb Terraform language runtime: %s.\n\nThis is a bug in Dumb Terraform; please report it!", err),
 			))
 			return diags, nil
 		}
 
 		providerClients, valid := unconfiguredProviderClients(r.main, providers)
 		if !valid {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Cannot validate component",
 				Detail:   fmt.Sprintf("Cannot validate %s because its provider configuration assignments are invalid.", r.Addr()),
 				Subject:  r.DeclRange(),
@@ -195,7 +195,7 @@ func (r *RemovedComponentConfig) CheckValid(ctx context.Context, phase EvalPhase
 			}
 		}()
 
-		diags = diags.Append(tfCtx.Validate(moduleTree, &terraform.ValidateOpts{
+		diags = diags.Append(tfCtx.Validate(moduleTree, &dumb-terraform.ValidateOpts{
 			ExternalProviders:         providerClients,
 			AllowRootEphemeralOutputs: false, // TODO(issues/37822): Enable this.
 		}))

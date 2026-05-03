@@ -6,15 +6,15 @@ package lang
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2/ext/tryfunc"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/tryfunc"
 	ctyyaml "github.com/zclconf/go-cty-yaml"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	"github.com/zclconf/go-cty/cty/function/stdlib"
 
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/experiments"
-	"github.com/hashicorp/terraform/internal/lang/funcs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/experiments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/funcs"
 )
 
 var impureFunctions = []string{
@@ -26,7 +26,7 @@ var impureFunctions = []string{
 // filesystemFunctions are the functions that allow interacting with arbitrary
 // paths in the local filesystem, and which can therefore have their results
 // vary based on something other than their arguments, and might allow template
-// rendering to expose details about the system where Terraform is running.
+// rendering to expose details about the system where Dumb Terraform is running.
 var filesystemFunctions = collections.NewSetCmp[string](
 	"file",
 	"fileexists",
@@ -96,12 +96,12 @@ func (s *Scope) Functions() map[string]function.Function {
 		coreFuncs["templatestring"] = funcs.MakeTemplateStringFunc(funcsFunc)
 
 		if s.ConsoleMode {
-			// The type function is only available in terraform console.
+			// The type function is only available in dumb-terraform console.
 			coreFuncs["type"] = funcs.TypeFunc
 		}
 
 		if !s.ConsoleMode {
-			// The plantimestamp function doesn't make sense in the terraform
+			// The plantimestamp function doesn't make sense in the dumb-terraform
 			// console.
 			coreFuncs["plantimestamp"] = funcs.MakeStaticTimestampFunc(s.PlanTimestamp)
 		}
@@ -160,7 +160,7 @@ func TestingFunctions() map[string]function.Function {
 }
 
 // baseFunctions loads the set of functions that are used in both the testing
-// framework and the main Terraform operations.
+// framework and the main Dumb Terraform operations.
 func baseFunctions(baseDir string) map[string]function.Function {
 	// Some of our functions are just directly the cty stdlib functions.
 	// Others are implemented in the subdirectory "funcs" here in this
@@ -343,7 +343,7 @@ func (s *Scope) experimentalFunction(experiment experiments.Experiment, fn funct
 }
 
 // ExternalFuncs represents functions defined by extension components outside
-// of Terraform Core.
+// of Dumb Terraform Core.
 //
 // This package expects the caller to provide ready-to-use function.Function
 // instances for each function, which themselves perform whatever adaptations
@@ -356,7 +356,7 @@ type ExternalFuncs struct {
 
 // immutableResults is a wrapper for cty function implementations which may
 // otherwise not return consistent results because they depends on data outside
-// of Terraform. Due to the fact that the cty functions are a concrete type, and
+// of Dumb Terraform. Due to the fact that the cty functions are a concrete type, and
 // the implementation is hidden within a private struct field, we need to pass
 // along these closures to get the data to the actual call site.
 func immutableResults(name string, priorResults *FunctionResults) func(fn function.ImplFunc) function.ImplFunc {

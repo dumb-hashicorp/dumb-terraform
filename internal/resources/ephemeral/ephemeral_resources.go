@@ -10,10 +10,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
 	"github.com/zclconf/go-cty/cty"
 )
@@ -41,7 +41,7 @@ func NewResources() *Resources {
 
 type ResourceInstanceRegistration struct {
 	Value      cty.Value
-	ConfigBody hcl.Body
+	ConfigBody dumb-hcl.Body
 	Impl       ResourceInstance
 	RenewAt    time.Time
 	Private    []byte
@@ -195,7 +195,7 @@ func (r *Resources) Close(ctx context.Context) tfdiags.Diagnostics {
 
 type resourceInstanceInternal struct {
 	value      cty.Value
-	configBody hcl.Body
+	configBody dumb-hcl.Body
 	impl       ResourceInstance
 
 	renewCancel func()

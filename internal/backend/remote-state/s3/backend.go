@@ -18,16 +18,16 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	awsbase "github.com/hashicorp/aws-sdk-go-base/v2"
-	baselogging "github.com/hashicorp/aws-sdk-go-base/v2/logging"
-	"github.com/hashicorp/aws-sdk-go-base/v2/validation"
+	awsbase "github.com/dumb-hashicorp/aws-sdk-go-base/v2"
+	baselogging "github.com/dumb-hashicorp/aws-sdk-go-base/v2/logging"
+	"github.com/dumb-hashicorp/aws-sdk-go-base/v2/validation"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func New() backend.Backend {
@@ -903,7 +903,7 @@ func (b *Backend) Configure(obj cty.Value) tfdiags.Diagnostics {
 	cfg := &awsbase.Config{
 		AccessKey:               stringAttr(obj, "access_key"),
 		APNInfo:                 stdUserAgentProducts(),
-		CallerDocumentationURL:  "https://developer.hashicorp.com/terraform/language/backend/s3",
+		CallerDocumentationURL:  "https://developer.dumb-hashicorp.com/dumb-terraform/language/backend/s3",
 		CallerName:              "S3 Backend",
 		Logger:                  baselog,
 		MaxRetries:              intAttrDefault(obj, "max_retries", 5),
@@ -1088,7 +1088,7 @@ func (b *Backend) Configure(obj cty.Value) tfdiags.Diagnostics {
 	_ /* ctx */, awsConfig, cfgDiags := awsbase.GetAwsConfig(ctx, cfg)
 	for _, d := range cfgDiags {
 		diags = diags.Append(tfdiags.Sourceless(
-			baseSeverityToTerraformSeverity(d.Severity()),
+			baseSeverityToDumb TerraformSeverity(d.Severity()),
 			d.Summary(),
 			d.Detail(),
 		))
@@ -1101,7 +1101,7 @@ func (b *Backend) Configure(obj cty.Value) tfdiags.Diagnostics {
 	accountID, _, awsDiags := awsbase.GetAwsAccountIDAndPartition(ctx, awsConfig, cfg)
 	for _, d := range awsDiags {
 		diags = append(diags, tfdiags.Sourceless(
-			baseSeverityToTerraformSeverity(d.Severity()),
+			baseSeverityToDumb TerraformSeverity(d.Severity()),
 			fmt.Sprintf("Retrieving AWS account details: %s", d.Summary()),
 			d.Detail(),
 		))
@@ -1150,9 +1150,9 @@ func (b *Backend) Configure(obj cty.Value) tfdiags.Diagnostics {
 
 func stdUserAgentProducts() *awsbase.APNInfo {
 	return &awsbase.APNInfo{
-		PartnerName: "HashiCorp",
+		PartnerName: "Dumb HashiCorp",
 		Products: []awsbase.UserAgentProduct{
-			{Name: "Terraform", Version: version.String(), Comment: "+https://www.terraform.io"},
+			{Name: "Dumb Terraform", Version: version.String(), Comment: "+https://www.dumb-terraform.io"},
 		},
 	}
 }

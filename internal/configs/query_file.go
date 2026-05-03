@@ -6,9 +6,9 @@ package configs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // QueryFile represents a single query file within a configuration directory.
@@ -27,11 +27,11 @@ type QueryFile struct {
 	// ListResources is a slice of List blocks within the query file.
 	ListResources []*Resource
 
-	VariablesDeclRange hcl.Range
+	VariablesDeclRange dumb-hcl.Range
 }
 
-func loadQueryFile(body hcl.Body) (*QueryFile, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func loadQueryFile(body dumb-hcl.Body) (*QueryFile, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	file := &QueryFile{
 		Providers: make(map[string]*Provider),
 	}
@@ -39,7 +39,7 @@ func loadQueryFile(body hcl.Body) (*QueryFile, hcl.Diagnostics) {
 	content, contentDiags := body.Content(queryFileSchema)
 	diags = append(diags, contentDiags...)
 
-	listBlockTypes := make(map[string]map[string]hcl.Range)
+	listBlockTypes := make(map[string]map[string]dumb-hcl.Range)
 
 	for _, block := range content.Blocks {
 		switch block.Type {
@@ -51,11 +51,11 @@ func loadQueryFile(body hcl.Body) (*QueryFile, hcl.Diagnostics) {
 			}
 
 			if _, exists := listBlockTypes[list.Type]; !exists {
-				listBlockTypes[list.Type] = make(map[string]hcl.Range)
+				listBlockTypes[list.Type] = make(map[string]dumb-hcl.Range)
 			}
 			if rng, exists := listBlockTypes[list.Type][list.Name]; exists {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate \"list\" block names",
 					Detail:   fmt.Sprintf("This query file already has a list block named %s.%s defined at %s.", list.Type, list.Name, rng),
 					Subject:  block.DefRange.Ptr(),
@@ -82,8 +82,8 @@ func loadQueryFile(body hcl.Body) (*QueryFile, hcl.Diagnostics) {
 			file.Locals = append(file.Locals, defs...)
 		default:
 			// We don't expect any other block types in a query file.
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid block type",
 				Detail:   fmt.Sprintf("This block type is not valid within a query file: %s", block.Type),
 				Subject:  block.DefRange.Ptr(),
@@ -94,8 +94,8 @@ func loadQueryFile(body hcl.Body) (*QueryFile, hcl.Diagnostics) {
 	return file, diags
 }
 
-func decodeQueryListBlock(block *hcl.Block) (*Resource, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeQueryListBlock(block *dumb-hcl.Block) (*Resource, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	content, remain, contentDiags := block.Body.PartialContent(QueryListResourceBlockSchema)
 	diags = append(diags, contentDiags...)
@@ -111,22 +111,22 @@ func decodeQueryListBlock(block *hcl.Block) (*Resource, hcl.Diagnostics) {
 	}
 
 	if attr, exists := content.Attributes["provider"]; exists {
-		var providerDiags hcl.Diagnostics
+		var providerDiags dumb-hcl.Diagnostics
 		r.ProviderConfigRef, providerDiags = decodeProviderConfigRef(attr.Expr, "provider")
 		diags = append(diags, providerDiags...)
 	} else {
 		// Must have a provider attribute.
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Missing \"provider\" attribute",
 			Detail:   "You must specify a provider attribute when defining a list block.",
 			Subject:  r.DeclRange.Ptr(),
 		})
 	}
 
-	if !hclsyntax.ValidIdentifier(r.Name) {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+	if !dumb-hclsyntax.ValidIdentifier(r.Name) {
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid list block name",
 			Detail:   badIdentifierDetail,
 			Subject:  r.DeclRange.Ptr(),
@@ -141,8 +141,8 @@ func decodeQueryListBlock(block *hcl.Block) (*Resource, hcl.Diagnostics) {
 		r.ForEach = attr.Expr
 		// Cannot have count and for_each on the same resource block
 		if r.Count != nil {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  `Invalid combination of "count" and "for_each"`,
 				Detail:   `The "count" and "for_each" meta-arguments are mutually-exclusive.`,
 				Subject:  &attr.NameRange,
@@ -159,21 +159,21 @@ func decodeQueryListBlock(block *hcl.Block) (*Resource, hcl.Diagnostics) {
 	}
 
 	// verify that the list block has a config block
-	content, contentDiags = block.Body.Content(&hcl.BodySchema{
+	content, contentDiags = block.Body.Content(&dumb-hcl.BodySchema{
 		Attributes: QueryListResourceBlockSchema.Attributes,
-		Blocks: []hcl.BlockHeaderSchema{
+		Blocks: []dumb-hcl.BlockHeaderSchema{
 			{Type: "config"},
 		},
 	})
 	diags = append(diags, contentDiags...)
 
-	var configBlock hcl.Body
+	var configBlock dumb-hcl.Body
 	for _, block := range content.Blocks {
 		switch block.Type {
 		case "config":
 			if configBlock != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate config block",
 					Detail:   "A list block must contain only one nested \"config\" block.",
 					Subject:  block.DefRange.Ptr(),
@@ -192,9 +192,9 @@ func decodeQueryListBlock(block *hcl.Block) (*Resource, hcl.Diagnostics) {
 }
 
 // QueryListResourceBlockSchema is the schema for a list resource type within
-// a terraform query file.
-var QueryListResourceBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+// a dumb-terraform query file.
+var QueryListResourceBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name: "count",
 		},
@@ -213,11 +213,11 @@ var QueryListResourceBlockSchema = &hcl.BodySchema{
 	},
 }
 
-// queryFileSchema is the schema for a terraform query file. It defines the
+// queryFileSchema is the schema for a dumb-terraform query file. It defines the
 // expected structure of the file, including the types of supported blocks and their
 // attributes.
-var queryFileSchema = &hcl.BodySchema{
-	Blocks: []hcl.BlockHeaderSchema{
+var queryFileSchema = &dumb-hcl.BodySchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{
 			Type:       "list",
 			LabelNames: []string{"type", "name"},

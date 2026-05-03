@@ -7,12 +7,12 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestRun_ValidateExpectedFailures(t *testing.T) {
@@ -35,14 +35,14 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 		"carries through simple diags": {
 			Input: createDiagnostics(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
 
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "simple error",
 					Detail:   "want to see this in the returned set",
 				})
 
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "simple warning",
 					Detail:   "want to see this in the returned set",
 				})
@@ -91,8 +91,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// First, let's create an output that failed that isn't
 				// expected. This should be unaffected by our function.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "unexpected failure",
 						Detail:   "this should not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -106,8 +106,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// Second, let's create an output that failed but is expected.
 				// Our function should remove this from the set of diags.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "expected failure",
 						Detail:   "this should be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -119,8 +119,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 					})
 
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagWarning,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagWarning,
 						Summary:  "expected warning",
 						Detail:   "this should not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -138,8 +138,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// triggered.
 
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "error in child module",
 						Detail:   "this should not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -197,8 +197,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// First, let's create an input that failed that isn't
 				// expected. This should be unaffected by our function.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "unexpected failure",
 						Detail:   "this should not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -212,8 +212,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// Second, let's create an input that failed but is expected.
 				// Our function should remove this from the set of diags.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "expected failure",
 						Detail:   "this should be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -225,8 +225,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 					})
 
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagWarning,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagWarning,
 						Summary:  "expected warning",
 						Detail:   "this should not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -244,8 +244,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// triggered.
 
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "error in child module",
 						Detail:   "this should not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -305,8 +305,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// First, we'll create an unexpected failure that should be
 				// carried through untouched.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "unexpected failure",
 						Detail:   "this should not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -326,8 +326,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// Second, we'll create a failure from our test_instance.single
 				// resource that should be removed.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "expected failure in test_instance.single",
 						Detail:   "this should be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -347,8 +347,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// Third, we'll create a warning from our test_instance.single
 				// resource that should be propagated as it is only a warning.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagWarning,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagWarning,
 						Summary:  "expected warning in test_instance.single",
 						Detail:   "this should not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -368,8 +368,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// Fourth, we'll create diagnostics from several instances of
 				// the test_instance.all_instances which should all be removed.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "expected failure in test_instance.all_instances[0]",
 						Detail:   "this should be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -387,8 +387,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 						},
 					})
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "expected failure in test_instance.all_instances[1]",
 						Detail:   "this should be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -406,8 +406,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 						},
 					})
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "expected failure in test_instance.all_instances[2]",
 						Detail:   "this should be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -429,8 +429,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// the test_instance.instance resource, only some of which
 				// should be removed.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "expected failure in test_instance.instance[0]",
 						Detail:   "this should be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -448,8 +448,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 						},
 					})
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "expected failure in test_instance.instance[1]",
 						Detail:   "this should not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -467,8 +467,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 						},
 					})
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "expected failure in test_instance.instance[2]",
 						Detail:   "this should be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -490,8 +490,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// test_instance.missing but in a child module which shouldn't
 				// be removed.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "failure in child module",
 						Detail:   "this should not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -561,8 +561,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// First, we'll add an unexpected warning from a check block
 				// assertion that should get upgraded to an error.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagWarning,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagWarning,
 						Summary:  "unexpected failure",
 						Detail:   "this should upgrade and not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -578,8 +578,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// Second, we'll add an unexpected warning from a check block
 				// in a child module that should get upgrade to error.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagWarning,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagWarning,
 						Summary:  "expected failure in child module",
 						Detail:   "this should upgrade and not be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -599,8 +599,8 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 				// Third, we'll add an expected warning from a check block
 				// assertion that should be removed.
 				diags = diags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagWarning,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagWarning,
 						Summary:  "expected failure",
 						Detail:   "this should be removed",
 						Extra: &addrs.CheckRuleDiagnosticExtra{
@@ -747,9 +747,9 @@ func TestRun_ValidateExpectedFailures(t *testing.T) {
 	}
 	for name, tc := range tcs {
 		t.Run(name, func(t *testing.T) {
-			var traversals []hcl.Traversal
+			var traversals []dumb-hcl.Traversal
 			for _, ef := range tc.ExpectedFailures {
-				traversal, diags := hclsyntax.ParseTraversalAbs([]byte(ef), "foo.tf", hcl.Pos{Line: 1, Column: 1})
+				traversal, diags := dumb-hclsyntax.ParseTraversalAbs([]byte(ef), "foo.tf", dumb-hcl.Pos{Line: 1, Column: 1})
 				if diags.HasErrors() {
 					t.Errorf("invalid expected failure %s: %v", ef, diags.Error())
 				}

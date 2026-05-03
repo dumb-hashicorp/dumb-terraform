@@ -4,7 +4,7 @@
 package arguments
 
 import (
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Console represents the command-line arguments for the console command.
@@ -29,7 +29,7 @@ type Console struct {
 	// TargetFlags are the raw -target flag values.
 	TargetFlags []string
 
-	// ConfigPath is the path to a directory of Terraform configuration files.
+	// ConfigPath is the path to a directory of Dumb Terraform configuration files.
 	ConfigPath string
 }
 

@@ -6,13 +6,13 @@ package graph
 import (
 	"log"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/dag"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dag"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type GraphNodeExecutable interface {
@@ -20,40 +20,40 @@ type GraphNodeExecutable interface {
 }
 
 // TestGraphBuilder is a GraphBuilder implementation that builds a graph for
-// a terraform test file. The file may contain multiple runs, and each run may have
+// a dumb-terraform test file. The file may contain multiple runs, and each run may have
 // dependencies on other runs.
 type TestGraphBuilder struct {
 	Config      *configs.Config
 	File        *moduletest.File
-	ContextOpts *terraform.ContextOpts
+	ContextOpts *dumb-terraform.ContextOpts
 	CommandMode moduletest.CommandMode
 }
 
 type graphOptions struct {
 	File        *moduletest.File
-	ContextOpts *terraform.ContextOpts
+	ContextOpts *dumb-terraform.ContextOpts
 }
 
 // See GraphBuilder
-func (b *TestGraphBuilder) Build() (*terraform.Graph, tfdiags.Diagnostics) {
-	log.Printf("[TRACE] building graph for terraform test")
-	return (&terraform.BasicGraphBuilder{
+func (b *TestGraphBuilder) Build() (*dumb-terraform.Graph, tfdiags.Diagnostics) {
+	log.Printf("[TRACE] building graph for dumb-terraform test")
+	return (&dumb-terraform.BasicGraphBuilder{
 		Steps: b.Steps(),
 		Name:  "TestGraphBuilder",
 	}).Build(addrs.RootModuleInstance)
 }
 
 // See GraphBuilder
-func (b *TestGraphBuilder) Steps() []terraform.GraphTransformer {
+func (b *TestGraphBuilder) Steps() []dumb-terraform.GraphTransformer {
 	opts := &graphOptions{
 		File:        b.File,
 		ContextOpts: b.ContextOpts,
 	}
-	steps := []terraform.GraphTransformer{
+	steps := []dumb-terraform.GraphTransformer{
 		&TestRunTransformer{opts: opts, mode: b.CommandMode},
 		&TestVariablesTransformer{File: b.File},
-		terraform.DynamicTransformer(validateRunConfigs),
-		terraform.DynamicTransformer(func(g *terraform.Graph) error {
+		dumb-terraform.DynamicTransformer(validateRunConfigs),
+		dumb-terraform.DynamicTransformer(func(g *dumb-terraform.Graph) error {
 			cleanup := &TeardownSubgraph{opts: opts, parent: g, mode: b.CommandMode}
 			g.Add(cleanup)
 
@@ -73,13 +73,13 @@ func (b *TestGraphBuilder) Steps() []terraform.GraphTransformer {
 		},
 		&ReferenceTransformer{},
 		&CloseTestGraphTransformer{},
-		&terraform.TransitiveReductionTransformer{},
+		&dumb-terraform.TransitiveReductionTransformer{},
 	}
 
 	return steps
 }
 
-func validateRunConfigs(g *terraform.Graph) error {
+func validateRunConfigs(g *dumb-terraform.Graph) error {
 	for node := range dag.SelectSeq[*NodeTestRun](g.VerticesSeq()) {
 		diags := node.run.Config.Validate(node.run.ModuleConfig)
 		node.run.Diagnostics = node.run.Diagnostics.Append(diags)
@@ -90,7 +90,7 @@ func validateRunConfigs(g *terraform.Graph) error {
 	return nil
 }
 
-func Walk(g *terraform.Graph, ctx *EvalContext) tfdiags.Diagnostics {
+func Walk(g *dumb-terraform.Graph, ctx *EvalContext) tfdiags.Diagnostics {
 	walkFn := func(v dag.Vertex) tfdiags.Diagnostics {
 		if ctx.Cancelled() {
 			// If the graph walk has been cancelled, the node should just return immediately.

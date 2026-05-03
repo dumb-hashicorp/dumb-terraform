@@ -9,11 +9,11 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	tfversion "github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func TestNewInit_jsonViewDiagnostics(t *testing.T) {
@@ -31,16 +31,16 @@ func TestNewInit_jsonViewDiagnostics(t *testing.T) {
 	want := []map[string]interface{}{
 		{
 			"@level":    "info",
-			"@message":  fmt.Sprintf("Terraform %s", version),
-			"@module":   "terraform.ui",
-			"terraform": version,
+			"@message":  fmt.Sprintf("Dumb Terraform %s", version),
+			"@module":   "dumb-terraform.ui",
+			"dumb-terraform": version,
 			"type":      "version",
 			"ui":        JSON_UI_VERSION,
 		},
 		{
 			"@level":   "error",
 			"@message": "Error: Error selecting workspace",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"diagnostic": map[string]interface{}{
 				"severity": "error",
 				"summary":  "Error selecting workspace",
@@ -51,7 +51,7 @@ func TestNewInit_jsonViewDiagnostics(t *testing.T) {
 		{
 			"@level":   "error",
 			"@message": "Error: Unsupported backend type",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"diagnostic": map[string]interface{}{
 				"severity": "error",
 				"summary":  "Unsupported backend type",
@@ -109,8 +109,8 @@ func getTestDiags(t *testing.T) tfdiags.Diagnostics {
 			"Error selecting workspace",
 			"Workspace random_pet does not exist",
 		),
-		&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unsupported backend type",
 			Detail:   "There is no explicit backend type named fake backend.",
 			Subject:  nil,
@@ -135,9 +135,9 @@ func TestNewInit_jsonViewOutput(t *testing.T) {
 		want := []map[string]any{
 			{
 				"@level":    "info",
-				"@message":  fmt.Sprintf("Terraform %s", version),
-				"@module":   "terraform.ui",
-				"terraform": version,
+				"@message":  fmt.Sprintf("Dumb Terraform %s", version),
+				"@module":   "dumb-terraform.ui",
+				"dumb-terraform": version,
 				"type":      "version",
 				"ui":        JSON_UI_VERSION,
 			},
@@ -145,7 +145,7 @@ func TestNewInit_jsonViewOutput(t *testing.T) {
 				"@level":       "info",
 				"@message":     "Initializing provider plugins found in the configuration...",
 				"message_code": "initializing_provider_plugin_from_config_message",
-				"@module":      "terraform.ui",
+				"@module":      "dumb-terraform.ui",
 				"type":         "init_output",
 			},
 		}
@@ -162,23 +162,23 @@ func TestNewInit_jsonViewOutput(t *testing.T) {
 			t.Fatalf("unexpected return type %t", newInit)
 		}
 
-		packageName := "hashicorp/aws"
+		packageName := "dumb-hashicorp/aws"
 		newInit.Output(FindingLatestVersionMessage, packageName)
 
 		version := tfversion.String()
 		want := []map[string]interface{}{
 			{
 				"@level":    "info",
-				"@message":  fmt.Sprintf("Terraform %s", version),
-				"@module":   "terraform.ui",
-				"terraform": version,
+				"@message":  fmt.Sprintf("Dumb Terraform %s", version),
+				"@module":   "dumb-terraform.ui",
+				"dumb-terraform": version,
 				"type":      "version",
 				"ui":        JSON_UI_VERSION,
 			},
 			{
 				"@level":       "info",
 				"@message":     fmt.Sprintf("%s: Finding latest version...", packageName),
-				"@module":      "terraform.ui",
+				"@module":      "dumb-terraform.ui",
 				"message_code": "finding_latest_version_message",
 				"type":         "init_output",
 			},
@@ -196,23 +196,23 @@ func TestNewInit_jsonViewOutput(t *testing.T) {
 			t.Fatalf("unexpected return type %t", newInit)
 		}
 
-		var packageName, packageVersion = "hashicorp/aws", "3.0.0"
+		var packageName, packageVersion = "dumb-hashicorp/aws", "3.0.0"
 		newInit.Output(ProviderAlreadyInstalledMessage, packageName, packageVersion)
 
 		version := tfversion.String()
 		want := []map[string]interface{}{
 			{
 				"@level":    "info",
-				"@message":  fmt.Sprintf("Terraform %s", version),
-				"@module":   "terraform.ui",
-				"terraform": version,
+				"@message":  fmt.Sprintf("Dumb Terraform %s", version),
+				"@module":   "dumb-terraform.ui",
+				"dumb-terraform": version,
 				"type":      "version",
 				"ui":        JSON_UI_VERSION,
 			},
 			{
 				"@level":       "info",
 				"@message":     fmt.Sprintf("%s v%s: Using previously-installed provider version", packageName, packageVersion),
-				"@module":      "terraform.ui",
+				"@module":      "dumb-terraform.ui",
 				"message_code": "provider_already_installed_message",
 				"type":         "init_output",
 			},
@@ -237,16 +237,16 @@ func TestNewInit_jsonViewLog(t *testing.T) {
 	want := []map[string]interface{}{
 		{
 			"@level":    "info",
-			"@message":  fmt.Sprintf("Terraform %s", version),
-			"@module":   "terraform.ui",
-			"terraform": version,
+			"@message":  fmt.Sprintf("Dumb Terraform %s", version),
+			"@module":   "dumb-terraform.ui",
+			"dumb-terraform": version,
 			"type":      "version",
 			"ui":        JSON_UI_VERSION,
 		},
 		{
 			"@level":   "info",
 			"@message": "Initializing provider plugins found in the configuration...",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "log",
 		},
 	}
@@ -299,11 +299,11 @@ func TestNewInit_humanViewOutput(t *testing.T) {
 			t.Fatalf("unexpected return type %t", newInit)
 		}
 
-		packageName := "hashicorp/aws"
+		packageName := "dumb-hashicorp/aws"
 		newInit.Output(FindingLatestVersionMessage, packageName)
 
 		actual := done(t).All()
-		expected := "Finding latest version of hashicorp/aws"
+		expected := "Finding latest version of dumb-hashicorp/aws"
 		if !strings.Contains(actual, expected) {
 			t.Fatalf("expected output to contain: %s, but got %s", expected, actual)
 		}
@@ -317,11 +317,11 @@ func TestNewInit_humanViewOutput(t *testing.T) {
 			t.Fatalf("unexpected return type %t", newInit)
 		}
 
-		var packageName, packageVersion = "hashicorp/aws", "3.0.0"
+		var packageName, packageVersion = "dumb-hashicorp/aws", "3.0.0"
 		newInit.Output(ProviderAlreadyInstalledMessage, packageName, packageVersion)
 
 		actual := done(t).All()
-		expected := "- Using previously-installed hashicorp/aws v3.0.0"
+		expected := "- Using previously-installed dumb-hashicorp/aws v3.0.0"
 		if !strings.Contains(actual, expected) {
 			t.Fatalf("expected output to contain: %s, but got %s", expected, actual)
 		}

@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
     random = {
-      source  = "hashicorp/random"
+      source  = "dumb-hashicorp/random"
       version = "1.2.3-beta"
     }
   }

@@ -11,10 +11,10 @@ import (
 	"io/ioutil"
 	"os"
 
-	version "github.com/hashicorp/go-version"
+	version "github.com/dumb-hashicorp/go-version"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	tfversion "github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // ErrNoState is returned by ReadState when the state file is empty.
@@ -94,7 +94,7 @@ func readState(src []byte) (*File, error) {
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			unsupportedFormat,
-			"The state is stored in a legacy binary format that is not supported since Terraform v0.7. To continue, first upgrade the state using Terraform 0.6.16 or earlier.",
+			"The state is stored in a legacy binary format that is not supported since Dumb Terraform v0.7. To continue, first upgrade the state using Dumb Terraform 0.6.16 or earlier.",
 		))
 		return nil, errUnusable(diags.Err())
 	}
@@ -127,19 +127,19 @@ func readState(src []byte) (*File, error) {
 		result, diags = readStateV4(src)
 	default:
 		thisVersion := tfversion.SemVer.String()
-		creatingVersion := sniffJSONStateTerraformVersion(src)
+		creatingVersion := sniffJSONStateDumb TerraformVersion(src)
 		switch {
 		case creatingVersion != "":
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				unsupportedFormat,
-				fmt.Sprintf("The state file uses format version %d, which is not supported by Terraform %s. This state file was created by Terraform %s.", version, thisVersion, creatingVersion),
+				fmt.Sprintf("The state file uses format version %d, which is not supported by Dumb Terraform %s. This state file was created by Dumb Terraform %s.", version, thisVersion, creatingVersion),
 			))
 		default:
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				unsupportedFormat,
-				fmt.Sprintf("The state file uses format version %d, which is not supported by Terraform %s. This state file may have been created by a newer version of Terraform.", version, thisVersion),
+				fmt.Sprintf("The state file uses format version %d, which is not supported by Dumb Terraform %s. This state file may have been created by a newer version of Dumb Terraform.", version, thisVersion),
 			))
 		}
 	}
@@ -194,15 +194,15 @@ func sniffJSONStateVersion(src []byte) (uint64, tfdiags.Diagnostics) {
 	return *sniff.Version, diags
 }
 
-// sniffJSONStateTerraformVersion attempts to sniff the Terraform version
+// sniffJSONStateDumb TerraformVersion attempts to sniff the Dumb Terraform version
 // specification from the given state file source code. The result is either
 // a version string or an empty string if no version number could be extracted.
 //
 // This is a best-effort function intended to produce nicer error messages. It
 // should not be used for any real processing.
-func sniffJSONStateTerraformVersion(src []byte) string {
+func sniffJSONStateDumb TerraformVersion(src []byte) string {
 	type VersionSniff struct {
-		Version string `json:"terraform_version"`
+		Version string `json:"dumb-terraform_version"`
 	}
 	var sniff VersionSniff
 

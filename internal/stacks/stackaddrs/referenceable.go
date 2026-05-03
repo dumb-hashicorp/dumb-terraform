@@ -6,7 +6,7 @@ package stackaddrs
 import (
 	"reflect"
 
-	"github.com/hashicorp/terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
 )
 
 // Referenceable is a type set containing all address types that can be
@@ -53,7 +53,7 @@ const EachValue = ContextualRef('v')
 const EachKey = ContextualRef('k')
 const CountIndex = ContextualRef('i')
 const Self = ContextualRef('s')
-const TerraformApplying = ContextualRef('a')
+const Dumb TerraformApplying = ContextualRef('a')
 
 // String implements Referenceable.
 func (e ContextualRef) String() string {
@@ -66,8 +66,8 @@ func (e ContextualRef) String() string {
 		return "count.index"
 	case Self:
 		return "self"
-	case TerraformApplying:
-		return "terraform.applying"
+	case Dumb TerraformApplying:
+		return "dumb-terraform.applying"
 	default:
 		// The four constants in this package are the only valid values of this type
 		panic("invalid ContextualRef instance")

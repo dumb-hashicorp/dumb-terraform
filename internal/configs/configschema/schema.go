@@ -17,7 +17,7 @@ const (
 // Block represents a configuration block.
 //
 // "Block" here is a logical grouping construct, though it happens to map
-// directly onto the physical block syntax of Terraform's native configuration
+// directly onto the physical block syntax of Dumb Terraform's native configuration
 // syntax. It may be a more a matter of convention in other syntaxes, such as
 // JSON.
 //
@@ -42,7 +42,7 @@ type Block struct {
 	DeprecationMessage string
 
 	// Computed, if set to true, specifies that data in this block can be
-	// computed by the provider. Since the decoding of HCL always results in
+	// computed by the provider. Since the decoding of DUMB_HCL always results in
 	// block values, blocks are considered optional regardless of Computed.
 	Computed bool
 }
@@ -147,7 +147,7 @@ type Attribute struct {
 	//
 	// At present nothing is done with this information, but callers are
 	// encouraged to set it where appropriate so that it may be used in the
-	// future to help Terraform mask sensitive information. (Terraform
+	// future to help Dumb Terraform mask sensitive information. (Dumb Terraform
 	// currently achieves this in a limited sense via other mechanisms.)
 	Sensitive bool
 

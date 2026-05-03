@@ -8,11 +8,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/backend/local"
-	"github.com/hashicorp/terraform/internal/command/junit"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/junit"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // This test cannot access sources when contructing output for XML files. Due to this, the majority of testing
@@ -36,8 +36,8 @@ func Test_TestJUnitXMLFile_Save(t *testing.T) {
 			suite: moduletest.Suite{
 				Status: moduletest.Skip,
 				Files: map[string]*moduletest.File{
-					"file1.tftest.hcl": {
-						Name:   "file1.tftest.hcl",
+					"file1.tftest.dumb-hcl": {
+						Name:   "file1.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -49,9 +49,9 @@ func Test_TestJUnitXMLFile_Save(t *testing.T) {
 				},
 			},
 			expectedOuput: []byte(`<?xml version="1.0" encoding="UTF-8"?><testsuites>
-  <testsuite name="file1.tftest.hcl" tests="1" skipped="1" failures="0" errors="0">
-    <testcase name="my_test" classname="file1.tftest.hcl">
-      <skipped message="Testcase skipped due to an interrupt"><![CDATA[Terraform received an interrupt and stopped gracefully. This caused all remaining testcases to be skipped]]></skipped>
+  <testsuite name="file1.tftest.dumb-hcl" tests="1" skipped="1" failures="0" errors="0">
+    <testcase name="my_test" classname="file1.tftest.dumb-hcl">
+      <skipped message="Testcase skipped due to an interrupt"><![CDATA[Dumb Terraform received an interrupt and stopped gracefully. This caused all remaining testcases to be skipped]]></skipped>
     </testcase>
   </testsuite>
 </testsuites>`),
@@ -62,8 +62,8 @@ func Test_TestJUnitXMLFile_Save(t *testing.T) {
 			suite: moduletest.Suite{
 				Status: moduletest.Error,
 				Files: map[string]*moduletest.File{
-					"file1.tftest.hcl": {
-						Name:   "file1.tftest.hcl",
+					"file1.tftest.dumb-hcl": {
+						Name:   "file1.tftest.dumb-hcl",
 						Status: moduletest.Error,
 						Runs: []*moduletest.Run{
 							{
@@ -79,11 +79,11 @@ func Test_TestJUnitXMLFile_Save(t *testing.T) {
 				},
 			},
 			expectedOuput: []byte(`<?xml version="1.0" encoding="UTF-8"?><testsuites>
-  <testsuite name="file1.tftest.hcl" tests="2" skipped="1" failures="0" errors="1">
-    <testcase name="my_test_1" classname="file1.tftest.hcl">
+  <testsuite name="file1.tftest.dumb-hcl" tests="2" skipped="1" failures="0" errors="1">
+    <testcase name="my_test_1" classname="file1.tftest.dumb-hcl">
       <error message="Encountered an error"></error>
     </testcase>
-    <testcase name="my_test_2" classname="file1.tftest.hcl">
+    <testcase name="my_test_2" classname="file1.tftest.dumb-hcl">
       <skipped message="Testcase skipped due to a previous testcase error"><![CDATA[Previous testcase "my_test_1" ended in error, which caused the remaining tests in the file to be skipped]]></skipped>
     </testcase>
   </testsuite>
@@ -97,8 +97,8 @@ func Test_TestJUnitXMLFile_Save(t *testing.T) {
 			suite: moduletest.Suite{
 				Status: moduletest.Pending,
 				Files: map[string]*moduletest.File{
-					"file1.tftest.hcl": {
-						Name:   "file1.tftest.hcl",
+					"file1.tftest.dumb-hcl": {
+						Name:   "file1.tftest.dumb-hcl",
 						Status: moduletest.Pending,
 						Runs: []*moduletest.Run{
 							{
@@ -110,8 +110,8 @@ func Test_TestJUnitXMLFile_Save(t *testing.T) {
 				},
 			},
 			expectedOuput: []byte(`<?xml version="1.0" encoding="UTF-8"?><testsuites>
-  <testsuite name="file1.tftest.hcl" tests="1" skipped="1" failures="0" errors="0">
-    <testcase name="my_test" classname="file1.tftest.hcl">
+  <testsuite name="file1.tftest.dumb-hcl" tests="1" skipped="1" failures="0" errors="0">
+    <testcase name="my_test" classname="file1.tftest.dumb-hcl">
       <skipped></skipped>
     </testcase>
   </testsuite>
@@ -122,7 +122,7 @@ func Test_TestJUnitXMLFile_Save(t *testing.T) {
 			runner:   &local.TestSuiteRunner{},
 			suite: func() moduletest.Suite {
 				file := &moduletest.File{
-					Name:   "file1.tftest.hcl",
+					Name:   "file1.tftest.dumb-hcl",
 					Status: moduletest.Error,
 					Runs: []*moduletest.Run{
 						{
@@ -142,13 +142,13 @@ func Test_TestJUnitXMLFile_Save(t *testing.T) {
 				return moduletest.Suite{
 					Status: moduletest.Error,
 					Files: map[string]*moduletest.File{
-						"file1.tftest.hcl": file,
+						"file1.tftest.dumb-hcl": file,
 					},
 				}
 			}(),
 			expectedOuput: []byte(`<?xml version="1.0" encoding="UTF-8"?><testsuites>
-  <testsuite name="file1.tftest.hcl" tests="1" skipped="1" failures="0" errors="0">
-    <testcase name="my_test" classname="file1.tftest.hcl">
+  <testsuite name="file1.tftest.dumb-hcl" tests="1" skipped="1" failures="0" errors="0">
+    <testcase name="my_test" classname="file1.tftest.dumb-hcl">
       <skipped message="Testcase skipped due to file-level errors"></skipped>
     </testcase>
     <system-err><![CDATA[

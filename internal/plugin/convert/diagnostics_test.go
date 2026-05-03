@@ -9,10 +9,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	proto "github.com/hashicorp/terraform/internal/tfplugin5"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	proto "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin5"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -394,7 +394,7 @@ func TestProtoDiagnostics_emptyAttributePath(t *testing.T) {
 	testConfig := `provider "test" {
   foo = "bar"
 }`
-	f, parseDiags := hclsyntax.ParseConfig([]byte(testConfig), "test.tf", hcl.Pos{Line: 1, Column: 1})
+	f, parseDiags := dumb-hclsyntax.ParseConfig([]byte(testConfig), "test.tf", dumb-hcl.Pos{Line: 1, Column: 1})
 	if parseDiags.HasErrors() {
 		t.Fatal(parseDiags)
 	}

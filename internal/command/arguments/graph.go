@@ -3,7 +3,7 @@
 
 package arguments
 
-import "github.com/hashicorp/terraform/internal/tfdiags"
+import "github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
 // Graph represents the command-line arguments for the graph command.
 type Graph struct {

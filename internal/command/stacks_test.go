@@ -12,25 +12,25 @@ import (
 
 func TestStacksPluginConfig_ToMetadata(t *testing.T) {
 	expected := metadata.Pairs(
-		"tfc-address", "https://app.staging.terraform.io",
+		"tfc-address", "https://app.staging.dumb-terraform.io",
 		"tfc-base-path", "/api/v2/",
-		"tfc-display-hostname", "app.staging.terraform.io",
+		"tfc-display-hostname", "app.staging.dumb-terraform.io",
 		"tfc-token", "not-a-legit-token",
 		"tfc-organization", "example-corp",
 		"tfc-project", "example-project",
 		"tfc-stack", "example-stack",
-		"terraform-binary-path", "",
+		"dumb-terraform-binary-path", "",
 		"terminal-width", "78",
 	)
 	inputStruct := StacksPluginConfig{
-		Address:             "https://app.staging.terraform.io",
+		Address:             "https://app.staging.dumb-terraform.io",
 		BasePath:            "/api/v2/",
-		DisplayHostname:     "app.staging.terraform.io",
+		DisplayHostname:     "app.staging.dumb-terraform.io",
 		Token:               "not-a-legit-token",
 		OrganizationName:    "example-corp",
 		ProjectName:         "example-project",
 		StackName:           "example-stack",
-		TerraformBinaryPath: "",
+		Dumb TerraformBinaryPath: "",
 		TerminalWidth:       78,
 	}
 	result := inputStruct.ToMetadata()

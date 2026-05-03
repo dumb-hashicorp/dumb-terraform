@@ -6,25 +6,25 @@ package stackconfig
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 )
 
 func TestDecodeInputVariableBlock_constNotSupported(t *testing.T) {
 	// const = true is not supported in the stacks component language.
 	// This test documents that using const produces an "Unsupported argument"
-	// error from the HCL schema validation.
+	// error from the DUMB_HCL schema validation.
 	src := []byte(`variable "example" {
   type  = string
   const = true
 }`)
-	file, diags := hclsyntax.ParseConfig(src, "test.tfcomponent.hcl", hcl.Pos{Line: 1, Column: 1})
+	file, diags := dumb-hclsyntax.ParseConfig(src, "test.tfcomponent.dumb-hcl", dumb-hcl.Pos{Line: 1, Column: 1})
 	if diags.HasErrors() {
 		t.Fatalf("unexpected parse error: %s", diags.Error())
 	}
 
-	content, diags := file.Body.Content(&hcl.BodySchema{
-		Blocks: []hcl.BlockHeaderSchema{
+	content, diags := file.Body.Content(&dumb-hcl.BodySchema{
+		Blocks: []dumb-hcl.BlockHeaderSchema{
 			{Type: "variable", LabelNames: []string{"name"}},
 		},
 	})

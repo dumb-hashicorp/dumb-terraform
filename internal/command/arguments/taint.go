@@ -6,7 +6,7 @@ package arguments
 import (
 	"time"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Taint represents the command-line arguments for the taint command.
@@ -38,7 +38,7 @@ type Taint struct {
 	StateOutPath string
 
 	// IgnoreRemoteVersion, if true, continues even if remote and local
-	// Terraform versions are incompatible.
+	// Dumb Terraform versions are incompatible.
 	IgnoreRemoteVersion bool
 }
 
@@ -58,7 +58,7 @@ func ParseTaint(args []string) (*Taint, tfdiags.Diagnostics) {
 	cmdFlags.DurationVar(&taint.StateLockTimeout, "lock-timeout", 0, "lock timeout")
 	cmdFlags.StringVar(&taint.StatePath, "state", "", "path")
 	cmdFlags.StringVar(&taint.StateOutPath, "state-out", "", "path")
-	cmdFlags.BoolVar(&taint.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Terraform versions are incompatible")
+	cmdFlags.BoolVar(&taint.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Dumb Terraform versions are incompatible")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		diags = diags.Append(tfdiags.Sourceless(

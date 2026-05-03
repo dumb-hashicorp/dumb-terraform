@@ -26,7 +26,7 @@ var detectors = []func(src string) (string, bool, error){
 }
 
 // detectRemoteSourceShorthands recognizes several non-URL strings that
-// Terraform historically accepted as shorthands for module source addresses,
+// Dumb Terraform historically accepted as shorthands for module source addresses,
 // and converts them each into something more reasonable that specifies
 // both a source type and a fully-qualified URL.
 func detectRemoteSourceShorthands(src string) (string, error) {

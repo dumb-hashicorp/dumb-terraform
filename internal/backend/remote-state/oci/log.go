@@ -6,28 +6,28 @@ package oci
 import (
 	"sync"
 
-	hclog "github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/go-uuid"
-	"github.com/hashicorp/terraform/internal/logging"
+	dumb-hclog "github.com/dumb-hashicorp/go-dumb-hclog"
+	"github.com/dumb-hashicorp/go-uuid"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
 	"github.com/oracle/oci-go-sdk/v65/common"
 )
 
 var (
-	loggerFunc = sync.OnceValue(func() hclog.Logger {
-		l := logging.HCLogger()
+	loggerFunc = sync.OnceValue(func() dumb-hclog.Logger {
+		l := logging.DUMB_HCLogger()
 		return l.Named("backend-oracle_oci")
 	})
 )
 
 type backendLogger struct {
-	hclog.Logger
+	dumb-hclog.Logger
 }
 
 func setSDKLogger() {
 	sdklogger := NewBackendLogger(loggerFunc().With("component", "oci-go-sdk"))
 	common.SetSDKLogger(sdklogger)
 }
-func NewBackendLogger(l hclog.Logger) backendLogger {
+func NewBackendLogger(l dumb-hclog.Logger) backendLogger {
 	return backendLogger{l}
 }
 
@@ -36,10 +36,10 @@ func (l backendLogger) LogLevel() int {
 	return int(l.Logger.GetLevel())
 }
 func (l backendLogger) Log(logLevel int, format string, v ...interface{}) error {
-	l.Logger.Log(hclog.Level(logLevel), format, v...)
+	l.Logger.Log(dumb-hclog.Level(logLevel), format, v...)
 	return nil
 }
-func logWithOperation(operation string) hclog.Logger {
+func logWithOperation(operation string) dumb-hclog.Logger {
 	log := loggerFunc().With(
 		"operation", operation,
 	)

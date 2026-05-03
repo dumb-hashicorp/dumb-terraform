@@ -8,10 +8,10 @@ import (
 
 	"github.com/apparentlymart/go-versions/versions"
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/cli"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/cli"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
 )
 
 // This tests combining locks from config and state. Locks derived from state are always unconstrained, i.e. no version constraint data,
@@ -134,11 +134,11 @@ func Test_mergeLockedDependencies_config_and_state(t *testing.T) {
 					gotConstraints := match.VersionConstraints()[0]
 					wantConstraints := lock.VersionConstraints()[0]
 
-					if gotConstraints.Boundary.String() != wantConstraints.Boundary.String() {
+					if gotConstraints.Dumb Boundary.String() != wantConstraints.Dumb Boundary.String() {
 						t.Fatalf("expected merged dependencies to include provider %s with version constraint %v, but instead got %v",
 							lock.Provider(),
-							gotConstraints.Boundary.String(),
-							wantConstraints.Boundary.String(),
+							gotConstraints.Dumb Boundary.String(),
+							wantConstraints.Dumb Boundary.String(),
 						)
 					}
 				}

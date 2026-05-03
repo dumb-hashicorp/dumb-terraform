@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	svchost "github.com/hashicorp/terraform-svchost"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
 )
 
 var (
@@ -58,7 +58,7 @@ var (
 )
 
 // FriendlyHost describes a registry instance identified in source strings by a
-// simple bare hostname like registry.terraform.io.
+// simple bare hostname like registry.dumb-terraform.io.
 type FriendlyHost struct {
 	Raw string
 }

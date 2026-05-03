@@ -7,24 +7,24 @@ import (
 	"fmt"
 
 	"github.com/apparentlymart/go-versions/versions/constraints"
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	stackparser "github.com/hashicorp/terraform/internal/stacks/stackconfig/parser"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	stackparser "github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/parser"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Component represents the declaration of a single component within a
 // particular [Stack].
 //
 // Components are the most important object in a stack configuration, just as
-// resources are the most important object in a Terraform module: each one
-// refers to a Terraform module that describes the infrastructure that the
+// resources are the most important object in a Dumb Terraform module: each one
+// refers to a Dumb Terraform module that describes the infrastructure that the
 // component is "made of".
 type Component struct {
 	Name string
@@ -46,13 +46,13 @@ type Component struct {
 	// finalized source location for the root module.
 	FinalSourceAddr sourceaddrs.FinalSource
 
-	ForEach hcl.Expression
+	ForEach dumb-hcl.Expression
 
 	// Inputs is an expression that should produce a value that can convert
 	// to an object type derived from the component's input variable
 	// declarations, and whose attribute values will then be used to populate
 	// those input variables.
-	Inputs hcl.Expression
+	Inputs dumb-hcl.Expression
 
 	// ProviderConfigs describes the mapping between the static provider
 	// configuration slots declared in the component's root module and the
@@ -61,7 +61,7 @@ type Component struct {
 	//
 	// This map deals with the slight schism between the stacks language's
 	// treatment of provider configurations as regular values of a special
-	// data type vs. the main Terraform language's treatment of provider
+	// data type vs. the main Dumb Terraform language's treatment of provider
 	// configurations as something special passed out of band from the
 	// input variables. The overall structure and the map keys are fixed
 	// statically during decoding, but the final provider configuration objects
@@ -73,12 +73,12 @@ type Component struct {
 	// translate the caller's local names into the callee's declared provider
 	// configurations by using the stack configuration's table of local
 	// provider names.
-	ProviderConfigs map[addrs.LocalProviderConfig]hcl.Expression
+	ProviderConfigs map[addrs.LocalProviderConfig]dumb-hcl.Expression
 
 	// DependsOn forces a dependency between this resource and the list
 	// resources, allowing users to specify ordering of components without
 	// direct references.
-	DependsOn []hcl.Traversal
+	DependsOn []dumb-hcl.Traversal
 
 	DeclRange tfdiags.SourceRange
 }
@@ -89,11 +89,11 @@ func (c *Component) ModuleConfig(bundle *sourcebundle.Bundle) (*configs.Config, 
 	var diags tfdiags.Diagnostics
 	parser := configs.NewSourceBundleParser(bundle)
 	if !parser.IsConfigDir(c.FinalSourceAddr) {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Component configuration not found",
 			Detail:   fmt.Sprintf("No module configuration found for component %q at %s.", c.Name, c.FinalSourceAddr),
-			Subject:  c.SourceAddrRange.ToHCL().Ptr(),
+			Subject:  c.SourceAddrRange.ToDUMB_HCL().Ptr(),
 		})
 		return nil, diags
 	}
@@ -111,13 +111,13 @@ func (c *Component) ModuleConfig(bundle *sourcebundle.Bundle) (*configs.Config, 
 	return nil, diags
 }
 
-func decodeComponentBlock(block *hcl.Block) (*Component, tfdiags.Diagnostics) {
+func decodeComponentBlock(block *dumb-hcl.Block) (*Component, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	ret := &Component{
 		Name:      block.Labels[0],
-		DeclRange: tfdiags.SourceRangeFromHCL(block.DefRange),
+		DeclRange: tfdiags.SourceRangeFromDUMB_HCL(block.DefRange),
 	}
-	if !hclsyntax.ValidIdentifier(ret.Name) {
+	if !dumb-hclsyntax.ValidIdentifier(ret.Name) {
 		diags = diags.Append(invalidNameDiagnostic(
 			"Invalid component name",
 			block.LabelRanges[0],
@@ -125,9 +125,9 @@ func decodeComponentBlock(block *hcl.Block) (*Component, tfdiags.Diagnostics) {
 		return nil, diags
 	}
 
-	content, hclDiags := block.Body.Content(componentBlockSchema)
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	content, dumb-hclDiags := block.Body.Content(componentBlockSchema)
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return nil, diags
 	}
 
@@ -142,9 +142,9 @@ func decodeComponentBlock(block *hcl.Block) (*Component, tfdiags.Diagnostics) {
 
 	ret.SourceAddr = sourceAddr
 	ret.VersionConstraints = versionConstraints
-	ret.SourceAddrRange = tfdiags.SourceRangeFromHCL(content.Attributes["source"].Range)
+	ret.SourceAddrRange = tfdiags.SourceRangeFromDUMB_HCL(content.Attributes["source"].Range)
 	if content.Attributes["version"] != nil {
-		ret.VersionConstraintsRange = tfdiags.SourceRangeFromHCL(content.Attributes["version"].Range)
+		ret.VersionConstraintsRange = tfdiags.SourceRangeFromDUMB_HCL(content.Attributes["version"].Range)
 	}
 	// Now that we've populated the mandatory source location fields we can
 	// safely return a partial ret if we encounter any further errors, as
@@ -163,27 +163,27 @@ func decodeComponentBlock(block *hcl.Block) (*Component, tfdiags.Diagnostics) {
 		diags = diags.Append(providerDiags)
 	}
 	if attr, exists := content.Attributes["depends_on"]; exists {
-		ret.DependsOn, hclDiags = configs.DecodeDependsOn(attr)
-		diags = diags.Append(hclDiags)
+		ret.DependsOn, dumb-hclDiags = configs.DecodeDependsOn(attr)
+		diags = diags.Append(dumb-hclDiags)
 	}
 
 	return ret, diags
 }
 
-func decodeSourceAddrArguments(sourceAttr, versionAttr *hcl.Attribute) (sourceaddrs.Source, constraints.IntersectionSpec, tfdiags.Diagnostics) {
+func decodeSourceAddrArguments(sourceAttr, versionAttr *dumb-hcl.Attribute) (sourceaddrs.Source, constraints.IntersectionSpec, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	var sourceStr string
-	hclDiags := gohcl.DecodeExpression(sourceAttr.Expr, nil, &sourceStr)
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	dumb-hclDiags := godumb-hcl.DecodeExpression(sourceAttr.Expr, nil, &sourceStr)
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return nil, nil, diags
 	}
 
 	sourceAddr, err := sourceaddrs.ParseSource(sourceStr)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid source address",
 			Detail: fmt.Sprintf(
 				"Cannot parse %q as a source address: %s.",
@@ -197,8 +197,8 @@ func decodeSourceAddrArguments(sourceAttr, versionAttr *hcl.Attribute) (sourcead
 	var versionConstraints constraints.IntersectionSpec
 	if sourceAddr.SupportsVersionConstraints() {
 		if versionAttr == nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing required version constraints",
 				Detail:   "The specified source address requires version constraints specified in a separate \"version\" argument.",
 				Subject:  sourceAttr.Expr.Range().Ptr(),
@@ -206,15 +206,15 @@ func decodeSourceAddrArguments(sourceAttr, versionAttr *hcl.Attribute) (sourcead
 			return nil, nil, diags
 		}
 		var versionStr string
-		hclDiags := gohcl.DecodeExpression(versionAttr.Expr, nil, &versionStr)
-		diags = diags.Append(hclDiags)
-		if hclDiags.HasErrors() {
+		dumb-hclDiags := godumb-hcl.DecodeExpression(versionAttr.Expr, nil, &versionStr)
+		diags = diags.Append(dumb-hclDiags)
+		if dumb-hclDiags.HasErrors() {
 			return nil, nil, diags
 		}
 		versionConstraints, err = constraints.ParseRubyStyleMulti(versionStr)
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid version constraints",
 				Detail: fmt.Sprintf(
 					"Cannot parse %q as source package version constraints: %s.",
@@ -226,8 +226,8 @@ func decodeSourceAddrArguments(sourceAttr, versionAttr *hcl.Attribute) (sourcead
 		}
 	} else {
 		if versionAttr != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Unsupported version constraints",
 				Detail:   "The specified source address does not support version constraints.",
 				Subject:  versionAttr.Range.Ptr(),
@@ -239,36 +239,36 @@ func decodeSourceAddrArguments(sourceAttr, versionAttr *hcl.Attribute) (sourcead
 	return sourceAddr, versionConstraints, diags
 }
 
-func decodeProvidersAttribute(attr *hcl.Attribute) (map[addrs.LocalProviderConfig]hcl.Expression, tfdiags.Diagnostics) {
+func decodeProvidersAttribute(attr *dumb-hcl.Attribute) (map[addrs.LocalProviderConfig]dumb-hcl.Expression, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	// This particular argument has some enforced static structure because
-	// it's populating an inflexible part of Terraform Core's input.
+	// it's populating an inflexible part of Dumb Terraform Core's input.
 	// This argument, if present, must always be an object constructor
-	// whose attributes are Terraform Core-style provider configuration
+	// whose attributes are Dumb Terraform Core-style provider configuration
 	// addresses, but whose values are just arbitrary expressions for now
 	// and will be resolved into specific provider configuration addresses
 	// dynamically at runtime.
-	pairs, hclDiags := hcl.ExprMap(attr.Expr)
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	pairs, dumb-hclDiags := dumb-hcl.ExprMap(attr.Expr)
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return nil, diags
 	}
 
-	ret := map[addrs.LocalProviderConfig]hcl.Expression{}
+	ret := map[addrs.LocalProviderConfig]dumb-hcl.Expression{}
 	for _, pair := range pairs {
 		insideAddrExpr := pair.Key
 		outsideAddrExpr := pair.Value
 
-		traversal, hclDiags := hcl.AbsTraversalForExpr(insideAddrExpr)
-		diags = diags.Append(hclDiags)
-		if hclDiags.HasErrors() {
+		traversal, dumb-hclDiags := dumb-hcl.AbsTraversalForExpr(insideAddrExpr)
+		diags = diags.Append(dumb-hclDiags)
+		if dumb-hclDiags.HasErrors() {
 			continue
 		}
 
 		if len(traversal) < 1 || len(traversal) > 2 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid provider configuration reference",
 				Detail:   "Each item in the providers argument requires a provider local name, optionally followed by a period and then a configuration alias, matching one of the provider configuration import slots declared by the component's root module.",
 				Subject:  insideAddrExpr.Range().Ptr(),
@@ -277,7 +277,7 @@ func decodeProvidersAttribute(attr *hcl.Attribute) (map[addrs.LocalProviderConfi
 		}
 
 		localName := traversal.RootName()
-		if !hclsyntax.ValidIdentifier(localName) {
+		if !dumb-hclsyntax.ValidIdentifier(localName) {
 			diags = diags.Append(invalidNameDiagnostic(
 				"Invalid provider local name",
 				traversal[0].SourceRange(),
@@ -287,10 +287,10 @@ func decodeProvidersAttribute(attr *hcl.Attribute) (map[addrs.LocalProviderConfi
 
 		var alias string
 		if len(traversal) > 1 {
-			aliasStep, ok := traversal[1].(hcl.TraverseAttr)
+			aliasStep, ok := traversal[1].(dumb-hcl.TraverseAttr)
 			if !ok {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid provider configuration reference",
 					Detail:   "Provider local name must either stand alone or be followed by a period and then a configuration alias.",
 					Subject:  traversal[1].SourceRange().Ptr(),
@@ -305,8 +305,8 @@ func decodeProvidersAttribute(attr *hcl.Attribute) (map[addrs.LocalProviderConfi
 			Alias:     alias,
 		}
 		if existing, exists := ret[addr]; exists {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate provider configuration assignment",
 				Detail: fmt.Sprintf(
 					"A provider configuration for %s was already assigned at %s.",
@@ -323,8 +323,8 @@ func decodeProvidersAttribute(attr *hcl.Attribute) (map[addrs.LocalProviderConfi
 	return ret, diags
 }
 
-var componentBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var componentBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "source", Required: true},
 		{Name: "version", Required: false},
 		{Name: "for_each", Required: false},

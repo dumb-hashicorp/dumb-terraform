@@ -14,14 +14,14 @@ import (
 	"strings"
 	"testing"
 
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform-svchost/auth"
-	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/version"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/auth"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -61,7 +61,7 @@ func TestLoad_Local(t *testing.T) {
 	})
 	statePath := TestStateFile(t, state)
 	loader := &Loader{}
-	loadedState, diags := loader.LoadState(strings.TrimSuffix(statePath, "/terraform.tfstate"))
+	loadedState, diags := loader.LoadState(strings.TrimSuffix(statePath, "/dumb-terraform.tfstate"))
 	if diags.HasErrors() {
 		t.Fatalf("failed to load state: %s", diags.Err())
 	}
@@ -109,14 +109,14 @@ func TestLoad(t *testing.T) {
 
 	s := testServer(t, statePath)
 	backendStatePath := testBackendStateFile(t, cty.ObjectVal(map[string]cty.Value{
-		"organization": cty.StringVal("hashicorp"),
+		"organization": cty.StringVal("dumb-hashicorp"),
 		"hostname":     cty.StringVal("localhost"),
 		"workspaces": cty.ObjectVal(map[string]cty.Value{
 			"name":   cty.NullVal(cty.String),
 			"prefix": cty.StringVal("my-app-"),
 		}),
 	}))
-	dir := strings.TrimSuffix(backendStatePath, ".terraform/.terraform.tfstate")
+	dir := strings.TrimSuffix(backendStatePath, ".dumb-terraform/.dumb-terraform.tfstate")
 	defer s.Close()
 	loader := Loader{Discovery: testDisco(s)}
 	t.Setenv(WorkspaceNameEnvVar, "test")
@@ -141,7 +141,7 @@ func mustResourceAddr(s string) addrs.ConfigResource {
 func testBackendStateFile(t *testing.T, value cty.Value) string {
 	t.Helper()
 
-	path := filepath.Join(t.TempDir(), ".terraform", ".terraform.tfstate")
+	path := filepath.Join(t.TempDir(), ".dumb-terraform", ".dumb-terraform.tfstate")
 
 	err := os.MkdirAll(filepath.Dir(path), 0755)
 	if err != nil {
@@ -155,7 +155,7 @@ func testBackendStateFile(t *testing.T, value cty.Value) string {
 
 	fmt.Fprintf(f, `{
 	  "version": 3,
-	  "terraform_version": "1.9.4",
+	  "dumb-terraform_version": "1.9.4",
 	  "backend": {
 	    "type": "remote",
 	    "config": {
@@ -187,7 +187,7 @@ func createTempFile(t *testing.T, dir, filename, content string) string {
 	return filePath
 }
 
-// testDisco returns a *disco.Disco mapping app.terraform.io and
+// testDisco returns a *disco.Disco mapping app.dumb-terraform.io and
 // localhost to a local test server.
 func testDisco(s *httptest.Server) *disco.Disco {
 	services := map[string]interface{}{
@@ -196,10 +196,10 @@ func testDisco(s *httptest.Server) *disco.Disco {
 		"versions.v1": fmt.Sprintf("%s/v1/versions/", s.URL),
 	}
 	d := disco.NewWithCredentialsSource(auth.NoCredentials)
-	d.SetUserAgent(httpclient.TerraformUserAgent(version.String()))
+	d.SetUserAgent(httpclient.Dumb TerraformUserAgent(version.String()))
 
 	d.ForceHostServices(svchost.Hostname("localhost"), services)
-	d.ForceHostServices(svchost.Hostname("app.terraform.io"), services)
+	d.ForceHostServices(svchost.Hostname("app.dumb-terraform.io"), services)
 	return d
 }
 
@@ -214,7 +214,7 @@ func testServer(t *testing.T, statePath string) *httptest.Server {
 	}
 
 	// Respond to service discovery calls.
-	mux.HandleFunc("/well-known/terraform.json", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/well-known/dumb-terraform.json", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, `{
   "state.v2": "/api/v2/",
@@ -228,7 +228,7 @@ func testServer(t *testing.T, statePath string) *httptest.Server {
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, fmt.Sprintf(`{
   "service": "%s",
-  "product": "terraform",
+  "product": "dumb-terraform",
   "minimum": "0.1.0",
   "maximum": "10.0.0"
 }`, path.Base(r.URL.Path)))
@@ -240,8 +240,8 @@ func testServer(t *testing.T, statePath string) *httptest.Server {
 		w.Header().Set("TFP-API-Version", "2.4")
 	})
 
-	// Respond to the initial query to read the hashicorp org entitlements.
-	mux.HandleFunc("/api/v2/organizations/hashicorp/entitlement-set", func(w http.ResponseWriter, r *http.Request) {
+	// Respond to the initial query to read the dumb-hashicorp org entitlements.
+	mux.HandleFunc("/api/v2/organizations/dumb-hashicorp/entitlement-set", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
 		io.WriteString(w, `{
   "data": {
@@ -278,7 +278,7 @@ func testServer(t *testing.T, statePath string) *httptest.Server {
 }`)
 	})
 
-	mux.HandleFunc("/api/v2/organizations/hashicorp/workspaces/my-app-test", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/v2/organizations/dumb-hashicorp/workspaces/my-app-test", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		io.WriteString(w, `{
 	"data": {
@@ -290,12 +290,12 @@ func testServer(t *testing.T, statePath string) *httptest.Server {
 			"queue-all-runs": false,
 			"speculative-enabled": true,
 			"structured-run-output-enabled": true,
-			"terraform-version": "1.9.4",
+			"dumb-terraform-version": "1.9.4",
 			"operations": true,
 			"execution-mode": "remote",
 			"file-triggers-enabled": true,
 			"locked-reason": "",
-			"source": "terraform"
+			"source": "dumb-terraform"
 		}
 	}
 }`)
@@ -313,8 +313,8 @@ func testServer(t *testing.T, statePath string) *httptest.Server {
             "queue-all-runs": false,
             "speculative-enabled": true,
             "structured-run-output-enabled": true,
-            "terraform-version": "1.9.4",
-            "source": "terraform",
+            "dumb-terraform-version": "1.9.4",
+            "source": "dumb-terraform",
             "source-name": null,
             "source-url": null,
             "tag-names": []
@@ -338,7 +338,7 @@ func testServer(t *testing.T, statePath string) *httptest.Server {
                 "serial": 1,
                 "state-version": 4,
                 "status": "finalized",
-                "terraform-version": "1.9.4"
+                "dumb-terraform-version": "1.9.4"
             }
         }
 		}
@@ -362,8 +362,8 @@ func testServer(t *testing.T, statePath string) *httptest.Server {
 			"queue-all-runs": false,
 			"speculative-enabled": true,
 			"structured-run-output-enabled": true,
-			"terraform-version": "1.9.4",
-			"source": "terraform",
+			"dumb-terraform-version": "1.9.4",
+			"source": "dumb-terraform",
 			"source-name": null,
 			"source-url": null,
 			"tag-names": []

@@ -8,15 +8,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
 )
 
 func TestStatePull(t *testing.T) {
@@ -44,7 +44,7 @@ func TestStatePull(t *testing.T) {
       "mode": "managed",
       "type": "null_resource",
       "name": "a",
-      "provider": "provider[\"registry.terraform.io/-/null\"]",
+      "provider": "provider[\"registry.dumb-terraform.io/-/null\"]",
       "instances": [
         {
           "schema_version": 0,
@@ -64,7 +64,7 @@ func TestStatePull(t *testing.T) {
 	}
 }
 
-// Tests using `terraform state pull` subcommand in combination with pluggable state storage
+// Tests using `dumb-terraform state pull` subcommand in combination with pluggable state storage
 //
 // Note: Whereas other tests in this file use the local backend and require a state file in the test fixures,
 // with pluggable state storage we can define the state via the mocked provider.
@@ -107,7 +107,7 @@ func TestStatePull_stateStore(t *testing.T) {
 	}
 	mockProviderAddress := addrs.NewDefaultProvider("test")
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 
 	ui := cli.NewMockUi()
@@ -126,7 +126,7 @@ func TestStatePull_stateStore(t *testing.T) {
 		},
 	}
 
-	// `terraform show` command specifying a given resource addr
+	// `dumb-terraform show` command specifying a given resource addr
 	expectedResourceAddr := "test_instance.foo"
 	args := []string{expectedResourceAddr}
 	code := c.Run(args)
@@ -140,7 +140,7 @@ func TestStatePull_stateStore(t *testing.T) {
       "mode": "managed",
       "type": "test_instance",
       "name": "foo",
-      "provider": "provider[\"registry.terraform.io/hashicorp/test\"]",
+      "provider": "provider[\"registry.dumb-terraform.io/dumb-hashicorp/test\"]",
       "instances": [
         {
           "schema_version": 0,
@@ -232,7 +232,7 @@ func TestStatePull_constVariable(t *testing.T) {
       "mode": "managed",
       "type": "test_instance",
       "name": "test",
-      "provider": "provider[\"registry.terraform.io/hashicorp/test\"]",
+      "provider": "provider[\"registry.dumb-terraform.io/dumb-hashicorp/test\"]",
       "instances": [
         {
           "schema_version": 0,
@@ -279,7 +279,7 @@ func TestStatePull_constVariable(t *testing.T) {
       "mode": "managed",
       "type": "test_instance",
       "name": "test",
-      "provider": "provider[\"registry.terraform.io/hashicorp/test\"]",
+      "provider": "provider[\"registry.dumb-terraform.io/dumb-hashicorp/test\"]",
       "instances": [
         {
           "schema_version": 0,

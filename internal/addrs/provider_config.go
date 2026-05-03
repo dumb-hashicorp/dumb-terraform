@@ -9,10 +9,10 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 )
 
 // ProviderConfig is an interface type whose dynamic type can be either
@@ -112,16 +112,16 @@ var _ UniqueKeyer = AbsProviderConfig{}
 // configuration address. The following are examples of traversals that can be
 // successfully parsed as absolute provider configuration addresses:
 //
-//   - provider["registry.terraform.io/hashicorp/aws"]
-//   - provider["registry.terraform.io/hashicorp/aws"].foo
-//   - module.bar.provider["registry.terraform.io/hashicorp/aws"]
-//   - module.bar.module.baz.provider["registry.terraform.io/hashicorp/aws"].foo
+//   - provider["registry.dumb-terraform.io/dumb-hashicorp/aws"]
+//   - provider["registry.dumb-terraform.io/dumb-hashicorp/aws"].foo
+//   - module.bar.provider["registry.dumb-terraform.io/dumb-hashicorp/aws"]
+//   - module.bar.module.baz.provider["registry.dumb-terraform.io/dumb-hashicorp/aws"].foo
 //
 // This type of address is used, for example, to record the relationships
 // between resources and provider configurations in the state structure.
 // This type of address is typically not used prominently in the UI, except in
 // error messages that refer to provider configurations.
-func ParseAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, tfdiags.Diagnostics) {
+func ParseAbsProviderConfig(traversal dumb-hcl.Traversal) (AbsProviderConfig, tfdiags.Diagnostics) {
 	modInst, remain, diags := parseModuleInstancePrefix(traversal, false)
 	var ret AbsProviderConfig
 
@@ -129,8 +129,8 @@ func ParseAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, tfdiags
 	// are no instance keys in the module path before converting to a Module.
 	for _, step := range modInst {
 		if step.InstanceKey != NoKey {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid provider configuration address",
 				Detail:   "Provider address cannot contain module indexes",
 				Subject:  remain.SourceRange().Ptr(),
@@ -141,8 +141,8 @@ func ParseAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, tfdiags
 	ret.Module = modInst.Module()
 
 	if len(remain) < 2 || remain.RootName() != "provider" {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider configuration address",
 			Detail:   "Provider address must begin with \"provider.\", followed by a provider type name.",
 			Subject:  remain.SourceRange().Ptr(),
@@ -150,19 +150,19 @@ func ParseAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, tfdiags
 		return ret, diags
 	}
 	if len(remain) > 3 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider configuration address",
 			Detail:   "Extraneous operators after provider configuration alias.",
-			Subject:  hcl.Traversal(remain[3:]).SourceRange().Ptr(),
+			Subject:  dumb-hcl.Traversal(remain[3:]).SourceRange().Ptr(),
 		})
 		return ret, diags
 	}
 
-	if tt, ok := remain[1].(hcl.TraverseIndex); ok {
+	if tt, ok := remain[1].(dumb-hcl.TraverseIndex); ok {
 		if !tt.Key.Type().Equals(cty.String) {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid provider configuration address",
 				Detail:   "The prefix \"provider.\" must be followed by a provider type name.",
 				Subject:  remain[1].SourceRange().Ptr(),
@@ -176,8 +176,8 @@ func ParseAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, tfdiags
 			return ret, diags
 		}
 	} else {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider configuration address",
 			Detail:   "The prefix \"provider.\" must be followed by a provider type name.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -186,11 +186,11 @@ func ParseAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, tfdiags
 	}
 
 	if len(remain) == 3 {
-		if tt, ok := remain[2].(hcl.TraverseAttr); ok {
+		if tt, ok := remain[2].(dumb-hcl.TraverseAttr); ok {
 			ret.Alias = tt.Name
 		} else {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid provider configuration address",
 				Detail:   "Provider type name must be followed by a configuration alias name.",
 				Subject:  remain[2].SourceRange().Ptr(),
@@ -203,14 +203,14 @@ func ParseAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, tfdiags
 }
 
 // ParseAbsProviderConfigStr is a helper wrapper around ParseAbsProviderConfig
-// that takes a string and parses it with the HCL native syntax traversal parser
+// that takes a string and parses it with the DUMB_HCL native syntax traversal parser
 // before interpreting it.
 //
 // This should be used only in specialized situations since it will cause the
 // created references to not have any meaningful source location information.
 // If a reference string is coming from a source that should be identified in
 // error messages then the caller should instead parse it directly using a
-// suitable function from the HCL API and pass the traversal itself to
+// suitable function from the DUMB_HCL API and pass the traversal itself to
 // ParseAbsProviderConfig.
 //
 // Error diagnostics are returned if either the parsing fails or the analysis
@@ -219,7 +219,7 @@ func ParseAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, tfdiags
 // the returned address is invalid.
 func ParseAbsProviderConfigStr(str string) (AbsProviderConfig, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return AbsProviderConfig{}, diags
@@ -232,7 +232,7 @@ func ParseAbsProviderConfigStr(str string) (AbsProviderConfig, tfdiags.Diagnosti
 func ParseLegacyAbsProviderConfigStr(str string) (AbsProviderConfig, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return AbsProviderConfig{}, diags
@@ -244,7 +244,7 @@ func ParseLegacyAbsProviderConfigStr(str string) (AbsProviderConfig, tfdiags.Dia
 }
 
 // ParseLegacyAbsProviderConfig parses the given traversal as an absolute
-// provider address in the legacy form used by Terraform v0.12 and earlier.
+// provider address in the legacy form used by Dumb Terraform v0.12 and earlier.
 // The following are examples of traversals that can be successfully parsed as
 // legacy absolute provider configuration addresses:
 //
@@ -255,12 +255,12 @@ func ParseLegacyAbsProviderConfigStr(str string) (AbsProviderConfig, tfdiags.Dia
 //
 // We can encounter this kind of address in a historical state snapshot that
 // hasn't yet been upgraded by refreshing or applying a plan with
-// Terraform v0.13. Later versions of Terraform reject state snapshots using
-// this format, and so users must follow the Terraform v0.13 upgrade guide
+// Dumb Terraform v0.13. Later versions of Dumb Terraform reject state snapshots using
+// this format, and so users must follow the Dumb Terraform v0.13 upgrade guide
 // in that case.
 //
 // We will not use this address form for any new file formats.
-func ParseLegacyAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, tfdiags.Diagnostics) {
+func ParseLegacyAbsProviderConfig(traversal dumb-hcl.Traversal) (AbsProviderConfig, tfdiags.Diagnostics) {
 	modInst, remain, diags := parseModuleInstancePrefix(traversal, false)
 	var ret AbsProviderConfig
 
@@ -268,8 +268,8 @@ func ParseLegacyAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, t
 	// are no instance keys in the module path before converting to a Module.
 	for _, step := range modInst {
 		if step.InstanceKey != NoKey {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid provider configuration address",
 				Detail:   "Provider address cannot contain module indexes",
 				Subject:  remain.SourceRange().Ptr(),
@@ -280,8 +280,8 @@ func ParseLegacyAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, t
 	ret.Module = modInst.Module()
 
 	if len(remain) < 2 || remain.RootName() != "provider" {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider configuration address",
 			Detail:   "Provider address must begin with \"provider.\", followed by a provider type name.",
 			Subject:  remain.SourceRange().Ptr(),
@@ -289,26 +289,26 @@ func ParseLegacyAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, t
 		return ret, diags
 	}
 	if len(remain) > 3 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider configuration address",
 			Detail:   "Extraneous operators after provider configuration alias.",
-			Subject:  hcl.Traversal(remain[3:]).SourceRange().Ptr(),
+			Subject:  dumb-hcl.Traversal(remain[3:]).SourceRange().Ptr(),
 		})
 		return ret, diags
 	}
 
 	// We always assume legacy-style providers in legacy state ...
-	if tt, ok := remain[1].(hcl.TraverseAttr); ok {
-		// ... unless it's the builtin "terraform" provider, a special case.
-		if tt.Name == "terraform" {
+	if tt, ok := remain[1].(dumb-hcl.TraverseAttr); ok {
+		// ... unless it's the builtin "dumb-terraform" provider, a special case.
+		if tt.Name == "dumb-terraform" {
 			ret.Provider = NewBuiltInProvider(tt.Name)
 		} else {
 			ret.Provider = NewLegacyProvider(tt.Name)
 		}
 	} else {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider configuration address",
 			Detail:   "The prefix \"provider.\" must be followed by a provider type name.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -317,11 +317,11 @@ func ParseLegacyAbsProviderConfig(traversal hcl.Traversal) (AbsProviderConfig, t
 	}
 
 	if len(remain) == 3 {
-		if tt, ok := remain[2].(hcl.TraverseAttr); ok {
+		if tt, ok := remain[2].(dumb-hcl.TraverseAttr); ok {
 			ret.Alias = tt.Name
 		} else {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid provider configuration address",
 				Detail:   "Provider type name must be followed by a configuration alias name.",
 				Subject:  remain[2].SourceRange().Ptr(),
@@ -363,7 +363,7 @@ func (pc AbsProviderConfig) providerConfig() {}
 // other than the root module. Even if a valid address is returned, inheritence
 // may not be performed for other reasons, such as if the calling module
 // provided explicit provider configurations within the call for this module.
-// The ProviderTransformer graph transform in the main terraform module has the
+// The ProviderTransformer graph transform in the main dumb-terraform module has the
 // authoritative logic for provider inheritance, and this method is here mainly
 // just for its benefit.
 func (pc AbsProviderConfig) Inherited() (AbsProviderConfig, bool) {

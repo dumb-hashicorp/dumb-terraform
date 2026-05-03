@@ -7,8 +7,8 @@ import (
 	"context"
 	"testing"
 
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform/internal/addrs"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func TestMissingProviderSuggestion(t *testing.T) {
@@ -49,9 +49,9 @@ func TestMissingProviderSuggestion(t *testing.T) {
 		defer close()
 
 		// testRegistrySource handles -/moved as a valid legacy provider
-		// lookup mapping to hashicorp/moved but with an additional "redirect"
+		// lookup mapping to dumb-hashicorp/moved but with an additional "redirect"
 		// to acme/moved. This mimics how for some providers there is both
-		// a copy under terraform-providers for v0.12 compatibility _and_ a
+		// a copy under dumb-terraform-providers for v0.12 compatibility _and_ a
 		// copy in some other namespace for v0.13 or later to use. Our naming
 		// suggestions ignore the v0.12-compatible one and suggest the
 		// other one.
@@ -125,7 +125,7 @@ func TestMissingProviderSuggestion(t *testing.T) {
 		source, _, close := testRegistrySource(t)
 		defer close()
 
-		// Because this provider address isn't on registry.terraform.io,
+		// Because this provider address isn't on registry.dumb-terraform.io,
 		// MissingProviderSuggestion won't even attempt to make a suggestion
 		// for it.
 		want := addrs.Provider{
@@ -151,7 +151,7 @@ func TestMissingProviderSuggestion(t *testing.T) {
 		defer close()
 
 		// Because this provider address isn't in
-		// registry.terraform.io/hashicorp/..., MissingProviderSuggestion
+		// registry.dumb-terraform.io/dumb-hashicorp/..., MissingProviderSuggestion
 		// will provide the same addr since there's no alternative in Requirements
 		want := addrs.Provider{
 			Hostname:  defaultRegistryHost,
@@ -174,7 +174,7 @@ func TestMissingProviderSuggestion(t *testing.T) {
 		// but different namespace, we can suggest that
 		foo := addrs.Provider{
 			Hostname:  defaultRegistryHost,
-			Namespace: "hashicorp",
+			Namespace: "dumb-hashicorp",
 			Type:      "foo",
 		}
 		realFoo := addrs.Provider{

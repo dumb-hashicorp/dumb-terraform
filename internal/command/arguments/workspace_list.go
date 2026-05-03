@@ -6,10 +6,10 @@ package arguments
 import (
 	"errors"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// WorkspaceList represent arguments specific to the `terraform workspace list` command.
+// WorkspaceList represent arguments specific to the `dumb-terraform workspace list` command.
 type WorkspaceList struct {
 	Workspace
 }

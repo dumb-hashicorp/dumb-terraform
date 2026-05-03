@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func TestMultiSourceAvailableVersions(t *testing.T) {
@@ -126,11 +126,11 @@ func TestMultiSourceAvailableVersions(t *testing.T) {
 		multi := MultiSource{
 			{
 				Source:  s1,
-				Include: mustParseMultiSourceMatchingPatterns("hashicorp/*"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/*"),
 			},
 			{
 				Source:  s2,
-				Include: mustParseMultiSourceMatchingPatterns("hashicorp/bar"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/bar"),
 			},
 		}
 
@@ -177,7 +177,7 @@ func TestMultiSourceAvailableVersions(t *testing.T) {
 			t.Fatal("expected error, got success")
 		}
 
-		wantErr := `provider registry registry.terraform.io does not have a provider named registry.terraform.io/hashicorp/foo`
+		wantErr := `provider registry registry.dumb-terraform.io does not have a provider named registry.dumb-terraform.io/dumb-hashicorp/foo`
 
 		if err.Error() != wantErr {
 			t.Fatalf("wrong error.\ngot:  %s\nwant: %s\n", err, wantErr)
@@ -391,7 +391,7 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with include constraint that matches it exactly": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Include: mustParseMultiSourceMatchingPatterns("hashicorp/foo"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/foo"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			true,
@@ -399,7 +399,7 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with include constraint that matches it via type wildcard": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Include: mustParseMultiSourceMatchingPatterns("hashicorp/*"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/*"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			true,
@@ -415,7 +415,7 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with non-normalized include constraint that matches it via type wildcard": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Include: mustParseMultiSourceMatchingPatterns("HashiCorp/*"),
+				Include: mustParseMultiSourceMatchingPatterns("Dumb HashiCorp/*"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			true,
@@ -423,7 +423,7 @@ func TestMultiSourceSelector(t *testing.T) {
 		"built-in provider with exact include constraint that does not match it": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Include: mustParseMultiSourceMatchingPatterns("hashicorp/foo"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/foo"),
 			},
 			addrs.NewBuiltInProvider("bar"),
 			false,
@@ -431,7 +431,7 @@ func TestMultiSourceSelector(t *testing.T) {
 		"built-in provider with type-wild include constraint that does not match it": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Include: mustParseMultiSourceMatchingPatterns("hashicorp/*"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/*"),
 			},
 			addrs.NewBuiltInProvider("bar"),
 			false,
@@ -441,15 +441,15 @@ func TestMultiSourceSelector(t *testing.T) {
 				Source:  emptySource,
 				Include: mustParseMultiSourceMatchingPatterns("*/*"),
 			},
-			// Doesn't match because builtin providers are in "terraform.io",
-			// but a pattern with no hostname is for registry.terraform.io.
+			// Doesn't match because builtin providers are in "dumb-terraform.io",
+			// but a pattern with no hostname is for registry.dumb-terraform.io.
 			addrs.NewBuiltInProvider("bar"),
 			false,
 		},
 		"built-in provider with include constraint that matches it via type wildcard": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Include: mustParseMultiSourceMatchingPatterns("terraform.io/builtin/*"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-terraform.io/builtin/*"),
 			},
 			addrs.NewBuiltInProvider("bar"),
 			true,
@@ -459,7 +459,7 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with exclude constraint that matches it exactly": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Exclude: mustParseMultiSourceMatchingPatterns("hashicorp/foo"),
+				Exclude: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/foo"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			false,
@@ -467,7 +467,7 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with exclude constraint that matches it via type wildcard": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Exclude: mustParseMultiSourceMatchingPatterns("hashicorp/*"),
+				Exclude: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/*"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			false,
@@ -475,7 +475,7 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with exact exclude constraint that doesn't match it": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Exclude: mustParseMultiSourceMatchingPatterns("hashicorp/bar"),
+				Exclude: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/bar"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			true,
@@ -483,7 +483,7 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with non-normalized exclude constraint that matches it via type wildcard": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Exclude: mustParseMultiSourceMatchingPatterns("HashiCorp/*"),
+				Exclude: mustParseMultiSourceMatchingPatterns("Dumb HashiCorp/*"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			false,
@@ -493,8 +493,8 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with exclude wildcard overriding include exact": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Include: mustParseMultiSourceMatchingPatterns("hashicorp/foo"),
-				Exclude: mustParseMultiSourceMatchingPatterns("hashicorp/*"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/foo"),
+				Exclude: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/*"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			false,
@@ -502,8 +502,8 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with exclude wildcard overriding irrelevant include exact": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Include: mustParseMultiSourceMatchingPatterns("hashicorp/bar"),
-				Exclude: mustParseMultiSourceMatchingPatterns("hashicorp/*"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/bar"),
+				Exclude: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/*"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			false,
@@ -511,8 +511,8 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with exclude exact overriding include wildcard": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Include: mustParseMultiSourceMatchingPatterns("hashicorp/*"),
-				Exclude: mustParseMultiSourceMatchingPatterns("hashicorp/foo"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/*"),
+				Exclude: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/foo"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			false,
@@ -520,8 +520,8 @@ func TestMultiSourceSelector(t *testing.T) {
 		"default provider with irrelevant exclude exact overriding include wildcard": {
 			MultiSourceSelector{
 				Source:  emptySource,
-				Include: mustParseMultiSourceMatchingPatterns("hashicorp/*"),
-				Exclude: mustParseMultiSourceMatchingPatterns("hashicorp/bar"),
+				Include: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/*"),
+				Exclude: mustParseMultiSourceMatchingPatterns("dumb-hashicorp/bar"),
 			},
 			addrs.NewDefaultProvider("foo"),
 			true,

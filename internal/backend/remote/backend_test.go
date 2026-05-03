@@ -10,16 +10,16 @@ import (
 	"strings"
 	"testing"
 
-	tfe "github.com/hashicorp/go-tfe"
-	version "github.com/hashicorp/go-version"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	version "github.com/dumb-hashicorp/go-version"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	backendLocal "github.com/hashicorp/terraform/internal/backend/local"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	tfversion "github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	backendLocal "github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func TestRemote(t *testing.T) {
@@ -59,12 +59,12 @@ func TestRemote_config(t *testing.T) {
 					"prefix": cty.NullVal(cty.String),
 				}),
 			}),
-			confErr: "organization \"nonexisting\" at host app.terraform.io not found",
+			confErr: "organization \"nonexisting\" at host app.dumb-terraform.io not found",
 		},
 		"with_an_unknown_host": {
 			config: cty.ObjectVal(map[string]cty.Value{
 				"hostname":     cty.StringVal("nonexisting.local"),
-				"organization": cty.StringVal("hashicorp"),
+				"organization": cty.StringVal("dumb-hashicorp"),
 				"token":        cty.NullVal(cty.String),
 				"workspaces": cty.ObjectVal(map[string]cty.Value{
 					"name":   cty.StringVal("prod"),
@@ -77,19 +77,19 @@ func TestRemote_config(t *testing.T) {
 		"without_a_token": {
 			config: cty.ObjectVal(map[string]cty.Value{
 				"hostname":     cty.StringVal("localhost"),
-				"organization": cty.StringVal("hashicorp"),
+				"organization": cty.StringVal("dumb-hashicorp"),
 				"token":        cty.NullVal(cty.String),
 				"workspaces": cty.ObjectVal(map[string]cty.Value{
 					"name":   cty.StringVal("prod"),
 					"prefix": cty.NullVal(cty.String),
 				}),
 			}),
-			confErr: "terraform login localhost",
+			confErr: "dumb-terraform login localhost",
 		},
 		"with_a_name": {
 			config: cty.ObjectVal(map[string]cty.Value{
 				"hostname":     cty.NullVal(cty.String),
-				"organization": cty.StringVal("hashicorp"),
+				"organization": cty.StringVal("dumb-hashicorp"),
 				"token":        cty.NullVal(cty.String),
 				"workspaces": cty.ObjectVal(map[string]cty.Value{
 					"name":   cty.StringVal("prod"),
@@ -100,7 +100,7 @@ func TestRemote_config(t *testing.T) {
 		"with_a_prefix": {
 			config: cty.ObjectVal(map[string]cty.Value{
 				"hostname":     cty.NullVal(cty.String),
-				"organization": cty.StringVal("hashicorp"),
+				"organization": cty.StringVal("dumb-hashicorp"),
 				"token":        cty.NullVal(cty.String),
 				"workspaces": cty.ObjectVal(map[string]cty.Value{
 					"name":   cty.NullVal(cty.String),
@@ -111,7 +111,7 @@ func TestRemote_config(t *testing.T) {
 		"without_either_a_name_and_a_prefix": {
 			config: cty.ObjectVal(map[string]cty.Value{
 				"hostname":     cty.NullVal(cty.String),
-				"organization": cty.StringVal("hashicorp"),
+				"organization": cty.StringVal("dumb-hashicorp"),
 				"token":        cty.NullVal(cty.String),
 				"workspaces": cty.ObjectVal(map[string]cty.Value{
 					"name":   cty.NullVal(cty.String),
@@ -123,7 +123,7 @@ func TestRemote_config(t *testing.T) {
 		"with_both_a_name_and_a_prefix": {
 			config: cty.ObjectVal(map[string]cty.Value{
 				"hostname":     cty.NullVal(cty.String),
-				"organization": cty.StringVal("hashicorp"),
+				"organization": cty.StringVal("dumb-hashicorp"),
 				"token":        cty.NullVal(cty.String),
 				"workspaces": cty.ObjectVal(map[string]cty.Value{
 					"name":   cty.StringVal("prod"),
@@ -167,7 +167,7 @@ func TestRemote_versionConstraints(t *testing.T) {
 		"compatible version": {
 			config: cty.ObjectVal(map[string]cty.Value{
 				"hostname":     cty.NullVal(cty.String),
-				"organization": cty.StringVal("hashicorp"),
+				"organization": cty.StringVal("dumb-hashicorp"),
 				"token":        cty.NullVal(cty.String),
 				"workspaces": cty.ObjectVal(map[string]cty.Value{
 					"name":   cty.StringVal("prod"),
@@ -179,7 +179,7 @@ func TestRemote_versionConstraints(t *testing.T) {
 		"version too old": {
 			config: cty.ObjectVal(map[string]cty.Value{
 				"hostname":     cty.NullVal(cty.String),
-				"organization": cty.StringVal("hashicorp"),
+				"organization": cty.StringVal("dumb-hashicorp"),
 				"token":        cty.NullVal(cty.String),
 				"workspaces": cty.ObjectVal(map[string]cty.Value{
 					"name":   cty.StringVal("prod"),
@@ -187,12 +187,12 @@ func TestRemote_versionConstraints(t *testing.T) {
 				}),
 			}),
 			version: "0.0.1",
-			result:  "upgrade Terraform to >= 0.1.0",
+			result:  "upgrade Dumb Terraform to >= 0.1.0",
 		},
 		"version too new": {
 			config: cty.ObjectVal(map[string]cty.Value{
 				"hostname":     cty.NullVal(cty.String),
-				"organization": cty.StringVal("hashicorp"),
+				"organization": cty.StringVal("dumb-hashicorp"),
 				"token":        cty.NullVal(cty.String),
 				"workspaces": cty.ObjectVal(map[string]cty.Value{
 					"name":   cty.StringVal("prod"),
@@ -200,7 +200,7 @@ func TestRemote_versionConstraints(t *testing.T) {
 				}),
 			}),
 			version: "10.0.1",
-			result:  "downgrade Terraform to <= 10.0.0",
+			result:  "downgrade Dumb Terraform to <= 10.0.0",
 		},
 	}
 
@@ -384,7 +384,7 @@ func TestRemote_checkConstraints(t *testing.T) {
 				Maximum: "0.11.11",
 			},
 			version: "0.10.1",
-			result:  "upgrade Terraform to >= 0.11.0",
+			result:  "upgrade Dumb Terraform to >= 0.11.0",
 		},
 		"version too new": {
 			constraints: &disco.Constraints{
@@ -392,7 +392,7 @@ func TestRemote_checkConstraints(t *testing.T) {
 				Maximum: "0.11.11",
 			},
 			version: "0.12.0",
-			result:  "downgrade Terraform to <= 0.11.11",
+			result:  "downgrade Dumb Terraform to <= 0.11.11",
 		},
 		"version excluded - ordered": {
 			constraints: &disco.Constraints{
@@ -401,7 +401,7 @@ func TestRemote_checkConstraints(t *testing.T) {
 				Maximum:   "0.11.11",
 			},
 			version: "0.11.7",
-			result:  "upgrade Terraform to > 0.11.8",
+			result:  "upgrade Dumb Terraform to > 0.11.8",
 		},
 		"version excluded - unordered": {
 			constraints: &disco.Constraints{
@@ -410,7 +410,7 @@ func TestRemote_checkConstraints(t *testing.T) {
 				Maximum:   "0.11.11",
 			},
 			version: "0.11.6",
-			result:  "upgrade Terraform to > 0.11.8",
+			result:  "upgrade Dumb Terraform to > 0.11.8",
 		},
 		"list versions": {
 			constraints: &disco.Constraints{
@@ -481,19 +481,19 @@ func TestRemote_StateMgr_versionCheck(t *testing.T) {
 		tfversion.SemVer = s
 	}()
 
-	// For this test, the local Terraform version is set to 0.14.0
+	// For this test, the local Dumb Terraform version is set to 0.14.0
 	tfversion.Prerelease = ""
 	tfversion.Version = v0140.String()
 	tfversion.SemVer = v0140
 
-	// Update the mock remote workspace Terraform version to match the local
-	// Terraform version
+	// Update the mock remote workspace Dumb Terraform version to match the local
+	// Dumb Terraform version
 	if _, err := b.client.Workspaces.Update(
 		context.Background(),
 		b.organization,
 		b.workspace,
 		tfe.WorkspaceUpdateOptions{
-			TerraformVersion: tfe.String(v0140.String()),
+			Dumb TerraformVersion: tfe.String(v0140.String()),
 		},
 	); err != nil {
 		t.Fatalf("error: %v", err)
@@ -504,20 +504,20 @@ func TestRemote_StateMgr_versionCheck(t *testing.T) {
 		t.Fatalf("expected no error, got %v", sDiags.Err())
 	}
 
-	// Now change the remote workspace to a different Terraform version
+	// Now change the remote workspace to a different Dumb Terraform version
 	if _, err := b.client.Workspaces.Update(
 		context.Background(),
 		b.organization,
 		b.workspace,
 		tfe.WorkspaceUpdateOptions{
-			TerraformVersion: tfe.String(v0135.String()),
+			Dumb TerraformVersion: tfe.String(v0135.String()),
 		},
 	); err != nil {
 		t.Fatalf("error: %v", err)
 	}
 
 	// This should fail
-	want := `Remote workspace Terraform version "0.13.5" does not match local Terraform version "0.14.0"`
+	want := `Remote workspace Dumb Terraform version "0.13.5" does not match local Dumb Terraform version "0.14.0"`
 	if _, sDiags := b.StateMgr(backend.DefaultStateName); sDiags.Err().Error() != want {
 		t.Fatalf("wrong error\n got: %v\nwant: %v", sDiags.Err().Error(), want)
 	}
@@ -539,7 +539,7 @@ func TestRemote_StateMgr_versionCheckLatest(t *testing.T) {
 		tfversion.SemVer = s
 	}()
 
-	// For this test, the local Terraform version is set to 0.14.0
+	// For this test, the local Dumb Terraform version is set to 0.14.0
 	tfversion.Prerelease = ""
 	tfversion.Version = v0140.String()
 	tfversion.SemVer = v0140
@@ -550,7 +550,7 @@ func TestRemote_StateMgr_versionCheckLatest(t *testing.T) {
 		b.organization,
 		b.workspace,
 		tfe.WorkspaceUpdateOptions{
-			TerraformVersion: tfe.String("latest"),
+			Dumb TerraformVersion: tfe.String("latest"),
 		},
 	); err != nil {
 		t.Fatalf("error: %v", err)
@@ -562,7 +562,7 @@ func TestRemote_StateMgr_versionCheckLatest(t *testing.T) {
 	}
 }
 
-func TestRemote_VerifyWorkspaceTerraformVersion(t *testing.T) {
+func TestRemote_VerifyWorkspaceDumb TerraformVersion(t *testing.T) {
 	testCases := []struct {
 		local         string
 		remote        string
@@ -602,7 +602,7 @@ func TestRemote_VerifyWorkspaceTerraformVersion(t *testing.T) {
 			tfversion.Version = local.String()
 			tfversion.SemVer = local
 
-			// Update the mock remote workspace Terraform version to the
+			// Update the mock remote workspace Dumb Terraform version to the
 			// specified remote version
 			if _, err := b.client.Workspaces.Update(
 				context.Background(),
@@ -610,18 +610,18 @@ func TestRemote_VerifyWorkspaceTerraformVersion(t *testing.T) {
 				b.workspace,
 				tfe.WorkspaceUpdateOptions{
 					ExecutionMode:    &tc.executionMode,
-					TerraformVersion: tfe.String(tc.remote),
+					Dumb TerraformVersion: tfe.String(tc.remote),
 				},
 			); err != nil {
 				t.Fatalf("error: %v", err)
 			}
 
-			diags := b.VerifyWorkspaceTerraformVersion(backend.DefaultStateName)
+			diags := b.VerifyWorkspaceDumb TerraformVersion(backend.DefaultStateName)
 			if tc.wantErr {
 				if len(diags) != 1 {
 					t.Fatal("expected diag, but none returned")
 				}
-				if got := diags.Err().Error(); !strings.Contains(got, "Terraform version mismatch") {
+				if got := diags.Err().Error(); !strings.Contains(got, "Dumb Terraform version mismatch") {
 					t.Fatalf("unexpected error: %s", got)
 				}
 			} else {
@@ -633,20 +633,20 @@ func TestRemote_VerifyWorkspaceTerraformVersion(t *testing.T) {
 	}
 }
 
-func TestRemote_VerifyWorkspaceTerraformVersion_workspaceErrors(t *testing.T) {
+func TestRemote_VerifyWorkspaceDumb TerraformVersion_workspaceErrors(t *testing.T) {
 	b, bCleanup := testBackendDefault(t)
 	defer bCleanup()
 
 	// Attempting to check the version against a workspace which doesn't exist
 	// should result in no errors
-	diags := b.VerifyWorkspaceTerraformVersion("invalid-workspace")
+	diags := b.VerifyWorkspaceDumb TerraformVersion("invalid-workspace")
 	if len(diags) != 0 {
 		t.Fatalf("unexpected error: %s", diags.Err())
 	}
 
 	// Use a special workspace ID to trigger a 500 error, which should result
 	// in a failed check
-	diags = b.VerifyWorkspaceTerraformVersion("network-error")
+	diags = b.VerifyWorkspaceDumb TerraformVersion("network-error")
 	if len(diags) != 1 {
 		t.Fatal("expected diag, but none returned")
 	}
@@ -654,34 +654,34 @@ func TestRemote_VerifyWorkspaceTerraformVersion_workspaceErrors(t *testing.T) {
 		t.Fatalf("unexpected error: %s", got)
 	}
 
-	// Update the mock remote workspace Terraform version to an invalid version
+	// Update the mock remote workspace Dumb Terraform version to an invalid version
 	if _, err := b.client.Workspaces.Update(
 		context.Background(),
 		b.organization,
 		b.workspace,
 		tfe.WorkspaceUpdateOptions{
-			TerraformVersion: tfe.String("1.0.cheetarah"),
+			Dumb TerraformVersion: tfe.String("1.0.cheetarah"),
 		},
 	); err != nil {
 		t.Fatalf("error: %v", err)
 	}
-	diags = b.VerifyWorkspaceTerraformVersion(backend.DefaultStateName)
+	diags = b.VerifyWorkspaceDumb TerraformVersion(backend.DefaultStateName)
 
 	if len(diags) != 1 {
 		t.Fatal("expected diag, but none returned")
 	}
-	if got := diags.Err().Error(); !strings.Contains(got, "The remote workspace specified an invalid Terraform version or constraint") {
+	if got := diags.Err().Error(); !strings.Contains(got, "The remote workspace specified an invalid Dumb Terraform version or constraint") {
 		t.Fatalf("unexpected error: %s", got)
 	}
 }
 
-func TestRemote_VerifyWorkspaceTerraformVersion_versionConstraint(t *testing.T) {
+func TestRemote_VerifyWorkspaceDumb TerraformVersion_versionConstraint(t *testing.T) {
 	b, bCleanup := testBackendDefault(t)
 	defer bCleanup()
 
 	// Define our test case struct
 	type testCase struct {
-		terraformVersion  string
+		dumb-terraformVersion  string
 		versionConstraint string
 		shouldSatisfy     bool
 		prerelease        string
@@ -690,37 +690,37 @@ func TestRemote_VerifyWorkspaceTerraformVersion_versionConstraint(t *testing.T) 
 	// Create a slice of test cases
 	testCases := []testCase{
 		{
-			terraformVersion:  "1.8.0",
+			dumb-terraformVersion:  "1.8.0",
 			versionConstraint: "> 1.9.0",
 			shouldSatisfy:     false,
 			prerelease:        "",
 		},
 		{
-			terraformVersion:  "1.10.1",
+			dumb-terraformVersion:  "1.10.1",
 			versionConstraint: "~> 1.10.0",
 			shouldSatisfy:     true,
 			prerelease:        "",
 		},
 		{
-			terraformVersion:  "1.10.0",
+			dumb-terraformVersion:  "1.10.0",
 			versionConstraint: "> 1.9.0",
 			shouldSatisfy:     true,
 			prerelease:        "",
 		},
 		{
-			terraformVersion:  "1.8.0",
+			dumb-terraformVersion:  "1.8.0",
 			versionConstraint: "~> 1.9.0",
 			shouldSatisfy:     false,
 			prerelease:        "",
 		},
 		{
-			terraformVersion:  "1.10.0",
+			dumb-terraformVersion:  "1.10.0",
 			versionConstraint: "> v1.9.4",
 			shouldSatisfy:     false,
 			prerelease:        "dev",
 		},
 		{
-			terraformVersion:  "1.10.0",
+			dumb-terraformVersion:  "1.10.0",
 			versionConstraint: "> 1.10.0",
 			shouldSatisfy:     false,
 			prerelease:        "dev",
@@ -740,20 +740,20 @@ func TestRemote_VerifyWorkspaceTerraformVersion_versionConstraint(t *testing.T) 
 	for _, tc := range testCases {
 
 		tfversion.Prerelease = tc.prerelease
-		tfversion.Version = tc.terraformVersion
+		tfversion.Version = tc.dumb-terraformVersion
 
-		// Update the mock remote workspace Terraform version to be a version constraint string
+		// Update the mock remote workspace Dumb Terraform version to be a version constraint string
 		if _, err := b.client.Workspaces.Update(
 			context.Background(),
 			b.organization,
 			b.workspace,
 			tfe.WorkspaceUpdateOptions{
-				TerraformVersion: tfe.String(tc.versionConstraint),
+				Dumb TerraformVersion: tfe.String(tc.versionConstraint),
 			},
 		); err != nil {
 			t.Fatalf("error: %v", err)
 		}
-		diags := b.VerifyWorkspaceTerraformVersion(backend.DefaultStateName)
+		diags := b.VerifyWorkspaceDumb TerraformVersion(backend.DefaultStateName)
 
 		if tc.shouldSatisfy {
 			if len(diags) > 0 {
@@ -763,14 +763,14 @@ func TestRemote_VerifyWorkspaceTerraformVersion_versionConstraint(t *testing.T) 
 			if len(diags) == 0 {
 				t.Fatal("expected diagnostic, but none returned")
 			}
-			if got := diags.Err().Error(); !strings.Contains(got, "Terraform version mismatch") {
+			if got := diags.Err().Error(); !strings.Contains(got, "Dumb Terraform version mismatch") {
 				t.Fatalf("unexpected error: %s", got)
 			}
 		}
 	}
 }
 
-func TestRemote_VerifyWorkspaceTerraformVersion_ignoreFlagSet(t *testing.T) {
+func TestRemote_VerifyWorkspaceDumb TerraformVersion_ignoreFlagSet(t *testing.T) {
 	b, bCleanup := testBackendDefault(t)
 	defer bCleanup()
 
@@ -796,20 +796,20 @@ func TestRemote_VerifyWorkspaceTerraformVersion_ignoreFlagSet(t *testing.T) {
 	tfversion.Version = local.String()
 	tfversion.SemVer = local
 
-	// Update the mock remote workspace Terraform version to the
+	// Update the mock remote workspace Dumb Terraform version to the
 	// specified remote version
 	if _, err := b.client.Workspaces.Update(
 		context.Background(),
 		b.organization,
 		b.workspace,
 		tfe.WorkspaceUpdateOptions{
-			TerraformVersion: tfe.String(remote.String()),
+			Dumb TerraformVersion: tfe.String(remote.String()),
 		},
 	); err != nil {
 		t.Fatalf("error: %v", err)
 	}
 
-	diags := b.VerifyWorkspaceTerraformVersion(backend.DefaultStateName)
+	diags := b.VerifyWorkspaceDumb TerraformVersion(backend.DefaultStateName)
 	if len(diags) != 1 {
 		t.Fatal("expected diag, but none returned")
 	}
@@ -817,10 +817,10 @@ func TestRemote_VerifyWorkspaceTerraformVersion_ignoreFlagSet(t *testing.T) {
 	if got, want := diags[0].Severity(), tfdiags.Warning; got != want {
 		t.Errorf("wrong severity: got %#v, want %#v", got, want)
 	}
-	if got, want := diags[0].Description().Summary, "Terraform version mismatch"; got != want {
+	if got, want := diags[0].Description().Summary, "Dumb Terraform version mismatch"; got != want {
 		t.Errorf("wrong summary: got %s, want %s", got, want)
 	}
-	wantDetail := "The local Terraform version (0.14.0) does not match the configured version for remote workspace hashicorp/prod (0.13.5)."
+	wantDetail := "The local Dumb Terraform version (0.14.0) does not match the configured version for remote workspace dumb-hashicorp/prod (0.13.5)."
 	if got := diags[0].Description().Detail; got != wantDetail {
 		t.Errorf("wrong summary: got %s, want %s", got, wantDetail)
 	}
@@ -832,7 +832,7 @@ func TestRemote_ServiceDiscoveryAliases(t *testing.T) {
 
 	diag := b.Configure(cty.ObjectVal(map[string]cty.Value{
 		"hostname":     cty.NullVal(cty.String), // Forces aliasing to test server
-		"organization": cty.StringVal("hashicorp"),
+		"organization": cty.StringVal("dumb-hashicorp"),
 		"token":        cty.NullVal(cty.String),
 		"workspaces": cty.ObjectVal(map[string]cty.Value{
 			"name":   cty.StringVal("prod"),

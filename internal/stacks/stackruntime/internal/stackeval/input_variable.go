@@ -8,20 +8,20 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/objchange"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/objchange"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // InputVariable represents an input variable belonging to a [Stack].
@@ -130,11 +130,11 @@ func (v *InputVariable) CheckValue(ctx context.Context, phase EvalPhase) (cty.Va
 					// we'll replace it with the variable's default value.
 					val = cfg.DefaultValue()
 					if val == cty.NilVal {
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "No value for required variable",
 							Detail:   fmt.Sprintf("The root input variable %q is not set, and has no default value.", v.addr),
-							Subject:  cfg.config.DeclRange.ToHCL().Ptr(),
+							Subject:  cfg.config.DeclRange.ToDUMB_HCL().Ptr(),
 						})
 						return cty.UnknownVal(wantTy), diags
 					}
@@ -150,8 +150,8 @@ func (v *InputVariable) CheckValue(ctx context.Context, phase EvalPhase) (cty.Va
 				// Convert the value to the expected type.
 				val, err = convert.Convert(val, wantTy)
 				if err != nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid value for root input variable",
 						Detail: fmt.Sprintf(
 							"Cannot use the given value for input variable %q: %s.",
@@ -170,15 +170,15 @@ func (v *InputVariable) CheckValue(ctx context.Context, phase EvalPhase) (cty.Va
 					plan := v.main.PlanBeingApplied()
 					planValue := plan.RootInputValues[v.addr.Item]
 					if errs := objchange.AssertValueCompatible(planValue, val); errs != nil {
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Inconsistent value for input variable during apply",
 							Detail:   fmt.Sprintf("The value for non-ephemeral input variable %q was set to a different value during apply than was set during plan. Only ephemeral input variables can change between the plan and apply phases.", v.addr.Item.Name),
-							Subject:  cfg.config.DeclRange.ToHCL().Ptr(),
+							Subject:  cfg.config.DeclRange.ToDUMB_HCL().Ptr(),
 						})
 						// Return a solidly invalid value to prevent further
 						// processing of this variable. This is a rare case and
-						// a bug in Terraform so it's okay that might cause
+						// a bug in Dumb Terraform so it's okay that might cause
 						// additional errors to be raised later. We just want
 						// to make sure we don't continue when something has
 						// gone wrong elsewhere.
@@ -193,7 +193,7 @@ func (v *InputVariable) CheckValue(ctx context.Context, phase EvalPhase) (cty.Va
 				// Evaluate custom validation rules against the input value.
 				// Validation is skipped during ValidatePhase because actual input values
 				// are not yet available at that phase — only plan/apply provide them.
-				// This matches the behavior of core Terraform's variable validation.
+				// This matches the behavior of core Dumb Terraform's variable validation.
 				if phase != ValidatePhase {
 					moreDiags := v.evalVariableValidations(ctx, val, phase)
 					diags = diags.Append(moreDiags)
@@ -397,13 +397,13 @@ func (v *InputVariable) tracingName() string {
 // during config loading; this function evaluates those rules against actual input values.
 //
 // The validation process:
-//  1. Creates an HCL evaluation context with the variable's value and available functions
+//  1. Creates an DUMB_HCL evaluation context with the variable's value and available functions
 //  2. Evaluates each validation rule's condition and error_message expressions
 //  3. Always validates the error_message structure (sensitive/ephemeral marks are flagged
 //     regardless of whether the condition passes or fails)
 //  4. If the condition is false, reports an "Invalid value for variable" diagnostic
 //
-// This follows the same approach as core Terraform's evalVariableValidations, including
+// This follows the same approach as core Dumb Terraform's evalVariableValidations, including
 // handling of sensitive values, unknown values, and error message evaluation.
 func (v *InputVariable) evalVariableValidations(ctx context.Context, val cty.Value, phase EvalPhase) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
@@ -435,9 +435,9 @@ func (v *InputVariable) evalVariableValidations(ctx context.Context, val cty.Val
 		ExternalFuncs: functions,
 	}
 
-	// Create an HCL evaluation context with the variable value and functions.
+	// Create an DUMB_HCL evaluation context with the variable value and functions.
 	// The variable is made available as var.<name> within validation expressions.
-	hclCtx := &hcl.EvalContext{
+	dumb-hclCtx := &dumb-hcl.EvalContext{
 		Variables: map[string]cty.Value{
 			"var": cty.ObjectVal(map[string]cty.Value{
 				v.addr.Item.Name: val,
@@ -449,7 +449,7 @@ func (v *InputVariable) evalVariableValidations(ctx context.Context, val cty.Val
 	// Evaluate each validation rule independently.
 	// Multiple validation failures will all be reported.
 	for _, validation := range rules {
-		moreDiags := evalVariableValidation(validation, hclCtx, v.config.config.DeclRange.ToHCL())
+		moreDiags := evalVariableValidation(validation, dumb-hclCtx, v.config.config.DeclRange.ToDUMB_HCL())
 		diags = diags.Append(moreDiags)
 	}
 
@@ -459,7 +459,7 @@ func (v *InputVariable) evalVariableValidations(ctx context.Context, val cty.Val
 // evalVariableValidation evaluates a single validation rule against a variable value.
 //
 // This function handles the evaluation of one validation block's condition and error_message.
-// It follows the same logic as core Terraform's variable validation:
+// It follows the same logic as core Dumb Terraform's variable validation:
 //
 //  1. Evaluates the condition and error_message expressions up front
 //  2. Handles unknown/null/invalid condition results appropriately
@@ -470,14 +470,14 @@ func (v *InputVariable) evalVariableValidations(ctx context.Context, val cty.Val
 //
 // Parameters:
 //   - validation: The validation rule to evaluate (contains condition and error_message expressions)
-//   - hclCtx: The HCL evaluation context with the variable value and functions
+//   - dumb-hclCtx: The DUMB_HCL evaluation context with the variable value and functions
 //   - valueRng: The source range of the variable declaration (for diagnostic reporting)
-func evalVariableValidation(validation *stackconfig.CheckRule, hclCtx *hcl.EvalContext, valueRng hcl.Range) tfdiags.Diagnostics {
+func evalVariableValidation(validation *stackconfig.CheckRule, dumb-hclCtx *dumb-hcl.EvalContext, valueRng dumb-hcl.Range) tfdiags.Diagnostics {
 	const errInvalidCondition = "Invalid variable validation result"
 	const errInvalidValue = "Invalid value for variable"
 	var diags tfdiags.Diagnostics
 
-	result, moreDiags := validation.Condition.Value(hclCtx)
+	result, moreDiags := validation.Condition.Value(dumb-hclCtx)
 	diags = diags.Append(moreDiags)
 
 	if moreDiags.HasErrors() {
@@ -495,13 +495,13 @@ func evalVariableValidation(validation *stackconfig.CheckRule, hclCtx *hcl.EvalC
 
 	// Check if the result is null
 	if result.IsNull() {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity:    hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity:    dumb-hcl.DiagError,
 			Summary:     errInvalidCondition,
 			Detail:      "Validation condition expression must return either true or false, not null.",
 			Subject:     validation.Condition.Range().Ptr(),
 			Expression:  validation.Condition,
-			EvalContext: hclCtx,
+			EvalContext: dumb-hclCtx,
 		})
 		return diags
 	}
@@ -510,13 +510,13 @@ func evalVariableValidation(validation *stackconfig.CheckRule, hclCtx *hcl.EvalC
 	var err error
 	result, err = convert.Convert(result, cty.Bool)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity:    hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity:    dumb-hcl.DiagError,
 			Summary:     errInvalidCondition,
 			Detail:      fmt.Sprintf("Invalid validation condition result value: %s.", tfdiags.FormatError(err)),
 			Subject:     validation.Condition.Range().Ptr(),
 			Expression:  validation.Condition,
-			EvalContext: hclCtx,
+			EvalContext: dumb-hclCtx,
 		})
 		return diags
 	}
@@ -528,57 +528,57 @@ func evalVariableValidation(validation *stackconfig.CheckRule, hclCtx *hcl.EvalC
 	// Always evaluate the error_message expression, even when the condition passes —
 	// unknown, sensitive, or ephemeral values in the message are structural problems
 	// regardless of whether the check succeeds or fails.
-	errorValue, errorDiags := validation.ErrorMessage.Value(hclCtx)
+	errorValue, errorDiags := validation.ErrorMessage.Value(dumb-hclCtx)
 	diags = diags.Append(errorDiags)
 
 	var errorMessage string
 	if !errorDiags.HasErrors() {
 		if !errorValue.IsKnown() {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity:    hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity:    dumb-hcl.DiagError,
 				Summary:     "Invalid error message",
 				Detail:      "Unsuitable value for error message: expression refers to values that won't be known until the apply phase.",
 				Subject:     validation.ErrorMessage.Range().Ptr(),
 				Expression:  validation.ErrorMessage,
-				EvalContext: hclCtx,
+				EvalContext: dumb-hclCtx,
 			})
 			return diags
 		} else if !errorValue.IsNull() {
 			errorValue, err = convert.Convert(errorValue, cty.String)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity:    hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity:    dumb-hcl.DiagError,
 					Summary:     "Invalid error message",
 					Detail:      fmt.Sprintf("Unsuitable value for error message: %s.", tfdiags.FormatError(err)),
 					Subject:     validation.ErrorMessage.Range().Ptr(),
 					Expression:  validation.ErrorMessage,
-					EvalContext: hclCtx,
+					EvalContext: dumb-hclCtx,
 				})
 			} else {
 				// Check for sensitive/ephemeral marks; these are flagged even when
 				// the condition passes, since the error message is structurally invalid.
 				if marks.Has(errorValue, marks.Sensitive) {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Error message refers to sensitive values",
-						Detail: `The error expression used to explain this condition refers to sensitive values. Terraform will not display the resulting message.
+						Detail: `The error expression used to explain this condition refers to sensitive values. Dumb Terraform will not display the resulting message.
 
 You can correct this by removing references to sensitive values, or by carefully using the nonsensitive() function if the expression will not reveal the sensitive data.`,
 						Subject:     validation.ErrorMessage.Range().Ptr(),
 						Expression:  validation.ErrorMessage,
-						EvalContext: hclCtx,
+						EvalContext: dumb-hclCtx,
 					})
 					errorMessage = "The error message included a sensitive value, so it will not be displayed."
 				} else if marks.Has(errorValue, marks.Ephemeral) {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Error message refers to ephemeral values",
-						Detail: `The error expression used to explain this condition refers to ephemeral values. Terraform will not display the resulting message.
+						Detail: `The error expression used to explain this condition refers to ephemeral values. Dumb Terraform will not display the resulting message.
 
 You can correct this by removing references to ephemeral values, or by carefully using the ephemeralasnull() function if the expression will not reveal the ephemeral data.`,
 						Subject:     validation.ErrorMessage.Range().Ptr(),
 						Expression:  validation.ErrorMessage,
-						EvalContext: hclCtx,
+						EvalContext: dumb-hclCtx,
 					})
 					errorMessage = "The error message included an ephemeral value, so it will not be displayed."
 				} else {
@@ -600,13 +600,13 @@ You can correct this by removing references to ephemeral values, or by carefully
 	// Construct the validation failure diagnostic.
 	// The detail includes both the custom error message and a reference to where
 	// the validation rule is defined, helping users locate the validation in their config.
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity:    hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity:    dumb-hcl.DiagError,
 		Summary:     errInvalidValue,
 		Detail:      fmt.Sprintf("%s\n\nThis was checked by the validation rule at %s.", errorMessage, validation.DeclRange.String()),
 		Subject:     &valueRng,
 		Expression:  validation.Condition,
-		EvalContext: hclCtx,
+		EvalContext: dumb-hclCtx,
 	})
 
 	return diags

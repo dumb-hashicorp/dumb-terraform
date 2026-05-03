@@ -8,13 +8,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/dag"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dag"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ValidateMoves tests whether all of the given move statements comply with
@@ -62,14 +62,14 @@ func ValidateMoves(stmts []MoveStatement, rootCfg *configs.Config, declaredInsts
 			absTo := stmt.To.InModuleInstance(fromModInst)
 
 			if addrs.Equivalent(absFrom, absTo) {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Redundant move statement",
 					Detail: fmt.Sprintf(
 						"This statement declares a move from %s to the same address, which is the same as not declaring this move at all.",
 						absFrom,
 					),
-					Subject: stmt.DeclRange.ToHCL().Ptr(),
+					Subject: stmt.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 				continue
 			}
@@ -106,29 +106,29 @@ func ValidateMoves(stmts []MoveStatement, rootCfg *configs.Config, declaredInsts
 					declaredAt = fmt.Sprintf(" at %s", conflictRange.StartString())
 				}
 
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Moved object still exists",
 					Detail: fmt.Sprintf(
 						"This statement declares a move from %s, but that %s is still declared%s.\n\nChange your configuration so that this %s will be declared as %s instead.",
 						absFrom, noun, declaredAt, shortNoun, absTo,
 					),
-					Subject: stmt.DeclRange.ToHCL().Ptr(),
+					Subject: stmt.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 			}
 
 			// There can only be one destination for each source address.
 			if existing, exists := stmtFrom.GetOk(absFrom); exists {
 				if !addrs.Equivalent(existing.Other, absTo) {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Ambiguous move statements",
 						Detail: fmt.Sprintf(
 							"A statement at %s declared that %s moved to %s, but this statement instead declares that it moved to %s.\n\nEach %s can move to only one destination %s.",
 							existing.StmtRange.StartString(), absFrom, existing.Other, absTo,
 							noun, shortNoun,
 						),
-						Subject: stmt.DeclRange.ToHCL().Ptr(),
+						Subject: stmt.DeclRange.ToDUMB_HCL().Ptr(),
 					})
 				}
 			} else {
@@ -141,15 +141,15 @@ func ValidateMoves(stmts []MoveStatement, rootCfg *configs.Config, declaredInsts
 			// There can only be one source for each destination address.
 			if existing, exists := stmtTo.GetOk(absTo); exists {
 				if !addrs.Equivalent(existing.Other, absFrom) {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Ambiguous move statements",
 						Detail: fmt.Sprintf(
 							"A statement at %s declared that %s moved to %s, but this statement instead declares that %s moved there.\n\nEach %s can have moved from only one source %s.",
 							existing.StmtRange.StartString(), existing.Other, absTo, absFrom,
 							noun, shortNoun,
 						),
-						Subject: stmt.DeclRange.ToHCL().Ptr(),
+						Subject: stmt.DeclRange.ToDUMB_HCL().Ptr(),
 					})
 				}
 			} else {
@@ -216,7 +216,7 @@ func validateMoveStatementGraph(g *dag.AcyclicGraph) tfdiags.Diagnostics {
 				tfdiags.Error,
 				"Self reference in move statements",
 				fmt.Sprintf(
-					"The move statement %s refers to itself the move dependency graph, which is invalid. This is a bug in Terraform; please report it!",
+					"The move statement %s refers to itself the move dependency graph, which is invalid. This is a bug in Dumb Terraform; please report it!",
 					src.(*MoveStatement).Name(),
 				),
 			))
@@ -264,11 +264,11 @@ func movableObjectDeclRange(addr addrs.AbsMoveable, cfg *configs.Config) (tfdiag
 		// the expression that decides which instances are available.
 		switch {
 		case call.ForEach != nil:
-			return tfdiags.SourceRangeFromHCL(call.ForEach.Range()), true
+			return tfdiags.SourceRangeFromDUMB_HCL(call.ForEach.Range()), true
 		case call.Count != nil:
-			return tfdiags.SourceRangeFromHCL(call.Count.Range()), true
+			return tfdiags.SourceRangeFromDUMB_HCL(call.Count.Range()), true
 		default:
-			return tfdiags.SourceRangeFromHCL(call.DeclRange), true
+			return tfdiags.SourceRangeFromDUMB_HCL(call.DeclRange), true
 		}
 	case addrs.AbsModuleCall:
 		modCfg := cfg.DescendantForInstance(addr.Module)
@@ -279,7 +279,7 @@ func movableObjectDeclRange(addr addrs.AbsMoveable, cfg *configs.Config) (tfdiag
 		if call == nil {
 			return tfdiags.SourceRange{}, false
 		}
-		return tfdiags.SourceRangeFromHCL(call.DeclRange), true
+		return tfdiags.SourceRangeFromDUMB_HCL(call.DeclRange), true
 	case addrs.AbsResourceInstance:
 		modCfg := cfg.DescendantForInstance(addr.Module)
 		if modCfg == nil {
@@ -295,11 +295,11 @@ func movableObjectDeclRange(addr addrs.AbsMoveable, cfg *configs.Config) (tfdiag
 		// the expression that decides which instances are available.
 		switch {
 		case rc.ForEach != nil:
-			return tfdiags.SourceRangeFromHCL(rc.ForEach.Range()), true
+			return tfdiags.SourceRangeFromDUMB_HCL(rc.ForEach.Range()), true
 		case rc.Count != nil:
-			return tfdiags.SourceRangeFromHCL(rc.Count.Range()), true
+			return tfdiags.SourceRangeFromDUMB_HCL(rc.Count.Range()), true
 		default:
-			return tfdiags.SourceRangeFromHCL(rc.DeclRange), true
+			return tfdiags.SourceRangeFromDUMB_HCL(rc.DeclRange), true
 		}
 	case addrs.AbsResource:
 		modCfg := cfg.DescendantForInstance(addr.Module)
@@ -310,7 +310,7 @@ func movableObjectDeclRange(addr addrs.AbsMoveable, cfg *configs.Config) (tfdiag
 		if rc == nil {
 			return tfdiags.SourceRange{}, false
 		}
-		return tfdiags.SourceRangeFromHCL(rc.DeclRange), true
+		return tfdiags.SourceRangeFromDUMB_HCL(rc.DeclRange), true
 	default:
 		// The above cases should cover all of the AbsMoveable types
 		panic("unsupported AbsMoveable address type")

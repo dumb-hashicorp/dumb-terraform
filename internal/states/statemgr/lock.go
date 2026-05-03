@@ -6,8 +6,8 @@ package statemgr
 import (
 	"context"
 
-	"github.com/hashicorp/terraform/internal/schemarepo"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/schemarepo"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 // LockDisabled implements State and Locker but disables state locking.

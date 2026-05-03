@@ -6,7 +6,7 @@ package command
 import (
 	"strings"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 )
 
 // MetadataCommand is a Command implementation that just shows help for
@@ -21,7 +21,7 @@ func (c *MetadataCommand) Run(args []string) int {
 
 func (c *MetadataCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] metadata <subcommand> [options] [args]
+Usage: dumb-terraform [global options] metadata <subcommand> [options] [args]
 
   This command has subcommands for metadata related purposes.
 

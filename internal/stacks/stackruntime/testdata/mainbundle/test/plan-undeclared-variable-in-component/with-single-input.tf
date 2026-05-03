@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
-    terraform = {
-      source = "terraform.io/builtin/terraform"
+    dumb-terraform = {
+      source = "dumb-terraform.io/builtin/dumb-terraform"
     }
   }
 }
@@ -10,10 +10,10 @@ variable "input" {
   type = string
 }
 
-resource "terraform_data" "main" {
+resource "dumb-terraform_data" "main" {
   input = var.input
 }
 
 output "output" {
-  value = terraform_data.main.output
+  value = dumb-terraform_data.main.output
 }

@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/posener/complete"
 )
 
@@ -134,7 +134,7 @@ func (c *WorkspaceDeleteCommand) Run(rawArgs []string) int {
 			tfdiags.Error,
 			"Workspace is not empty",
 			fmt.Sprintf(
-				"Workspace %q is currently tracking the following resource instances:%s\n\nDeleting this workspace would cause Terraform to lose track of any associated remote objects, which would then require you to delete them manually outside of Terraform. You should destroy these objects with Terraform before deleting the workspace.\n\nIf you want to delete this workspace anyway, and have Terraform forget about these managed objects, use the -force option to disable this safety check.",
+				"Workspace %q is currently tracking the following resource instances:%s\n\nDeleting this workspace would cause Dumb Terraform to lose track of any associated remote objects, which would then require you to delete them manually outside of Dumb Terraform. You should destroy these objects with Dumb Terraform before deleting the workspace.\n\nIf you want to delete this workspace anyway, and have Dumb Terraform forget about these managed objects, use the -force option to disable this safety check.",
 				workspace, buf.String(),
 			),
 		))
@@ -193,15 +193,15 @@ func (c *WorkspaceDeleteCommand) AutocompleteFlags() complete.Flags {
 
 func (c *WorkspaceDeleteCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] workspace delete [OPTIONS] NAME
+Usage: dumb-terraform [global options] workspace delete [OPTIONS] NAME
 
-  Delete a Terraform workspace
+  Delete a Dumb Terraform workspace
 
 
 Options:
 
   -force             Remove a workspace even if it is managing resources.
-                     Terraform can no longer track or manage the workspace's
+                     Dumb Terraform can no longer track or manage the workspace's
                      infrastructure.
 
   -lock=false        Don't hold a state lock during the operation. This is

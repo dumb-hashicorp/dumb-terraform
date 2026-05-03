@@ -9,18 +9,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var _ Plannable = (*RemovedStackCall)(nil)
@@ -134,11 +134,11 @@ func (r *RemovedStackCall) Instances(ctx context.Context, phase EvalPhase) (map[
 					if _, exists := insts[key]; exists {
 						// error, we have an embedded stack call and a removed block
 						// pointing at the same instance
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Cannot remove stack instance",
-							Detail:   fmt.Sprintf("The stack instance %s is targeted by an embedded stack block and cannot be removed. The relevant embedded stack is defined at %s.", rsc.from, embeddedCall.config.config.DeclRange.ToHCL()),
-							Subject:  rsc.call.config.config.DeclRange.ToHCL().Ptr(),
+							Detail:   fmt.Sprintf("The stack instance %s is targeted by an embedded stack block and cannot be removed. The relevant embedded stack is defined at %s.", rsc.from, embeddedCall.config.config.DeclRange.ToDUMB_HCL()),
+							Subject:  rsc.call.config.config.DeclRange.ToDUMB_HCL().Ptr(),
 						})
 
 						continue // don't add this to the known instances

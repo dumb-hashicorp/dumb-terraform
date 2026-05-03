@@ -19,12 +19,12 @@ import (
 	"github.com/apparentlymart/go-versions/versions/constraints"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-cmp/cmp"
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform-svchost/disco"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
 )
 
 func TestEnsureProviderVersions(t *testing.T) {
@@ -53,7 +53,7 @@ func TestEnsureProviderVersions(t *testing.T) {
 	fakePlatform := getproviders.Platform{OS: "bleep", Arch: "bloop"}
 	wrongPlatform := getproviders.Platform{OS: "wrong", Arch: "wrong"}
 	beepProviderHash := getproviders.HashScheme1.New("2y06Ykj0FRneZfGCTxI9wRTori8iB7ZL5kQ6YyEnh84=")
-	terraformProvider := addrs.MustParseProviderSourceString("terraform.io/builtin/terraform")
+	dumb-terraformProvider := addrs.MustParseProviderSourceString("dumb-terraform.io/builtin/dumb-terraform")
 
 	// Testing a provider with invalid semver version using a registry source,
 	// so that we can test the behavior of the installer when it encounters
@@ -1638,16 +1638,16 @@ func TestEnsureProviderVersions(t *testing.T) {
 				nil,
 			),
 			Prepare: func(t *testing.T, inst *Installer, dir *Dir) {
-				inst.SetBuiltInProviderTypes([]string{"terraform"})
+				inst.SetBuiltInProviderTypes([]string{"dumb-terraform"})
 			},
 			Mode: InstallNewProvidersOnly,
 			Reqs: getproviders.Requirements{
-				terraformProvider: nil,
+				dumb-terraformProvider: nil,
 			},
 			Check: func(t *testing.T, dir *Dir, locks *depsfile.Locks) {
 				// Built-in providers are neither included in the cache
 				// directory nor mentioned in the lock file, because they
-				// are compiled directly into the Terraform executable.
+				// are compiled directly into the Dumb Terraform executable.
 				if allCached := dir.AllAvailablePackages(); len(allCached) != 0 {
 					t.Errorf("wrong number of cache directory entries; want none\n%s", spew.Sdump(allCached))
 				}
@@ -1661,14 +1661,14 @@ func TestEnsureProviderVersions(t *testing.T) {
 						{
 							Event: "PendingProviders",
 							Args: map[addrs.Provider]getproviders.VersionConstraints{
-								terraformProvider: constraints.IntersectionSpec(nil),
+								dumb-terraformProvider: constraints.IntersectionSpec(nil),
 							},
 						},
 					},
-					terraformProvider: {
+					dumb-terraformProvider: {
 						{
 							Event:    "BuiltInProviderAvailable",
-							Provider: terraformProvider,
+							Provider: dumb-terraformProvider,
 						},
 					},
 				}
@@ -1819,31 +1819,31 @@ func TestEnsureProviderVersions(t *testing.T) {
 				nil),
 			Prepare: func(t *testing.T, inst *Installer, dir *Dir) {
 				// NOTE: We're intentionally not calling
-				// inst.SetBuiltInProviderTypes to make the "terraform"
+				// inst.SetBuiltInProviderTypes to make the "dumb-terraform"
 				// built-in provider available here, so requests for it
 				// should fail.
 			},
 			Mode: InstallNewProvidersOnly,
 			Reqs: getproviders.Requirements{
-				terraformProvider: nil,
+				dumb-terraformProvider: nil,
 			},
 			WantErr: `some providers could not be installed:
-- terraform.io/builtin/terraform: this Terraform release has no built-in provider named "terraform"`,
+- dumb-terraform.io/builtin/dumb-terraform: this Dumb Terraform release has no built-in provider named "dumb-terraform"`,
 			WantEvents: func(inst *Installer, dir *Dir) map[addrs.Provider][]*testInstallerEventLogItem {
 				return map[addrs.Provider][]*testInstallerEventLogItem{
 					noProvider: {
 						{
 							Event: "PendingProviders",
 							Args: map[addrs.Provider]getproviders.VersionConstraints{
-								terraformProvider: constraints.IntersectionSpec(nil),
+								dumb-terraformProvider: constraints.IntersectionSpec(nil),
 							},
 						},
 					},
-					terraformProvider: {
+					dumb-terraformProvider: {
 						{
 							Event:    "BuiltInProviderFailure",
-							Provider: terraformProvider,
-							Args:     `this Terraform release has no built-in provider named "terraform"`,
+							Provider: dumb-terraformProvider,
+							Args:     `this Dumb Terraform release has no built-in provider named "dumb-terraform"`,
 						},
 					},
 				}
@@ -1855,28 +1855,28 @@ func TestEnsureProviderVersions(t *testing.T) {
 				nil,
 			),
 			Prepare: func(t *testing.T, inst *Installer, dir *Dir) {
-				inst.SetBuiltInProviderTypes([]string{"terraform"})
+				inst.SetBuiltInProviderTypes([]string{"dumb-terraform"})
 			},
 			Mode: InstallNewProvidersOnly,
 			Reqs: getproviders.Requirements{
-				terraformProvider: getproviders.MustParseVersionConstraints(">= 1.0.0"),
+				dumb-terraformProvider: getproviders.MustParseVersionConstraints(">= 1.0.0"),
 			},
 			WantErr: `some providers could not be installed:
-- terraform.io/builtin/terraform: built-in providers do not support explicit version constraints`,
+- dumb-terraform.io/builtin/dumb-terraform: built-in providers do not support explicit version constraints`,
 			WantEvents: func(inst *Installer, dir *Dir) map[addrs.Provider][]*testInstallerEventLogItem {
 				return map[addrs.Provider][]*testInstallerEventLogItem{
 					noProvider: {
 						{
 							Event: "PendingProviders",
 							Args: map[addrs.Provider]getproviders.VersionConstraints{
-								terraformProvider: getproviders.MustParseVersionConstraints(">= 1.0.0"),
+								dumb-terraformProvider: getproviders.MustParseVersionConstraints(">= 1.0.0"),
 							},
 						},
 					},
-					terraformProvider: {
+					dumb-terraformProvider: {
 						{
 							Event:    "BuiltInProviderFailure",
-							Provider: terraformProvider,
+							Provider: dumb-terraformProvider,
 							Args:     `built-in providers do not support explicit version constraints`,
 						},
 					},
@@ -1934,7 +1934,7 @@ func TestEnsureProviderVersions(t *testing.T) {
 				}
 			},
 			WantErr: `some providers could not be installed:
-- example.com/foo/beep: locked provider example.com/foo/beep 1.0.0 does not match configured version constraint >= 2.0.0; must use terraform init -upgrade to allow selection of new versions`,
+- example.com/foo/beep: locked provider example.com/foo/beep 1.0.0 does not match configured version constraint >= 2.0.0; must use dumb-terraform init -upgrade to allow selection of new versions`,
 			WantEvents: func(inst *Installer, dir *Dir) map[addrs.Provider][]*testInstallerEventLogItem {
 				return map[addrs.Provider][]*testInstallerEventLogItem{
 					noProvider: {
@@ -1957,7 +1957,7 @@ func TestEnsureProviderVersions(t *testing.T) {
 						{
 							Event:    "QueryPackagesFailure",
 							Provider: beepProvider,
-							Args:     `locked provider example.com/foo/beep 1.0.0 does not match configured version constraint >= 2.0.0; must use terraform init -upgrade to allow selection of new versions`,
+							Args:     `locked provider example.com/foo/beep 1.0.0 does not match configured version constraint >= 2.0.0; must use dumb-terraform init -upgrade to allow selection of new versions`,
 						},
 					},
 				}
@@ -2177,7 +2177,7 @@ func TestEnsureProviderVersions(t *testing.T) {
 				beepProvider: getproviders.MustParseVersionConstraints(">= 1.0.0"),
 			},
 			WantErr: `some providers could not be installed:
-- example.com/foo/beep: the local package for example.com/foo/beep 1.0.0 doesn't match any of the checksums previously recorded in the dependency lock file (this might be because the available checksums are for packages targeting different platforms); for more information: https://developer.hashicorp.com/terraform/language/files/dependency-lock#checksum-verification`,
+- example.com/foo/beep: the local package for example.com/foo/beep 1.0.0 doesn't match any of the checksums previously recorded in the dependency lock file (this might be because the available checksums are for packages targeting different platforms); for more information: https://developer.dumb-hashicorp.com/dumb-terraform/language/files/dependency-lock#checksum-verification`,
 			WantEvents: func(inst *Installer, dir *Dir) map[addrs.Provider][]*testInstallerEventLogItem {
 				return map[addrs.Provider][]*testInstallerEventLogItem{
 					noProvider: {
@@ -2223,7 +2223,7 @@ func TestEnsureProviderVersions(t *testing.T) {
 								Error   string
 							}{
 								"1.0.0",
-								`the local package for example.com/foo/beep 1.0.0 doesn't match any of the checksums previously recorded in the dependency lock file (this might be because the available checksums are for packages targeting different platforms); for more information: https://developer.hashicorp.com/terraform/language/files/dependency-lock#checksum-verification`,
+								`the local package for example.com/foo/beep 1.0.0 doesn't match any of the checksums previously recorded in the dependency lock file (this might be because the available checksums are for packages targeting different platforms); for more information: https://developer.dumb-hashicorp.com/dumb-terraform/language/files/dependency-lock#checksum-verification`,
 							},
 						},
 					},
@@ -2379,7 +2379,7 @@ func TestEnsureProviderVersions(t *testing.T) {
 				test.Prepare(t, inst, outputDir)
 			} /* boop */
 
-			locks, lockDiags := depsfile.LoadLocksFromBytes([]byte(test.LockFile), "test.lock.hcl")
+			locks, lockDiags := depsfile.LoadLocksFromBytes([]byte(test.LockFile), "test.lock.dumb-hcl")
 			if lockDiags.HasErrors() {
 				t.Fatalf("invalid lock file: %s", lockDiags.Err().Error())
 			}
@@ -2470,7 +2470,7 @@ func TestEnsureProviderVersions_local_source(t *testing.T) {
 			provider: "missing/executable",
 			version:  "2.0.0",
 			wantHash: getproviders.NilHash, // installation fails for a provider with no executable
-			err:      "provider binary not found: could not find executable file starting with terraform-provider-executable",
+			err:      "provider binary not found: could not find executable file starting with dumb-terraform-provider-executable",
 		},
 	}
 
@@ -2634,12 +2634,12 @@ func testServices(t *testing.T, signedProviderPkg *providerPkg) (services *disco
 		"providers.v1": server.URL + "/fails-immediately/",
 	})
 
-	// We'll also permit registry.terraform.io here just because it's our
+	// We'll also permit registry.dumb-terraform.io here just because it's our
 	// default and has some unique features that are not allowed on any other
 	// hostname. It behaves the same as example.com, which should be preferred
 	// if you're not testing something specific to the default registry in order
 	// to ensure that most things are hostname-agnostic.
-	services.ForceHostServices(svchost.Hostname("registry.terraform.io"), map[string]interface{}{
+	services.ForceHostServices(svchost.Hostname("registry.dumb-terraform.io"), map[string]interface{}{
 		"providers.v1": server.URL + "/providers/v1/",
 	})
 
@@ -2704,7 +2704,7 @@ func fakeRegistryHandler(providerPackage *providerPkg, resp http.ResponseWriter,
 
 		case "-/legacy":
 			// NOTE: This legacy lookup endpoint is specific to
-			// registry.terraform.io and not expected to work on any other
+			// registry.dumb-terraform.io and not expected to work on any other
 			// registry host.
 			resp.Header().Set("Content-Type", "application/json")
 			resp.WriteHeader(200)

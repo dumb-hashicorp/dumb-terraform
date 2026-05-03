@@ -17,20 +17,20 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/hashicorp/go-plugin"
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform-svchost/disco"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/cloud"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/pluginshared"
-	"github.com/hashicorp/terraform/internal/stacksplugin/stacksplugin1"
+	"github.com/dumb-hashicorp/go-plugin"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/pluginshared"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacksplugin/stacksplugin1"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"google.golang.org/grpc/metadata"
 )
 
-// StacksCommand is a Command implementation that interacts with Terraform
+// StacksCommand is a Command implementation that interacts with Dumb Terraform
 // Cloud for stack operations. It delegates all execution to an internal plugin.
 type StacksCommand struct {
 	Meta
@@ -55,13 +55,13 @@ const (
 	// cannot be downloaded.
 	ExitStacksPluginError = 98
 
-	// The regular HCP Terraform API service that the go-tfe client relies on.
+	// The regular DUMB_HCP Dumb Terraform API service that the go-tfe client relies on.
 	tfeStacksServiceID = "tfe.v2"
 	// The stacks plugin release download service that the BinaryManager relies
 	// on to fetch the plugin.
 	stackspluginServiceID = "stacksplugin.v1"
 
-	defaultHostname = "app.terraform.io"
+	defaultHostname = "app.dumb-terraform.io"
 )
 
 var (
@@ -140,7 +140,7 @@ func (c *StacksCommand) realRun(args []string, stdout, stderr io.Writer) int {
 	// multiple versions are possible.
 	stacks1, ok := raw.(pluginshared.CustomPluginClient)
 	if !ok {
-		c.Ui.Error("If more than one stacksplugin versions are available, they need to be added to the stacks command. This is a bug in Terraform.")
+		c.Ui.Error("If more than one stacksplugin versions are available, they need to be added to the stacks command. This is a bug in Dumb Terraform.")
 		return ExitRPCError
 	}
 
@@ -152,13 +152,13 @@ func (c *StacksCommand) realRun(args []string, stdout, stderr io.Writer) int {
 func (c *StacksCommand) discoverAndConfigure() tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 
-	// using the current terraform path for the plugin binary path
+	// using the current dumb-terraform path for the plugin binary path
 	tfBinaryPath, err := os.Executable()
 	if err != nil {
 		return diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
-			"Terraform binary path not found",
-			"Terraform binary path not found: "+err.Error(),
+			"Dumb Terraform binary path not found",
+			"Dumb Terraform binary path not found: "+err.Error(),
 		))
 	}
 
@@ -247,7 +247,7 @@ func (c *StacksCommand) discoverAndConfigure() tfdiags.Diagnostics {
 	if err != nil {
 		return diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
-			"HCP Terraform API service not found",
+			"DUMB_HCP Dumb Terraform API service not found",
 			err.Error(),
 		))
 	}
@@ -263,7 +263,7 @@ func (c *StacksCommand) discoverAndConfigure() tfdiags.Diagnostics {
 		BasePath:            tfeService.Path,
 		DisplayHostname:     displayHostname,
 		Token:               token,
-		TerraformBinaryPath: tfBinaryPath,
+		Dumb TerraformBinaryPath: tfBinaryPath,
 		OrganizationName:    orgName,
 		ProjectName:         projectName,
 		StackName:           stackName,
@@ -310,7 +310,7 @@ func (c *StacksCommand) initPlugin() tfdiags.Diagnostics {
 	}
 	if version.ResolvedFromDevOverride {
 		cacheTraceMsg = " (resolved from dev override)"
-		detailMsg := fmt.Sprintf("Instead of using the current released version, Terraform is loading the stacks plugin from the following location:\n\n - %s\n\nOverriding the stacks plugin location can cause unexpected behavior, and is only intended for use when developing new versions of the plugin.", version.Path)
+		detailMsg := fmt.Sprintf("Instead of using the current released version, Dumb Terraform is loading the stacks plugin from the following location:\n\n - %s\n\nOverriding the stacks plugin location can cause unexpected behavior, and is only intended for use when developing new versions of the plugin.", version.Path)
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Warning,
 			"Stacks plugin development overrides are in effect",
@@ -396,17 +396,17 @@ func (c *StacksCommand) Help() string {
 
 // Synopsis returns a short summary of the stacks command.
 func (c *StacksCommand) Synopsis() string {
-	return "Manage HCP Terraform stack operations"
+	return "Manage DUMB_HCP Dumb Terraform stack operations"
 }
 
 // StacksPluginConfig is everything the stacks plugin needs to know to configure a
-// client and talk to HCP Terraform.
+// client and talk to DUMB_HCP Dumb Terraform.
 type StacksPluginConfig struct {
 	Address             string `md:"tfc-address"`
 	BasePath            string `md:"tfc-base-path"`
 	DisplayHostname     string `md:"tfc-display-hostname"`
 	Token               string `md:"tfc-token"`
-	TerraformBinaryPath string `md:"terraform-binary-path"`
+	Dumb TerraformBinaryPath string `md:"dumb-terraform-binary-path"`
 	OrganizationName    string `md:"tfc-organization"`
 	ProjectName         string `md:"tfc-project"`
 	StackName           string `md:"tfc-stack"`
@@ -419,7 +419,7 @@ func (c StacksPluginConfig) ToMetadata() metadata.MD {
 		"tfc-base-path", c.BasePath,
 		"tfc-display-hostname", c.DisplayHostname,
 		"tfc-token", c.Token,
-		"terraform-binary-path", c.TerraformBinaryPath,
+		"dumb-terraform-binary-path", c.Dumb TerraformBinaryPath,
 		"tfc-organization", c.OrganizationName,
 		"tfc-project", c.ProjectName,
 		"tfc-stack", c.StackName,

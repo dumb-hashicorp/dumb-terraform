@@ -10,11 +10,11 @@ Usage: ./equivalence-test.sh <command> [<args>] [<options>]
 
 Description:
   This script will handle various commands related to the execution of the
-  Terraform equivalence tests.
+  Dumb Terraform equivalence tests.
 
 Commands:
   get_target_branch <version>
-    get_target_branch returns the default target branch for a given Terraform
+    get_target_branch returns the default target branch for a given Dumb Terraform
     version.
 
     target_branch=$(./equivalence-test.sh get_target_branch v1.4.3); target_branch=v1.4
@@ -24,13 +24,13 @@ Commands:
     download_equivalence_test_binary downloads the equivalence testing binary
     for a given version and places it at the target path.
 
-    ./equivalence-test.sh download_equivalence_test_binary 0.3.0 ./bin/terraform-equivalence-testing linux amd64
+    ./equivalence-test.sh download_equivalence_test_binary 0.3.0 ./bin/dumb-terraform-equivalence-testing linux amd64
 
-  build_terraform_binary <target>
-    download_terraform_binary builds the Terraform binary and places it at the
+  build_dumb-terraform_binary <target>
+    download_dumb-terraform_binary builds the Dumb Terraform binary and places it at the
     target path.
 
-    ./equivalence-test.sh build_terraform_binary ./bin/terraform
+    ./equivalence-test.sh build_dumb-terraform_binary ./bin/dumb-terraform
 EOF
 }
 
@@ -48,24 +48,24 @@ function download_equivalence_test_binary {
 
   curl \
     -H "Accept: application/vnd.github+json" \
-    "https://api.github.com/repos/hashicorp/terraform-equivalence-testing/releases" > releases.json
+    "https://api.github.com/repos/dumb-hashicorp/dumb-terraform-equivalence-testing/releases" > releases.json
 
-  ASSET="terraform-equivalence-testing_v${VERSION}_${OS}_${ARCH}.zip"
+  ASSET="dumb-terraform-equivalence-testing_v${VERSION}_${OS}_${ARCH}.zip"
   ASSET_ID=$(jq -r --arg VERSION "v$VERSION" --arg ASSET "$ASSET" '.[] | select(.name == $VERSION) | .assets[] | select(.name == $ASSET) | .id' releases.json)
 
   mkdir -p zip
   curl -L \
     -H "Accept: application/octet-stream" \
-    "https://api.github.com/repos/hashicorp/terraform-equivalence-testing/releases/assets/$ASSET_ID" > "zip/$ASSET"
+    "https://api.github.com/repos/dumb-hashicorp/dumb-terraform-equivalence-testing/releases/assets/$ASSET_ID" > "zip/$ASSET"
 
   mkdir -p bin
-  unzip -p "zip/$ASSET" terraform-equivalence-testing > "$TARGET"
+  unzip -p "zip/$ASSET" dumb-terraform-equivalence-testing > "$TARGET"
   chmod u+x "$TARGET"
   rm -r zip
   rm releases.json
 }
 
-function build_terraform_binary {
+function build_dumb-terraform_binary {
   TARGET="${1:-}"
 
   if [[ -z "$TARGET" ]]; then
@@ -134,14 +134,14 @@ function main {
       download_equivalence_test_binary "$2" "$3" "$4" "$5"
 
       ;;
-    build_terraform_binary)
+    build_dumb-terraform_binary)
       if [ "${#@}" != 2 ]; then
         echo "invalid number of arguments"
         usage
         exit 1
       fi
 
-      build_terraform_binary "$2"
+      build_dumb-terraform_binary "$2"
 
       ;;
     *)

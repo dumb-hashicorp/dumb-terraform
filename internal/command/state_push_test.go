@@ -9,14 +9,14 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/backend/remote-state/inmem"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/inmem"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
 )
 
 func TestStatePush_empty(t *testing.T) {
@@ -380,12 +380,12 @@ func TestStatePush_constVariable(t *testing.T) {
 			t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter.String())
 		}
 
-		actual := strings.TrimSpace(testStateRead(t, "terraform.tfstate").String())
+		actual := strings.TrimSpace(testStateRead(t, "dumb-terraform.tfstate").String())
 		expected := strings.TrimSpace(`<no state>
 module.replaced:
   test_instance.test:
     ID = 
-    provider = provider["registry.terraform.io/hashicorp/test"]`)
+    provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]`)
 		if diff := cmp.Diff(expected, actual); diff != "" {
 			t.Fatalf("unexpected state output\n%s", diff)
 		}
@@ -417,12 +417,12 @@ module.replaced:
 			t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter.String())
 		}
 
-		actual := strings.TrimSpace(testStateRead(t, "terraform.tfstate").String())
+		actual := strings.TrimSpace(testStateRead(t, "dumb-terraform.tfstate").String())
 		expected := strings.TrimSpace(`<no state>
 module.replaced:
   test_instance.test:
     ID = 
-    provider = provider["registry.terraform.io/hashicorp/test"]`)
+    provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]`)
 		if diff := cmp.Diff(expected, actual); diff != "" {
 			t.Fatalf("unexpected state output\n%s", diff)
 		}

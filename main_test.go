@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 )
 
 func TestMain_cliArgsFromEnv(t *testing.T) {
@@ -298,9 +298,9 @@ func TestMain_autoComplete(t *testing.T) {
 	}
 
 	// Run command that should get autocomplete suggestion "version"
-	os.Setenv("COMP_LINE", "terraform versio")
+	os.Setenv("COMP_LINE", "dumb-terraform versio")
 	defer os.Unsetenv("COMP_LINE")
-	os.Args = []string{"terraform", "terraform", "versio"}
+	os.Args = []string{"dumb-terraform", "dumb-terraform", "versio"}
 	exit := realMain()
 	if exit != 0 {
 		t.Fatalf("unexpected exit status %d; want 0", exit)
@@ -323,9 +323,9 @@ func TestMain_autoComplete(t *testing.T) {
 	r, w, _ = os.Pipe()
 	os.Stdout = w
 
-	os.Setenv("COMP_LINE", "terraform zzz")
+	os.Setenv("COMP_LINE", "dumb-terraform zzz")
 	defer os.Unsetenv("COMP_LINE")
-	os.Args = []string{"terraform", "terraform", "zzz"}
+	os.Args = []string{"dumb-terraform", "dumb-terraform", "zzz"}
 	exit = realMain()
 	if exit != 0 {
 		t.Fatalf("unexpected exit status %d; want 0", exit)

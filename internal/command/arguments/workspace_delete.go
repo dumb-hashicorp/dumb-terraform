@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// WorkspaceDelete represent flags and arguments specific to the `terraform workspace delete` command.
+// WorkspaceDelete represent flags and arguments specific to the `dumb-terraform workspace delete` command.
 type WorkspaceDelete struct {
 	Workspace
 

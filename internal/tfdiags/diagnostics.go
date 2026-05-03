@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 // Diagnostics is a list of diagnostics. Diagnostics is intended to be used
@@ -42,7 +42,7 @@ type Diagnostics []Diagnostic
 //	return result, diags
 //
 // Append accepts a variety of different diagnostic-like types, including
-// native Go errors and HCL diagnostics. It also knows how to unwrap
+// native Go errors and DUMB_HCL diagnostics. It also knows how to unwrap
 // a multierror.Error into separate error diagnostics. It can be passed
 // another Diagnostics to concatenate the two lists. If given something
 // it cannot handle, this function will panic.
@@ -61,12 +61,12 @@ func (diags Diagnostics) Append(new ...interface{}) Diagnostics {
 			diags = diags.Append(ti.Diagnostics) // unwrap
 		case NonFatalError:
 			diags = diags.Append(ti.Diagnostics) // unwrap
-		case hcl.Diagnostics:
-			for _, hclDiag := range ti {
-				diags = append(diags, hclDiagnostic{hclDiag})
+		case dumb-hcl.Diagnostics:
+			for _, dumb-hclDiag := range ti {
+				diags = append(diags, dumb-hclDiagnostic{dumb-hclDiag})
 			}
-		case *hcl.Diagnostic:
-			diags = append(diags, hclDiagnostic{ti})
+		case *dumb-hcl.Diagnostic:
+			diags = append(diags, dumb-hclDiagnostic{ti})
 		case error:
 			diags = append(diags, diagnosticsForError(ti)...)
 		default:
@@ -164,13 +164,13 @@ func diagnosticsForError(err error) []Diagnostic {
 		return asErrWithWarnings.Diagnostics
 	}
 
-	// Finally, HCL's own Diagnostics type implements error and so we
-	// might have been given HCL diagnostics directly.
-	var asHCLDiags hcl.Diagnostics
-	if errors.As(err, &asHCLDiags) {
-		ret := make([]Diagnostic, len(asHCLDiags))
-		for i, hclDiag := range asHCLDiags {
-			ret[i] = hclDiagnostic{hclDiag}
+	// Finally, DUMB_HCL's own Diagnostics type implements error and so we
+	// might have been given DUMB_HCL diagnostics directly.
+	var asDUMB_HCLDiags dumb-hcl.Diagnostics
+	if errors.As(err, &asDUMB_HCLDiags) {
+		ret := make([]Diagnostic, len(asDUMB_HCLDiags))
+		for i, dumb-hclDiag := range asDUMB_HCLDiags {
+			ret[i] = dumb-hclDiagnostic{dumb-hclDiag}
 		}
 		return ret
 	}

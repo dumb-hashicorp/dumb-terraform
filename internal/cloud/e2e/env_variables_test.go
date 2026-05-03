@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/go-tfe"
 )
 
 func Test_cloud_organization_env_var(t *testing.T) {
@@ -25,13 +25,13 @@ func Test_cloud_organization_env_var(t *testing.T) {
 				{
 					prep: func(t *testing.T, orgName, dir string) {
 						remoteWorkspace := "cloud-workspace"
-						tfBlock := terraformConfigCloudBackendOmitOrg(remoteWorkspace)
+						tfBlock := dumb-terraformConfigCloudBackendOmitOrg(remoteWorkspace)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:         []string{"apply", "-auto-approve"},
@@ -72,13 +72,13 @@ func Test_cloud_workspace_name_env_var(t *testing.T) {
 			operations: []operationSets{
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigCloudBackendOmitWorkspaces(org.Name)
+						tfBlock := dumb-terraformConfigCloudBackendOmitWorkspaces(org.Name)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:         []string{"apply", "-auto-approve"},
@@ -88,13 +88,13 @@ func Test_cloud_workspace_name_env_var(t *testing.T) {
 				},
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigCloudBackendOmitWorkspaces(org.Name)
+						tfBlock := dumb-terraformConfigCloudBackendOmitWorkspaces(org.Name)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:           []string{"workspace", "show"},
@@ -111,7 +111,7 @@ func Test_cloud_workspace_name_env_var(t *testing.T) {
 			operations: []operationSets{
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigCloudBackendOmitWorkspaces(org.Name)
+						tfBlock := dumb-terraformConfigCloudBackendOmitWorkspaces(org.Name)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
@@ -153,13 +153,13 @@ func Test_cloud_workspace_tags_env_var(t *testing.T) {
 			operations: []operationSets{
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigCloudBackendTags(org.Name, wkValid.TagNames[0])
+						tfBlock := dumb-terraformConfigCloudBackendTags(org.Name, wkValid.TagNames[0])
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:         []string{"apply", "-auto-approve"},
@@ -169,13 +169,13 @@ func Test_cloud_workspace_tags_env_var(t *testing.T) {
 				},
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigCloudBackendTags(org.Name, wkValid.TagNames[0])
+						tfBlock := dumb-terraformConfigCloudBackendTags(org.Name, wkValid.TagNames[0])
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:           []string{"workspace", "show"},
@@ -192,7 +192,7 @@ func Test_cloud_workspace_tags_env_var(t *testing.T) {
 			operations: []operationSets{
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigCloudBackendTags(org.Name, wkValid.TagNames[0])
+						tfBlock := dumb-terraformConfigCloudBackendTags(org.Name, wkValid.TagNames[0])
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
@@ -226,13 +226,13 @@ func Test_cloud_null_config(t *testing.T) {
 			operations: []operationSets{
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigCloudBackendOmitConfig()
+						tfBlock := dumb-terraformConfigCloudBackendOmitConfig()
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:         []string{"apply", "-auto-approve"},
@@ -242,13 +242,13 @@ func Test_cloud_null_config(t *testing.T) {
 				},
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigCloudBackendOmitConfig()
+						tfBlock := dumb-terraformConfigCloudBackendOmitConfig()
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:           []string{"workspace", "show"},

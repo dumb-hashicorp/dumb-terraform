@@ -8,12 +8,12 @@ import (
 
 	"go.opentelemetry.io/otel/codes"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Validate performs static validation of a full stack configuration, returning

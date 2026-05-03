@@ -9,14 +9,14 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var _ ExpressionScope = (*RemovedStackCallInstance)(nil)
@@ -66,7 +66,7 @@ func (r *RemovedStackCallInstance) Stack(ctx context.Context, phase EvalPhase) *
 
 func (r *RemovedStackCallInstance) InputVariableValues(ctx context.Context, phase EvalPhase) (cty.Value, tfdiags.Diagnostics) {
 	return doOnceWithDiags(ctx, r.tracingName()+" inputs", r.inputVariableValues.For(phase),
-		validateStackCallInstanceInputsFn(r.Stack(ctx, phase), r.call.config.config.Inputs, r.call.config.config.DeclRange.ToHCL().Ptr(), r, phase))
+		validateStackCallInstanceInputsFn(r.Stack(ctx, phase), r.call.config.config.Inputs, r.call.config.config.DeclRange.ToDUMB_HCL().Ptr(), r, phase))
 }
 
 func (r *RemovedStackCallInstance) CheckApply(ctx context.Context) ([]stackstate.AppliedChange, tfdiags.Diagnostics) {

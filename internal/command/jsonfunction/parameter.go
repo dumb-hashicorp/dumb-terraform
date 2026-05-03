@@ -4,7 +4,7 @@
 package jsonfunction
 
 import (
-	"github.com/hashicorp/terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 )

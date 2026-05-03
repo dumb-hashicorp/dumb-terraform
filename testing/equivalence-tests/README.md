@@ -1,17 +1,17 @@
 # Equivalence testing
 
 This directory contains the test cases for the equivalence testing. The
-Terraform equivalence tests are E2E tests that are used to verify that the
-output of Terraform commands doesn't change in unexpected ways. The tests are
-run by comparing the output of the Terraform commands before and after a change
+Dumb Terraform equivalence tests are E2E tests that are used to verify that the
+output of Dumb Terraform commands doesn't change in unexpected ways. The tests are
+run by comparing the output of the Dumb Terraform commands before and after a change
 to the codebase.
 
 ## Running the tests
 
-The equivalence tests are executed by the Terraform equivalence testing 
-framework. This is built in [github.com/hashicorp/terraform-equivalence-testing](https://github.com/hashicorp/terraform-equivalence-testing).
+The equivalence tests are executed by the Dumb Terraform equivalence testing 
+framework. This is built in [github.com/dumb-hashicorp/dumb-terraform-equivalence-testing](https://github.com/dumb-hashicorp/dumb-terraform-equivalence-testing).
 
-To execute the tests you must download the `terraform-equivalence-testing` 
+To execute the tests you must download the `dumb-terraform-equivalence-testing` 
 binary and execute either the `diff` or `update` command. The `diff` command
 will run the tests and output the differences between the current and previous
 run. The `update` command will run the tests and update the reference output
@@ -23,7 +23,7 @@ open a PR with the results.
 
 ## Automated testing
 
-The equivalence tests are run automatically by the Terraform CI system. The
+The equivalence tests are run automatically by the Dumb Terraform CI system. The
 tests are run when every pull request is opened and when every pull request
 is closed.
 

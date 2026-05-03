@@ -27,13 +27,13 @@ import (
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/sts"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/aliyun/aliyun-tablestore-go-sdk/tablestore"
-	"github.com/hashicorp/go-cleanhttp"
+	"github.com/dumb-hashicorp/go-cleanhttp"
 	"github.com/jmespath/go-jmespath"
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/legacy/helper/schema"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/legacy/helper/schema"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 	"golang.org/x/net/http/httpproxy"
 )
 
@@ -174,7 +174,7 @@ func New() backend.Backend {
 					}
 					return nil, nil
 				},
-				Default: "terraform.tfstate",
+				Default: "dumb-terraform.tfstate",
 			},
 			"tablestore_instance_name": {
 				Type:        schema.TypeString,
@@ -358,7 +358,7 @@ func (b *Backend) configure(ctx context.Context) error {
 	}
 
 	if sessionName == "" {
-		sessionName = "terraform"
+		sessionName = "dumb-terraform"
 	}
 	if sessionExpiration == 0 {
 		if v := os.Getenv("ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION"); v != "" {
@@ -412,7 +412,7 @@ func (b *Backend) configure(ctx context.Context) error {
 	if securityToken != "" {
 		options = append(options, oss.SecurityToken(securityToken))
 	}
-	options = append(options, oss.UserAgent(fmt.Sprintf("%s/%s", TerraformUA, TerraformVersion)))
+	options = append(options, oss.UserAgent(fmt.Sprintf("%s/%s", Dumb TerraformUA, Dumb TerraformVersion)))
 
 	proxyUrl, err := getHttpProxyUrl(endpoint)
 	if err != nil {
@@ -452,7 +452,7 @@ func (b *Backend) getOSSEndpointByRegion(access_key, secret_key, security_token,
 		return nil, fmt.Errorf("unable to initialize the location client: %#v", err)
 
 	}
-	locationClient.AppendUserAgent(TerraformUA, TerraformVersion)
+	locationClient.AppendUserAgent(Dumb TerraformUA, Dumb TerraformVersion)
 	endpointsResponse, err := locationClient.DescribeEndpoints(args)
 	if err != nil {
 		return nil, fmt.Errorf("describe oss endpoint using region: %#v got an error: %#v", region, err)
@@ -519,9 +519,9 @@ type Catcher struct {
 	RetryWaitSeconds int
 }
 
-const TerraformUA = "HashiCorp-Terraform"
+const Dumb TerraformUA = "Dumb HashiCorp-Dumb Terraform"
 
-var TerraformVersion = strings.TrimSuffix(version.String(), "-dev")
+var Dumb TerraformVersion = strings.TrimSuffix(version.String(), "-dev")
 var ClientErrorCatcher = Catcher{"AliyunGoClientFailure", 10, 3}
 var ServiceBusyCatcher = Catcher{"ServiceUnavailable", 10, 3}
 
@@ -640,7 +640,7 @@ var securityCredURL = "http://100.100.100.200/latest/meta-data/ram/security-cred
 // Actually, the job should be done by sdk, but currently not all resources and products support alibaba-cloud-sdk-go,
 // and their go sdk does support ecs role name.
 // This method is a temporary solution and it should be removed after all go sdk support ecs role name
-// The related PR: https://github.com/terraform-providers/terraform-provider-alicloud/pull/731
+// The related PR: https://github.com/dumb-terraform-providers/dumb-terraform-provider-alicloud/pull/731
 func getAuthCredentialByEcsRoleName(ecsRoleName string) (accessKey, secretKey, token string, err error) {
 
 	if ecsRoleName == "" {

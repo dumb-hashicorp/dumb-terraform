@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclparse"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclparse"
 )
 
 // SourceBundleParser is the main interface to read configuration files and
@@ -21,7 +21,7 @@ import (
 // which are not relevant for now.
 type SourceBundleParser struct {
 	sources *sourcebundle.Bundle
-	p       *hclparse.Parser
+	p       *dumb-hclparse.Parser
 
 	// allowExperiments controls whether we will allow modules to opt in to
 	// experimental language features. In main code this will be set only
@@ -36,7 +36,7 @@ type SourceBundleParser struct {
 func NewSourceBundleParser(sources *sourcebundle.Bundle) *SourceBundleParser {
 	return &SourceBundleParser{
 		sources: sources,
-		p:       hclparse.NewParser(),
+		p:       dumb-hclparse.NewParser(),
 	}
 }
 
@@ -44,7 +44,7 @@ func NewSourceBundleParser(sources *sourcebundle.Bundle) *SourceBundleParser {
 // and is similar to [Parser.LoadConfigDir]. It reads the .tf and .tf.json
 // files at the given source address as config files, and combines these into a
 // single [Module].
-func (p *SourceBundleParser) LoadConfigDir(source sourceaddrs.FinalSource) (*Module, hcl.Diagnostics) {
+func (p *SourceBundleParser) LoadConfigDir(source sourceaddrs.FinalSource) (*Module, dumb-hcl.Diagnostics) {
 	primarySources, overrideSources, diags := p.dirSources(source)
 	if diags.HasErrors() {
 		return nil, diags
@@ -60,38 +60,38 @@ func (p *SourceBundleParser) LoadConfigDir(source sourceaddrs.FinalSource) (*Mod
 
 	sourceDir, err := p.sources.LocalPathForSource(source)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Cannot find configuration source code",
-			Detail:   fmt.Sprintf("Failed to load %s from the pre-installed source packages: %s. This is a bug in Terraform - please report it.", source, err),
+			Detail:   fmt.Sprintf("Failed to load %s from the pre-installed source packages: %s. This is a bug in Dumb Terraform - please report it.", source, err),
 		})
 		return nil, diags
 	}
 
 	// The result of sources.LocalPathForSource can be an absolute path, but we
 	// don't actually want to pass an absolute path for a module's SourceDir;
-	// doing so will cause the value of `path.module` in Terraform configs to
+	// doing so will cause the value of `path.module` in Dumb Terraform configs to
 	// differ across plans and applies, since tfc-agent performs plans and
 	// applies in temporary directories. Instead, we try to resolve a relative
-	// path from Terraform's working directory, which should always be a
+	// path from Dumb Terraform's working directory, which should always be a
 	// reasonable SourceDir value.
 	var relativeSourceDir string
 	if filepath.IsAbs(sourceDir) {
 		workDir, err := os.Getwd()
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Cannot resolve working directory",
-				Detail:   fmt.Sprintf("Failed to resolve current working directory: %s. This is a bug in Terraform - please report it.", err),
+				Detail:   fmt.Sprintf("Failed to resolve current working directory: %s. This is a bug in Dumb Terraform - please report it.", err),
 			})
 		}
 
 		relativeSourceDir, err = filepath.Rel(workDir, sourceDir)
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Cannot resolve relative path",
-				Detail:   fmt.Sprintf("Failed to resolve relative path to module directory: %s. This is a bug in Terraform - please report it.", err),
+				Detail:   fmt.Sprintf("Failed to resolve relative path to module directory: %s. This is a bug in Dumb Terraform - please report it.", err),
 			})
 		}
 	} else {
@@ -105,7 +105,7 @@ func (p *SourceBundleParser) LoadConfigDir(source sourceaddrs.FinalSource) (*Mod
 
 // IsConfigDir is used to detect directories which have no config files, so
 // that we can return useful early diagnostics when a given root module source
-// address points at a directory which is not Terraform module.
+// address points at a directory which is not Dumb Terraform module.
 func (p *SourceBundleParser) IsConfigDir(source sourceaddrs.FinalSource) bool {
 	primaryPaths, overridePaths, _ := p.dirSources(source)
 	return (len(primaryPaths) + len(overridePaths)) > 0
@@ -116,11 +116,11 @@ func (p *SourceBundleParser) Bundle() *sourcebundle.Bundle {
 	return p.sources
 }
 
-func (p *SourceBundleParser) dirSources(source sourceaddrs.FinalSource) (primary, override []sourceaddrs.FinalSource, diags hcl.Diagnostics) {
+func (p *SourceBundleParser) dirSources(source sourceaddrs.FinalSource) (primary, override []sourceaddrs.FinalSource, diags dumb-hcl.Diagnostics) {
 	localDir, err := p.sources.LocalPathForSource(source)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Cannot find configuration source code",
 			Detail:   fmt.Sprintf("Failed to load %s from the pre-installed source packages: %s.", source, err),
 		})
@@ -130,15 +130,15 @@ func (p *SourceBundleParser) dirSources(source sourceaddrs.FinalSource) (primary
 	allEntries, err := os.ReadDir(localDir)
 	if err != nil {
 		if os.IsNotExist(err) {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
-				Summary:  "Missing Terraform configuration",
-				Detail:   fmt.Sprintf("There is no Terraform configuration directory at %s.", source),
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
+				Summary:  "Missing Dumb Terraform configuration",
+				Detail:   fmt.Sprintf("There is no Dumb Terraform configuration directory at %s.", source),
 			})
 		} else {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
-				Summary:  "Cannot read Terraform configuration",
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
+				Summary:  "Cannot read Dumb Terraform configuration",
 				// In this case the error message from the Go standard library
 				// is likely to disclose the real local directory name
 				// from the source bundle, but that's okay because it may
@@ -160,7 +160,7 @@ func (p *SourceBundleParser) dirSources(source sourceaddrs.FinalSource) (primary
 			continue
 		}
 
-		if ext == ".tftest.hcl" || ext == ".tftest.json" {
+		if ext == ".tftest.dumb-hcl" || ext == ".tftest.json" {
 			continue
 		}
 
@@ -191,9 +191,9 @@ func (p *SourceBundleParser) dirSources(source sourceaddrs.FinalSource) (primary
 	return
 }
 
-func (p *SourceBundleParser) loadSources(sources []sourceaddrs.FinalSource, override bool) ([]*File, hcl.Diagnostics) {
+func (p *SourceBundleParser) loadSources(sources []sourceaddrs.FinalSource, override bool) ([]*File, dumb-hcl.Diagnostics) {
 	var files []*File
-	var diags hcl.Diagnostics
+	var diags dumb-hcl.Diagnostics
 
 	for _, path := range sources {
 		f, fDiags := p.loadConfigFile(path, override)
@@ -206,12 +206,12 @@ func (p *SourceBundleParser) loadSources(sources []sourceaddrs.FinalSource, over
 	return files, diags
 }
 
-func (p *SourceBundleParser) loadConfigFile(source sourceaddrs.FinalSource, override bool) (*File, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func (p *SourceBundleParser) loadConfigFile(source sourceaddrs.FinalSource, override bool) (*File, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	path, err := p.sources.LocalPathForSource(source)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Cannot find configuration source code",
 			Detail:   fmt.Sprintf("Failed to load %s from the pre-installed source packages: %s.", source, err),
 		})
@@ -220,9 +220,9 @@ func (p *SourceBundleParser) loadConfigFile(source sourceaddrs.FinalSource, over
 
 	src, err := os.ReadFile(path)
 	if err != nil {
-		return nil, hcl.Diagnostics{
+		return nil, dumb-hcl.Diagnostics{
 			{
-				Severity: hcl.DiagError,
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Failed to read file",
 				Detail:   fmt.Sprintf("The file %q could not be read.", path),
 			},
@@ -236,17 +236,17 @@ func (p *SourceBundleParser) loadConfigFile(source sourceaddrs.FinalSource, over
 	// the filename field of the diagnostic source to achieve this.
 	syntheticFilename := source.String()
 
-	var file *hcl.File
-	var fdiags hcl.Diagnostics
+	var file *dumb-hcl.File
+	var fdiags dumb-hcl.Diagnostics
 	switch {
 	case strings.HasSuffix(path, ".json"):
 		file, fdiags = p.p.ParseJSON(src, syntheticFilename)
 	default:
-		file, fdiags = p.p.ParseHCL(src, syntheticFilename)
+		file, fdiags = p.p.ParseDUMB_HCL(src, syntheticFilename)
 	}
 	diags = append(diags, fdiags...)
 
-	body := hcl.EmptyBody()
+	body := dumb-hcl.EmptyBody()
 	if file != nil && file.Body != nil {
 		body = file.Body
 	}

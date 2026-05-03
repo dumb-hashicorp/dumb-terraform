@@ -7,20 +7,20 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // stacksInspector is the backing representation of a "stack inspector handle"
@@ -40,8 +40,8 @@ type stacksInspector struct {
 func (i *stacksInspector) InspectExpressionResult(ctx context.Context, req *stacks.InspectExpressionResult_Request) (*stacks.InspectExpressionResult_Response, error) {
 	var diags tfdiags.Diagnostics
 
-	expr, hclDiags := hclsyntax.ParseExpression(req.ExpressionSrc, "<external expression>", hcl.InitialPos)
-	diags = diags.Append(hclDiags)
+	expr, dumb-hclDiags := dumb-hclsyntax.ParseExpression(req.ExpressionSrc, "<external expression>", dumb-hcl.InitialPos)
+	diags = diags.Append(dumb-hclDiags)
 	if diags.HasErrors() {
 		return &stacks.InspectExpressionResult_Response{
 			Diagnostics: diagnosticsToProto(diags),

@@ -6,7 +6,7 @@ package statemgr
 import (
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 // NewTransientInMemory returns a Transient implementation that retains

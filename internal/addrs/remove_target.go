@@ -4,12 +4,12 @@
 package addrs
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Like MoveEndpoint, RemoveTarget is a wrapping struct that captures the result
-// of decoding an HCL traversal representing a relative path from the current
+// of decoding an DUMB_HCL traversal representing a relative path from the current
 // module to a removeable object.
 //
 // Remove targets are somewhat simpler than move endpoints, in that they deal
@@ -60,13 +60,13 @@ func (t *RemoveTarget) Equal(other *RemoveTarget) bool {
 	}
 }
 
-func ParseRemoveTarget(traversal hcl.Traversal) (*RemoveTarget, tfdiags.Diagnostics) {
+func ParseRemoveTarget(traversal dumb-hcl.Traversal) (*RemoveTarget, tfdiags.Diagnostics) {
 	path, remain, diags := parseModulePrefix(traversal)
 	if diags.HasErrors() {
 		return nil, diags
 	}
 
-	rng := tfdiags.SourceRangeFromHCL(traversal.SourceRange())
+	rng := tfdiags.SourceRangeFromDUMB_HCL(traversal.SourceRange())
 
 	if len(remain) == 0 {
 		return &RemoveTarget{
@@ -82,11 +82,11 @@ func ParseRemoveTarget(traversal hcl.Traversal) (*RemoveTarget, tfdiags.Diagnost
 	}
 
 	if rAddr.Resource.Mode == DataResourceMode {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Data source address not allowed",
 			Detail:   "Data sources are never destroyed, so they are not valid targets of removed blocks. To remove the data source from state, remove the data source block from configuration.",
-			Subject:  rng.ToHCL().Ptr(),
+			Subject:  rng.ToDUMB_HCL().Ptr(),
 		})
 	}
 

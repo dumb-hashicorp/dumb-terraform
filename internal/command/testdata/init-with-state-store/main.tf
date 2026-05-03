@@ -1,8 +1,8 @@
-terraform {
+dumb-terraform {
 
   required_providers {
     test = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
     }
   }
   state_store "test_store" {

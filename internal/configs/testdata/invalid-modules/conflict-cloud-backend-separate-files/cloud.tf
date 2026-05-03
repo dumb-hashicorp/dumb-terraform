@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   cloud {
     organization = "sarahfrench"
     workspaces {

@@ -8,20 +8,20 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Stack represents a single stack, which can potentially call other
-// "embedded stacks" in a similar manner to how Terraform modules can call
+// "embedded stacks" in a similar manner to how Dumb Terraform modules can call
 // other modules.
 type Stack struct {
 	SourceAddr sourceaddrs.FinalSource
 
-	// ConfigFiles describes the individual .tfcomponent.hcl or
+	// ConfigFiles describes the individual .tfcomponent.dumb-hcl or
 	// .tfcomponent.json files that this stack configuration object was built
 	// from. Most callers should ignore the detail of which file each
 	// declaration originated in, but we retain this in case it's useful for
@@ -150,8 +150,8 @@ func LoadSingleStackConfig(sourceAddr sourceaddrs.FinalSource, sources *sourcebu
 		localName := pc.LocalAddr.LocalName
 		providerAddr, ok := ret.RequiredProviders.ProviderForLocalName(localName)
 		if !ok {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Undeclared provider local name",
 				Detail: fmt.Sprintf(
 					"This configuration's required_providers block does not include a definition for the local name %q.",

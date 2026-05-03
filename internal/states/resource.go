@@ -6,7 +6,7 @@ package states
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // Resource represents the state of a resource.

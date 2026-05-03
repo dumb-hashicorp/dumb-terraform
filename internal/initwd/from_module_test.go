@@ -11,18 +11,18 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/copy"
-	"github.com/hashicorp/terraform/internal/registry"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/copy"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestDirFromModule_registry(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
-		t.Skip("this test accesses registry.terraform.io and github.com; set TF_ACC=1 to run it")
+		t.Skip("this test accesses registry.dumb-terraform.io and github.com; set TF_ACC=1 to run it")
 	}
 
 	fixtureDir := filepath.Clean("testdata/empty")
@@ -37,14 +37,14 @@ func TestDirFromModule_registry(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	modsDir := filepath.Join(dir, ".terraform/modules")
+	modsDir := filepath.Join(dir, ".dumb-terraform/modules")
 
 	hooks := &testInstallHooks{}
 
 	reg := registry.NewClient(nil, nil)
 	loader, cleanup := configload.NewLoaderForTests(t)
 	defer cleanup()
-	diags := DirFromModule(context.Background(), loader, dir, modsDir, "hashicorp/module-installer-acctest/aws//examples/main", reg, hooks)
+	diags := DirFromModule(context.Background(), loader, dir, modsDir, "dumb-hashicorp/module-installer-acctest/aws//examples/main", reg, hooks)
 	tfdiags.AssertNoDiagnostics(t, diags)
 
 	v := version.Must(version.NewVersion("0.0.2"))
@@ -63,7 +63,7 @@ func TestDirFromModule_registry(t *testing.T) {
 		{
 			Name:        "Download",
 			ModuleAddr:  "root",
-			PackageAddr: "registry.terraform.io/hashicorp/module-installer-acctest/aws",
+			PackageAddr: "registry.dumb-terraform.io/dumb-hashicorp/module-installer-acctest/aws",
 			Version:     v,
 		},
 		{
@@ -72,7 +72,7 @@ func TestDirFromModule_registry(t *testing.T) {
 			Version:    v,
 			// NOTE: This local path and the other paths derived from it below
 			// can vary depending on how the registry is implemented. At the
-			// time of writing this test, registry.terraform.io returns
+			// time of writing this test, registry.dumb-terraform.io returns
 			// git repository source addresses and so this path refers to the
 			// root of the git clone, but historically the registry referred
 			// to GitHub-provided tar archives which meant that there was an
@@ -81,17 +81,17 @@ func TestDirFromModule_registry(t *testing.T) {
 			// an extra segment on this path. If this test fails due to an
 			// additional path segment in future, then a change to the upstream
 			// registry might be the root cause.
-			LocalPath: filepath.Join(dir, ".terraform/modules/root"),
+			LocalPath: filepath.Join(dir, ".dumb-terraform/modules/root"),
 		},
 		{
 			Name:       "Install",
 			ModuleAddr: "root.child_a",
-			LocalPath:  filepath.Join(dir, ".terraform/modules/root/modules/child_a"),
+			LocalPath:  filepath.Join(dir, ".dumb-terraform/modules/root/modules/child_a"),
 		},
 		{
 			Name:       "Install",
 			ModuleAddr: "root.child_a.child_b",
-			LocalPath:  filepath.Join(dir, ".terraform/modules/root/modules/child_b"),
+			LocalPath:  filepath.Join(dir, ".dumb-terraform/modules/root/modules/child_b"),
 		},
 	}
 
@@ -108,10 +108,10 @@ func TestDirFromModule_registry(t *testing.T) {
 
 	// Make sure the configuration is loadable now.
 	// (This ensures that correct information is recorded in the manifest.)
-	rootMod, hclDiags := loader.LoadRootModule(".")
-	tfdiags.AssertNoDiagnostics(t, tfdiags.Diagnostics{}.Append(hclDiags))
+	rootMod, dumb-hclDiags := loader.LoadRootModule(".")
+	tfdiags.AssertNoDiagnostics(t, tfdiags.Diagnostics{}.Append(dumb-hclDiags))
 
-	config, buildDiags := terraform.BuildConfigWithGraph(
+	config, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		nil,
@@ -149,7 +149,7 @@ func TestDirFromModule_submodules(t *testing.T) {
 	// the same for our "wantCalls" comparison values. Otherwise this test
 	// will fail when building in a source tree with symlinks in $PWD.
 	//
-	// See also: https://github.com/hashicorp/terraform/issues/26014
+	// See also: https://github.com/dumb-hashicorp/dumb-terraform/issues/26014
 	//
 	fromModuleDirRealpath, err := filepath.EvalSymlinks(fromModuleDir)
 	if err != nil {
@@ -164,7 +164,7 @@ func TestDirFromModule_submodules(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	modInstallDir := filepath.Join(dir, ".terraform/modules")
+	modInstallDir := filepath.Join(dir, ".dumb-terraform/modules")
 
 	loader, cleanup := configload.NewLoaderForTests(t)
 	defer cleanup()
@@ -196,10 +196,10 @@ func TestDirFromModule_submodules(t *testing.T) {
 
 	// Make sure the configuration is loadable now.
 	// (This ensures that correct information is recorded in the manifest.)
-	rootMod, hclDiags := loader.LoadRootModule(".")
-	tfdiags.AssertNoDiagnostics(t, tfdiags.Diagnostics{}.Append(hclDiags))
+	rootMod, dumb-hclDiags := loader.LoadRootModule(".")
+	tfdiags.AssertNoDiagnostics(t, tfdiags.Diagnostics{}.Append(dumb-hclDiags))
 
-	config, buildDiags := terraform.BuildConfigWithGraph(
+	config, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		nil,
@@ -245,7 +245,7 @@ func TestDirFromModule_submodulesWithProvider(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	modInstallDir := filepath.Join(dir, ".terraform/modules")
+	modInstallDir := filepath.Join(dir, ".dumb-terraform/modules")
 
 	loader, cleanup := configload.NewLoaderForTests(t)
 	defer cleanup()
@@ -260,7 +260,7 @@ func TestDirFromModule_submodulesWithProvider(t *testing.T) {
 
 // TestDirFromModule_rel_submodules is similar to the test above, but the
 // from-module is relative to the install dir ("../"):
-// https://github.com/hashicorp/terraform/issues/23010
+// https://github.com/dumb-hashicorp/dumb-terraform/issues/23010
 func TestDirFromModule_rel_submodules(t *testing.T) {
 	// This test creates a tmpdir with the following directory structure:
 	// - tmpdir/local-modules (with contents of testdata/local-modules)
@@ -297,7 +297,7 @@ func TestDirFromModule_rel_submodules(t *testing.T) {
 
 	hooks := &testInstallHooks{}
 
-	modInstallDir := ".terraform/modules"
+	modInstallDir := ".dumb-terraform/modules"
 	sourceDir := "../local-modules"
 	loader, cleanup := configload.NewLoaderForTests(t)
 	defer cleanup()
@@ -329,10 +329,10 @@ func TestDirFromModule_rel_submodules(t *testing.T) {
 
 	// Make sure the configuration is loadable now.
 	// (This ensures that correct information is recorded in the manifest.)
-	rootMod, hclDiags := loader.LoadRootModule(".")
-	tfdiags.AssertNoDiagnostics(t, tfdiags.Diagnostics{}.Append(hclDiags))
+	rootMod, dumb-hclDiags := loader.LoadRootModule(".")
+	tfdiags.AssertNoDiagnostics(t, tfdiags.Diagnostics{}.Append(dumb-hclDiags))
 
-	config, buildDiags := terraform.BuildConfigWithGraph(
+	config, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		nil,

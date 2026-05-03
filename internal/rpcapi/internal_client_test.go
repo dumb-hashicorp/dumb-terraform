@@ -9,8 +9,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
-	"github.com/hashicorp/terraform/internal/rpcapi"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/setup"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/setup"
 )
 
 func TestInternalClientOpenClose(t *testing.T) {

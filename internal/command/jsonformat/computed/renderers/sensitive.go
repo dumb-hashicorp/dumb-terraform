@@ -6,8 +6,8 @@ package renderers
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/command/jsonformat/computed"
-	"github.com/hashicorp/terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/computed"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
 )
 
 var _ computed.DiffRenderer = (*sensitiveRenderer)(nil)

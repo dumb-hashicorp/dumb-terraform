@@ -11,18 +11,18 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // backendrun.Local implementation.
@@ -73,7 +73,7 @@ func (b *Local) localRun(op *backendrun.Operation) (*backendrun.LocalRun, *confi
 	ret := &backendrun.LocalRun{}
 
 	// Initialize our context options
-	var coreOpts terraform.ContextOpts
+	var coreOpts dumb-terraform.ContextOpts
 	if v := b.ContextOpts; v != nil {
 		coreOpts = *v
 	}
@@ -83,7 +83,7 @@ func (b *Local) localRun(op *backendrun.Operation) (*backendrun.LocalRun, *confi
 	var ctxDiags tfdiags.Diagnostics
 	var configSnap *configload.Snapshot
 	if op.PlanFile.IsCloud() {
-		diags = diags.Append(fmt.Errorf("error: using a saved cloud plan when executing Terraform locally is not supported"))
+		diags = diags.Append(fmt.Errorf("error: using a saved cloud plan when executing Dumb Terraform locally is not supported"))
 		return nil, nil, nil, diags
 	}
 
@@ -120,7 +120,7 @@ func (b *Local) localRun(op *backendrun.Operation) (*backendrun.LocalRun, *confi
 	if op.Type != backendrun.OperationTypeInvalid {
 		// If input asking is enabled, then do that
 		if op.PlanFile == nil && b.OpInput {
-			mode := terraform.InputModeProvider
+			mode := dumb-terraform.InputModeProvider
 
 			log.Printf("[TRACE] backend/local: requesting interactive input, if necessary")
 			inputDiags := ret.Core.Input(ret.Config, mode)
@@ -133,8 +133,8 @@ func (b *Local) localRun(op *backendrun.Operation) (*backendrun.LocalRun, *confi
 		// If validation is enabled, validate
 		if b.OpValidation {
 			log.Printf("[TRACE] backend/local: running validation operation")
-			// TODO: Implement query validate command. op.Query is false when running the command "terraform validate"
-			opts := &terraform.ValidateOpts{Query: op.Query}
+			// TODO: Implement query validate command. op.Query is false when running the command "dumb-terraform validate"
+			opts := &dumb-terraform.ValidateOpts{Query: op.Query}
 			validateDiags := ret.Core.Validate(ret.Config, opts)
 			diags = diags.Append(validateDiags)
 		}
@@ -143,7 +143,7 @@ func (b *Local) localRun(op *backendrun.Operation) (*backendrun.LocalRun, *confi
 	return ret, configSnap, s, diags
 }
 
-func (b *Local) localRunDirect(op *backendrun.Operation, run *backendrun.LocalRun, coreOpts *terraform.ContextOpts, s statemgr.Full) (*backendrun.LocalRun, *configload.Snapshot, tfdiags.Diagnostics) {
+func (b *Local) localRunDirect(op *backendrun.Operation, run *backendrun.LocalRun, coreOpts *dumb-terraform.ContextOpts, s statemgr.Full) (*backendrun.LocalRun, *configload.Snapshot, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	rootMod, configDiags := op.ConfigLoader.LoadRootModule(op.ConfigDir)
@@ -173,7 +173,7 @@ func (b *Local) localRunDirect(op *backendrun.Operation, run *backendrun.LocalRu
 		return nil, nil, diags
 	}
 
-	planOpts := &terraform.PlanOpts{
+	planOpts := &dumb-terraform.PlanOpts{
 		Mode:               op.PlanMode,
 		Targets:            op.Targets,
 		ActionTargets:      op.ActionTargets,
@@ -190,7 +190,7 @@ func (b *Local) localRunDirect(op *backendrun.Operation, run *backendrun.LocalRu
 	// snapshot, from the previous run.
 	run.InputState = s.State()
 
-	tfCtx, moreDiags := terraform.NewContext(coreOpts)
+	tfCtx, moreDiags := dumb-terraform.NewContext(coreOpts)
 	diags = diags.Append(moreDiags)
 	if moreDiags.HasErrors() {
 		return nil, nil, diags
@@ -198,7 +198,7 @@ func (b *Local) localRunDirect(op *backendrun.Operation, run *backendrun.LocalRu
 	run.Core = tfCtx
 
 	walkerSnapshot, configSnap := op.ConfigLoader.ModuleWalkerSnapshot()
-	config, buildDiags := terraform.BuildConfigWithGraph(
+	config, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		walkerSnapshot,
 		variables,
@@ -226,11 +226,11 @@ func (b *Local) localRunDirect(op *backendrun.Operation, run *backendrun.LocalRu
 		case op.DependencyLocks == nil:
 			// If we get here then it suggests that there's a caller that we
 			// didn't yet update to populate DependencyLocks, which is a bug.
-			suggestion = "This run has no dependency lock information provided at all, which is a bug in Terraform; please report it!"
+			suggestion = "This run has no dependency lock information provided at all, which is a bug in Dumb Terraform; please report it!"
 		case op.DependencyLocks.Empty():
-			suggestion = "To make the initial dependency selections that will initialize the dependency lock file, run:\n  terraform init"
+			suggestion = "To make the initial dependency selections that will initialize the dependency lock file, run:\n  dumb-terraform init"
 		default:
-			suggestion = "To update the locked dependency selections to match a changed configuration, run:\n  terraform init -upgrade"
+			suggestion = "To update the locked dependency selections to match a changed configuration, run:\n  dumb-terraform init -upgrade"
 		}
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
@@ -245,7 +245,7 @@ func (b *Local) localRunDirect(op *backendrun.Operation, run *backendrun.LocalRu
 	return run, configSnap, diags
 }
 
-func (b *Local) localRunForPlanFile(op *backendrun.Operation, pf *planfile.Reader, run *backendrun.LocalRun, coreOpts *terraform.ContextOpts, currentStateMeta *statemgr.SnapshotMeta) (*backendrun.LocalRun, *configload.Snapshot, tfdiags.Diagnostics) {
+func (b *Local) localRunForPlanFile(op *backendrun.Operation, pf *planfile.Reader, run *backendrun.LocalRun, coreOpts *dumb-terraform.ContextOpts, currentStateMeta *statemgr.SnapshotMeta) (*backendrun.LocalRun, *configload.Snapshot, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	const errSummary = "Invalid plan file"
@@ -353,7 +353,7 @@ func (b *Local) localRunForPlanFile(op *backendrun.Operation, pf *planfile.Reade
 	// All variables that we need to load the configuration should be in the
 	// plan file. We don't need to look at plan.ApplyTimeVariables, because
 	// ephemeral values are not supported for constant variables.
-	variables := terraform.InputValues{}
+	variables := dumb-terraform.InputValues{}
 	for name, dyVal := range plan.VariableValues {
 		val, err := dyVal.Decode(cty.DynamicPseudoType)
 		if err != nil {
@@ -368,20 +368,20 @@ func (b *Local) localRunForPlanFile(op *backendrun.Operation, pf *planfile.Reade
 			val = val.MarkWithPaths(pvm)
 		}
 
-		variables[name] = &terraform.InputValue{
+		variables[name] = &dumb-terraform.InputValue{
 			Value:      val,
-			SourceType: terraform.ValueFromPlan,
+			SourceType: dumb-terraform.ValueFromPlan,
 		}
 	}
 
-	tfCtx, moreDiags := terraform.NewContext(coreOpts)
+	tfCtx, moreDiags := dumb-terraform.NewContext(coreOpts)
 	diags = diags.Append(moreDiags)
 	if moreDiags.HasErrors() {
 		return nil, nil, diags
 	}
 	run.Core = tfCtx
 
-	config, buildDiags := terraform.BuildConfigWithGraph(
+	config, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		variables,
@@ -432,12 +432,12 @@ func (b *Local) localRunForPlanFile(op *backendrun.Operation, pf *planfile.Reade
 // additional elements as appropriate.
 //
 // Interactive prompting is a "best effort" thing for first-time user UX and
-// not something we expect folks to be relying on for routine use. Terraform
+// not something we expect folks to be relying on for routine use. Dumb Terraform
 // is primarily a non-interactive tool and so we prefer to report in error
 // messages that variables are not set rather than reporting that input failed:
 // the primary resolution to missing variables is to provide them by some other
 // means.
-func (b *Local) interactiveCollectVariables(ctx context.Context, existing map[string]arguments.UnparsedVariableValue, vcs map[string]*configs.Variable, uiInput terraform.UIInput) map[string]arguments.UnparsedVariableValue {
+func (b *Local) interactiveCollectVariables(ctx context.Context, existing map[string]arguments.UnparsedVariableValue, vcs map[string]*configs.Variable, uiInput dumb-terraform.UIInput) map[string]arguments.UnparsedVariableValue {
 	var needed []string
 	if b.OpInput && uiInput != nil {
 		for name, vc := range vcs {
@@ -469,7 +469,7 @@ func (b *Local) interactiveCollectVariables(ctx context.Context, existing map[st
 		if vc.Ephemeral {
 			query += " (ephemeral)"
 		}
-		rawValue, err := uiInput.Input(ctx, &terraform.InputOpts{
+		rawValue, err := uiInput.Input(ctx, &dumb-terraform.InputOpts{
 			Id:          fmt.Sprintf("var.%s", name),
 			Query:       query,
 			Description: vc.Description,
@@ -504,8 +504,8 @@ func (b *Local) interactiveCollectVariables(ctx context.Context, existing map[st
 //
 // This function should be used only in situations where variables values
 // will not be directly used and the variables map is being constructed only
-// to produce a complete Terraform context for some ancillary functionality
-// like "terraform console", "terraform state ...", etc.
+// to produce a complete Dumb Terraform context for some ancillary functionality
+// like "dumb-terraform console", "dumb-terraform state ...", etc.
 //
 // This function is guaranteed not to modify the given map, but it may return
 // the given map unchanged if no additions are required. If additions are
@@ -546,16 +546,16 @@ type unparsedInteractiveVariableValue struct {
 
 var _ arguments.UnparsedVariableValue = unparsedInteractiveVariableValue{}
 
-func (v unparsedInteractiveVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*terraform.InputValue, tfdiags.Diagnostics) {
+func (v unparsedInteractiveVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	val, valDiags := mode.Parse(v.Name, v.RawValue)
 	diags = diags.Append(valDiags)
 	if diags.HasErrors() {
 		return nil, diags
 	}
-	return &terraform.InputValue{
+	return &dumb-terraform.InputValue{
 		Value:      val,
-		SourceType: terraform.ValueFromInput,
+		SourceType: dumb-terraform.ValueFromInput,
 	}, diags
 }
 
@@ -566,23 +566,23 @@ type unparsedUnknownVariableValue struct {
 
 var _ arguments.UnparsedVariableValue = unparsedUnknownVariableValue{}
 
-func (v unparsedUnknownVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*terraform.InputValue, tfdiags.Diagnostics) {
-	return &terraform.InputValue{
+func (v unparsedUnknownVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
+	return &dumb-terraform.InputValue{
 		Value:      cty.UnknownVal(v.WantType),
-		SourceType: terraform.ValueFromInput,
+		SourceType: dumb-terraform.ValueFromInput,
 	}, nil
 }
 
 type unparsedTestVariableValue struct {
-	Expr hcl.Expression
+	Expr dumb-hcl.Expression
 }
 
 var _ arguments.UnparsedVariableValue = unparsedTestVariableValue{}
 
-func (v unparsedTestVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*terraform.InputValue, tfdiags.Diagnostics) {
+func (v unparsedTestVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	value, valueDiags := v.Expr.Value(&hcl.EvalContext{
+	value, valueDiags := v.Expr.Value(&dumb-hcl.EvalContext{
 		Functions: lang.TestingFunctions(),
 	})
 	diags = diags.Append(valueDiags)
@@ -590,9 +590,9 @@ func (v unparsedTestVariableValue) ParseVariableValue(mode configs.VariableParsi
 		return nil, diags
 	}
 
-	return &terraform.InputValue{
+	return &dumb-terraform.InputValue{
 		Value:       value,
-		SourceType:  terraform.ValueFromConfig,
-		SourceRange: tfdiags.SourceRangeFromHCL(v.Expr.Range()),
+		SourceType:  dumb-terraform.ValueFromConfig,
+		SourceRange: tfdiags.SourceRangeFromDUMB_HCL(v.Expr.Range()),
 	}, diags
 }

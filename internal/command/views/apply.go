@@ -6,12 +6,12 @@ package views
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/format"
-	"github.com/hashicorp/terraform/internal/command/views/json"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views/json"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // The Apply view is used for the apply command.
@@ -20,7 +20,7 @@ type Apply interface {
 	Outputs(outputValues map[string]*states.OutputValue)
 
 	Operation() Operation
-	Hooks() []terraform.Hook
+	Hooks() []dumb-terraform.Hook
 
 	Diagnostics(diags tfdiags.Diagnostics)
 	HelpPrompt()
@@ -98,8 +98,8 @@ func (v *ApplyHuman) Operation() Operation {
 	return NewOperation(arguments.ViewHuman, v.inAutomation, v.view)
 }
 
-func (v *ApplyHuman) Hooks() []terraform.Hook {
-	return []terraform.Hook{
+func (v *ApplyHuman) Hooks() []dumb-terraform.Hook {
+	return []dumb-terraform.Hook{
 		v.countHook,
 		NewUiHook(v.view),
 	}
@@ -117,7 +117,7 @@ func (v *ApplyHuman) HelpPrompt() {
 	v.view.HelpPrompt(command)
 }
 
-const stateOutPathPostApply = "The state of your infrastructure has been saved to the path below. This state is required to modify and destroy your infrastructure, so keep it safe. To inspect the complete state use the `terraform show` command."
+const stateOutPathPostApply = "The state of your infrastructure has been saved to the path below. This state is required to modify and destroy your infrastructure, so keep it safe. To inspect the complete state use the `dumb-terraform show` command."
 
 // The ApplyJSON implementation renders streaming JSON logs, suitable for
 // integrating with other software.
@@ -159,8 +159,8 @@ func (v *ApplyJSON) Operation() Operation {
 	return &OperationJSON{view: v.view}
 }
 
-func (v *ApplyJSON) Hooks() []terraform.Hook {
-	return []terraform.Hook{
+func (v *ApplyJSON) Hooks() []dumb-terraform.Hook {
+	return []dumb-terraform.Hook{
 		v.countHook,
 		newJSONHook(v.view),
 	}

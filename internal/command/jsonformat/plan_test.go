@@ -13,18 +13,18 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/differ"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/structured"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/structured/attribute_path"
-	"github.com/hashicorp/terraform/internal/command/jsonplan"
-	"github.com/hashicorp/terraform/internal/command/jsonprovider"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/differ"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/structured"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/structured/attribute_path"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonprovider"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 func TestRenderHuman_InvokeActionPlan(t *testing.T) {
@@ -64,11 +64,11 @@ func TestRenderHuman_InvokeActionPlan(t *testing.T) {
 	plan.renderHuman(renderer, plans.RefreshOnlyMode)
 
 	want := `
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
 Plan: 0 to add, 0 to change, 0 to destroy. Actions: 1 to invoke.
 
-Terraform will invoke the following action(s):
+Dumb Terraform will invoke the following action(s):
 
   # action.test_action.action will be invoked
     action "test_action" "action" {
@@ -159,10 +159,10 @@ func TestRenderHuman_InvokeActionPlanWithRefresh(t *testing.T) {
 	plan.renderHuman(renderer, plans.RefreshOnlyMode)
 
 	want := `
-Note: Objects have changed outside of Terraform
+Note: Objects have changed outside of Dumb Terraform
 
-Terraform detected the following changes made outside of Terraform since the
-last "terraform apply" which may have affected this plan:
+Dumb Terraform detected the following changes made outside of Dumb Terraform since the
+last "dumb-terraform apply" which may have affected this plan:
 
   # aws_instance.foo has changed
   ~ resource "aws_instance" "foo" {
@@ -170,18 +170,18 @@ last "terraform apply" which may have affected this plan:
     }
 
 
-This is a refresh-only plan, so Terraform will not take any actions to undo
+This is a refresh-only plan, so Dumb Terraform will not take any actions to undo
 these. If you were expecting these changes then you can apply this plan to
-record the updated values in the Terraform state without changing any remote
+record the updated values in the Dumb Terraform state without changing any remote
 objects.
 
 ─────────────────────────────────────────────────────────────────────────────
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
 Plan: 0 to add, 0 to change, 0 to destroy. Actions: 1 to invoke.
 
-Terraform will invoke the following action(s):
+Dumb Terraform will invoke the following action(s):
 
   # action.test_action.action will be invoked
     action "test_action" "action" {
@@ -210,7 +210,7 @@ func TestRenderHuman_EmptyPlan(t *testing.T) {
 	want := `
 No changes. Your infrastructure matches the configuration.
 
-Terraform has compared your real infrastructure against your configuration
+Dumb Terraform has compared your real infrastructure against your configuration
 and found no differences, so no changes are needed.
 `
 
@@ -315,7 +315,7 @@ func TestRenderHuman_EmptyOutputs(t *testing.T) {
 	want := `
 No changes. Your infrastructure matches the configuration.
 
-Terraform has compared your real infrastructure against your configuration
+Dumb Terraform has compared your real infrastructure against your configuration
 and found no differences, so no changes are needed.
 `
 
@@ -378,7 +378,7 @@ func TestRenderHuman_Imports(t *testing.T) {
 				},
 			},
 			output: `
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.resource will be imported
     resource "test_resource" "resource" {
@@ -420,7 +420,7 @@ Plan: 1 to import, 0 to add, 0 to change, 0 to destroy.
 				},
 			},
 			output: `
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.resource will be imported
   # (config will be generated)
@@ -460,7 +460,7 @@ Plan: 1 to import, 0 to add, 0 to change, 0 to destroy.
 				},
 			},
 			output: `
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.before has moved to test_resource.after
   # (imported from "1D5F5E9E-F2E5-401B-9ED5-692A215AC67E")
@@ -500,11 +500,11 @@ Plan: 1 to import, 0 to add, 0 to change, 0 to destroy.
 				},
 			},
 			output: `
-Terraform used the selected providers to generate the following execution
+Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   ~ update in-place
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.after will be updated in-place
   # (moved from test_resource.before)
@@ -544,11 +544,11 @@ Plan: 1 to import, 0 to add, 1 to change, 0 to destroy.
 				},
 			},
 			output: `
-Terraform used the selected providers to generate the following execution
+Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   ~ update in-place
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.resource will be updated in-place
   # (imported from "1D5F5E9E-F2E5-401B-9ED5-692A215AC67E")
@@ -585,11 +585,11 @@ Plan: 1 to import, 0 to add, 1 to change, 0 to destroy.
 				},
 			},
 			output: `
-Terraform used the selected providers to generate the following execution
+Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   ~ update in-place
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.resource will be updated in-place
   # (will be imported first)
@@ -630,11 +630,11 @@ Plan: 1 to import, 0 to add, 1 to change, 0 to destroy.
 				},
 			},
 			output: `
-Terraform used the selected providers to generate the following execution
+Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
 +/- create replacement and then destroy
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.resource must be replaced
   # (imported from "1D5F5E9E-F2E5-401B-9ED5-692A215AC67E")
@@ -829,7 +829,7 @@ func TestResourceChange_primitiveTypes(t *testing.T) {
 				},
 			},
 			RequiredReplace: cty.NewPathSet(),
-			ExpectedOutput: ` # test_instance.example will no longer be managed by Terraform, but will not be destroyed
+			ExpectedOutput: ` # test_instance.example will no longer be managed by Dumb Terraform, but will not be destroyed
  # (destroy = false is set in the configuration)
  . resource "test_instance" "example" {
         id  = "i-02ae66f368e8518a9"
@@ -850,7 +850,7 @@ func TestResourceChange_primitiveTypes(t *testing.T) {
 				},
 			},
 			RequiredReplace: cty.NewPathSet(),
-			ExpectedOutput: ` # test_instance.example (deposed object adios) will be removed from Terraform state, but will not be destroyed
+			ExpectedOutput: ` # test_instance.example (deposed object adios) will be removed from Dumb Terraform state, but will not be destroyed
  # (left over from a partially-failed replacement of this instance)
  # (destroy = false is set in the configuration)
  . resource "test_instance" "example" {
@@ -2038,7 +2038,7 @@ func TestResourceChange_JSON(t *testing.T) {
 
 func TestResourceChange_listObject(t *testing.T) {
 	testCases := map[string]testCase{
-		// https://github.com/hashicorp/terraform/issues/30641
+		// https://github.com/dumb-hashicorp/dumb-terraform/issues/30641
 		"updating non-identifying attribute": {
 			Action: plans.Update,
 			Mode:   addrs.ManagedResourceMode,
@@ -8049,7 +8049,7 @@ func runTestCases(t *testing.T, testCases map[string]testCase) {
 				RequiredReplace: tc.RequiredReplace,
 			}
 
-			tfschemas := &terraform.Schemas{
+			tfschemas := &dumb-terraform.Schemas{
 				Providers: map[addrs.Provider]providers.ProviderSchema{
 					src.ProviderAddr.Provider: {
 						ResourceTypes: map[string]providers.Schema{
@@ -8393,7 +8393,7 @@ func TestResourceChange_deferredActions(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			blockSchema := testSchema(configschema.NestingSingle)
-			fullSchema := &terraform.Schemas{
+			fullSchema := &dumb-terraform.Schemas{
 				Providers: map[addrs.Provider]providers.ProviderSchema{
 					providerAddr.Provider: {
 						ResourceTypes: map[string]providers.Schema{
@@ -8450,7 +8450,7 @@ func TestResourceChange_actions(t *testing.T) {
 		Type:         "test_instance",
 		Name:         "example",
 		IndexUnknown: true,
-		ProviderName: "registry.terraform.io/hashicorp/test",
+		ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 		Change: jsonplan.Change{
 			Actions: []string{"create"},
 			After: marshalJson(t, map[string]interface{}{
@@ -8470,7 +8470,7 @@ func TestResourceChange_actions(t *testing.T) {
 					Address:      "action.test_action.hello",
 					Type:         "test_action",
 					Name:         "hello",
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					LifecycleActionTrigger: &jsonplan.LifecycleActionTrigger{
 						ActionTriggerBlockIndex:   0,
 						ActionsListIndex:          0,
@@ -8514,7 +8514,7 @@ func TestResourceChange_actions(t *testing.T) {
 					Address:      "action.test_action.hello",
 					Type:         "test_action",
 					Name:         "hello",
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					LifecycleActionTrigger: &jsonplan.LifecycleActionTrigger{
 						ActionTriggerBlockIndex:   0,
 						ActionsListIndex:          0,
@@ -8558,7 +8558,7 @@ func TestResourceChange_actions(t *testing.T) {
 					Address:      "action.test_action.hello",
 					Type:         "test_action",
 					Name:         "hello",
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					LifecycleActionTrigger: &jsonplan.LifecycleActionTrigger{
 						ActionTriggerBlockIndex:   0,
 						ActionsListIndex:          0,
@@ -8573,7 +8573,7 @@ func TestResourceChange_actions(t *testing.T) {
 					Address:      "action.test_action.hello",
 					Type:         "test_action",
 					Name:         "hello",
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					LifecycleActionTrigger: &jsonplan.LifecycleActionTrigger{
 						ActionTriggerBlockIndex:   0,
 						ActionsListIndex:          1,
@@ -8588,7 +8588,7 @@ func TestResourceChange_actions(t *testing.T) {
 					Address:      "action.test_action.hello",
 					Type:         "test_action",
 					Name:         "hello",
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					LifecycleActionTrigger: &jsonplan.LifecycleActionTrigger{
 						ActionTriggerBlockIndex:   1,
 						ActionsListIndex:          0,
@@ -8603,7 +8603,7 @@ func TestResourceChange_actions(t *testing.T) {
 					Address:      "action.test_action.hello",
 					Type:         "test_action",
 					Name:         "hello",
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					LifecycleActionTrigger: &jsonplan.LifecycleActionTrigger{
 						ActionTriggerBlockIndex:   2,
 						ActionsListIndex:          0,
@@ -8618,7 +8618,7 @@ func TestResourceChange_actions(t *testing.T) {
 					Address:      "action.test_action.hello",
 					Type:         "test_action",
 					Name:         "hello",
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					LifecycleActionTrigger: &jsonplan.LifecycleActionTrigger{
 						ActionTriggerBlockIndex:   3,
 						ActionsListIndex:          0,
@@ -8672,7 +8672,7 @@ func TestResourceChange_actions(t *testing.T) {
 					Address:      "action.test_action.hello",
 					Type:         "test_action",
 					Name:         "hello",
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					LifecycleActionTrigger: &jsonplan.LifecycleActionTrigger{
 						ActionTriggerBlockIndex:   0,
 						ActionsListIndex:          0,
@@ -8698,7 +8698,7 @@ func TestResourceChange_actions(t *testing.T) {
 				Provider: addrs.NewDefaultProvider("test"),
 			}
 			blockSchema := testSchema(configschema.NestingSingle)
-			fullSchema := &terraform.Schemas{
+			fullSchema := &dumb-terraform.Schemas{
 				Providers: map[addrs.Provider]providers.ProviderSchema{
 					providerAddr.Provider: {
 						ResourceTypes: map[string]providers.Schema{

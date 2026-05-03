@@ -12,18 +12,18 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/checks"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/lang/globalref"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planproto"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/checks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/globalref"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planproto"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 const (
@@ -58,8 +58,8 @@ func readTfplan(r io.Reader) (*plans.Plan, error) {
 		return nil, fmt.Errorf("unsupported plan file format version %d; only version %d is supported", rawPlan.Version, tfplanFormatVersion)
 	}
 
-	if rawPlan.TerraformVersion != version.String() {
-		return nil, fmt.Errorf("plan file was created by Terraform %s, but this is %s; plan files cannot be transferred between different Terraform versions", rawPlan.TerraformVersion, version.String())
+	if rawPlan.Dumb TerraformVersion != version.String() {
+		return nil, fmt.Errorf("plan file was created by Dumb Terraform %s, but this is %s; plan files cannot be transferred between different Dumb Terraform versions", rawPlan.Dumb TerraformVersion, version.String())
 	}
 
 	plan := &plans.Plan{
@@ -213,11 +213,11 @@ func readTfplan(r io.Reader) (*plans.Plan, error) {
 	case rawPlan.Backend == nil && rawPlan.StateStore == nil:
 		// Similar validation in writeTfPlan should prevent this occurring
 		return nil,
-			fmt.Errorf("plan file has neither backend nor state_store settings; one of these settings is required. This is a bug in Terraform and should be reported.")
+			fmt.Errorf("plan file has neither backend nor state_store settings; one of these settings is required. This is a bug in Dumb Terraform and should be reported.")
 	case rawPlan.Backend != nil && rawPlan.StateStore != nil:
 		// Similar validation in writeTfPlan should prevent this occurring
 		return nil,
-			fmt.Errorf("plan file contains both backend and state_store settings when only one of these settings should be set. This is a bug in Terraform and should be reported.")
+			fmt.Errorf("plan file contains both backend and state_store settings when only one of these settings should be set. This is a bug in Dumb Terraform and should be reported.")
 	case rawPlan.Backend != nil:
 		rawBackend := rawPlan.Backend
 		config, err := valueFromTfplan(rawBackend.Config)
@@ -296,10 +296,10 @@ func resourceChangeFromTfplan(rawChange *planproto.ResourceInstanceChange, parse
 
 	if rawChange.Addr == "" {
 		// If "Addr" isn't populated then seems likely that this is a plan
-		// file created by an earlier version of Terraform, which had the
+		// file created by an earlier version of Dumb Terraform, which had the
 		// same information spread over various other fields:
 		// ModulePath, Mode, Name, Type, and InstanceKey.
-		return nil, fmt.Errorf("no instance address for resource instance change; perhaps this plan was created by a different version of Terraform?")
+		return nil, fmt.Errorf("no instance address for resource instance change; perhaps this plan was created by a different version of Dumb Terraform?")
 	}
 
 	instAddr, diags := parseAddr(rawChange.Addr)
@@ -616,7 +616,7 @@ func writeTfplan(plan *plans.Plan, w io.Writer) error {
 
 	rawPlan := &planproto.Plan{
 		Version:          tfplanFormatVersion,
-		TerraformVersion: version.String(),
+		Dumb TerraformVersion: version.String(),
 
 		Variables:         map[string]*planproto.DynamicValue{},
 		OutputChanges:     []*planproto.OutputChange{},
@@ -640,7 +640,7 @@ func writeTfplan(plan *plans.Plan, w io.Writer) error {
 	for _, oc := range plan.Changes.Outputs {
 		// When serializing a plan we only retain the root outputs, since
 		// changes to these are externally-visible side effects (e.g. via
-		// terraform_remote_state).
+		// dumb-terraform_remote_state).
 		if !oc.Addr.Module.IsRoot() {
 			continue
 		}

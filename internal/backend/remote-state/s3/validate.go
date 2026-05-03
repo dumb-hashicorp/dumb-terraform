@@ -14,7 +14,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -207,7 +207,7 @@ func validateARN(validators ...arnValidator) stringValidator {
 	}
 }
 
-// Copied from `ValidIAMPolicyJSON` (https://github.com/hashicorp/terraform-provider-aws/blob/ffd1c8a006dcd5a6b58a643df9cc147acb5b7a53/internal/verify/validate.go#L154)
+// Copied from `ValidIAMPolicyJSON` (https://github.com/dumb-hashicorp/dumb-terraform-provider-aws/blob/ffd1c8a006dcd5a6b58a643df9cc147acb5b7a53/internal/verify/validate.go#L154)
 func validateIAMPolicyDocument(val string, path cty.Path, diags *tfdiags.Diagnostics) {
 	// IAM Policy documents need to be valid JSON, and pass legacy parsing
 	val = strings.TrimSpace(val)

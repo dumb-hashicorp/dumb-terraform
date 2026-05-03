@@ -477,12 +477,12 @@ type Plan struct {
 	Version uint64 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
 	// The mode that was active when this plan was created.
 	//
-	// This is saved only for UI purposes, so that Terraform can tailor its
+	// This is saved only for UI purposes, so that Dumb Terraform can tailor its
 	// rendering of the plan depending on the mode. This must never be used to
-	// make decisions in Terraform Core during the applying of a plan.
+	// make decisions in Dumb Terraform Core during the applying of a plan.
 	UiMode Mode `protobuf:"varint,17,opt,name=ui_mode,json=uiMode,proto3,enum=tfplan.Mode" json:"ui_mode,omitempty"`
 	// Applyable is true for any plan where it makes sense to ask an operator
-	// to approve it and then ask Terraform to apply it.
+	// to approve it and then ask Dumb Terraform to apply it.
 	//
 	// The other fields provide more context about why a non-applyable plan
 	// is not applyable, but this field is here so that if new situations
@@ -509,7 +509,7 @@ type Plan struct {
 	// incomplete.
 	Errored bool `protobuf:"varint,20,opt,name=errored,proto3" json:"errored,omitempty"`
 	// The variables that were set when creating the plan. Each value is
-	// a msgpack serialization of an HCL value.
+	// a msgpack serialization of an DUMB_HCL value.
 	Variables map[string]*DynamicValue `protobuf:"bytes,2,rep,name=variables,proto3" json:"variables,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Variables whose values must be provided during the apply phase.
 	ApplyTimeVariables []string `protobuf:"bytes,28,rep,name=apply_time_variables,json=applyTimeVariables,proto3" json:"apply_time_variables,omitempty"`
@@ -518,7 +518,7 @@ type Plan struct {
 	// each resource to determine which module it belongs to.
 	ResourceChanges []*ResourceInstanceChange `protobuf:"bytes,3,rep,name=resource_changes,json=resourceChanges,proto3" json:"resource_changes,omitempty"`
 	// An unordered set of detected drift: changes made to resources outside of
-	// Terraform, computed by comparing the previous run's state to the state
+	// Dumb Terraform, computed by comparing the previous run's state to the state
 	// after refresh.
 	ResourceDrift []*ResourceInstanceChange `protobuf:"bytes,18,rep,name=resource_drift,json=resourceDrift,proto3" json:"resource_drift,omitempty"`
 	// An unordered set of deferred changes. These are changes that will be
@@ -557,8 +557,8 @@ type Plan struct {
 	// plan, or else applying the plan will fail when it reaches a different
 	// conclusion about what action a particular resource instance needs.
 	ForceReplaceAddrs []string `protobuf:"bytes,16,rep,name=force_replace_addrs,json=forceReplaceAddrs,proto3" json:"force_replace_addrs,omitempty"`
-	// The version string for the Terraform binary that created this plan.
-	TerraformVersion string `protobuf:"bytes,14,opt,name=terraform_version,json=terraformVersion,proto3" json:"terraform_version,omitempty"`
+	// The version string for the Dumb Terraform binary that created this plan.
+	Dumb TerraformVersion string `protobuf:"bytes,14,opt,name=dumb-terraform_version,json=dumb-terraformVersion,proto3" json:"dumb-terraform_version,omitempty"`
 	// Backend is a description of the backend configuration and other related
 	// settings at the time the plan was created.
 	Backend *Backend `protobuf:"bytes,13,opt,name=backend,proto3" json:"backend,omitempty"`
@@ -724,9 +724,9 @@ func (x *Plan) GetForceReplaceAddrs() []string {
 	return nil
 }
 
-func (x *Plan) GetTerraformVersion() string {
+func (x *Plan) GetDumb TerraformVersion() string {
 	if x != nil {
-		return x.TerraformVersion
+		return x.Dumb TerraformVersion
 	}
 	return ""
 }
@@ -960,10 +960,10 @@ func (x *Provider) GetConfig() *DynamicValue {
 // state to a new state.
 type Change struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Not all action values are valid for all object types. Consult
+	// Not all action values are valid for all object types. Dumb Consult
 	// the documentation for any message that embeds Change.
 	Action Action `protobuf:"varint,1,opt,name=action,proto3,enum=tfplan.Action" json:"action,omitempty"`
-	// msgpack-encoded HCL values involved in the change.
+	// msgpack-encoded DUMB_HCL values involved in the change.
 	//   - For update and replace, two values are provided that give the old and new values,
 	//     respectively.
 	//   - For create, one value is provided that gives the new value to be created
@@ -985,7 +985,7 @@ type Change struct {
 	// of the change.
 	Importing *Importing `protobuf:"bytes,5,opt,name=importing,proto3" json:"importing,omitempty"`
 	// GeneratedConfig contains any configuration that was generated as part of
-	// the change, as an HCL string.
+	// the change, as an DUMB_HCL string.
 	GeneratedConfig string `protobuf:"bytes,6,opt,name=generated_config,json=generatedConfig,proto3" json:"generated_config,omitempty"`
 	// The resource identity before the plan operation
 	BeforeIdentity *DynamicValue `protobuf:"bytes,7,opt,name=before_identity,json=beforeIdentity,proto3" json:"before_identity,omitempty"`
@@ -1090,7 +1090,7 @@ type ResourceInstanceChange struct {
 	// this resource instance was tracked during the previous apply operation.
 	//
 	// This is populated only if it would be different from addr due to
-	// Terraform having reacted to refactoring annotations in the configuration.
+	// Dumb Terraform having reacted to refactoring annotations in the configuration.
 	// If empty, the previous run address is the same as the current address.
 	PrevRunAddr string `protobuf:"bytes,14,opt,name=prev_run_addr,json=prevRunAddr,proto3" json:"prev_run_addr,omitempty"`
 	// deposed_key, if set, indicates that this change applies to a deposed
@@ -2251,7 +2251,7 @@ const file_planfile_proto_rawDesc = "" +
 	"\ftarget_addrs\x18\x05 \x03(\tR\vtargetAddrs\x12.\n" +
 	"\x13action_target_addrs\x18  \x03(\tR\x11actionTargetAddrs\x12.\n" +
 	"\x13force_replace_addrs\x18\x10 \x03(\tR\x11forceReplaceAddrs\x12+\n" +
-	"\x11terraform_version\x18\x0e \x01(\tR\x10terraformVersion\x12)\n" +
+	"\x11dumb-terraform_version\x18\x0e \x01(\tR\x10dumb-terraformVersion\x12)\n" +
 	"\abackend\x18\r \x01(\v2\x0f.tfplan.BackendR\abackend\x123\n" +
 	"\vstate_store\x18\x1d \x01(\v2\x12.tfplan.StateStoreR\n" +
 	"stateStore\x12K\n" +
@@ -2420,7 +2420,7 @@ const file_planfile_proto_rawDesc = "" +
 	"\x0eBEFORE_DESTROY\x10\x05\x12\x11\n" +
 	"\rAFTER_DESTROY\x10\x06\x12\n" +
 	"\n" +
-	"\x06INVOKE\x10\aB9Z7github.com/hashicorp/terraform/internal/plans/planprotob\x06proto3"
+	"\x06INVOKE\x10\aB9Z7github.com/dumb-hashicorp/dumb-terraform/internal/plans/planprotob\x06proto3"
 
 var (
 	file_planfile_proto_rawDescOnce sync.Once

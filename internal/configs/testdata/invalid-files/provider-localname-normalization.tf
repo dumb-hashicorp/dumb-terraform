@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   required_providers {
     test = {
       source = "mycorp/test"
@@ -15,6 +15,6 @@ resource test_resource "test" {
 }
 
 resource test_resource "TEST" {
-  // this resource is (explicitly) provided by "hashicorp/test"
+  // this resource is (explicitly) provided by "dumb-hashicorp/test"
   provider = TEST
 }

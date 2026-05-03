@@ -7,13 +7,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type instancesResult[T any] struct {
@@ -27,7 +27,7 @@ type instancesResult[T any] struct {
 // The caller might still need to do some further validation or post-processing
 // of the result for concerns that are specific to a particular phase or
 // evaluation context.
-func evaluateForEachExpr(ctx context.Context, expr hcl.Expression, phase EvalPhase, scope ExpressionScope, callerDiagName string) (ExprResultValue, tfdiags.Diagnostics) {
+func evaluateForEachExpr(ctx context.Context, expr dumb-hcl.Expression, phase EvalPhase, scope ExpressionScope, callerDiagName string) (ExprResultValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	result, moreDiags := EvalExprAndEvalContext(
 		ctx, expr, phase, scope,
@@ -50,8 +50,8 @@ func evaluateForEachExpr(ctx context.Context, expr hcl.Expression, phase EvalPha
 		// Sensitive values are not allowed as for_each arguments because
 		// they could be exposed as resource instance keys.
 		// TODO: This should have Extra: tdiagnosticCausedBySensitive(true),
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity:    hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity:    dumb-hcl.DiagError,
 			Summary:     invalidForEachSummary,
 			Detail:      sensitiveForEachDetail,
 			Subject:     result.Expression.Range().Ptr(),
@@ -62,8 +62,8 @@ func evaluateForEachExpr(ctx context.Context, expr hcl.Expression, phase EvalPha
 
 	case result.Value.IsNull():
 		// we don't alllow null values
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity:    hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity:    dumb-hcl.DiagError,
 			Summary:     invalidForEachSummary,
 			Detail:      fmt.Sprintf("%s The for_each expression produced a null value.", invalidForEachDetail),
 			Subject:     result.Expression.Range().Ptr(),
@@ -88,8 +88,8 @@ func evaluateForEachExpr(ctx context.Context, expr hcl.Expression, phase EvalPha
 		}
 
 		if !ty.ElementType().Equals(cty.String) {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity:    hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity:    dumb-hcl.DiagError,
 				Summary:     invalidForEachSummary,
 				Detail:      fmt.Sprintf(`%s "for_each" supports maps and sets of strings, but you have provided a set containing type %s.`, invalidForEachDetail, ty.ElementType().FriendlyName()),
 				Subject:     result.Expression.Range().Ptr(),
@@ -102,8 +102,8 @@ func evaluateForEachExpr(ctx context.Context, expr hcl.Expression, phase EvalPha
 		// Check if one of the values in the set is null
 		for k, v := range result.Value.AsValueSet().Values() {
 			if v.IsNull() {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity:    hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity:    dumb-hcl.DiagError,
 					Summary:     invalidForEachSummary,
 					Detail:      fmt.Sprintf("%s The for_each value must not contain null elements, but the element at index %d was null.", invalidForEachDetail, k),
 					Subject:     result.Expression.Range().Ptr(),
@@ -120,8 +120,8 @@ func evaluateForEachExpr(ctx context.Context, expr hcl.Expression, phase EvalPha
 		return result, diags
 
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity:    hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity:    dumb-hcl.DiagError,
 			Summary:     invalidForEachSummary,
 			Detail:      invalidForEachDetail,
 			Subject:     result.Expression.Range().Ptr(),

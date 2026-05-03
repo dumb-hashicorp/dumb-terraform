@@ -1,5 +1,5 @@
 
-terraform {
+dumb-terraform {
   cloud {
     foo = "bar"
 

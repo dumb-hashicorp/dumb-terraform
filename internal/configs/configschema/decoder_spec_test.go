@@ -9,9 +9,9 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/hcl/v2/hcltest"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -19,19 +19,19 @@ import (
 func TestBlockDecoderSpec(t *testing.T) {
 	tests := map[string]struct {
 		Schema    *Block
-		TestBody  hcl.Body
+		TestBody  dumb-hcl.Body
 		Want      cty.Value
 		DiagCount int
 	}{
 		"empty": {
 			&Block{},
-			hcl.EmptyBody(),
+			dumb-hcl.EmptyBody(),
 			cty.EmptyObjectVal,
 			0,
 		},
 		"nil": {
 			nil,
-			hcl.EmptyBody(),
+			dumb-hcl.EmptyBody(),
 			cty.EmptyObjectVal,
 			0,
 		},
@@ -67,19 +67,19 @@ func TestBlockDecoderSpec(t *testing.T) {
 					},
 				},
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"required": {
 						Name: "required",
-						Expr: hcltest.MockExprLiteral(cty.NumberIntVal(5)),
+						Expr: dumb-hcltest.MockExprLiteral(cty.NumberIntVal(5)),
 					},
 					"optional_computed_overridden": {
 						Name: "optional_computed_overridden",
-						Expr: hcltest.MockExprLiteral(cty.True),
+						Expr: dumb-hcltest.MockExprLiteral(cty.True),
 					},
 					"optional_computed_unknown": {
 						Name: "optional_computed_overridden",
-						Expr: hcltest.MockExprLiteral(cty.UnknownVal(cty.String)),
+						Expr: dumb-hcltest.MockExprLiteral(cty.UnknownVal(cty.String)),
 					},
 				},
 			}),
@@ -102,11 +102,11 @@ func TestBlockDecoderSpec(t *testing.T) {
 					},
 				},
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"foo": {
 						Name: "foo",
-						Expr: hcltest.MockExprLiteral(cty.True),
+						Expr: dumb-hcltest.MockExprLiteral(cty.True),
 					},
 				},
 			}),
@@ -124,7 +124,7 @@ func TestBlockDecoderSpec(t *testing.T) {
 					},
 				},
 			},
-			hcltest.MockBody(&hcl.BodyContent{}),
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{}),
 			cty.ObjectVal(map[string]cty.Value{
 				"foo": cty.NullVal(cty.DynamicPseudoType),
 			}),
@@ -139,7 +139,7 @@ func TestBlockDecoderSpec(t *testing.T) {
 					},
 				},
 			},
-			hcltest.MockBody(&hcl.BodyContent{}),
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{}),
 			cty.ObjectVal(map[string]cty.Value{
 				"foo": cty.NullVal(cty.Bool),
 			}),
@@ -154,11 +154,11 @@ func TestBlockDecoderSpec(t *testing.T) {
 					},
 				},
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"optional": {
 						Name: "optional",
-						Expr: hcltest.MockExprLiteral(cty.True),
+						Expr: dumb-hcltest.MockExprLiteral(cty.True),
 					},
 				},
 			}),
@@ -188,39 +188,39 @@ func TestBlockDecoderSpec(t *testing.T) {
 					},
 				},
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Blocks: hcl.Blocks{
-					&hcl.Block{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Blocks: dumb-hcl.Blocks{
+					&dumb-hcl.Block{
 						Type: "list",
-						Body: hcl.EmptyBody(),
+						Body: dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type: "single",
-						Body: hcl.EmptyBody(),
+						Body: dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type: "list",
-						Body: hcl.EmptyBody(),
+						Body: dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type: "set",
-						Body: hcl.EmptyBody(),
+						Body: dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type:        "map",
 						Labels:      []string{"foo"},
-						LabelRanges: []hcl.Range{hcl.Range{}},
-						Body:        hcl.EmptyBody(),
+						LabelRanges: []dumb-hcl.Range{dumb-hcl.Range{}},
+						Body:        dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type:        "map",
 						Labels:      []string{"bar"},
-						LabelRanges: []hcl.Range{hcl.Range{}},
-						Body:        hcl.EmptyBody(),
+						LabelRanges: []dumb-hcl.Range{dumb-hcl.Range{}},
+						Body:        dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type: "set",
-						Body: hcl.EmptyBody(),
+						Body: dumb-hcl.EmptyBody(),
 					},
 				},
 			}),
@@ -279,31 +279,31 @@ func TestBlockDecoderSpec(t *testing.T) {
 					},
 				},
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Blocks: hcl.Blocks{
-					&hcl.Block{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Blocks: dumb-hcl.Blocks{
+					&dumb-hcl.Block{
 						Type: "list",
-						Body: hcl.EmptyBody(),
+						Body: dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type: "single",
-						Body: hcl.EmptyBody(),
+						Body: dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type: "list",
-						Body: hcl.EmptyBody(),
+						Body: dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type:        "map",
 						Labels:      []string{"foo"},
-						LabelRanges: []hcl.Range{hcl.Range{}},
-						Body:        hcl.EmptyBody(),
+						LabelRanges: []dumb-hcl.Range{dumb-hcl.Range{}},
+						Body:        dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type:        "map",
 						Labels:      []string{"bar"},
-						LabelRanges: []hcl.Range{hcl.Range{}},
-						Body:        hcl.EmptyBody(),
+						LabelRanges: []dumb-hcl.Range{dumb-hcl.Range{}},
+						Body:        dumb-hcl.EmptyBody(),
 					},
 				},
 			}),
@@ -340,15 +340,15 @@ func TestBlockDecoderSpec(t *testing.T) {
 					},
 				},
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Blocks: hcl.Blocks{
-					&hcl.Block{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Blocks: dumb-hcl.Blocks{
+					&dumb-hcl.Block{
 						Type: "foo",
-						Body: hcl.EmptyBody(),
+						Body: dumb-hcl.EmptyBody(),
 					},
-					&hcl.Block{
+					&dumb-hcl.Block{
 						Type: "foo",
-						Body: unknownBody{hcl.EmptyBody()},
+						Body: unknownBody{dumb-hcl.EmptyBody()},
 					},
 				},
 			}),
@@ -369,11 +369,11 @@ func TestBlockDecoderSpec(t *testing.T) {
 					},
 				},
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Blocks: hcl.Blocks{
-					&hcl.Block{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Blocks: dumb-hcl.Blocks{
+					&dumb-hcl.Block{
 						Type: "foo",
-						Body: unknownBody{hcl.EmptyBody()},
+						Body: unknownBody{dumb-hcl.EmptyBody()},
 					},
 				},
 			}),
@@ -384,11 +384,11 @@ func TestBlockDecoderSpec(t *testing.T) {
 		},
 		"extraneous attribute": {
 			&Block{},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"extra": {
 						Name: "extra",
-						Expr: hcltest.MockExprLiteral(cty.StringVal("hello")),
+						Expr: dumb-hcltest.MockExprLiteral(cty.StringVal("hello")),
 					},
 				},
 			}),
@@ -401,7 +401,7 @@ func TestBlockDecoderSpec(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			spec := test.Schema.DecoderSpec()
 
-			got, diags := hcldec.Decode(test.TestBody, spec, nil)
+			got, diags := dumb-hcldec.Decode(test.TestBody, spec, nil)
 			if len(diags) != test.DiagCount {
 				t.Errorf("wrong number of diagnostics %d; want %d", len(diags), test.DiagCount)
 				for _, diag := range diags {
@@ -410,7 +410,7 @@ func TestBlockDecoderSpec(t *testing.T) {
 			}
 
 			if diff := cmp.Diff(test.Want, got, ctydebug.CmpOptions); diff != "" {
-				t.Logf("implied schema is %s", spew.Sdump(hcldec.ImpliedSchema(spec)))
+				t.Logf("implied schema is %s", spew.Sdump(dumb-hcldec.ImpliedSchema(spec)))
 				t.Errorf("wrong result\n%s", diff)
 			}
 
@@ -427,10 +427,10 @@ func TestBlockDecoderSpec(t *testing.T) {
 	}
 }
 
-// this satisfies hcldec.UnknownBody to simulate a dynamic block with an
+// this satisfies dumb-hcldec.UnknownBody to simulate a dynamic block with an
 // unknown number of values.
 type unknownBody struct {
-	hcl.Body
+	dumb-hcl.Body
 }
 
 func (b unknownBody) Unknown() bool {
@@ -440,7 +440,7 @@ func (b unknownBody) Unknown() bool {
 func TestAttributeDecoderSpec(t *testing.T) {
 	tests := map[string]struct {
 		Schema    *Attribute
-		TestBody  hcl.Body
+		TestBody  dumb-hcl.Body
 		Want      cty.Value
 		DiagCount int
 	}{
@@ -449,7 +449,7 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				Type:     cty.String,
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{}),
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{}),
 			cty.NullVal(cty.String),
 			0,
 		},
@@ -458,11 +458,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				Type:     cty.String,
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.StringVal("bar")),
+						Expr: dumb-hcltest.MockExprLiteral(cty.StringVal("bar")),
 					},
 				},
 			}),
@@ -482,11 +482,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+						Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 							"foo": cty.StringVal("bar"),
 						})),
 					},
@@ -514,11 +514,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+						Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 							"foo": cty.StringVal("bar"),
 						})),
 					},
@@ -543,11 +543,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.EmptyObjectVal),
+						Expr: dumb-hcltest.MockExprLiteral(cty.EmptyObjectVal),
 					},
 				},
 			}),
@@ -570,11 +570,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.ListVal([]cty.Value{
+						Expr: dumb-hcltest.MockExprLiteral(cty.ListVal([]cty.Value{
 							cty.ObjectVal(map[string]cty.Value{
 								"foo": cty.StringVal("bar"),
 							}),
@@ -604,11 +604,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.ListVal([]cty.Value{cty.ObjectVal(map[string]cty.Value{
+						Expr: dumb-hcltest.MockExprLiteral(cty.ListVal([]cty.Value{cty.ObjectVal(map[string]cty.Value{
 							// "foo" should be a string, not a list
 							"foo": cty.ListVal([]cty.Value{cty.StringVal("bar"), cty.StringVal("baz")}),
 						})})),
@@ -631,11 +631,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.SetVal([]cty.Value{
+						Expr: dumb-hcltest.MockExprLiteral(cty.SetVal([]cty.Value{
 							cty.ObjectVal(map[string]cty.Value{
 								"foo": cty.StringVal("bar"),
 							}),
@@ -665,11 +665,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.SetVal([]cty.Value{cty.ObjectVal(map[string]cty.Value{
+						Expr: dumb-hcltest.MockExprLiteral(cty.SetVal([]cty.Value{cty.ObjectVal(map[string]cty.Value{
 							// "foo" should be a string, not a list
 							"foo": cty.ListVal([]cty.Value{cty.StringVal("bar"), cty.StringVal("baz")}),
 						})})),
@@ -692,11 +692,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.MapVal(map[string]cty.Value{
+						Expr: dumb-hcltest.MockExprLiteral(cty.MapVal(map[string]cty.Value{
 							"one": cty.ObjectVal(map[string]cty.Value{
 								"foo": cty.StringVal("bar"),
 							}),
@@ -726,11 +726,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.MapVal(map[string]cty.Value{
+						Expr: dumb-hcltest.MockExprLiteral(cty.MapVal(map[string]cty.Value{
 							"one": cty.ObjectVal(map[string]cty.Value{
 								// "foo" should be a string, not a list
 								"foo": cty.ListVal([]cty.Value{cty.StringVal("bar"), cty.StringVal("baz")}),
@@ -763,11 +763,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.ListVal([]cty.Value{
+						Expr: dumb-hcltest.MockExprLiteral(cty.ListVal([]cty.Value{
 							cty.ObjectVal(map[string]cty.Value{
 								"foo": cty.ListVal([]cty.Value{
 									cty.ObjectVal(map[string]cty.Value{"bar": cty.StringVal("baz")}),
@@ -817,11 +817,11 @@ func TestAttributeDecoderSpec(t *testing.T) {
 				},
 				Optional: true,
 			},
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"attr": {
 						Name: "attr",
-						Expr: hcltest.MockExprLiteral(cty.ListVal([]cty.Value{
+						Expr: dumb-hcltest.MockExprLiteral(cty.ListVal([]cty.Value{
 							cty.ObjectVal(map[string]cty.Value{
 								"foo": cty.ListVal([]cty.Value{
 									// bar should be a Number
@@ -843,7 +843,7 @@ func TestAttributeDecoderSpec(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			spec := test.Schema.decoderSpec("attr")
-			got, diags := hcldec.Decode(test.TestBody, spec, nil)
+			got, diags := dumb-hcldec.Decode(test.TestBody, spec, nil)
 			if len(diags) != test.DiagCount {
 				t.Errorf("wrong number of diagnostics %d; want %d", len(diags), test.DiagCount)
 				for _, diag := range diags {
@@ -852,7 +852,7 @@ func TestAttributeDecoderSpec(t *testing.T) {
 			}
 
 			if diff := cmp.Diff(test.Want, got, ctydebug.CmpOptions); diff != "" {
-				t.Logf("implied schema is %s", spew.Sdump(hcldec.ImpliedSchema(spec)))
+				t.Logf("implied schema is %s", spew.Sdump(dumb-hcldec.ImpliedSchema(spec)))
 				t.Errorf("wrong result\n%s", diff)
 			}
 		})

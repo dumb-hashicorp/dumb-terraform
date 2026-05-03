@@ -11,23 +11,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/hooks"
-	stacks_testing_provider "github.com/hashicorp/terraform/internal/stacks/stackruntime/testing"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/hooks"
+	stacks_testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func TestApplyDestroy(t *testing.T) {
@@ -62,7 +62,7 @@ func TestApplyDestroy(t *testing.T) {
 							Applyable: true,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangeOutputValue{
 							Addr:   mustStackOutputValue("value"),
@@ -178,7 +178,7 @@ func TestApplyDestroy(t *testing.T) {
 							ComponentInstanceAddr: mustAbsComponentInstance("component.self"),
 						},
 						// This is a bit of a quirk of the system, this wasn't in the state
-						// file before so we don't need to emit this. But since Terraform
+						// file before so we don't need to emit this. But since Dumb Terraform
 						// pushes data sources into the refresh state, it's very difficult to
 						// tell the difference between this kind of change that doesn't need to
 						// be emitted, and the next change that does need to be emitted. It's
@@ -476,8 +476,8 @@ func TestApplyDestroy(t *testing.T) {
 						},
 					},
 					wantAppliedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-						return diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						return diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "failedResource error",
 							Detail:   "failed during apply",
 						})
@@ -533,8 +533,8 @@ func TestApplyDestroy(t *testing.T) {
 						},
 					},
 					wantAppliedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-						return diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						return diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "failedResource error",
 							Detail:   "failed during apply",
 						})
@@ -763,7 +763,7 @@ func TestApplyDestroy(t *testing.T) {
 							DeferredReason: "deferred_prereq",
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -1133,7 +1133,7 @@ func TestApplyDestroy(t *testing.T) {
 							ProviderConfigAddr:         mustDefaultRootProvider("testing"),
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -1275,7 +1275,7 @@ func TestApplyDestroy(t *testing.T) {
 							PlanTimestamp: fakePlanTimestamp,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangeOutputValue{
 							Addr:   mustStackOutputValue("value"),
@@ -1405,7 +1405,7 @@ func TestApplyDestroy(t *testing.T) {
 							Schema:             stacks_testing_provider.TestingResourceSchema,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -1570,7 +1570,7 @@ func TestApplyDestroy(t *testing.T) {
 							Schema:             stacks_testing_provider.TestingResourceSchema,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,

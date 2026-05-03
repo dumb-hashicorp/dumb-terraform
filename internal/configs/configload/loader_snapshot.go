@@ -12,12 +12,12 @@ import (
 	"slices"
 	"time"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/spf13/afero"
 
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/modsdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/modsdir"
 )
 
 func (l *Loader) ModuleWalkerSnapshot() (configs.ModuleWalker, *Snapshot) {
@@ -28,7 +28,7 @@ func (l *Loader) ModuleWalkerSnapshot() (configs.ModuleWalker, *Snapshot) {
 	return l.makeModuleWalkerSnapshot(snap), snap
 }
 
-func (l *Loader) AddRootModuleToSnapshot(snap *Snapshot, rootDir string) hcl.Diagnostics {
+func (l *Loader) AddRootModuleToSnapshot(snap *Snapshot, rootDir string) dumb-hcl.Diagnostics {
 	return l.addModuleToSnapshot(snap, "", rootDir, "", nil)
 }
 
@@ -125,7 +125,7 @@ func (s *Snapshot) moduleManifest() modsdir.Manifest {
 // source files from the referenced modules into the given snapshot.
 func (l *Loader) makeModuleWalkerSnapshot(snap *Snapshot) configs.ModuleWalker {
 	return configs.ModuleWalkerFunc(
-		func(req *configs.ModuleRequest) (*configs.Module, *version.Version, hcl.Diagnostics) {
+		func(req *configs.ModuleRequest) (*configs.Module, *version.Version, dumb-hcl.Diagnostics) {
 			mod, v, diags := l.moduleWalkerLoad(req)
 			if diags.HasErrors() {
 				return mod, v, diags
@@ -148,16 +148,16 @@ func (l *Loader) makeModuleWalkerSnapshot(snap *Snapshot) configs.ModuleWalker {
 	)
 }
 
-func (l *Loader) addModuleToSnapshot(snap *Snapshot, key string, dir string, sourceAddr string, v *version.Version) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (l *Loader) addModuleToSnapshot(snap *Snapshot, key string, dir string, sourceAddr string, v *version.Version) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	primaryFiles, overrideFiles, moreDiags := l.parser.ConfigDirFiles(dir)
 	if moreDiags.HasErrors() {
 		// Any diagnostics we get here should be already present
 		// in diags, so it's weird if we get here but we'll allow it
 		// and return a general error message in that case.
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Failed to read directory for module",
 			Detail:   fmt.Sprintf("The source directory %s could not be read", dir),
 		})
@@ -179,8 +179,8 @@ func (l *Loader) addModuleToSnapshot(snap *Snapshot, key string, dir string, sou
 		filename := filepath.Base(filePath)
 		src, exists := sources[filePath]
 		if !exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing source file for snapshot",
 				Detail:   fmt.Sprintf("The source code for file %s could not be found to produce a configuration snapshot.", filePath),
 			})

@@ -22,14 +22,14 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendbase"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendbase"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
-// Modified from github.com/terraform-providers/terraform-provider-kubernetes
+// Modified from github.com/dumb-terraform-providers/dumb-terraform-provider-kubernetes
 
 const (
 	noConfigError = `
@@ -285,7 +285,7 @@ func (b *Backend) Configure(configVal cty.Value) tfdiags.Diagnostics {
 	}
 
 	// Overriding with static configuration
-	cfg.UserAgent = fmt.Sprintf("HashiCorp/1.0 Terraform/%s", version.String())
+	cfg.UserAgent = fmt.Sprintf("Dumb HashiCorp/1.0 Dumb Terraform/%s", version.String())
 
 	if v := data.String("host"); v != "" {
 		cfg.Host = v

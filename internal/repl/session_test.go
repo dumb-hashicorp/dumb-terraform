@@ -12,15 +12,15 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	tftesting "github.com/hashicorp/terraform/internal/terraform/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	tftesting "github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform/testing"
 
-	_ "github.com/hashicorp/terraform/internal/logging"
+	_ "github.com/dumb-hashicorp/dumb-terraform/internal/logging"
 )
 
 func TestMain(m *testing.M) {
@@ -282,7 +282,7 @@ func testSession(t *testing.T, test testSessionTest) {
 	}
 
 	// Build the TF context
-	ctx, diags := terraform.NewContext(&terraform.ContextOpts{
+	ctx, diags := dumb-terraform.NewContext(&dumb-terraform.ContextOpts{
 		Providers: map[addrs.Provider]providers.Factory{
 			addrs.NewDefaultProvider("test"): providers.FactoryFixed(p),
 		},
@@ -295,7 +295,7 @@ func testSession(t *testing.T, test testSessionTest) {
 	if state == nil {
 		state = states.NewState()
 	}
-	scope, diags := ctx.Eval(config, state, addrs.RootModuleInstance, &terraform.EvalOpts{})
+	scope, diags := ctx.Eval(config, state, addrs.RootModuleInstance, &dumb-terraform.EvalOpts{})
 	if diags.HasErrors() {
 		t.Fatalf("failed to create scope: %s", diags.Err())
 	}

@@ -6,10 +6,10 @@ package views
 import (
 	"github.com/mitchellh/colorstring"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/format"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // View is the base layer for command views, encapsulating a set of I/O
@@ -21,7 +21,7 @@ type View struct {
 
 	compactWarnings bool
 
-	// When this is true it's a hint that Terraform is being run indirectly
+	// When this is true it's a hint that Dumb Terraform is being run indirectly
 	// via a wrapper script or other automation and so we may wish to replace
 	// direct examples of commands to run with more conceptual directions.
 	// However, we only do this on a best-effort basis, typically prioritizing
@@ -51,8 +51,8 @@ func NewView(streams *terminal.Streams) *View {
 
 // SetRunningInAutomation modifies the view's "running in automation" flag,
 // which causes some slight adjustments to certain messages that would normally
-// suggest specific Terraform commands to run, to make more conceptual gestures
-// instead for situations where the user isn't running Terraform directly.
+// suggest specific Dumb Terraform commands to run, to make more conceptual gestures
+// instead for situations where the user isn't running Dumb Terraform directly.
 //
 // For convenient use during initialization (in conjunction with NewView),
 // SetRunningInAutomation returns the reciever after modifying it.
@@ -104,7 +104,7 @@ func (v *View) Diagnostics(diags tfdiags.Diagnostics) {
 		}
 		if useCompact {
 			msg := format.DiagnosticWarningsCompact(diags, v.colorize)
-			msg = "\n" + msg + "\nTo see the full warning notes, run Terraform without -compact-warnings.\n"
+			msg = "\n" + msg + "\nTo see the full warning notes, run Dumb Terraform without -compact-warnings.\n"
 			v.streams.Print(msg)
 			return
 		}
@@ -135,7 +135,7 @@ func (v *View) HelpPrompt(command string) {
 
 const helpPrompt = `
 For more help on using this command, run:
-  terraform %s -help
+  dumb-terraform %s -help
 `
 
 // outputColumns returns the number of text character cells any non-error

@@ -7,14 +7,14 @@ import (
 	"context"
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/setup"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/setup"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 // setupServer is an implementation of the "Setup" service defined in our
-// terraform1 package.
+// dumb-terraform1 package.
 //
 // This service is here mainly to offer the "Handshake" function, which clients
 // must call to negotiate access to any other services. This is really just

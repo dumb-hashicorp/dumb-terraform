@@ -8,32 +8,32 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/hcl/v2/hcltest"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 	"github.com/zclconf/go-cty/cty"
 )
 
 func TestParseConfigResourceFromExpression(t *testing.T) {
 	tests := []struct {
-		expr   hcl.Expression
+		expr   dumb-hcl.Expression
 		expect addrs.ConfigResource
 	}{
 		{
-			mustExpr(hclsyntax.ParseExpression([]byte("test_instance.bar"), "my_traversal", hcl.Pos{})),
+			mustExpr(dumb-hclsyntax.ParseExpression([]byte("test_instance.bar"), "my_traversal", dumb-hcl.Pos{})),
 			mustAbsResourceInstanceAddr("test_instance.bar").ConfigResource(),
 		},
 
 		// parsing should skip the each.key variable
 		{
-			mustExpr(hclsyntax.ParseExpression([]byte("test_instance.bar[each.key]"), "my_traversal", hcl.Pos{})),
+			mustExpr(dumb-hclsyntax.ParseExpression([]byte("test_instance.bar[each.key]"), "my_traversal", dumb-hcl.Pos{})),
 			mustAbsResourceInstanceAddr("test_instance.bar").ConfigResource(),
 		},
 
 		// nested modules must work too
 		{
-			mustExpr(hclsyntax.ParseExpression([]byte("module.foo[each.key].test_instance.bar[each.key]"), "my_traversal", hcl.Pos{})),
+			mustExpr(dumb-hclsyntax.ParseExpression([]byte("module.foo[each.key].test_instance.bar[each.key]"), "my_traversal", dumb-hcl.Pos{})),
 			mustAbsResourceInstanceAddr("module.foo.test_instance.bar").ConfigResource(),
 		},
 	}
@@ -53,32 +53,32 @@ func TestParseConfigResourceFromExpression(t *testing.T) {
 }
 
 func TestImportBlock_decode(t *testing.T) {
-	blockRange := hcl.Range{
+	blockRange := dumb-hcl.Range{
 		Filename: "mock.tf",
-		Start:    hcl.Pos{Line: 3, Column: 12, Byte: 27},
-		End:      hcl.Pos{Line: 3, Column: 19, Byte: 34},
+		Start:    dumb-hcl.Pos{Line: 3, Column: 12, Byte: 27},
+		End:      dumb-hcl.Pos{Line: 3, Column: 19, Byte: 34},
 	}
 
-	foo_str_expr := hcltest.MockExprLiteral(cty.StringVal("foo"))
-	id_obj_expr := hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+	foo_str_expr := dumb-hcltest.MockExprLiteral(cty.StringVal("foo"))
+	id_obj_expr := dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 		"id": cty.StringVal("foo"),
 	}))
-	bar_expr := hcltest.MockExprTraversalSrc("test_instance.bar")
+	bar_expr := dumb-hcltest.MockExprTraversalSrc("test_instance.bar")
 
-	bar_index_expr := hcltest.MockExprTraversalSrc("test_instance.bar[\"one\"]")
+	bar_index_expr := dumb-hcltest.MockExprTraversalSrc("test_instance.bar[\"one\"]")
 
-	mod_bar_expr := hcltest.MockExprTraversalSrc("module.bar.test_instance.bar")
+	mod_bar_expr := dumb-hcltest.MockExprTraversalSrc("module.bar.test_instance.bar")
 
 	tests := map[string]struct {
-		input *hcl.Block
+		input *dumb-hcl.Block
 		want  *Import
 		err   string
 	}{
 		"success": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "import",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"id": {
 							Name: "id",
 							Expr: foo_str_expr,
@@ -99,10 +99,10 @@ func TestImportBlock_decode(t *testing.T) {
 			``,
 		},
 		"indexed resources": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "import",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"id": {
 							Name: "id",
 							Expr: foo_str_expr,
@@ -123,10 +123,10 @@ func TestImportBlock_decode(t *testing.T) {
 			``,
 		},
 		"resource inside module": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "import",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"id": {
 							Name: "id",
 							Expr: foo_str_expr,
@@ -147,10 +147,10 @@ func TestImportBlock_decode(t *testing.T) {
 			``,
 		},
 		"error: missing id or identity argument": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "import",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"to": {
 							Name: "to",
 							Expr: bar_expr,
@@ -166,10 +166,10 @@ func TestImportBlock_decode(t *testing.T) {
 			"Invalid import block",
 		},
 		"error: id and identity argument": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "import",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"id": {
 							Name: "id",
 							Expr: foo_str_expr,
@@ -193,10 +193,10 @@ func TestImportBlock_decode(t *testing.T) {
 			"Invalid import block",
 		},
 		"error: missing to argument": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "import",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"id": {
 							Name: "id",
 							Expr: foo_str_expr,
@@ -212,17 +212,17 @@ func TestImportBlock_decode(t *testing.T) {
 			"Missing required argument",
 		},
 		"error: data source": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "import",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"id": {
 							Name: "id",
 							Expr: foo_str_expr,
 						},
 						"to": {
 							Name: "to",
-							Expr: hcltest.MockExprTraversalSrc("data.test_instance.bar"),
+							Expr: dumb-hcltest.MockExprTraversalSrc("data.test_instance.bar"),
 						},
 					},
 				}),
@@ -274,7 +274,7 @@ func mustAbsResourceInstanceAddr(str string) addrs.AbsResourceInstance {
 	return addr
 }
 
-func mustExpr(expr hcl.Expression, diags hcl.Diagnostics) hcl.Expression {
+func mustExpr(expr dumb-hcl.Expression, diags dumb-hcl.Diagnostics) dumb-hcl.Expression {
 	if diags != nil {
 		panic(diags.Error())
 	}

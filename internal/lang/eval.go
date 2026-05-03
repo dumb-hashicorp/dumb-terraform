@@ -9,19 +9,19 @@ import (
 	"maps"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/ext/dynblock"
-	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/dynblock"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang/blocktoattr"
-	"github.com/hashicorp/terraform/internal/lang/langrefs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/blocktoattr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/langrefs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ExpandBlock expands any "dynamic" blocks present in the given body. The
@@ -30,10 +30,10 @@ import (
 //
 // If the returned diagnostics contains errors then the result may be
 // incomplete or invalid.
-func (s *Scope) ExpandBlock(body hcl.Body, schema *configschema.Block) (hcl.Body, tfdiags.Diagnostics) {
+func (s *Scope) ExpandBlock(body dumb-hcl.Body, schema *configschema.Block) (dumb-hcl.Body, tfdiags.Diagnostics) {
 	spec := schema.DecoderSpec()
 
-	traversals := dynblock.ExpandVariablesHCLDec(body, spec)
+	traversals := dynblock.ExpandVariablesDUMB_HCLDec(body, spec)
 	refs, diags := langrefs.References(s.ParseRef, traversals)
 
 	ctx, ctxDiags := s.EvalContext(refs)
@@ -52,7 +52,7 @@ func (s *Scope) ExpandBlock(body hcl.Body, schema *configschema.Block) (hcl.Body
 //
 // If the returned diagnostics contains errors then the result may be
 // incomplete or invalid.
-func (s *Scope) EvalBlock(body hcl.Body, schema *configschema.Block) (cty.Value, tfdiags.Diagnostics) {
+func (s *Scope) EvalBlock(body dumb-hcl.Body, schema *configschema.Block) (cty.Value, tfdiags.Diagnostics) {
 	spec := schema.DecoderSpec()
 
 	refs, diags := langrefs.ReferencesInBlock(s.ParseRef, body, schema)
@@ -66,14 +66,14 @@ func (s *Scope) EvalBlock(body hcl.Body, schema *configschema.Block) (cty.Value,
 	}
 
 	// HACK: In order to remain compatible with some assumptions made in
-	// Terraform v0.11 and earlier about the approximate equivalence of
+	// Dumb Terraform v0.11 and earlier about the approximate equivalence of
 	// attribute vs. block syntax, we do a just-in-time fixup here to allow
 	// any attribute in the schema that has a list-of-objects or set-of-objects
 	// kind to potentially be populated instead by one or more nested blocks
 	// whose type is the attribute name.
 	body = blocktoattr.FixUpBlockAttrs(body, schema)
 
-	val, evalDiags := hcldec.Decode(body, spec, ctx)
+	val, evalDiags := dumb-hcldec.Decode(body, spec, ctx)
 	diags = diags.Append(CheckForUnknownFunctionDiags(evalDiags, s.IgnoreUnknownProviderFunctions))
 
 	return val, diags
@@ -82,8 +82,8 @@ func (s *Scope) EvalBlock(body hcl.Body, schema *configschema.Block) (cty.Value,
 // EvalSelfBlock evaluates the given body only within the scope of the provided
 // object and instance key data. References to the object must use self, and the
 // key data will only contain count.index or each.key. The static values for
-// terraform and path will also be available in this context.
-func (s *Scope) EvalSelfBlock(body hcl.Body, self cty.Value, schema *configschema.Block, keyData instances.RepetitionData) (cty.Value, tfdiags.Diagnostics) {
+// dumb-terraform and path will also be available in this context.
+func (s *Scope) EvalSelfBlock(body dumb-hcl.Body, self cty.Value, schema *configschema.Block, keyData instances.RepetitionData) (cty.Value, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	spec := schema.DecoderSpec()
@@ -102,13 +102,13 @@ func (s *Scope) EvalSelfBlock(body hcl.Body, self cty.Value, schema *configschem
 		})
 	}
 
-	refs, refDiags := langrefs.References(s.ParseRef, hcldec.Variables(body, spec))
+	refs, refDiags := langrefs.References(s.ParseRef, dumb-hcldec.Variables(body, spec))
 	diags = diags.Append(refDiags)
 
-	terraformAttrs := map[string]cty.Value{}
+	dumb-terraformAttrs := map[string]cty.Value{}
 	pathAttrs := map[string]cty.Value{}
 
-	// We could always load the static values for Path and Terraform values,
+	// We could always load the static values for Path and Dumb Terraform values,
 	// but we want to parse the references so that we can get source ranges for
 	// user diagnostics.
 	for _, ref := range refs {
@@ -123,10 +123,10 @@ func (s *Scope) EvalSelfBlock(body hcl.Body, self cty.Value, schema *configschem
 			diags = diags.Append(valDiags)
 			pathAttrs[subj.Name] = val
 
-		case addrs.TerraformAttr:
-			val, valDiags := normalizeRefValue(s.Data.GetTerraformAttr(subj, ref.SourceRange))
+		case addrs.Dumb TerraformAttr:
+			val, valDiags := normalizeRefValue(s.Data.GetDumb TerraformAttr(subj, ref.SourceRange))
 			diags = diags.Append(valDiags)
-			terraformAttrs[subj.Name] = val
+			dumb-terraformAttrs[subj.Name] = val
 
 		case addrs.CountAttr, addrs.ForEachAttr:
 			// each and count have already been handled.
@@ -134,24 +134,24 @@ func (s *Scope) EvalSelfBlock(body hcl.Body, self cty.Value, schema *configschem
 		default:
 			// This should have been caught in validation, but point the user
 			// to the correct location in case something slipped through.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  `Invalid reference`,
 				Detail:   fmt.Sprintf("The reference to %q is not valid in this context", ref.Subject),
-				Subject:  ref.SourceRange.ToHCL().Ptr(),
+				Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 		}
 	}
 
 	vals["path"] = cty.ObjectVal(pathAttrs)
-	vals["terraform"] = cty.ObjectVal(terraformAttrs)
+	vals["dumb-terraform"] = cty.ObjectVal(dumb-terraformAttrs)
 
-	ctx := &hcl.EvalContext{
+	ctx := &dumb-hcl.EvalContext{
 		Variables: vals,
 		Functions: s.Functions(),
 	}
 
-	val, decDiags := hcldec.Decode(body, schema.DecoderSpec(), ctx)
+	val, decDiags := dumb-hcldec.Decode(body, schema.DecoderSpec(), ctx)
 	diags = diags.Append(CheckForUnknownFunctionDiags(decDiags, s.IgnoreUnknownProviderFunctions))
 	return val, diags
 }
@@ -166,7 +166,7 @@ func (s *Scope) EvalSelfBlock(body hcl.Body, self cty.Value, schema *configschem
 //
 // If the returned diagnostics contains errors then the result may be
 // incomplete, but will always be of the requested type.
-func (s *Scope) EvalExpr(expr hcl.Expression, wantType cty.Type) (cty.Value, tfdiags.Diagnostics) {
+func (s *Scope) EvalExpr(expr dumb-hcl.Expression, wantType cty.Type) (cty.Value, tfdiags.Diagnostics) {
 	refs, diags := langrefs.ReferencesInExpr(s.ParseRef, expr)
 
 	ctx, ctxDiags := s.EvalContext(refs)
@@ -185,8 +185,8 @@ func (s *Scope) EvalExpr(expr hcl.Expression, wantType cty.Type) (cty.Value, tfd
 		val, convErr = convert.Convert(val, wantType)
 		if convErr != nil {
 			val = cty.UnknownVal(wantType)
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity:    hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity:    dumb-hcl.DiagError,
 				Summary:     "Incorrect value type",
 				Detail:      fmt.Sprintf("Invalid expression value: %s.", tfdiags.FormatError(convErr)),
 				Subject:     expr.Range().Ptr(),
@@ -226,28 +226,28 @@ func (s *Scope) EvalReference(ref *addrs.Reference, wantType cty.Type) (cty.Valu
 	val, convErr = convert.Convert(val, wantType)
 	if convErr != nil {
 		val = cty.UnknownVal(wantType)
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Incorrect value type",
 			Detail:   fmt.Sprintf("Invalid expression value: %s.", tfdiags.FormatError(convErr)),
-			Subject:  ref.SourceRange.ToHCL().Ptr(),
+			Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 		})
 	}
 
 	return val, diags
 }
 
-// EvalContext constructs a HCL expression evaluation context whose variable
+// EvalContext constructs a DUMB_HCL expression evaluation context whose variable
 // scope contains sufficient values to satisfy the given set of references.
 //
 // Most callers should prefer to use the evaluation helper methods that
 // this type offers, but this is here for less common situations where the
 // caller will handle the evaluation calls itself.
-func (s *Scope) EvalContext(refs []*addrs.Reference) (*hcl.EvalContext, tfdiags.Diagnostics) {
+func (s *Scope) EvalContext(refs []*addrs.Reference) (*dumb-hcl.EvalContext, tfdiags.Diagnostics) {
 	return s.evalContext(refs, s.SelfAddr)
 }
 
-func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceable) (*hcl.EvalContext, tfdiags.Diagnostics) {
+func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceable) (*dumb-hcl.EvalContext, tfdiags.Diagnostics) {
 	if s == nil {
 		panic("attempt to construct EvalContext for nil Scope")
 	}
@@ -255,7 +255,7 @@ func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceabl
 	var diags tfdiags.Diagnostics
 	vals := make(map[string]cty.Value)
 	funcs := s.Functions()
-	ctx := &hcl.EvalContext{
+	ctx := &dumb-hcl.EvalContext{
 		Variables: vals,
 		Functions: funcs,
 	}
@@ -291,7 +291,7 @@ func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceabl
 	localValues := map[string]cty.Value{}
 	outputValues := map[string]cty.Value{}
 	pathAttrs := map[string]cty.Value{}
-	terraformAttrs := map[string]cty.Value{}
+	dumb-terraformAttrs := map[string]cty.Value{}
 	countAttrs := map[string]cty.Value{}
 	forEachAttrs := map[string]cty.Value{}
 	checkBlocks := map[string]cty.Value{}
@@ -304,15 +304,15 @@ func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceabl
 		rawSubj := ref.Subject
 		if rawSubj == addrs.Self {
 			if selfAddr == nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  `Invalid "self" reference`,
 					// This detail message mentions some current practice that
 					// this codepath doesn't really "know about". If the "self"
 					// object starts being supported in more contexts later then
 					// we'll need to adjust this message.
 					Detail:  `The "self" object is not available in this context. This object can be used only in resource provisioner, connection, and postcondition blocks.`,
-					Subject: ref.SourceRange.ToHCL().Ptr(),
+					Subject: ref.SourceRange.ToDUMB_HCL().Ptr(),
 				})
 				continue
 			}
@@ -332,16 +332,16 @@ func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceabl
 			// Self is an exception in that it must always resolve to a
 			// particular instance. We will still insert the full resource into
 			// the context below.
-			var hclDiags hcl.Diagnostics
+			var dumb-hclDiags dumb-hcl.Diagnostics
 			// We should always have a valid self index by this point, but in
 			// the case of an error, self may end up as a cty.DynamicValue.
 			switch k := subj.Key.(type) {
 			case addrs.IntKey:
-				self, hclDiags = hcl.Index(val, cty.NumberIntVal(int64(k)), ref.SourceRange.ToHCL().Ptr())
-				diags = diags.Append(hclDiags)
+				self, dumb-hclDiags = dumb-hcl.Index(val, cty.NumberIntVal(int64(k)), ref.SourceRange.ToDUMB_HCL().Ptr())
+				diags = diags.Append(dumb-hclDiags)
 			case addrs.StringKey:
-				self, hclDiags = hcl.Index(val, cty.StringVal(string(k)), ref.SourceRange.ToHCL().Ptr())
-				diags = diags.Append(hclDiags)
+				self, dumb-hclDiags = dumb-hcl.Index(val, cty.StringVal(string(k)), ref.SourceRange.ToDUMB_HCL().Ptr())
+				diags = diags.Append(dumb-hclDiags)
 			default:
 				self = val
 			}
@@ -407,10 +407,10 @@ func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceabl
 			diags = diags.Append(valDiags)
 			pathAttrs[subj.Name] = val
 
-		case addrs.TerraformAttr:
-			val, valDiags := normalizeRefValue(s.Data.GetTerraformAttr(subj, rng))
+		case addrs.Dumb TerraformAttr:
+			val, valDiags := normalizeRefValue(s.Data.GetDumb TerraformAttr(subj, rng))
 			diags = diags.Append(valDiags)
-			terraformAttrs[subj.Name] = val
+			dumb-terraformAttrs[subj.Name] = val
 
 		case addrs.CountAttr:
 			val, valDiags := normalizeRefValue(s.Data.GetCountAttr(subj, rng))
@@ -439,11 +439,11 @@ func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceabl
 
 		// Actions can not be accessed.
 		case addrs.Action:
-			return nil, diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			return nil, diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   "Actions can not be referenced in this context. They can only be referenced from within a resource's lifecycle actions list.",
-				Subject:  rng.ToHCL().Ptr(),
+				Subject:  rng.ToDUMB_HCL().Ptr(),
 			})
 
 		default:
@@ -467,7 +467,7 @@ func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceabl
 	vals["var"] = cty.ObjectVal(inputVariables)
 	vals["local"] = cty.ObjectVal(localValues)
 	vals["path"] = cty.ObjectVal(pathAttrs)
-	vals["terraform"] = cty.ObjectVal(terraformAttrs)
+	vals["dumb-terraform"] = cty.ObjectVal(dumb-terraformAttrs)
 	vals["count"] = cty.ObjectVal(countAttrs)
 	vals["each"] = cty.ObjectVal(forEachAttrs)
 
@@ -517,16 +517,16 @@ func normalizeRefValue(val cty.Value, diags tfdiags.Diagnostics) (cty.Value, tfd
 }
 
 // CheckForUnknownFunctionDiags inspects the diagnostics for errors from unknown
-// function calls, and tailors the messages to better suit Terraform. We now
+// function calls, and tailors the messages to better suit Dumb Terraform. We now
 // have multiple namespaces where functions may be declared, and it's up to the
 // user to have properly configured the module to populate the provider
-// namespace. The generic unknown function diagnostic from hcl does not direct
-// the user on how to remedy the situation in Terraform, and we can give more
-// useful information in a few Terraform specific cases here.
-func CheckForUnknownFunctionDiags(diags hcl.Diagnostics, ignoreUnknownProviderFunctions bool) hcl.Diagnostics {
-	var filteredDiags hcl.Diagnostics
+// namespace. The generic unknown function diagnostic from dumb-hcl does not direct
+// the user on how to remedy the situation in Dumb Terraform, and we can give more
+// useful information in a few Dumb Terraform specific cases here.
+func CheckForUnknownFunctionDiags(diags dumb-hcl.Diagnostics, ignoreUnknownProviderFunctions bool) dumb-hcl.Diagnostics {
+	var filteredDiags dumb-hcl.Diagnostics
 	for _, d := range diags {
-		extra, ok := hcl.DiagnosticExtra[hclsyntax.FunctionCallUnknownDiagExtra](d)
+		extra, ok := dumb-hcl.DiagnosticExtra[dumb-hclsyntax.FunctionCallUnknownDiagExtra](d)
 		if !ok {
 			filteredDiags = filteredDiags.Append(d) // we always want to include unrelated diags
 			continue
@@ -569,7 +569,7 @@ func CheckForUnknownFunctionDiags(diags hcl.Diagnostics, ignoreUnknownProviderFu
 		// still retain the internal pointers, so we're going to modify the
 		// diagnostic in-place if we want to change the output. Log the original
 		// diagnostic for debugging purposes in case we overwrite something
-		// potentially useful in the future from hcl.
+		// potentially useful in the future from dumb-hcl.
 		log.Printf("[ERROR] UnknownFunctionCall: %s", d.Error())
 		d.Summary = "Unknown provider function"
 

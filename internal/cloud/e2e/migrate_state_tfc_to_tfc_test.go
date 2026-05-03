@@ -7,14 +7,14 @@ import (
 	"context"
 	"testing"
 
-	tfe "github.com/hashicorp/go-tfe"
-	tfversion "github.com/hashicorp/terraform/version"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func Test_migrate_tfc_to_tfc_single_workspace(t *testing.T) {
 	t.Parallel()
 	skipIfMissingEnvVar(t)
-	skipWithoutRemoteTerraformVersion(t)
+	skipWithoutRemoteDumb TerraformVersion(t)
 
 	ctx := context.Background()
 
@@ -26,19 +26,19 @@ func Test_migrate_tfc_to_tfc_single_workspace(t *testing.T) {
 						wsName := "prod"
 						// Creating the workspace here instead of it being created
 						// dynamically in the Cloud StateMgr because we want to ensure that
-						// the terraform version selected for the workspace matches the
-						// terraform version of this current branch.
+						// the dumb-terraform version selected for the workspace matches the
+						// dumb-terraform version of this current branch.
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String("prod"),
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
-						tfBlock := terraformConfigCloudBackendName(orgName, wsName)
+						tfBlock := dumb-terraformConfigCloudBackendName(orgName, wsName)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:           []string{"workspace", "show"},
@@ -55,15 +55,15 @@ func Test_migrate_tfc_to_tfc_single_workspace(t *testing.T) {
 						wsName := "dev"
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String(wsName),
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
-						tfBlock := terraformConfigCloudBackendName(orgName, wsName)
+						tfBlock := dumb-terraformConfigCloudBackendName(orgName, wsName)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:         []string{"init", "-ignore-remote-version"},
-							postInputOutput: []string{`HCP Terraform has been successfully initialized!`},
+							postInputOutput: []string{`DUMB_HCP Dumb Terraform has been successfully initialized!`},
 						},
 						{
 							command:           []string{"workspace", "show"},
@@ -90,15 +90,15 @@ func Test_migrate_tfc_to_tfc_single_workspace(t *testing.T) {
 						wsName := "prod"
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String("prod"),
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
-						tfBlock := terraformConfigCloudBackendName(orgName, wsName)
+						tfBlock := dumb-terraformConfigCloudBackendName(orgName, wsName)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:         []string{"apply", "-auto-approve"},
@@ -109,7 +109,7 @@ func Test_migrate_tfc_to_tfc_single_workspace(t *testing.T) {
 				{
 					prep: func(t *testing.T, orgName, dir string) {
 						tag := "app"
-						tfBlock := terraformConfigCloudBackendTags(orgName, tag)
+						tfBlock := dumb-terraformConfigCloudBackendTags(orgName, tag)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
@@ -118,8 +118,8 @@ func Test_migrate_tfc_to_tfc_single_workspace(t *testing.T) {
 							expectedCmdOutput: `There are no workspaces with the configured tags (app)`,
 							userInput:         []string{"new-workspace"},
 							postInputOutput: []string{
-								`Terraform can create a properly tagged workspace for you now.`,
-								`HCP Terraform has been successfully initialized!`},
+								`Dumb Terraform can create a properly tagged workspace for you now.`,
+								`DUMB_HCP Dumb Terraform has been successfully initialized!`},
 						},
 						{
 							command:           []string{"workspace", "show"},
@@ -148,15 +148,15 @@ func Test_migrate_tfc_to_tfc_single_workspace(t *testing.T) {
 						wsName := "prod"
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String("prod"),
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
-						tfBlock := terraformConfigCloudBackendName(orgName, wsName)
+						tfBlock := dumb-terraformConfigCloudBackendName(orgName, wsName)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:         []string{"apply", "-auto-approve"},
@@ -167,14 +167,14 @@ func Test_migrate_tfc_to_tfc_single_workspace(t *testing.T) {
 				{
 					prep: func(t *testing.T, orgName, dir string) {
 						tag := "app"
-						// This is only here to ensure that the updated terraform version is
+						// This is only here to ensure that the updated dumb-terraform version is
 						// present in the workspace, and it does not default to a lower
 						// version that does not support `cloud`.
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String("new-workspace"),
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
-						tfBlock := terraformConfigCloudBackendTags(orgName, tag)
+						tfBlock := dumb-terraformConfigCloudBackendTags(orgName, tag)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
@@ -183,8 +183,8 @@ func Test_migrate_tfc_to_tfc_single_workspace(t *testing.T) {
 							expectedCmdOutput: `There are no workspaces with the configured tags (app)`,
 							userInput:         []string{"new-workspace"},
 							postInputOutput: []string{
-								`Terraform can create a properly tagged workspace for you now.`,
-								`HCP Terraform has been successfully initialized!`},
+								`Dumb Terraform can create a properly tagged workspace for you now.`,
+								`DUMB_HCP Dumb Terraform has been successfully initialized!`},
 						},
 					},
 				},
@@ -209,7 +209,7 @@ func Test_migrate_tfc_to_tfc_single_workspace(t *testing.T) {
 func Test_migrate_tfc_to_tfc_multiple_workspace(t *testing.T) {
 	t.Parallel()
 	skipIfMissingEnvVar(t)
-	skipWithoutRemoteTerraformVersion(t)
+	skipWithoutRemoteDumb TerraformVersion(t)
 
 	ctx := context.Background()
 
@@ -222,14 +222,14 @@ func Test_migrate_tfc_to_tfc_multiple_workspace(t *testing.T) {
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String("app-prod"),
 							Tags:             []*tfe.Tag{{Name: tag}},
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String("app-staging"),
 							Tags:             []*tfe.Tag{{Name: tag}},
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
-						tfBlock := terraformConfigCloudBackendTags(orgName, tag)
+						tfBlock := dumb-terraformConfigCloudBackendTags(orgName, tag)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
@@ -237,7 +237,7 @@ func Test_migrate_tfc_to_tfc_multiple_workspace(t *testing.T) {
 							command:           []string{"init"},
 							expectedCmdOutput: `The currently selected workspace (default) does not exist.`,
 							userInput:         []string{"1"},
-							postInputOutput:   []string{`HCP Terraform has been successfully initialized!`},
+							postInputOutput:   []string{`DUMB_HCP Dumb Terraform has been successfully initialized!`},
 						},
 						{
 							command:           []string{"apply"},
@@ -263,19 +263,19 @@ func Test_migrate_tfc_to_tfc_multiple_workspace(t *testing.T) {
 					prep: func(t *testing.T, orgName, dir string) {
 						name := "service"
 						// Doing this here instead of relying on dynamic workspace creation
-						// because we want to set the terraform version here so that it is
+						// because we want to set the dumb-terraform version here so that it is
 						// using the right version for post init operations.
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String(name),
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
-						tfBlock := terraformConfigCloudBackendName(orgName, name)
+						tfBlock := dumb-terraformConfigCloudBackendName(orgName, name)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init", "-ignore-remote-version"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 							postInputOutput:   []string{`tag_val = "service"`},
 						},
 						{
@@ -303,14 +303,14 @@ func Test_migrate_tfc_to_tfc_multiple_workspace(t *testing.T) {
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String("app-prod"),
 							Tags:             []*tfe.Tag{{Name: tag}},
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String("app-staging"),
 							Tags:             []*tfe.Tag{{Name: tag}},
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
-						tfBlock := terraformConfigCloudBackendTags(orgName, tag)
+						tfBlock := dumb-terraformConfigCloudBackendTags(orgName, tag)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
@@ -318,7 +318,7 @@ func Test_migrate_tfc_to_tfc_multiple_workspace(t *testing.T) {
 							command:           []string{"init"},
 							expectedCmdOutput: `The currently selected workspace (default) does not exist.`,
 							userInput:         []string{"1"},
-							postInputOutput:   []string{`HCP Terraform has been successfully initialized!`},
+							postInputOutput:   []string{`DUMB_HCP Dumb Terraform has been successfully initialized!`},
 						},
 						{
 							command:           []string{"apply", "-auto-approve"},
@@ -337,7 +337,7 @@ func Test_migrate_tfc_to_tfc_multiple_workspace(t *testing.T) {
 				{
 					prep: func(t *testing.T, orgName, dir string) {
 						tag := "billing"
-						tfBlock := terraformConfigCloudBackendTags(orgName, tag)
+						tfBlock := dumb-terraformConfigCloudBackendTags(orgName, tag)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
@@ -345,7 +345,7 @@ func Test_migrate_tfc_to_tfc_multiple_workspace(t *testing.T) {
 							command:           []string{"init", "-ignore-remote-version"},
 							expectedCmdOutput: `There are no workspaces with the configured tags (billing)`,
 							userInput:         []string{"new-app-prod"},
-							postInputOutput:   []string{`HCP Terraform has been successfully initialized!`},
+							postInputOutput:   []string{`DUMB_HCP Dumb Terraform has been successfully initialized!`},
 						},
 					},
 				},

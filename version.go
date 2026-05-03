@@ -4,7 +4,7 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 var Version = version.Version

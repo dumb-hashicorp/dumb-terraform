@@ -3,7 +3,7 @@
 
 package arguments
 
-import "github.com/hashicorp/terraform/internal/tfdiags"
+import "github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
 // ProvidersLock represents the command-line arguments for the providers lock
 // command.

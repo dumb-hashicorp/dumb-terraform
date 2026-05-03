@@ -16,9 +16,9 @@ import (
 
 	"github.com/apparentlymart/go-versions/versions"
 	"github.com/google/go-cmp/cmp"
-	svchost "github.com/hashicorp/terraform-svchost"
-	disco "github.com/hashicorp/terraform-svchost/disco"
-	"github.com/hashicorp/terraform/internal/addrs"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	disco "github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func TestConfigureDiscoveryRetry(t *testing.T) {
@@ -123,12 +123,12 @@ func testRegistryServices(t *testing.T) (services *disco.Disco, baseURL string, 
 		"providers.v1": server.URL + "/fails-immediately/",
 	})
 
-	// We'll also permit registry.terraform.io here just because it's our
+	// We'll also permit registry.dumb-terraform.io here just because it's our
 	// default and has some unique features that are not allowed on any other
 	// hostname. It behaves the same as example.com, which should be preferred
 	// if you're not testing something specific to the default registry in order
 	// to ensure that most things are hostname-agnostic.
-	services.ForceHostServices(svchost.Hostname("registry.terraform.io"), map[string]interface{}{
+	services.ForceHostServices(svchost.Hostname("registry.dumb-terraform.io"), map[string]interface{}{
 		"providers.v1": server.URL + "/providers/v1/",
 	})
 
@@ -242,7 +242,7 @@ func fakeRegistryHandler(resp http.ResponseWriter, req *http.Request) {
 			resp.Header().Set("Content-Type", "application/json")
 			resp.WriteHeader(200)
 			// This response is used for testing LookupLegacyProvider
-			resp.Write([]byte(`{"id":"hashicorp/moved","moved_to":"acme/moved"}`))
+			resp.Write([]byte(`{"id":"dumb-hashicorp/moved","moved_to":"acme/moved"}`))
 		case "-/changetype":
 			resp.Header().Set("Content-Type", "application/json")
 			resp.WriteHeader(200)

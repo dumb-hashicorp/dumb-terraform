@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -29,7 +29,7 @@ func TestStateStoreConfigState_Config_SetConfig(t *testing.T) {
 			"foo": "bar",
 			"fizz": "buzz"
 		}`),
-		Provider: getTestProviderState(t, "1.2.3", "registry.terraform.io", "my-org", "foobar", pConfig),
+		Provider: getTestProviderState(t, "1.2.3", "registry.dumb-terraform.io", "my-org", "foobar", pConfig),
 		Hash:     12345,
 	}
 
@@ -83,7 +83,7 @@ func TestProviderConfigState_Config_SetConfig(t *testing.T) {
 	pConfig := `{
 		"foo": "bar"
 	}`
-	s := getTestProviderState(t, "1.2.3", "registry.terraform.io", "my-org", "foobar", pConfig)
+	s := getTestProviderState(t, "1.2.3", "registry.dumb-terraform.io", "my-org", "foobar", pConfig)
 	s.ConfigRaw = []byte(`{
 		"credentials": "./creds.json",
 		"region": "saturn"
@@ -143,7 +143,7 @@ func TestStateStoreConfigState_Empty(t *testing.T) {
 			"fizz": "buzz",
 			"foo": "bar"
 		}`),
-		Provider: getTestProviderState(t, "1.2.3", "registry.terraform.io", "my-org", "foobar", pConfig),
+		Provider: getTestProviderState(t, "1.2.3", "registry.dumb-terraform.io", "my-org", "foobar", pConfig),
 		Hash:     12345,
 	}
 
@@ -174,7 +174,7 @@ func TestProviderConfigState_Empty(t *testing.T) {
 	pConfig := `{
 		"foo": "bar"
 	}`
-	s := getTestProviderState(t, "1.2.3", "registry.terraform.io", "my-org", "foobar", pConfig)
+	s := getTestProviderState(t, "1.2.3", "registry.dumb-terraform.io", "my-org", "foobar", pConfig)
 
 	isEmpty := s.Empty()
 	if isEmpty {
@@ -204,7 +204,7 @@ func TestStateStoreConfigState_PlanData(t *testing.T) {
 	pConfig := `{
 	"credentials": "./creds.json"
 }`
-	provider := getTestProviderState(t, "1.2.3", "registry.terraform.io", "my-org", "foobar", pConfig)
+	provider := getTestProviderState(t, "1.2.3", "registry.dumb-terraform.io", "my-org", "foobar", pConfig)
 
 	s := &StateStoreConfigState{
 		Type: "whatever",
@@ -213,7 +213,7 @@ func TestStateStoreConfigState_PlanData(t *testing.T) {
 		}`),
 		Hash:               123,
 		Provider:           provider,
-		ProviderSupplyMode: getproviders.ManagedByTerraform, // not reflected in plan data, but required to generate it
+		ProviderSupplyMode: getproviders.ManagedByDumb Terraform, // not reflected in plan data, but required to generate it
 	}
 
 	ssSchema := &configschema.Block{

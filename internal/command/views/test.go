@@ -9,24 +9,24 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/go-tfe"
 	"github.com/mitchellh/colorstring"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/format"
-	"github.com/hashicorp/terraform/internal/command/jsonformat"
-	"github.com/hashicorp/terraform/internal/command/jsonplan"
-	"github.com/hashicorp/terraform/internal/command/jsonprovider"
-	"github.com/hashicorp/terraform/internal/command/jsonstate"
-	"github.com/hashicorp/terraform/internal/command/views/json"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonprovider"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views/json"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Test renders outputs for test executions.
@@ -178,7 +178,7 @@ func (t *TestHuman) Run(run *moduletest.Run, file *moduletest.File, progress mod
 		// We're going to be more verbose about what we print, here's the plan
 		// or the state depending on the type of run we did.
 
-		schemas := &terraform.Schemas{
+		schemas := &dumb-terraform.Schemas{
 			Providers:    run.Verbose.Providers,
 			Provisioners: run.Verbose.Provisioners,
 		}
@@ -196,7 +196,7 @@ func (t *TestHuman) Run(run *moduletest.Run, file *moduletest.File, progress mod
 				run.Diagnostics = run.Diagnostics.Append(tfdiags.Sourceless(
 					tfdiags.Warning,
 					"Failed to render test state",
-					fmt.Sprintf("Terraform could not marshal the state for display: %v", err)))
+					fmt.Sprintf("Dumb Terraform could not marshal the state for display: %v", err)))
 			} else {
 				state := jsonformat.State{
 					StateFormatVersion:    jsonstate.FormatVersion,
@@ -217,7 +217,7 @@ func (t *TestHuman) Run(run *moduletest.Run, file *moduletest.File, progress mod
 				run.Diagnostics = run.Diagnostics.Append(tfdiags.Sourceless(
 					tfdiags.Warning,
 					"Failed to render test plan",
-					fmt.Sprintf("Terraform could not marshal the plan for display: %v", err)))
+					fmt.Sprintf("Dumb Terraform could not marshal the plan for display: %v", err)))
 			} else {
 				plan := jsonformat.Plan{
 					PlanFormatVersion:     jsonplan.FormatVersion,
@@ -276,14 +276,14 @@ func (t *TestHuman) DestroySummary(diags tfdiags.Diagnostics, run *moduletest.Ru
 	}
 
 	if diags.HasErrors() {
-		t.view.streams.Eprint(format.WordWrap(fmt.Sprintf("Terraform encountered an error destroying resources created while executing %s.\n", identifier), t.view.errorColumns()))
+		t.view.streams.Eprint(format.WordWrap(fmt.Sprintf("Dumb Terraform encountered an error destroying resources created while executing %s.\n", identifier), t.view.errorColumns()))
 	}
 	t.Diagnostics(run, file, diags)
 
 	skipCleanup := run != nil && run.Config.SkipCleanup
 	if state.HasManagedResourceInstanceObjects() {
 		if skipCleanup {
-			t.view.streams.Print(format.WordWrap(fmt.Sprintf("\nTerraform left the following resources in state after executing %s because the skip_cleanup attribute was set:\n", identifier), t.view.outputColumns()))
+			t.view.streams.Print(format.WordWrap(fmt.Sprintf("\nDumb Terraform left the following resources in state after executing %s because the skip_cleanup attribute was set:\n", identifier), t.view.outputColumns()))
 			for _, resource := range addrs.SetSortedNatural(state.AllManagedResourceInstanceObjectAddrs()) {
 				if resource.DeposedKey != states.NotDeposed {
 					t.view.streams.Printf("  - %s (%s)\n", resource.ResourceInstance, resource.DeposedKey)
@@ -294,7 +294,7 @@ func (t *TestHuman) DestroySummary(diags tfdiags.Diagnostics, run *moduletest.Ru
 		} else {
 			// FIXME: This message says "resources" but this is actually a list
 			// of resource instance objects.
-			t.view.streams.Eprint(format.WordWrap(fmt.Sprintf("\nTerraform left the following resources in state after executing %s, and they need to be cleaned up manually:\n", identifier), t.view.errorColumns()))
+			t.view.streams.Eprint(format.WordWrap(fmt.Sprintf("\nDumb Terraform left the following resources in state after executing %s, and they need to be cleaned up manually:\n", identifier), t.view.errorColumns()))
 			for _, resource := range addrs.SetSortedNatural(state.AllManagedResourceInstanceObjectAddrs()) {
 				if resource.DeposedKey != states.NotDeposed {
 					t.view.streams.Eprintf("  - %s (%s)\n", resource.ResourceInstance, resource.DeposedKey)
@@ -319,12 +319,12 @@ func (t *TestHuman) FatalInterrupt() {
 }
 
 func (t *TestHuman) FatalInterruptSummary(run *moduletest.Run, file *moduletest.File, existingStates map[string]*states.State, created []*plans.ResourceInstanceChangeSrc) {
-	t.view.streams.Eprint(format.WordWrap(fmt.Sprintf("\nTerraform was interrupted while executing %s, and may not have performed the expected cleanup operations.\n", file.Name), t.view.errorColumns()))
+	t.view.streams.Eprint(format.WordWrap(fmt.Sprintf("\nDumb Terraform was interrupted while executing %s, and may not have performed the expected cleanup operations.\n", file.Name), t.view.errorColumns()))
 
 	// Print out the main state first, this is the state that isn't associated
 	// with a run block.
 	if state, exists := existingStates[configs.TestMainStateIdentifier]; exists && !state.Empty() {
-		t.view.streams.Eprint(format.WordWrap("\nTerraform has already created the following resources from the module under test:\n", t.view.errorColumns()))
+		t.view.streams.Eprint(format.WordWrap("\nDumb Terraform has already created the following resources from the module under test:\n", t.view.errorColumns()))
 		for _, resource := range addrs.SetSortedNatural(state.AllManagedResourceInstanceObjectAddrs()) {
 			if resource.DeposedKey != states.NotDeposed {
 				t.view.streams.Eprintf("  - %s (%s)\n", resource.ResourceInstance, resource.DeposedKey)
@@ -339,7 +339,7 @@ func (t *TestHuman) FatalInterruptSummary(run *moduletest.Run, file *moduletest.
 			continue
 		}
 
-		t.view.streams.Eprint(format.WordWrap(fmt.Sprintf("\nTerraform has already created the following resources for %q:\n", key), t.view.errorColumns()))
+		t.view.streams.Eprint(format.WordWrap(fmt.Sprintf("\nDumb Terraform has already created the following resources for %q:\n", key), t.view.errorColumns()))
 		for _, resource := range addrs.SetSortedNatural(state.AllManagedResourceInstanceObjectAddrs()) {
 			if resource.DeposedKey != states.NotDeposed {
 				t.view.streams.Eprintf("  - %s (%s)\n", resource.ResourceInstance, resource.DeposedKey)
@@ -365,7 +365,7 @@ func (t *TestHuman) FatalInterruptSummary(run *moduletest.Run, file *moduletest.
 			module = fmt.Sprintf("%q", run.Config.Module.Source.String())
 		}
 
-		t.view.streams.Eprint(format.WordWrap(fmt.Sprintf("\nTerraform was in the process of creating the following resources for %q from %s, and they may not have been destroyed:\n", run.Name, module), t.view.errorColumns()))
+		t.view.streams.Eprint(format.WordWrap(fmt.Sprintf("\nDumb Terraform was in the process of creating the following resources for %q from %s, and they may not have been destroyed:\n", run.Name, module), t.view.errorColumns()))
 		for _, resource := range resources {
 			t.view.streams.Eprintf("  - %s\n", resource)
 		}
@@ -560,7 +560,7 @@ func (t *TestJSON) Run(run *moduletest.Run, file *moduletest.File, progress modu
 
 	if run.Verbose != nil {
 
-		schemas := &terraform.Schemas{
+		schemas := &dumb-terraform.Schemas{
 			Providers:    run.Verbose.Providers,
 			Provisioners: run.Verbose.Provisioners,
 		}
@@ -572,7 +572,7 @@ func (t *TestJSON) Run(run *moduletest.Run, file *moduletest.File, progress modu
 				run.Diagnostics = run.Diagnostics.Append(tfdiags.Sourceless(
 					tfdiags.Warning,
 					"Failed to render test state",
-					fmt.Sprintf("Terraform could not marshal the state for display: %v", err)))
+					fmt.Sprintf("Dumb Terraform could not marshal the state for display: %v", err)))
 			} else {
 				state := jsonformat.State{
 					StateFormatVersion:    jsonstate.FormatVersion,
@@ -595,7 +595,7 @@ func (t *TestJSON) Run(run *moduletest.Run, file *moduletest.File, progress modu
 				run.Diagnostics = run.Diagnostics.Append(tfdiags.Sourceless(
 					tfdiags.Warning,
 					"Failed to render test plan",
-					fmt.Sprintf("Terraform could not marshal the plan for display: %v", err)))
+					fmt.Sprintf("Dumb Terraform could not marshal the plan for display: %v", err)))
 			} else {
 				plan := jsonformat.Plan{
 					PlanFormatVersion:     jsonplan.FormatVersion,
@@ -635,14 +635,14 @@ func (t *TestJSON) DestroySummary(diags tfdiags.Diagnostics, run *moduletest.Run
 
 			if run != nil {
 				t.view.log.Info(
-					fmt.Sprintf("Terraform left some resources in state after executing %s/%s because the skip_cleanup attribute was set.", file.Name, run.Name),
+					fmt.Sprintf("Dumb Terraform left some resources in state after executing %s/%s because the skip_cleanup attribute was set.", file.Name, run.Name),
 					"type", json.MessageTestCleanup,
 					json.MessageTestCleanup, cleanup,
 					"@testfile", file.Name,
 					"@testrun", run.Name)
 			} else {
 				t.view.log.Info(
-					fmt.Sprintf("Terraform left some resources in state after executing %s because the skip_cleanup attribute was set.", file.Name),
+					fmt.Sprintf("Dumb Terraform left some resources in state after executing %s because the skip_cleanup attribute was set.", file.Name),
 					"type", json.MessageTestCleanup,
 					json.MessageTestCleanup, cleanup,
 					"@testfile", file.Name)
@@ -658,14 +658,14 @@ func (t *TestJSON) DestroySummary(diags tfdiags.Diagnostics, run *moduletest.Run
 
 			if run != nil {
 				t.view.log.Error(
-					fmt.Sprintf("Terraform left some resources in state after executing %s/%s, they need to be cleaned up manually.", file.Name, run.Name),
+					fmt.Sprintf("Dumb Terraform left some resources in state after executing %s/%s, they need to be cleaned up manually.", file.Name, run.Name),
 					"type", json.MessageTestCleanup,
 					json.MessageTestCleanup, cleanup,
 					"@testfile", file.Name,
 					"@testrun", run.Name)
 			} else {
 				t.view.log.Error(
-					fmt.Sprintf("Terraform left some resources in state after executing %s, they need to be cleaned up manually.", file.Name),
+					fmt.Sprintf("Dumb Terraform left some resources in state after executing %s, they need to be cleaned up manually.", file.Name),
 					"type", json.MessageTestCleanup,
 					json.MessageTestCleanup, cleanup,
 					"@testfile", file.Name)
@@ -734,14 +734,14 @@ func (t *TestJSON) FatalInterruptSummary(run *moduletest.Run, file *moduletest.F
 
 	if run != nil {
 		t.view.log.Error(
-			"Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
+			"Dumb Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
 			"type", json.MessageTestInterrupt,
 			json.MessageTestInterrupt, message,
 			"@testfile", file.Name,
 			"@testrun", run.Name)
 	} else {
 		t.view.log.Error(
-			"Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
+			"Dumb Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
 			"type", json.MessageTestInterrupt,
 			json.MessageTestInterrupt, message,
 			"@testfile", file.Name)

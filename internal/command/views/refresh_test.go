@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -91,7 +91,7 @@ func TestRefreshJSON_outputs(t *testing.T) {
 		{
 			"@level":   "info",
 			"@message": "Outputs: 2",
-			"@module":  "terraform.ui",
+			"@module":  "dumb-terraform.ui",
 			"type":     "outputs",
 			"outputs": map[string]interface{}{
 				"boop_count": map[string]interface{}{

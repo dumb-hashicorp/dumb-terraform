@@ -8,14 +8,14 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 // Ensure that the correct view type and in-automation settings propagate to the
@@ -134,9 +134,9 @@ func testPlanWithDatasource(t *testing.T) *plans.Plan {
 	return plan
 }
 
-func testSchemas() *terraform.Schemas {
+func testSchemas() *dumb-terraform.Schemas {
 	provider := testProvider()
-	return &terraform.Schemas{
+	return &dumb-terraform.Schemas{
 		Providers: map[addrs.Provider]providers.ProviderSchema{
 			addrs.NewDefaultProvider("test"): provider.GetProviderSchema(),
 		},

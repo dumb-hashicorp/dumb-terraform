@@ -9,14 +9,14 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
 )
 
 func TestStateShow(t *testing.T) {
@@ -337,7 +337,7 @@ func TestStateShow_configured_provider(t *testing.T) {
 	}
 }
 
-// Tests using `terraform state show` subcommand in combination with pluggable state storage
+// Tests using `dumb-terraform state show` subcommand in combination with pluggable state storage
 //
 // Note: Whereas other tests in this file use the local backend and require a state file in the test fixures,
 // with pluggable state storage we can define the state via the mocked provider.
@@ -394,7 +394,7 @@ func TestStateShow_stateStore(t *testing.T) {
 		},
 	}
 
-	// `terraform show` command specifying a given resource addr
+	// `dumb-terraform show` command specifying a given resource addr
 	expectedResourceAddr := "test_instance.foo"
 	args := []string{expectedResourceAddr}
 	code := c.Run(args)
@@ -489,7 +489,7 @@ const testStateShowJsonOutput = `{
     "mode": "managed",
     "type": "test_instance",
     "name": "foo",
-    "provider_name": "registry.terraform.io/hashicorp/test",
+    "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
     "schema_version": 0,
     "values": {
       "bar": "value",

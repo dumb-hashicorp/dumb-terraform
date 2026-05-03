@@ -7,11 +7,11 @@ import (
 	"context"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// GetCommand is a Command implementation that takes a Terraform
+// GetCommand is a Command implementation that takes a Dumb Terraform
 // configuration and downloads all the modules.
 type GetCommand struct {
 	Meta
@@ -71,7 +71,7 @@ func (c *GetCommand) Run(args []string) int {
 
 func (c *GetCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] get [options]
+Usage: dumb-terraform [global options] get [options]
 
   Downloads and installs modules needed for the configuration in the 
   current working directory.
@@ -82,7 +82,7 @@ Usage: terraform [global options] get [options]
   unless the -update flag is specified.
 
   Module installation also happens automatically by default as part of
-  the "terraform init" command, so you should rarely need to run this
+  the "dumb-terraform init" command, so you should rarely need to run this
   command separately.
 
 Options:
@@ -92,14 +92,14 @@ Options:
 
   -no-color             Disable text coloring in the output.
 
-  -test-directory=path  Set the Terraform test directory, defaults to "tests".
+  -test-directory=path  Set the Dumb Terraform test directory, defaults to "tests".
 
   -var 'foo=bar'        Set a value for one of the input variables in the root
                         module of the configuration. Use this option more than
                         once to set more than one variable.
 
   -var-file=filename    Load variable values from the given file, in addition
-                        to the default files terraform.tfvars and *.auto.tfvars.
+                        to the default files dumb-terraform.tfvars and *.auto.tfvars.
                         Use this option more than once to include more than one
                         variables file.
 
@@ -108,7 +108,7 @@ Options:
 }
 
 func (c *GetCommand) Synopsis() string {
-	return "Install or upgrade remote Terraform modules"
+	return "Install or upgrade remote Dumb Terraform modules"
 }
 
 func getModules(ctx context.Context, m *Meta, path string, testsDir string, upgrade bool) (abort bool, diags tfdiags.Diagnostics) {

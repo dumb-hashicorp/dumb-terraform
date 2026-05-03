@@ -8,7 +8,7 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
 )
 
 func NewPath(src cty.Path) (*Path, error) {

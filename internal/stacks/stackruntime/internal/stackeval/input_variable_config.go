@@ -7,16 +7,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/ext/typeexpr"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/typeexpr"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // InputVariableConfig represents a "variable" block in a stack configuration.
@@ -85,13 +85,13 @@ func (v *InputVariableConfig) ValidateDefaultValue() (cty.Value, tfdiags.Diagnos
 	}
 	val, err := convert.Convert(val, want)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid default value for input variable",
 			Detail:   fmt.Sprintf("The default value does not conform to the variable's type constraint: %s.", err),
 			// TODO: Better to indicate the default value itself, but
 			// stackconfig.InputVariable doesn't currently retain that.
-			Subject: v.config.DeclRange.ToHCL().Ptr(),
+			Subject: v.config.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return cty.UnknownVal(want), diags
 	}

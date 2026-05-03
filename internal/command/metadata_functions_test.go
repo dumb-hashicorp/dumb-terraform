@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 )
 
 func TestMetadataFunctions_error(t *testing.T) {

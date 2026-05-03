@@ -6,16 +6,16 @@ package stackmigrate
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func (m *migration) migrateComponents(components collections.Map[Instance, collections.Set[*stackResource]]) {
@@ -137,7 +137,7 @@ func (m *migration) calculateDependencies(components collections.Map[Instance, c
 
 // componentDependenciesFromExpression returns a set of components that are
 // referenced in the given expression.
-func (m *migration) componentDependenciesFromExpression(expr hcl.Expression, current stackaddrs.StackInstance, components collections.Map[AbsComponent, collections.Set[*stackResource]]) (ds collections.Set[AbsComponent], diags tfdiags.Diagnostics) {
+func (m *migration) componentDependenciesFromExpression(expr dumb-hcl.Expression, current stackaddrs.StackInstance, components collections.Map[AbsComponent, collections.Set[*stackResource]]) (ds collections.Set[AbsComponent], diags tfdiags.Diagnostics) {
 	ds = collections.NewSet[AbsComponent]()
 	if expr == nil {
 		return ds, diags
@@ -153,7 +153,7 @@ func (m *migration) componentDependenciesFromExpression(expr hcl.Expression, cur
 
 // componentDependenciesFromTraversal returns the component that is referenced
 // in the given traversal, if it is a component reference.
-func (m *migration) componentDependenciesFromTraversal(traversal hcl.Traversal, current stackaddrs.StackInstance, components collections.Map[AbsComponent, collections.Set[*stackResource]]) (deps collections.Set[AbsComponent], diags tfdiags.Diagnostics) {
+func (m *migration) componentDependenciesFromTraversal(traversal dumb-hcl.Traversal, current stackaddrs.StackInstance, components collections.Map[AbsComponent, collections.Set[*stackResource]]) (deps collections.Set[AbsComponent], diags tfdiags.Diagnostics) {
 	deps = collections.NewSet[AbsComponent]()
 
 	parsed, _, moreDiags := stackaddrs.ParseReference(traversal)
@@ -179,11 +179,11 @@ func (m *migration) componentDependenciesFromTraversal(traversal hcl.Traversal, 
 
 		if stack == nil {
 			// reference to a stack that does not exist in the configuration.
-			diags = diags.Append(hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Stack not found",
 				Detail:   fmt.Sprintf("Stack %q not found in configuration.", targetStackAddress),
-				Subject:  parsed.SourceRange.ToHCL().Ptr(),
+				Subject:  parsed.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 			return deps, diags
 		}
@@ -209,7 +209,7 @@ func (m *migration) componentDependenciesFromTraversal(traversal hcl.Traversal, 
 	}
 }
 
-func (m *migration) providerDependencies(expr hcl.Expression, current stackaddrs.StackInstance, stack *stackconfig.Stack, components collections.Map[AbsComponent, collections.Set[*stackResource]]) (ds collections.Set[AbsComponent], diags tfdiags.Diagnostics) {
+func (m *migration) providerDependencies(expr dumb-hcl.Expression, current stackaddrs.StackInstance, stack *stackconfig.Stack, components collections.Map[AbsComponent, collections.Set[*stackResource]]) (ds collections.Set[AbsComponent], diags tfdiags.Diagnostics) {
 	ds = collections.NewSet[AbsComponent]()
 	for _, v := range expr.Variables() {
 		ref, _, moreDiags := stackaddrs.ParseReference(v)
@@ -249,7 +249,7 @@ func (m *migration) providerDependencies(expr hcl.Expression, current stackaddrs
 			}
 
 			spec := provider.GetProviderSchema().Provider.Body.DecoderSpec()
-			traversals := hcldec.Variables(config.Config, spec)
+			traversals := dumb-hcldec.Variables(config.Config, spec)
 			for _, traversal := range traversals {
 				dss, moreDiags := m.componentDependenciesFromTraversal(traversal, current, components)
 				diags = diags.Append(moreDiags)

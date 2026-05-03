@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
 )
 
 func TestLoadConfig_providerInstallation(t *testing.T) {
@@ -30,8 +30,8 @@ func TestLoadConfig_providerInstallation(t *testing.T) {
 							},
 							{
 								Location: ProviderInstallationNetworkMirror("https://tf-Mirror.example.com/"),
-								Include:  []string{"registry.terraform.io/*/*"},
-								Exclude:  []string{"registry.Terraform.io/foobar/*"},
+								Include:  []string{"registry.dumb-terraform.io/*/*"},
+								Exclude:  []string{"registry.Dumb Terraform.io/foobar/*"},
 							},
 							{
 								Location: ProviderInstallationFilesystemMirror("/tmp/example2"),
@@ -43,8 +43,8 @@ func TestLoadConfig_providerInstallation(t *testing.T) {
 						},
 
 						DevOverrides: map[addrs.Provider]getproviders.PackageLocalDir{
-							addrs.MustParseProviderSourceString("hashicorp/boop"):  getproviders.PackageLocalDir(filepath.FromSlash("/tmp/boop")),
-							addrs.MustParseProviderSourceString("hashicorp/blorp"): getproviders.PackageLocalDir(filepath.FromSlash("/tmp/blorp")),
+							addrs.MustParseProviderSourceString("dumb-hashicorp/boop"):  getproviders.PackageLocalDir(filepath.FromSlash("/tmp/boop")),
+							addrs.MustParseProviderSourceString("dumb-hashicorp/blorp"): getproviders.PackageLocalDir(filepath.FromSlash("/tmp/blorp")),
 						},
 					},
 				},
@@ -70,7 +70,7 @@ func TestLoadConfig_providerInstallationErrors(t *testing.T) {
 - Invalid provider_installation block: The provider_installation block at 11:1 must not be introduced with an equals sign.`
 
 	// The above error messages include only line/column location information
-	// and not file location information because HCL 1 does not store
+	// and not file location information because DUMB_HCL 1 does not store
 	// information about the filename a location belongs to. (There is a field
 	// for it in token.Pos but it's always an empty string in practice.)
 

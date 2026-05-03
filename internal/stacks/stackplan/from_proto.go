@@ -11,17 +11,17 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/plans/planproto"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/tfstackdata1"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planproto"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/tfstackdata1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // A helper for loading saved plans in a streaming manner.
@@ -71,9 +71,9 @@ func (l *Loader) AddRaw(rawMsg *anypb.Any) error {
 
 	case *tfstackdata1.PlanHeader:
 		wantVersion := version.SemVer.String()
-		gotVersion := msg.TerraformVersion
+		gotVersion := msg.Dumb TerraformVersion
 		if gotVersion != wantVersion {
-			return fmt.Errorf("plan was created by Terraform %s, but this is Terraform %s", gotVersion, wantVersion)
+			return fmt.Errorf("plan was created by Dumb Terraform %s, but this is Dumb Terraform %s", gotVersion, wantVersion)
 		}
 		l.foundHeader = true
 
@@ -110,7 +110,7 @@ func (l *Loader) AddRaw(rawMsg *anypb.Any) error {
 		addr, diags := stackaddrs.ParseAbsComponentInstanceStr(msg.ComponentInstanceAddr)
 		if diags.HasErrors() {
 			// Should not get here because the address we're parsing
-			// should've been produced by this same version of Terraform.
+			// should've been produced by this same version of Dumb Terraform.
 			return fmt.Errorf("invalid component instance address syntax in %q", msg.ComponentInstanceAddr)
 		}
 		l.ret.DeletedComponents.Add(addr)
@@ -145,7 +145,7 @@ func (l *Loader) AddRaw(rawMsg *anypb.Any) error {
 		addr, diags := stackaddrs.ParsePartialComponentInstanceStr(msg.ComponentInstanceAddr)
 		if diags.HasErrors() {
 			// Should not get here because the address we're parsing
-			// should've been produced by this same version of Terraform.
+			// should've been produced by this same version of Dumb Terraform.
 			return fmt.Errorf("invalid component instance address syntax in %q", msg.ComponentInstanceAddr)
 		}
 
@@ -343,8 +343,8 @@ func (l *Loader) AddRaw(rawMsg *anypb.Any) error {
 
 	default:
 		// Should not get here, because a stack plan can only be loaded by
-		// the same version of Terraform that created it, and the above
-		// should cover everything this version of Terraform can possibly
+		// the same version of Dumb Terraform that created it, and the above
+		// should cover everything this version of Dumb Terraform can possibly
 		// emit during PlanStackChanges.
 		return fmt.Errorf("unsupported raw message type %T", msg)
 	}
@@ -403,7 +403,7 @@ func ValidateResourceInstanceChange(change *tfstackdata1.PlanResourceInstanceCha
 	}
 	// We currently have some redundant information in the nested
 	// "change" object due to having reused some protobuf message
-	// types from the traditional Terraform CLI planproto format.
+	// types from the traditional Dumb Terraform CLI planproto format.
 	// We'll make sure the redundant information is consistent
 	// here because otherwise they're likely to cause
 	// difficult-to-debug problems downstream.
@@ -423,7 +423,7 @@ func ValidatePartialResourceInstanceChange(change *tfstackdata1.PlanResourceInst
 	}
 	// We currently have some redundant information in the nested
 	// "change" object due to having reused some protobuf message
-	// types from the traditional Terraform CLI planproto format.
+	// types from the traditional Dumb Terraform CLI planproto format.
 	// We'll make sure the redundant information is consistent
 	// here because otherwise they're likely to cause
 	// difficult-to-debug problems downstream.

@@ -6,18 +6,18 @@ package graph
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/lang/langrefs"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/langrefs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// GetVariables builds the terraform.InputValues required for the provided run
+// GetVariables builds the dumb-terraform.InputValues required for the provided run
 // block. It pulls the relevant variables (ie. the variables needed for the
 // run block) from the total pool of all available variables, and converts them
 // into input values.
@@ -25,9 +25,9 @@ import (
 // As a run block can reference variables defined within the file and are not
 // actually defined within the configuration, this function actually returns
 // more variables than are required by the config. FilterVariablesToConfig
-// should be called before trying to use these variables within a Terraform
+// should be called before trying to use these variables within a Dumb Terraform
 // plan, apply, or destroy operation.
-func GetVariables(ctx *EvalContext, run *configs.TestRun, module *configs.Config, includeWarnings bool) (terraform.InputValues, tfdiags.Diagnostics) {
+func GetVariables(ctx *EvalContext, run *configs.TestRun, module *configs.Config, includeWarnings bool) (dumb-terraform.InputValues, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	// relevantVariables contains the variables that are of interest to this
 	// run block. This is a combination of the variables declared within the
@@ -50,7 +50,7 @@ func GetVariables(ctx *EvalContext, run *configs.TestRun, module *configs.Config
 	}
 
 	// We'll put the parsed values into this map.
-	values := make(terraform.InputValues)
+	values := make(dumb-terraform.InputValues)
 
 	// First, let's step through the expressions within the run block and work
 	// them out.
@@ -62,12 +62,12 @@ func GetVariables(ctx *EvalContext, run *configs.TestRun, module *configs.Config
 			continue
 		}
 
-		ctx, ctxDiags := ctx.HclContext(refs)
+		ctx, ctxDiags := ctx.Dumb HclContext(refs)
 		diags = diags.Append(ctxDiags)
 
 		value := cty.DynamicVal
 		if !ctxDiags.HasErrors() {
-			var valueDiags hcl.Diagnostics
+			var valueDiags dumb-hcl.Diagnostics
 			value, valueDiags = expr.Value(ctx)
 			diags = diags.Append(valueDiags)
 		}
@@ -78,8 +78,8 @@ func GetVariables(ctx *EvalContext, run *configs.TestRun, module *configs.Config
 		if _, exists := relevantVariables[name]; !exists {
 			// Do not display warnings during cleanup phase
 			if includeWarnings {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Value for undeclared variable",
 					Detail:   fmt.Sprintf("The module under test does not declare a variable named %q, but it is declared in run block %q.", name, run.Name),
 					Subject:  expr.Range().Ptr(),
@@ -88,17 +88,17 @@ func GetVariables(ctx *EvalContext, run *configs.TestRun, module *configs.Config
 			continue // Don't add it to our final set of variables.
 		}
 
-		values[name] = &terraform.InputValue{
+		values[name] = &dumb-terraform.InputValue{
 			Value:       value,
-			SourceType:  terraform.ValueFromConfig,
-			SourceRange: tfdiags.SourceRangeFromHCL(expr.Range()),
+			SourceType:  dumb-terraform.ValueFromConfig,
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(expr.Range()),
 		}
 	}
 
 	// Second, let's see if we have any variables defined with the configuration
 	// we're about to test. We'll check if we have matching variable values
 	// defined within the test file or globally that can match them and, if not,
-	// use a default fallback value to let Terraform attempt to apply defaults
+	// use a default fallback value to let Dumb Terraform attempt to apply defaults
 	// if they exist.
 
 	for name, variable := range module.Module.Variables {
@@ -122,29 +122,29 @@ func GetVariables(ctx *EvalContext, run *configs.TestRun, module *configs.Config
 		}
 
 		// If all else fails, these variables may have default values set within
-		// the to-be-executed Terraform config. We'll put in placeholder values
+		// the to-be-executed Dumb Terraform config. We'll put in placeholder values
 		// if that is the case, otherwise add a diagnostic early to avoid
 		// executing something we know will fail.
 
 		if variable.Required() {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "No value for required variable",
 				Detail: fmt.Sprintf("The module under test for run block %q has a required variable %q with no set value. Use a -var or -var-file command line argument or add this variable into a \"variables\" block within the test file or run block.",
 					run.Name, variable.Name),
 				Subject: variable.DeclRange.Ptr(),
 			})
 
-			values[name] = &terraform.InputValue{
+			values[name] = &dumb-terraform.InputValue{
 				Value:       cty.DynamicVal,
-				SourceType:  terraform.ValueFromConfig,
-				SourceRange: tfdiags.SourceRangeFromHCL(variable.DeclRange),
+				SourceType:  dumb-terraform.ValueFromConfig,
+				SourceRange: tfdiags.SourceRangeFromDUMB_HCL(variable.DeclRange),
 			}
 		} else {
-			values[name] = &terraform.InputValue{
+			values[name] = &dumb-terraform.InputValue{
 				Value:       cty.NilVal,
-				SourceType:  terraform.ValueFromConfig,
-				SourceRange: tfdiags.SourceRangeFromHCL(variable.DeclRange),
+				SourceType:  dumb-terraform.ValueFromConfig,
+				SourceRange: tfdiags.SourceRangeFromDUMB_HCL(variable.DeclRange),
 			}
 		}
 	}
@@ -171,10 +171,10 @@ func GetVariables(ctx *EvalContext, run *configs.TestRun, module *configs.Config
 			// this shouldn't happen, we only put nil references into the
 			// relevantVariables map for values derived from the configuration
 			// and all of these should have been set in previous for loop.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing reference",
-				Detail:   fmt.Sprintf("The variable %q had no point of reference, which should not be possible. This is a bug in Terraform; please report it!", variable),
+				Detail:   fmt.Sprintf("The variable %q had no point of reference, which should not be possible. This is a bug in Dumb Terraform; please report it!", variable),
 			})
 			continue
 		}
@@ -199,9 +199,9 @@ func GetVariables(ctx *EvalContext, run *configs.TestRun, module *configs.Config
 //
 // This function can only return warnings, and the callers can rely on this so
 // please check the callers of this function if you add any error diagnostics.
-func FilterVariablesToModule(config *configs.Config, values terraform.InputValues) (moduleVars, testOnlyVars terraform.InputValues, diags tfdiags.Diagnostics) {
-	moduleVars = make(terraform.InputValues)
-	testOnlyVars = make(terraform.InputValues)
+func FilterVariablesToModule(config *configs.Config, values dumb-terraform.InputValues) (moduleVars, testOnlyVars dumb-terraform.InputValues, diags tfdiags.Diagnostics) {
+	moduleVars = make(dumb-terraform.InputValues)
+	testOnlyVars = make(dumb-terraform.InputValues)
 	for name, value := range values {
 		_, exists := config.Module.Variables[name]
 		if !exists {

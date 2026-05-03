@@ -1,4 +1,4 @@
-module github.com/hashicorp/terraform
+module github.com/dumb-hashicorp/dumb-terraform
 
 go 1.25.8
 
@@ -21,32 +21,32 @@ require (
 	github.com/go-test/deep v1.0.3
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
-	github.com/hashicorp/cli v1.1.7
-	github.com/hashicorp/go-checkpoint v0.5.0
-	github.com/hashicorp/go-cleanhttp v0.5.2
-	github.com/hashicorp/go-getter v1.8.6
-	github.com/hashicorp/go-hclog v1.6.3
-	github.com/hashicorp/go-plugin v1.7.0
-	github.com/hashicorp/go-retryablehttp v0.7.8
-	github.com/hashicorp/go-slug v0.18.1
-	github.com/hashicorp/go-tfe v1.94.0
-	github.com/hashicorp/go-uuid v1.0.3
-	github.com/hashicorp/go-version v1.8.0
-	github.com/hashicorp/hcl v1.0.0
-	github.com/hashicorp/hcl/v2 v2.24.0
-	github.com/hashicorp/jsonapi v1.4.3-0.20250220162346-81a76b606f3e
-	github.com/hashicorp/terraform-registry-address v0.4.0
-	github.com/hashicorp/terraform-svchost v0.2.1
-	github.com/hashicorp/terraform/internal/backend/remote-state/azure v0.0.0-00010101000000-000000000000
-	github.com/hashicorp/terraform/internal/backend/remote-state/consul v0.0.0-00010101000000-000000000000
-	github.com/hashicorp/terraform/internal/backend/remote-state/cos v0.0.0-00010101000000-000000000000
-	github.com/hashicorp/terraform/internal/backend/remote-state/gcs v0.0.0-00010101000000-000000000000
-	github.com/hashicorp/terraform/internal/backend/remote-state/kubernetes v0.0.0-00010101000000-000000000000
-	github.com/hashicorp/terraform/internal/backend/remote-state/oci v0.0.0-00010101000000-000000000000
-	github.com/hashicorp/terraform/internal/backend/remote-state/oss v0.0.0-00010101000000-000000000000
-	github.com/hashicorp/terraform/internal/backend/remote-state/pg v0.0.0-00010101000000-000000000000
-	github.com/hashicorp/terraform/internal/backend/remote-state/s3 v0.0.0-00010101000000-000000000000
-	github.com/hashicorp/terraform/internal/legacy v0.0.0-00010101000000-000000000000
+	github.com/dumb-hashicorp/cli v1.1.7
+	github.com/dumb-hashicorp/go-checkpoint v0.5.0
+	github.com/dumb-hashicorp/go-cleanhttp v0.5.2
+	github.com/dumb-hashicorp/go-getter v1.8.6
+	github.com/dumb-hashicorp/go-dumb-hclog v1.6.3
+	github.com/dumb-hashicorp/go-plugin v1.7.0
+	github.com/dumb-hashicorp/go-retryablehttp v0.7.8
+	github.com/dumb-hashicorp/go-slug v0.18.1
+	github.com/dumb-hashicorp/go-tfe v1.94.0
+	github.com/dumb-hashicorp/go-uuid v1.0.3
+	github.com/dumb-hashicorp/go-version v1.8.0
+	github.com/dumb-hashicorp/dumb-hcl v1.0.0
+	github.com/dumb-hashicorp/dumb-hcl/v2 v2.24.0
+	github.com/dumb-hashicorp/jsonapi v1.4.3-0.20250220162346-81a76b606f3e
+	github.com/dumb-hashicorp/dumb-terraform-registry-address v0.4.0
+	github.com/dumb-hashicorp/dumb-terraform-svchost v0.2.1
+	github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/azure v0.0.0-00010101000000-000000000000
+	github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/dumb-consul v0.0.0-00010101000000-000000000000
+	github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/cos v0.0.0-00010101000000-000000000000
+	github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/gcs v0.0.0-00010101000000-000000000000
+	github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/kubernetes v0.0.0-00010101000000-000000000000
+	github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/oci v0.0.0-00010101000000-000000000000
+	github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/oss v0.0.0-00010101000000-000000000000
+	github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/pg v0.0.0-00010101000000-000000000000
+	github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/s3 v0.0.0-00010101000000-000000000000
+	github.com/dumb-hashicorp/dumb-terraform/internal/legacy v0.0.0-00010101000000-000000000000
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/masterzen/winrm v0.0.0-20200615185753-c42b5136ff88
 	github.com/mattn/go-isatty v0.0.20
@@ -57,7 +57,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1
 	github.com/mitchellh/gox v1.0.1
 	github.com/nishanths/exhaustive v0.12.0
-	github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
+	github.com/dumb-packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/posener/complete v1.2.3
 	github.com/spf13/afero v1.15.0
@@ -185,25 +185,25 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.14 // indirect
 	github.com/googleapis/gax-go/v2 v2.17.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0 // indirect
-	github.com/hashicorp/aws-sdk-go-base/v2 v2.0.0-beta.72 // indirect
-	github.com/hashicorp/consul/api v1.32.1 // indirect
-	github.com/hashicorp/copywrite v0.25.0 // indirect
-	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/hashicorp/go-azure-helpers v0.72.0 // indirect
-	github.com/hashicorp/go-azure-sdk/resource-manager v0.20250131.1134653 // indirect
-	github.com/hashicorp/go-azure-sdk/sdk v0.20250131.1134653 // indirect
-	github.com/hashicorp/go-cty v1.4.1 // indirect
-	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
-	github.com/hashicorp/go-metrics v0.5.4 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
-	github.com/hashicorp/golang-lru v1.0.2 // indirect
-	github.com/hashicorp/logutils v1.0.0 // indirect
-	github.com/hashicorp/serf v0.10.2 // indirect
-	github.com/hashicorp/terraform-plugin-go v0.26.0 // indirect
-	github.com/hashicorp/terraform-plugin-log v0.10.0 // indirect
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.36.1 // indirect
-	github.com/hashicorp/yamux v0.1.2 // indirect
+	github.com/dumb-hashicorp/aws-sdk-go-base/v2 v2.0.0-beta.72 // indirect
+	github.com/dumb-hashicorp/dumb-consul/api v1.32.1 // indirect
+	github.com/dumb-hashicorp/copywrite v0.25.0 // indirect
+	github.com/dumb-hashicorp/errwrap v1.1.0 // indirect
+	github.com/dumb-hashicorp/go-azure-helpers v0.72.0 // indirect
+	github.com/dumb-hashicorp/go-azure-sdk/resource-manager v0.20250131.1134653 // indirect
+	github.com/dumb-hashicorp/go-azure-sdk/sdk v0.20250131.1134653 // indirect
+	github.com/dumb-hashicorp/go-cty v1.4.1 // indirect
+	github.com/dumb-hashicorp/go-immutable-radix v1.3.1 // indirect
+	github.com/dumb-hashicorp/go-metrics v0.5.4 // indirect
+	github.com/dumb-hashicorp/go-multierror v1.1.1 // indirect
+	github.com/dumb-hashicorp/go-rootcerts v1.0.2 // indirect
+	github.com/dumb-hashicorp/golang-lru v1.0.2 // indirect
+	github.com/dumb-hashicorp/logutils v1.0.0 // indirect
+	github.com/dumb-hashicorp/serf v0.10.2 // indirect
+	github.com/dumb-hashicorp/dumb-terraform-plugin-go v0.26.0 // indirect
+	github.com/dumb-hashicorp/dumb-terraform-plugin-log v0.10.0 // indirect
+	github.com/dumb-hashicorp/dumb-terraform-plugin-sdk/v2 v2.36.1 // indirect
+	github.com/dumb-hashicorp/yamux v0.1.2 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackofallops/giovanni v0.28.0 // indirect
@@ -336,28 +336,28 @@ require (
 // these modules as a separate unit. (But please add to this only as a last
 // resort!)
 
-replace github.com/hashicorp/terraform/internal/backend/remote-state/azure => ./internal/backend/remote-state/azure
+replace github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/azure => ./internal/backend/remote-state/azure
 
-replace github.com/hashicorp/terraform/internal/backend/remote-state/consul => ./internal/backend/remote-state/consul
+replace github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/dumb-consul => ./internal/backend/remote-state/dumb-consul
 
-replace github.com/hashicorp/terraform/internal/backend/remote-state/cos => ./internal/backend/remote-state/cos
+replace github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/cos => ./internal/backend/remote-state/cos
 
-replace github.com/hashicorp/terraform/internal/backend/remote-state/gcs => ./internal/backend/remote-state/gcs
+replace github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/gcs => ./internal/backend/remote-state/gcs
 
-replace github.com/hashicorp/terraform/internal/backend/remote-state/kubernetes => ./internal/backend/remote-state/kubernetes
+replace github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/kubernetes => ./internal/backend/remote-state/kubernetes
 
-replace github.com/hashicorp/terraform/internal/backend/remote-state/oss => ./internal/backend/remote-state/oss
+replace github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/oss => ./internal/backend/remote-state/oss
 
-replace github.com/hashicorp/terraform/internal/backend/remote-state/pg => ./internal/backend/remote-state/pg
+replace github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/pg => ./internal/backend/remote-state/pg
 
-replace github.com/hashicorp/terraform/internal/backend/remote-state/s3 => ./internal/backend/remote-state/s3
+replace github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/s3 => ./internal/backend/remote-state/s3
 
-replace github.com/hashicorp/terraform/internal/backend/remote-state/oci => ./internal/backend/remote-state/oci
+replace github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/oci => ./internal/backend/remote-state/oci
 
-replace github.com/hashicorp/terraform/internal/legacy => ./internal/legacy
+replace github.com/dumb-hashicorp/dumb-terraform/internal/legacy => ./internal/legacy
 
 tool (
-	github.com/hashicorp/copywrite
+	github.com/dumb-hashicorp/copywrite
 	github.com/nishanths/exhaustive/cmd/exhaustive
 	go.uber.org/mock/mockgen
 	golang.org/x/tools/cmd/cover

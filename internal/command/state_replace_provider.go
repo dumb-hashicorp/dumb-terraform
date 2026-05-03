@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StateReplaceProviderCommand is a Command implementation that allows users
@@ -142,7 +142,7 @@ func (c *StateReplaceProviderCommand) Run(args []string) int {
 
 	// Explain the changes
 	colorize := c.Colorize()
-	c.Ui.Output("Terraform will perform the following actions:\n")
+	c.Ui.Output("Dumb Terraform will perform the following actions:\n")
 	c.Ui.Output(colorize.Color("  [yellow]~[reset] Updating provider:"))
 	c.Ui.Output(colorize.Color(fmt.Sprintf("    [red]-[reset] %s", from)))
 	c.Ui.Output(colorize.Color(fmt.Sprintf("    [green]+[reset] %s\n", to)))
@@ -183,7 +183,7 @@ func (c *StateReplaceProviderCommand) Run(args []string) int {
 	}
 
 	// Get schemas, if possible, before writing state
-	var schemas *terraform.Schemas
+	var schemas *dumb-terraform.Schemas
 	if isCloudMode(b) {
 		var schemaDiags tfdiags.Diagnostics
 		schemas, schemaDiags = c.MaybeGetSchemas(state, nil)
@@ -207,9 +207,9 @@ func (c *StateReplaceProviderCommand) Run(args []string) int {
 
 func (c *StateReplaceProviderCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] state replace-provider [options] FROM_PROVIDER_FQN TO_PROVIDER_FQN
+Usage: dumb-terraform [global options] state replace-provider [options] FROM_PROVIDER_FQN TO_PROVIDER_FQN
 
-  Replace provider for resources in the Terraform state.
+  Replace provider for resources in the Dumb Terraform state.
 
 Options:
 
@@ -229,7 +229,7 @@ Options:
                           once to set more than one variable.
 
   -var-file=filename      Load variable values from the given file, in addition
-                          to the default files terraform.tfvars and *.auto.tfvars.
+                          to the default files dumb-terraform.tfvars and *.auto.tfvars.
                           Use this option more than once to include more than one
                           variables file.
 

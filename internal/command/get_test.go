@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	backendCloud "github.com/hashicorp/terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	backendCloud "github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
 )
 
 func TestGet(t *testing.T) {
@@ -87,7 +87,7 @@ func TestGet_update(t *testing.T) {
 }
 
 func TestGet_cancel(t *testing.T) {
-	// This test runs `terraform get` as if SIGINT (or similar on other
+	// This test runs `dumb-terraform get` as if SIGINT (or similar on other
 	// platforms) were sent to it, testing that it is interruptible.
 
 	wd := tempWorkingDirFixture(t, "init-registry-module")

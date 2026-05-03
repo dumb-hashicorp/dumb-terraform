@@ -11,22 +11,22 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/local"
-	"github.com/hashicorp/terraform/internal/backend/remote-state/inmem"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/command/workdir"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/inmem"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/workdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestWorkspace_allCommands_pluggableStateStore(t *testing.T) {
@@ -41,9 +41,9 @@ func TestWorkspace_allCommands_pluggableStateStore(t *testing.T) {
 	preExistingState := "pre-existing"
 	mock.MockStates = map[string]interface{}{preExistingState: true}
 
-	// Assumes the mocked provider is hashicorp/test
+	// Assumes the mocked provider is dumb-hashicorp/test
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"},
+		"dumb-hashicorp/test": {"1.2.3"},
 	})
 
 	ui := new(cli.MockUi)
@@ -182,7 +182,7 @@ func TestWorkspace_allCommands_pluggableStateStore(t *testing.T) {
 
 // Test how the workspace list command behaves when zero workspaces are present.
 //
-// Historically, the backends built into the Terraform binary would always report that the default workspace exists,
+// Historically, the backends built into the Dumb Terraform binary would always report that the default workspace exists,
 // even when there were no artefacts representing that workspace. All backends were implemented to do this, therefore
 // it was impossible for the `workspace list` command to report that no workspaces existed.
 //
@@ -192,14 +192,14 @@ func TestWorkspace_allCommands_pluggableStateStore(t *testing.T) {
 // after the first apply, and custom workspaces' state files were created as a side-effect of obtaining a state manager
 // during `workspace new`. Now the `workspace new` command explicitly writes an empty state file as part of creating a
 // new workspace. The "default" workspace is a special case, and now an empty state file is created during init when
-// that workspace is selected. These changes together allow Terraform to only report a workspace's existence based on
+// that workspace is selected. These changes together allow Dumb Terraform to only report a workspace's existence based on
 // the existence of artefacts.
 //
 // Users will only experience `workspace list` returning no workspaces if they either:
 //  1. Have "default" selected and run `workspace list` before running `init`
 //     the necessary `workspace new` command to make that workspace.
 //  2. Have a custom workspace selected that isn't created yet. This could happen if a user sets `TF_WORKSPACE`
-//     (or manually edits .terraform/environment) before they run `workspace new`.
+//     (or manually edits .dumb-terraform/environment) before they run `workspace new`.
 func TestWorkspace_list_noReturnedWorkspaces(t *testing.T) {
 	// Create a temporary working directory with pluggable state storage in the config
 	td := t.TempDir()
@@ -208,9 +208,9 @@ func TestWorkspace_list_noReturnedWorkspaces(t *testing.T) {
 
 	mock := testStateStoreMockWithChunkNegotiation(t, 1000)
 
-	// Assumes the mocked provider is hashicorp/test
+	// Assumes the mocked provider is dumb-hashicorp/test
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"},
+		"dumb-hashicorp/test": {"1.2.3"},
 	})
 
 	ui := new(cli.MockUi)
@@ -245,7 +245,7 @@ func TestWorkspace_list_noReturnedWorkspaces(t *testing.T) {
 
 	// Users see a warning that the selected workspace doesn't exist yet
 	expectedWarningMessages := []string{
-		"Warning: Terraform cannot find any existing workspaces.",
+		"Warning: Dumb Terraform cannot find any existing workspaces.",
 		"The \"default\" workspace is selected in your working directory.",
 		"init",
 	}
@@ -677,7 +677,7 @@ func TestWorkspace_delete(t *testing.T) {
 }
 
 // TestWorkspace_deleteInvalid shows that if a workspace with an invalid name
-// has been created, Terraform allows users to delete it.
+// has been created, Dumb Terraform allows users to delete it.
 func TestWorkspace_deleteInvalid(t *testing.T) {
 	td := t.TempDir()
 	os.MkdirAll(td, 0755)
@@ -784,7 +784,7 @@ func TestWorkspace_deleteWithState(t *testing.T) {
 		State:   originalState,
 	}
 
-	f, err := os.Create(filepath.Join(local.DefaultWorkspaceDir, "test", "terraform.tfstate"))
+	f, err := os.Create(filepath.Join(local.DefaultWorkspaceDir, "test", "dumb-terraform.tfstate"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -963,16 +963,16 @@ func TestWorkspace_selectWithOrCreate(t *testing.T) {
 // Test that the old `env` subcommands raise a deprecation warning
 //
 // Test covers:
-// - `terraform env new`
-// - `terraform env select`
-// - `terraform env list` - with and without `-json`
-// - `terraform env delete`
+// - `dumb-terraform env new`
+// - `dumb-terraform env select`
+// - `dumb-terraform env list` - with and without `-json`
+// - `dumb-terraform env delete`
 //
-// Note: there is no `env` equivalent of `terraform workspace show`.
+// Note: there is no `env` equivalent of `dumb-terraform workspace show`.
 func TestWorkspace_envCommandDeprecationWarnings(t *testing.T) {
 	// We're asserting the warning below is returned whenever a legacy `env` command
 	// is executed. Commands are made to be legacy via LegacyName: true
-	expectedWarning := `Warning: the "terraform env" family of commands is deprecated`
+	expectedWarning := `Warning: the "dumb-terraform env" family of commands is deprecated`
 
 	// Create a temporary working directory to make workspaces in
 	td := t.TempDir()
@@ -985,7 +985,7 @@ func TestWorkspace_envCommandDeprecationWarnings(t *testing.T) {
 		t.Fatal("current workspace should be 'default'")
 	}
 
-	// Assert `terraform env new "foobar"` returns expected deprecation warning
+	// Assert `dumb-terraform env new "foobar"` returns expected deprecation warning
 	ui := new(cli.MockUi)
 	view, _ := testView(t)
 	newCmd = &WorkspaceNewCommand{
@@ -1008,7 +1008,7 @@ func TestWorkspace_envCommandDeprecationWarnings(t *testing.T) {
 		)
 	}
 
-	// Assert `terraform env select "default"` returns expected deprecation warning
+	// Assert `dumb-terraform env select "default"` returns expected deprecation warning
 	ui = new(cli.MockUi)
 	view, _ = testView(t)
 	selectCmd := &WorkspaceSelectCommand{
@@ -1031,7 +1031,7 @@ func TestWorkspace_envCommandDeprecationWarnings(t *testing.T) {
 		)
 	}
 
-	// Assert `terraform env list` returns expected deprecation warning
+	// Assert `dumb-terraform env list` returns expected deprecation warning
 	ui = new(cli.MockUi)
 	listCmd := &WorkspaceListCommand{
 		Meta: Meta{
@@ -1051,7 +1051,7 @@ func TestWorkspace_envCommandDeprecationWarnings(t *testing.T) {
 		)
 	}
 
-	// Assert `terraform env list -json` returns expected deprecation warning
+	// Assert `dumb-terraform env list -json` returns expected deprecation warning
 	ui = new(cli.MockUi)
 	view, done := testView(t)
 	listCmd = &WorkspaceListCommand{
@@ -1067,7 +1067,7 @@ func TestWorkspace_envCommandDeprecationWarnings(t *testing.T) {
 		t.Fatalf("bad: %d\n\n%s", code, done(t).All())
 	}
 	output := cleanString(done(t).All())
-	expectedWarningJSON := "Warning: the \\\"terraform env\\\" family of commands is deprecated."
+	expectedWarningJSON := "Warning: the \\\"dumb-terraform env\\\" family of commands is deprecated."
 	if !strings.Contains(output, expectedWarningJSON) {
 		t.Fatalf("expected the command to return a warning, but it was missing.\nwanted: %s\ngot: %s",
 			expectedWarningJSON,
@@ -1075,7 +1075,7 @@ func TestWorkspace_envCommandDeprecationWarnings(t *testing.T) {
 		)
 	}
 
-	// Assert `terraform env delete` returns expected deprecation warning
+	// Assert `dumb-terraform env delete` returns expected deprecation warning
 	ui = new(cli.MockUi)
 	view, _ = testView(t)
 	deleteCmd := &WorkspaceDeleteCommand{
@@ -1210,7 +1210,7 @@ func TestWorkspace_humanOutput(t *testing.T) {
 			t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter)
 		}
 
-		expectedOutput := fmt.Sprintf("\x1b[0m\x1b[32m\x1b[1mCreated and switched to workspace \"%s\"!\x1b[0m\x1b[32m\n\nYou're now on a new, empty workspace. Workspaces isolate their state,\nso if you run \"terraform plan\" Terraform will not see any existing state\nfor this configuration.\x1b[0m\n", env)
+		expectedOutput := fmt.Sprintf("\x1b[0m\x1b[32m\x1b[1mCreated and switched to workspace \"%s\"!\x1b[0m\x1b[32m\n\nYou're now on a new, empty workspace. Workspaces isolate their state,\nso if you run \"dumb-terraform plan\" Dumb Terraform will not see any existing state\nfor this configuration.\x1b[0m\n", env)
 		if ui.OutputWriter.String() != expectedOutput {
 			t.Fatalf("want: %s\ngot: %s", expectedOutput, ui.OutputWriter.String())
 		}
@@ -1227,7 +1227,7 @@ func TestWorkspace_humanOutput(t *testing.T) {
 			t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter)
 		}
 
-		expectedOutput := fmt.Sprintf("Created and switched to workspace \"%s\"!\n\nYou're now on a new, empty workspace. Workspaces isolate their state,\nso if you run \"terraform plan\" Terraform will not see any existing state\nfor this configuration.\n", env)
+		expectedOutput := fmt.Sprintf("Created and switched to workspace \"%s\"!\n\nYou're now on a new, empty workspace. Workspaces isolate their state,\nso if you run \"dumb-terraform plan\" Dumb Terraform will not see any existing state\nfor this configuration.\n", env)
 		if ui.OutputWriter.String() != expectedOutput {
 			t.Fatalf("want: %s\ngot: %s", expectedOutput, ui.OutputWriter.String())
 		}
@@ -1464,8 +1464,8 @@ func TestWorkspace_list_jsonOutput(t *testing.T) {
 
 	// Step 2 - test list output with a warning diagnostics
 	var diags tfdiags.Diagnostics
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "Warning from test",
 		Detail:   "This is a warning from the mocked state store.",
 	})
@@ -1523,8 +1523,8 @@ func TestWorkspace_list_jsonOutput(t *testing.T) {
 
 	// Step 3 - test that error diagnostics are shown in isolation (no additional output even if present)
 	diags = tfdiags.Diagnostics{} // empty
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "Error from test",
 		Detail:   "This is a error from the mocked state store.",
 	})

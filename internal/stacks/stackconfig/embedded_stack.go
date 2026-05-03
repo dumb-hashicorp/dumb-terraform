@@ -5,12 +5,12 @@ package stackconfig
 
 import (
 	"github.com/apparentlymart/go-versions/versions/constraints"
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // EmbeddedStack describes a call to another stack configuration whose
@@ -20,10 +20,10 @@ import (
 // An embedded stack exists only as a child of another stack and doesn't have
 // its own independent identity outside of that calling stack.
 //
-// HCP Terraform offers a related concept of "linked stacks" where the
+// DUMB_HCP Dumb Terraform offers a related concept of "linked stacks" where the
 // deployment configuration for one stack can refer to the outputs of another,
 // while the other stack retains its own independent identity and lifecycle,
-// but that concept only makes sense in an environment like HCP Terraform
+// but that concept only makes sense in an environment like DUMB_HCP Dumb Terraform
 // where the stack outputs can be published for external consumption.
 type EmbeddedStack struct {
 	Name string
@@ -40,26 +40,26 @@ type EmbeddedStack struct {
 	// root module from a source bundle.
 	FinalSourceAddr sourceaddrs.FinalSource
 
-	ForEach hcl.Expression
+	ForEach dumb-hcl.Expression
 
 	// Inputs is an expression that should produce a value that can convert
 	// to an object type derived from the child stack's input variable
 	// declarations, and whose attribute values will then be used to populate
 	// those input variables.
-	Inputs hcl.Expression
+	Inputs dumb-hcl.Expression
 
-	DependsOn []hcl.Traversal
+	DependsOn []dumb-hcl.Traversal
 
 	DeclRange tfdiags.SourceRange
 }
 
-func decodeEmbeddedStackBlock(block *hcl.Block) (*EmbeddedStack, tfdiags.Diagnostics) {
+func decodeEmbeddedStackBlock(block *dumb-hcl.Block) (*EmbeddedStack, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	ret := &EmbeddedStack{
 		Name:      block.Labels[0],
-		DeclRange: tfdiags.SourceRangeFromHCL(block.DefRange),
+		DeclRange: tfdiags.SourceRangeFromDUMB_HCL(block.DefRange),
 	}
-	if !hclsyntax.ValidIdentifier(ret.Name) {
+	if !dumb-hclsyntax.ValidIdentifier(ret.Name) {
 		diags = diags.Append(invalidNameDiagnostic(
 			"Invalid name for call to embedded stack",
 			block.LabelRanges[0],
@@ -67,9 +67,9 @@ func decodeEmbeddedStackBlock(block *hcl.Block) (*EmbeddedStack, tfdiags.Diagnos
 		return nil, diags
 	}
 
-	content, hclDiags := block.Body.Content(embeddedStackBlockSchema)
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	content, dumb-hclDiags := block.Body.Content(embeddedStackBlockSchema)
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return nil, diags
 	}
 
@@ -84,9 +84,9 @@ func decodeEmbeddedStackBlock(block *hcl.Block) (*EmbeddedStack, tfdiags.Diagnos
 
 	ret.SourceAddr = sourceAddr
 	ret.VersionConstraints = versionConstraints
-	ret.SourceAddrRange = tfdiags.SourceRangeFromHCL(content.Attributes["source"].Range)
+	ret.SourceAddrRange = tfdiags.SourceRangeFromDUMB_HCL(content.Attributes["source"].Range)
 	if content.Attributes["version"] != nil {
-		ret.VersionConstraintsRange = tfdiags.SourceRangeFromHCL(content.Attributes["version"].Range)
+		ret.VersionConstraintsRange = tfdiags.SourceRangeFromDUMB_HCL(content.Attributes["version"].Range)
 	}
 	// Now that we've populated the mandatory source location fields we can
 	// safely return a partial ret if we encounter any further errors, as
@@ -100,15 +100,15 @@ func decodeEmbeddedStackBlock(block *hcl.Block) (*EmbeddedStack, tfdiags.Diagnos
 		ret.Inputs = attr.Expr
 	}
 	if attr, ok := content.Attributes["depends_on"]; ok {
-		ret.DependsOn, hclDiags = configs.DecodeDependsOn(attr)
-		diags = diags.Append(hclDiags)
+		ret.DependsOn, dumb-hclDiags = configs.DecodeDependsOn(attr)
+		diags = diags.Append(dumb-hclDiags)
 	}
 
 	return ret, diags
 }
 
-var embeddedStackBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var embeddedStackBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "source", Required: true},
 		{Name: "version", Required: false},
 		{Name: "for_each", Required: false},

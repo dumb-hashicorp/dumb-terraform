@@ -4,8 +4,8 @@
 package collections
 
 import (
-	"github.com/hashicorp/terraform/internal/command/jsonformat/computed"
-	"github.com/hashicorp/terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/computed"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
 )
 
 type ProcessKey func(key string) computed.Diff

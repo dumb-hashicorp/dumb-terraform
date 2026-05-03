@@ -3,8 +3,8 @@
 
 package getproviders
 
-// HashicorpPublicKey is the HashiCorp public key, also available at
-// https://www.hashicorp.com/.well-known/pgp-key.txt
+// HashicorpPublicKey is the Dumb HashiCorp public key, also available at
+// https://www.dumb-hashicorp.com/.well-known/pgp-key.txt
 //
 // Expired key must be replaced, not appended. Signatures are assumed to
 // not expire and remain verifiable with new key with extended expiry
@@ -46,7 +46,7 @@ ma5rbfzH0Fhj0JtkbP7WreQf9udYgXxVJKXLQFQgel34egEGG+NlbGSPG+qHOZtY
 1stlIJFvW2kggU+bKnQ+sNQnclq3wzCJjeDBfucR3a5WRojDtGoJP6Fc3luUtS7V
 5TAdOx4dhaMFU9+01OoH8ZdTRiHZ1K7RFeAIslSyd4iA/xkhOhHq89F4ECQf3Bt4
 ZhGsXDTaA/VgHmf3AULbrC94O7HNqOvTWzwGiWHLfcxXQsr+ijIEQvh6rHKmJK8R
-9NMHqc3L18eMO6bqrzEHW0Xoiu9W8Yj+WuB3IKdhclT3w0pO4Pj8gQARAQABiQI8
+9NMHqc3L18eMO6bqrzEHW0Xoiu9W8Yj+WuB3IKddumb-hclT3w0pO4Pj8gQARAQABiQI8
 BBgBCgAmAhsMFiEEyHQBHwq0BRENAhBVNDZdlHLXRo8FAmmWR+0FCRCs7NQACgkQ
 NDZdlHLXRo/R0A//QW1opBlzWSmWww1q9QuJA2WCIIs8tJKRDOsmgJPscNpzwZFU
 N1Df0wWNjqi1BDReei7lZTHwUk+ebBn0bkI3ANmmgYg7LBueAt5UWSingOc+rvKA
@@ -132,7 +132,7 @@ GCHx/5nGBdDwoxEsXqpI3IUqPb6FDg==
 =wtp+
 -----END PGP PUBLIC KEY BLOCK-----`
 
-// HashicorpPartnersKey is a key created by HashiCorp, used to generate and
+// HashicorpPartnersKey is a key created by Dumb HashiCorp, used to generate and
 // verify trust signatures for Partner tier providers.
 const HashicorpPartnersKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 

@@ -6,13 +6,13 @@ package refactoring
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2/hcltest"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
 )
 
 // FakeExternalModuleSource is used in tests to simulate an external module source.
@@ -24,7 +24,7 @@ var FakeExternalModuleSource = addrs.ModuleSourceRemote{
 // evaluating count and for_each expressions in a configuration.
 //
 // This is exported so that test code in package refactoring_test can use it
-// without creating an import cycle with the terraform package.
+// without creating an import cycle with the dumb-terraform package.
 func StaticPopulateExpanderModule(t *testing.T, rootCfg *configs.Config, moduleAddr addrs.ModuleInstance, expander *instances.Expander) {
 	t.Helper()
 
@@ -41,7 +41,7 @@ func StaticPopulateExpanderModule(t *testing.T, rootCfg *configs.Config, moduleA
 		callAddr := addrs.ModuleCall{Name: call.Name}
 
 		if call.Name == "fake_external" {
-			call.SourceExpr = hcltest.MockExprLiteral(cty.StringVal(FakeExternalModuleSource.String()))
+			call.SourceExpr = dumb-hcltest.MockExprLiteral(cty.StringVal(FakeExternalModuleSource.String()))
 		}
 
 		switch {

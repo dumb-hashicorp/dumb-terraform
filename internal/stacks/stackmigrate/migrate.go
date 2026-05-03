@@ -7,24 +7,24 @@ import (
 	"fmt"
 	"iter"
 
-	"github.com/hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// Migration is a struct that aids in migrating a terraform state to a stack configuration.
+// Migration is a struct that aids in migrating a dumb-terraform state to a stack configuration.
 type Migration struct {
 	// Providers is a map of provider addresses available to the stack.
 	Providers map[addrs.Provider]providers.Factory
 
-	// PreviousState is the terraform core state that we are migrating from.
+	// PreviousState is the dumb-terraform core state that we are migrating from.
 	PreviousState *states.State
 	Config        *stackconfig.Config
 }

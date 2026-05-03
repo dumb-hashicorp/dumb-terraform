@@ -5,7 +5,7 @@ package s3
 
 import (
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var diagnosticComparer cmp.Option = cmp.Comparer(diagnosticComparerS3)

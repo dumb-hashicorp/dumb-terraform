@@ -7,11 +7,11 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestParseRefInTestingScope(t *testing.T) {
@@ -90,12 +90,12 @@ func TestParseRefInTestingScope(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 9, Byte: 8},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "value",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 9, Byte: 8},
-							End:   hcl.Pos{Line: 1, Column: 15, Byte: 14},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 9, Byte: 8},
+							End:   dumb-hcl.Pos{Line: 1, Column: 15, Byte: 14},
 						},
 					},
 				},
@@ -131,7 +131,7 @@ func TestParseRefInTestingScope(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.Input, func(t *testing.T) {
-			traversal, travDiags := hclsyntax.ParseTraversalAbs([]byte(test.Input), "", hcl.Pos{Line: 1, Column: 1})
+			traversal, travDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(test.Input), "", dumb-hcl.Pos{Line: 1, Column: 1})
 			if travDiags.HasErrors() {
 				t.Fatal(travDiags.Error())
 			}
@@ -195,12 +195,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 12, Byte: 11},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "blah",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 12, Byte: 11},
-							End:   hcl.Pos{Line: 1, Column: 17, Byte: 16},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
+							End:   dumb-hcl.Pos{Line: 1, Column: 17, Byte: 16},
 						},
 					},
 				},
@@ -242,12 +242,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 11, Byte: 10},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "blah",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 11, Byte: 10},
-							End:   hcl.Pos{Line: 1, Column: 16, Byte: 15},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 11, Byte: 10},
+							End:   dumb-hcl.Pos{Line: 1, Column: 16, Byte: 15},
 						},
 					},
 				},
@@ -294,12 +294,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 18, Byte: 17},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "bar",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 18, Byte: 17},
-							End:   hcl.Pos{Line: 1, Column: 22, Byte: 21},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 18, Byte: 17},
+							End:   dumb-hcl.Pos{Line: 1, Column: 22, Byte: 21},
 						},
 					},
 				},
@@ -321,12 +321,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 25, Byte: 24},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "bar",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 25, Byte: 24},
-							End:   hcl.Pos{Line: 1, Column: 29, Byte: 28},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 25, Byte: 24},
+							End:   dumb-hcl.Pos{Line: 1, Column: 29, Byte: 28},
 						},
 					},
 				},
@@ -392,12 +392,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 23, Byte: 22},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "bar",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 23, Byte: 22},
-							End:   hcl.Pos{Line: 1, Column: 27, Byte: 26},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 23, Byte: 22},
+							End:   dumb-hcl.Pos{Line: 1, Column: 27, Byte: 26},
 						},
 					},
 				},
@@ -419,12 +419,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 30, Byte: 29},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "bar",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 30, Byte: 29},
-							End:   hcl.Pos{Line: 1, Column: 34, Byte: 33},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 30, Byte: 29},
+							End:   dumb-hcl.Pos{Line: 1, Column: 34, Byte: 33},
 						},
 					},
 				},
@@ -484,12 +484,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 10, Byte: 9},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "blah",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 10, Byte: 9},
-							End:   hcl.Pos{Line: 1, Column: 15, Byte: 14},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 10, Byte: 9},
+							End:   dumb-hcl.Pos{Line: 1, Column: 15, Byte: 14},
 						},
 					},
 				},
@@ -506,12 +506,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 10, Byte: 9},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseIndex{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseIndex{
 						Key: cty.StringVal("blah"),
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 10, Byte: 9},
-							End:   hcl.Pos{Line: 1, Column: 18, Byte: 17},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 10, Byte: 9},
+							End:   dumb-hcl.Pos{Line: 1, Column: 18, Byte: 17},
 						},
 					},
 				},
@@ -576,12 +576,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 15, Byte: 14},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "baz",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 15, Byte: 14},
-							End:   hcl.Pos{Line: 1, Column: 19, Byte: 18},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 15, Byte: 14},
+							End:   dumb-hcl.Pos{Line: 1, Column: 19, Byte: 18},
 						},
 					},
 				},
@@ -639,12 +639,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 22, Byte: 21},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "boop",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 22, Byte: 21},
-							End:   hcl.Pos{Line: 1, Column: 27, Byte: 26},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 22, Byte: 21},
+							End:   dumb-hcl.Pos{Line: 1, Column: 27, Byte: 26},
 						},
 					},
 				},
@@ -686,12 +686,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 12, Byte: 11},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "blah",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 12, Byte: 11},
-							End:   hcl.Pos{Line: 1, Column: 17, Byte: 16},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
+							End:   dumb-hcl.Pos{Line: 1, Column: 17, Byte: 16},
 						},
 					},
 				},
@@ -729,12 +729,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 5, Byte: 4},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "blah",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 5, Byte: 4},
-							End:   hcl.Pos{Line: 1, Column: 10, Byte: 9},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 5, Byte: 4},
+							End:   dumb-hcl.Pos{Line: 1, Column: 10, Byte: 9},
 						},
 					},
 				},
@@ -742,11 +742,11 @@ func TestParseRef(t *testing.T) {
 			``,
 		},
 
-		// terraform
+		// dumb-terraform
 		{
-			`terraform.workspace`,
+			`dumb-terraform.workspace`,
 			&Reference{
-				Subject: TerraformAttr{
+				Subject: Dumb TerraformAttr{
 					Name: "workspace",
 				},
 				SourceRange: tfdiags.SourceRange{
@@ -757,21 +757,21 @@ func TestParseRef(t *testing.T) {
 			``,
 		},
 		{
-			`terraform.workspace.blah`,
+			`dumb-terraform.workspace.blah`,
 			&Reference{
-				Subject: TerraformAttr{
+				Subject: Dumb TerraformAttr{
 					Name: "workspace",
 				},
 				SourceRange: tfdiags.SourceRange{
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 20, Byte: 19},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "blah",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 20, Byte: 19},
-							End:   hcl.Pos{Line: 1, Column: 25, Byte: 24},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 20, Byte: 19},
+							End:   dumb-hcl.Pos{Line: 1, Column: 25, Byte: 24},
 						},
 					},
 				},
@@ -779,14 +779,14 @@ func TestParseRef(t *testing.T) {
 			``, // valid at this layer, but will fail during eval because "workspace" is a string
 		},
 		{
-			`terraform`,
+			`dumb-terraform`,
 			nil,
-			`The "terraform" object cannot be accessed directly. Instead, access one of its attributes.`,
+			`The "dumb-terraform" object cannot be accessed directly. Instead, access one of its attributes.`,
 		},
 		{
-			`terraform["workspace"]`,
+			`dumb-terraform["workspace"]`,
 			nil,
-			`The "terraform" object does not support this operation.`,
+			`The "dumb-terraform" object does not support this operation.`,
 		},
 
 		// var
@@ -813,12 +813,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 8, Byte: 7},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "blah",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 8, Byte: 7},
-							End:   hcl.Pos{Line: 1, Column: 13, Byte: 12},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 8, Byte: 7},
+							End:   dumb-hcl.Pos{Line: 1, Column: 13, Byte: 12},
 						},
 					},
 				},
@@ -839,7 +839,7 @@ func TestParseRef(t *testing.T) {
 		// the "resource" prefix forces interpreting the next name as a
 		// resource type name. This is an alias for just using a resource
 		// type name at the top level, to be used only if a later edition
-		// of the Terraform language introduces a new reserved word that
+		// of the Dumb Terraform language introduces a new reserved word that
 		// overlaps with a resource type name.
 		{
 			`resource.boop_instance.foo`,
@@ -863,17 +863,17 @@ func TestParseRef(t *testing.T) {
 		{
 			`template.foo`,
 			nil,
-			`The symbol name "template" is reserved for use in a future Terraform version. If you are using a provider that already uses this as a resource type name, add the prefix "resource." to force interpretation as a resource type name.`,
+			`The symbol name "template" is reserved for use in a future Dumb Terraform version. If you are using a provider that already uses this as a resource type name, add the prefix "resource." to force interpretation as a resource type name.`,
 		},
 		{
 			`lazy.foo`,
 			nil,
-			`The symbol name "lazy" is reserved for use in a future Terraform version. If you are using a provider that already uses this as a resource type name, add the prefix "resource." to force interpretation as a resource type name.`,
+			`The symbol name "lazy" is reserved for use in a future Dumb Terraform version. If you are using a provider that already uses this as a resource type name, add the prefix "resource." to force interpretation as a resource type name.`,
 		},
 		{
 			`arg.foo`,
 			nil,
-			`The symbol name "arg" is reserved for use in a future Terraform version. If you are using a provider that already uses this as a resource type name, add the prefix "resource." to force interpretation as a resource type name.`,
+			`The symbol name "arg" is reserved for use in a future Dumb Terraform version. If you are using a provider that already uses this as a resource type name, add the prefix "resource." to force interpretation as a resource type name.`,
 		},
 
 		// anything else, interpreted as a managed resource reference
@@ -906,12 +906,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 18, Byte: 17},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "bar",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 18, Byte: 17},
-							End:   hcl.Pos{Line: 1, Column: 22, Byte: 21},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 18, Byte: 17},
+							End:   dumb-hcl.Pos{Line: 1, Column: 22, Byte: 21},
 						},
 					},
 				},
@@ -933,12 +933,12 @@ func TestParseRef(t *testing.T) {
 					Start: tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
 					End:   tfdiags.SourcePos{Line: 1, Column: 25, Byte: 24},
 				},
-				Remaining: hcl.Traversal{
-					hcl.TraverseAttr{
+				Remaining: dumb-hcl.Traversal{
+					dumb-hcl.TraverseAttr{
 						Name: "bar",
-						SrcRange: hcl.Range{
-							Start: hcl.Pos{Line: 1, Column: 25, Byte: 24},
-							End:   hcl.Pos{Line: 1, Column: 29, Byte: 28},
+						SrcRange: dumb-hcl.Range{
+							Start: dumb-hcl.Pos{Line: 1, Column: 25, Byte: 24},
+							End:   dumb-hcl.Pos{Line: 1, Column: 29, Byte: 28},
 						},
 					},
 				},
@@ -1101,7 +1101,7 @@ func TestParseRef(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Input, func(t *testing.T) {
-			traversal, travDiags := hclsyntax.ParseTraversalAbs([]byte(test.Input), "", hcl.Pos{Line: 1, Column: 1})
+			traversal, travDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(test.Input), "", dumb-hcl.Pos{Line: 1, Column: 1})
 			if travDiags.HasErrors() {
 				t.Fatal(travDiags.Error())
 			}

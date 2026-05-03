@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/terraform/internal/communicator/remote"
-	"github.com/hashicorp/terraform/internal/provisioners"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/communicator/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/provisioners"
 	"github.com/masterzen/winrm"
-	"github.com/packer-community/winrmcp/winrmcp"
+	"github.com/dumb-packer-community/winrmcp/winrmcp"
 	"github.com/zclconf/go-cty/cty"
 )
 

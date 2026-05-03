@@ -9,13 +9,13 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	"github.com/hashicorp/terraform/internal/provisioners"
-	proto "github.com/hashicorp/terraform/internal/tfplugin5"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/provisioners"
+	proto "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin5"
 	"github.com/zclconf/go-cty/cty"
 	"go.uber.org/mock/gomock"
 
-	mockproto "github.com/hashicorp/terraform/internal/plugin/mock_proto"
+	mockproto "github.com/dumb-hashicorp/dumb-terraform/internal/plugin/mock_proto"
 )
 
 var _ provisioners.Interface = (*GRPCProvisioner)(nil)
@@ -75,7 +75,7 @@ func TestGRPCProvisioner_ValidateProvisionerConfig(t *testing.T) {
 		gomock.Any(),
 	).Return(&proto.ValidateProvisionerConfig_Response{}, nil)
 
-	cfg := hcl2shim.HCL2ValueFromConfigValue(map[string]interface{}{"attr": "value"})
+	cfg := dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(map[string]interface{}{"attr": "value"})
 	resp := p.ValidateProvisionerConfig(provisioners.ValidateProvisionerConfigRequest{Config: cfg})
 	checkDiags(t, resp.Diagnostics)
 }

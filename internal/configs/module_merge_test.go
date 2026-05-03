@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/hcl/v2/ext/typeexpr"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/typeexpr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func TestModuleOverrideVariable(t *testing.T) {
@@ -35,14 +35,14 @@ func TestModuleOverrideVariable(t *testing.T) {
 			Type:           cty.String,
 			ConstraintType: cty.String,
 			ParsingMode:    VariableParseLiteral,
-			DeclRange: hcl.Range{
+			DeclRange: dumb-hcl.Range{
 				Filename: "testdata/valid-modules/override-variable/primary.tf",
-				Start: hcl.Pos{
+				Start: dumb-hcl.Pos{
 					Line:   1,
 					Column: 1,
 					Byte:   0,
 				},
-				End: hcl.Pos{
+				End: dumb-hcl.Pos{
 					Line:   1,
 					Column: 28,
 					Byte:   27,
@@ -59,14 +59,14 @@ func TestModuleOverrideVariable(t *testing.T) {
 			Type:           cty.String,
 			ConstraintType: cty.String,
 			ParsingMode:    VariableParseLiteral,
-			DeclRange: hcl.Range{
+			DeclRange: dumb-hcl.Range{
 				Filename: "testdata/valid-modules/override-variable/primary.tf",
-				Start: hcl.Pos{
+				Start: dumb-hcl.Pos{
 					Line:   7,
 					Column: 1,
 					Byte:   103,
 				},
-				End: hcl.Pos{
+				End: dumb-hcl.Pos{
 					Line:   7,
 					Column: 32,
 					Byte:   134,
@@ -94,39 +94,39 @@ func TestModuleOverrideModule(t *testing.T) {
 	got := mod.ModuleCalls["example"]
 	want := &ModuleCall{
 		Name: "example",
-		SourceExpr: mustExpr(hclsyntax.ParseExpression(
+		SourceExpr: mustExpr(dumb-hclsyntax.ParseExpression(
 			[]byte("\"./example2-a_override\""), "testdata/valid-modules/override-module/a_override.tf",
-			hcl.Pos{Line: 3, Column: 12, Byte: 31},
+			dumb-hcl.Pos{Line: 3, Column: 12, Byte: 31},
 		)),
-		DeclRange: hcl.Range{
+		DeclRange: dumb-hcl.Range{
 			Filename: "testdata/valid-modules/override-module/primary.tf",
-			Start: hcl.Pos{
+			Start: dumb-hcl.Pos{
 				Line:   2,
 				Column: 1,
 				Byte:   1,
 			},
-			End: hcl.Pos{
+			End: dumb-hcl.Pos{
 				Line:   2,
 				Column: 17,
 				Byte:   17,
 			},
 		},
-		DependsOn: []hcl.Traversal{
+		DependsOn: []dumb-hcl.Traversal{
 			{
-				hcl.TraverseRoot{
+				dumb-hcl.TraverseRoot{
 					Name: "null_resource",
-					SrcRange: hcl.Range{
+					SrcRange: dumb-hcl.Range{
 						Filename: "testdata/valid-modules/override-module/primary.tf",
-						Start:    hcl.Pos{Line: 11, Column: 17, Byte: 149},
-						End:      hcl.Pos{Line: 11, Column: 30, Byte: 162},
+						Start:    dumb-hcl.Pos{Line: 11, Column: 17, Byte: 149},
+						End:      dumb-hcl.Pos{Line: 11, Column: 30, Byte: 162},
 					},
 				},
-				hcl.TraverseAttr{
+				dumb-hcl.TraverseAttr{
 					Name: "test",
-					SrcRange: hcl.Range{
+					SrcRange: dumb-hcl.Range{
 						Filename: "testdata/valid-modules/override-module/primary.tf",
-						Start:    hcl.Pos{Line: 11, Column: 30, Byte: 162},
-						End:      hcl.Pos{Line: 11, Column: 35, Byte: 167},
+						Start:    dumb-hcl.Pos{Line: 11, Column: 30, Byte: 162},
+						End:      dumb-hcl.Pos{Line: 11, Column: 35, Byte: 167},
 					},
 				},
 			},
@@ -135,31 +135,31 @@ func TestModuleOverrideModule(t *testing.T) {
 			{
 				InChild: &ProviderConfigRef{
 					Name: "test",
-					NameRange: hcl.Range{
+					NameRange: dumb-hcl.Range{
 						Filename: "testdata/valid-modules/override-module/b_override.tf",
-						Start:    hcl.Pos{Line: 7, Column: 5, Byte: 97},
-						End:      hcl.Pos{Line: 7, Column: 9, Byte: 101},
+						Start:    dumb-hcl.Pos{Line: 7, Column: 5, Byte: 97},
+						End:      dumb-hcl.Pos{Line: 7, Column: 9, Byte: 101},
 					},
 				},
 				InParent: &ProviderConfigRef{
 					Name: "test",
-					NameRange: hcl.Range{
+					NameRange: dumb-hcl.Range{
 						Filename: "testdata/valid-modules/override-module/b_override.tf",
-						Start:    hcl.Pos{Line: 7, Column: 12, Byte: 104},
-						End:      hcl.Pos{Line: 7, Column: 16, Byte: 108},
+						Start:    dumb-hcl.Pos{Line: 7, Column: 12, Byte: 104},
+						End:      dumb-hcl.Pos{Line: 7, Column: 16, Byte: 108},
 					},
 					Alias: "b_override",
-					AliasRange: &hcl.Range{
+					AliasRange: &dumb-hcl.Range{
 						Filename: "testdata/valid-modules/override-module/b_override.tf",
-						Start:    hcl.Pos{Line: 7, Column: 16, Byte: 108},
-						End:      hcl.Pos{Line: 7, Column: 27, Byte: 119},
+						Start:    dumb-hcl.Pos{Line: 7, Column: 16, Byte: 108},
+						End:      dumb-hcl.Pos{Line: 7, Column: 27, Byte: 119},
 					},
 				},
 			},
 		},
 	}
 
-	// We're going to extract and nil out our hcl.Body here because DeepEqual
+	// We're going to extract and nil out our dumb-hcl.Body here because DeepEqual
 	// is not a useful way to assert on that.
 	gotConfig := got.Config
 	got.Config = nil
@@ -167,13 +167,13 @@ func TestModuleOverrideModule(t *testing.T) {
 	assertResultDeepEqual(t, got, want)
 
 	type content struct {
-		Kept  *string `hcl:"kept"`
-		Foo   *string `hcl:"foo"`
-		New   *string `hcl:"new"`
-		Newer *string `hcl:"newer"`
+		Kept  *string `dumb-hcl:"kept"`
+		Foo   *string `dumb-hcl:"foo"`
+		New   *string `dumb-hcl:"new"`
+		Newer *string `dumb-hcl:"newer"`
 	}
 	var gotArgs content
-	diags = gohcl.DecodeBody(gotConfig, nil, &gotArgs)
+	diags = godumb-hcl.DecodeBody(gotConfig, nil, &gotArgs)
 	assertNoDiagnostics(t, diags)
 
 	wantArgs := content{
@@ -187,8 +187,8 @@ func TestModuleOverrideModule(t *testing.T) {
 }
 
 func TestModuleOverrideDynamic(t *testing.T) {
-	schema := &hcl.BodySchema{
-		Blocks: []hcl.BlockHeaderSchema{
+	schema := &dumb-hcl.BodySchema{
+		Blocks: []dumb-hcl.BlockHeaderSchema{
 			{Type: "foo"},
 			{Type: "dynamic", LabelNames: []string{"type"}},
 		},
@@ -476,10 +476,10 @@ func TestModuleOverrideResourceFQNs(t *testing.T) {
 	wantProvider := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "bar", "test")
 	wantProviderCfg := &ProviderConfigRef{
 		Name: "bar-test",
-		NameRange: hcl.Range{
+		NameRange: dumb-hcl.Range{
 			Filename: "testdata/valid-modules/override-resource-provider/a_override.tf",
-			Start:    hcl.Pos{Line: 2, Column: 14, Byte: 51},
-			End:      hcl.Pos{Line: 2, Column: 22, Byte: 59},
+			Start:    dumb-hcl.Pos{Line: 2, Column: 14, Byte: 51},
+			End:      dumb-hcl.Pos{Line: 2, Column: 22, Byte: 59},
 		},
 	}
 
@@ -527,20 +527,20 @@ func TestModuleOverride_action_and_trigger(t *testing.T) {
 		Count:             nil,
 		ForEach:           nil,
 		ProviderConfigRef: nil,
-		Provider:          addrs.NewProvider(addrs.DefaultProviderRegistryHost, "hashicorp", "test"),
-		DeclRange: hcl.Range{
+		Provider:          addrs.NewProvider(addrs.DefaultProviderRegistryHost, "dumb-hashicorp", "test"),
+		DeclRange: dumb-hcl.Range{
 			Filename: "testdata/valid-modules/override-action-and-trigger/main.tf",
-			Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-			End:      hcl.Pos{Line: 1, Column: 28, Byte: 27},
+			Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			End:      dumb-hcl.Pos{Line: 1, Column: 28, Byte: 27},
 		},
-		TypeRange: hcl.Range{
+		TypeRange: dumb-hcl.Range{
 			Filename: "testdata/valid-modules/override-action-and-trigger/main.tf",
-			Start:    hcl.Pos{Line: 1, Column: 8, Byte: 7},
-			End:      hcl.Pos{Line: 1, Column: 21, Byte: 20},
+			Start:    dumb-hcl.Pos{Line: 1, Column: 8, Byte: 7},
+			End:      dumb-hcl.Pos{Line: 1, Column: 21, Byte: 20},
 		},
 	}
 
-	// We're going to extract and nil out our hcl.Body here because DeepEqual
+	// We're going to extract and nil out our dumb-hcl.Body here because DeepEqual
 	// is not a useful way to assert on that.
 	gotConfig := got.Config
 	got.Config = nil
@@ -549,10 +549,10 @@ func TestModuleOverride_action_and_trigger(t *testing.T) {
 
 	// now to check that config
 	type content struct {
-		Foo *string `hcl:"foo"`
+		Foo *string `dumb-hcl:"foo"`
 	}
 	var gotArgs content
-	diags = gohcl.DecodeBody(gotConfig, nil, &gotArgs)
+	diags = godumb-hcl.DecodeBody(gotConfig, nil, &gotArgs)
 	assertNoDiagnostics(t, diags)
 
 	wantArgs := content{

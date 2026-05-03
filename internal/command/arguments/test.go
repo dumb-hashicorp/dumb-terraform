@@ -4,25 +4,25 @@
 package arguments
 
 import (
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Test represents the command-line arguments for the test command.
 type Test struct {
 	// CloudRunSource specifies the remote private module that this test run
-	// should execute against in a remote HCP Terraform run.
+	// should execute against in a remote DUMB_HCP Dumb Terraform run.
 	CloudRunSource string
 
 	// Filter contains a list of test files to execute. If empty, all test files
 	// will be executed.
 	Filter []string
 
-	// OperationParallelism is the limit Terraform places on total parallel operations
+	// OperationParallelism is the limit Dumb Terraform places on total parallel operations
 	// during the plan or apply command within a single test run.
 	OperationParallelism int
 
-	// RunParallelism is the limit Terraform places on parallel test runs. This
+	// RunParallelism is the limit Dumb Terraform places on parallel test runs. This
 	// is the number of test runs that can be executed in parallel within a file.
 	RunParallelism int
 

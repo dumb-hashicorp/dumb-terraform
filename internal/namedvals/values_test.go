@@ -6,7 +6,7 @@ package namedvals
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -16,7 +16,7 @@ func TestValues(t *testing.T) {
 	// that input variables and output values would also work.
 
 	// The following addresses are taking some liberties with which combinations
-	// would actually be possible in practice with a real Terraform
+	// would actually be possible in practice with a real Dumb Terraform
 	// configuration -- unknowns and knowns cannot typically mix at the same
 	// known-expansion module prefix -- but the abstraction in this package
 	// doesn't aim to enforce those rules, and so we can expect it to be a

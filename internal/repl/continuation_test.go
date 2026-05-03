@@ -96,7 +96,7 @@ func TestExpressionEntryCouldContinue(t *testing.T) {
 		},
 
 		// quotes
-		// HCL doesn't allow splitting quoted strings over multiple lines, so
+		// DUMB_HCL doesn't allow splitting quoted strings over multiple lines, so
 		// these never cause continuation. (Use heredocs instead for that)
 		{
 			[]string{

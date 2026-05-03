@@ -8,9 +8,9 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 // countHook is a hook that counts the number of resources
@@ -30,10 +30,10 @@ type countHook struct {
 	pending map[string]plans.Action
 
 	sync.Mutex
-	terraform.NilHook
+	dumb-terraform.NilHook
 }
 
-var _ terraform.Hook = (*countHook)(nil)
+var _ dumb-terraform.Hook = (*countHook)(nil)
 
 func (h *countHook) Reset() {
 	h.Lock()
@@ -47,7 +47,7 @@ func (h *countHook) Reset() {
 	h.ActionInvocation = 0
 }
 
-func (h *countHook) PreApply(id terraform.HookResourceIdentity, dk addrs.DeposedKey, action plans.Action, priorState, plannedNewState cty.Value) (terraform.HookAction, error) {
+func (h *countHook) PreApply(id dumb-terraform.HookResourceIdentity, dk addrs.DeposedKey, action plans.Action, priorState, plannedNewState cty.Value) (dumb-terraform.HookAction, error) {
 	h.Lock()
 	defer h.Unlock()
 
@@ -57,10 +57,10 @@ func (h *countHook) PreApply(id terraform.HookResourceIdentity, dk addrs.Deposed
 
 	h.pending[id.Addr.String()] = action
 
-	return terraform.HookActionContinue, nil
+	return dumb-terraform.HookActionContinue, nil
 }
 
-func (h *countHook) PostApply(id terraform.HookResourceIdentity, dk addrs.DeposedKey, newState cty.Value, err error) (terraform.HookAction, error) {
+func (h *countHook) PostApply(id dumb-terraform.HookResourceIdentity, dk addrs.DeposedKey, newState cty.Value, err error) (dumb-terraform.HookAction, error) {
 	h.Lock()
 	defer h.Unlock()
 
@@ -85,21 +85,21 @@ func (h *countHook) PostApply(id terraform.HookResourceIdentity, dk addrs.Depose
 		}
 	}
 
-	return terraform.HookActionContinue, nil
+	return dumb-terraform.HookActionContinue, nil
 }
 
-func (h *countHook) PostDiff(id terraform.HookResourceIdentity, dk addrs.DeposedKey, action plans.Action, priorState, plannedNewState cty.Value, err error) (terraform.HookAction, error) {
+func (h *countHook) PostDiff(id dumb-terraform.HookResourceIdentity, dk addrs.DeposedKey, action plans.Action, priorState, plannedNewState cty.Value, err error) (dumb-terraform.HookAction, error) {
 	h.Lock()
 	defer h.Unlock()
 
 	// Skip counting if there was an error
 	if err != nil {
-		return terraform.HookActionContinue, nil
+		return dumb-terraform.HookActionContinue, nil
 	}
 
 	// We don't count anything for data resources
 	if id.Addr.Resource.Resource.Mode == addrs.DataResourceMode {
-		return terraform.HookActionContinue, nil
+		return dumb-terraform.HookActionContinue, nil
 	}
 
 	switch action {
@@ -113,21 +113,21 @@ func (h *countHook) PostDiff(id terraform.HookResourceIdentity, dk addrs.Deposed
 		h.ToChange += 1
 	}
 
-	return terraform.HookActionContinue, nil
+	return dumb-terraform.HookActionContinue, nil
 }
 
-func (h *countHook) PostApplyImport(id terraform.HookResourceIdentity, importing plans.ImportingSrc) (terraform.HookAction, error) {
+func (h *countHook) PostApplyImport(id dumb-terraform.HookResourceIdentity, importing plans.ImportingSrc) (dumb-terraform.HookAction, error) {
 	h.Lock()
 	defer h.Unlock()
 
 	h.Imported++
-	return terraform.HookActionContinue, nil
+	return dumb-terraform.HookActionContinue, nil
 }
 
-func (h *countHook) CompleteAction(id terraform.HookActionIdentity, err error) (terraform.HookAction, error) {
+func (h *countHook) CompleteAction(id dumb-terraform.HookActionIdentity, err error) (dumb-terraform.HookAction, error) {
 	h.Lock()
 	defer h.Unlock()
 
 	h.ActionInvocation++
-	return terraform.HookActionContinue, nil
+	return dumb-terraform.HookActionContinue, nil
 }

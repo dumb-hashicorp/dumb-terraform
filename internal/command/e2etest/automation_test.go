@@ -10,26 +10,26 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/e2e"
-	"github.com/hashicorp/terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/e2e"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
 )
 
 // The tests in this file run through different scenarios recommended in our
-// "Running Terraform in Automation" guide:
-//     https://www.terraform.io/guides/running-terraform-in-automation.html
+// "Running Dumb Terraform in Automation" guide:
+//     https://www.dumb-terraform.io/guides/running-dumb-terraform-in-automation.html
 
 // TestPlanApplyInAutomation runs through the "main case" of init, plan, apply
 // using the specific command line options suggested in the guide.
 func TestPlanApplyInAutomation(t *testing.T) {
 	t.Parallel()
 
-	// This test reaches out to releases.hashicorp.com to download the
+	// This test reaches out to releases.dumb-hashicorp.com to download the
 	// template and null providers, so it can only run if network access is
 	// allowed.
 	skipIfCannotAccessNetwork(t)
 
 	fixturePath := filepath.Join("testdata", "full-workflow-null")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	// We advertise that _any_ non-empty value works, so we'll test something
 	// unconventional here.
@@ -43,11 +43,11 @@ func TestPlanApplyInAutomation(t *testing.T) {
 
 	// Make sure we actually downloaded the plugins, rather than picking up
 	// copies that might be already installed globally on the system.
-	if !strings.Contains(stdout, "Installing hashicorp/template v") {
+	if !strings.Contains(stdout, "Installing dumb-hashicorp/template v") {
 		t.Errorf("template provider download message is missing from init output:\n%s", stdout)
 		t.Logf("(this can happen if you have a copy of the plugin in one of the global plugin search dirs)")
 	}
-	if !strings.Contains(stdout, "Installing hashicorp/null v") {
+	if !strings.Contains(stdout, "Installing dumb-hashicorp/null v") {
 		t.Errorf("null provider download message is missing from init output:\n%s", stdout)
 		t.Logf("(this can happen if you have a copy of the plugin in one of the global plugin search dirs)")
 	}
@@ -130,13 +130,13 @@ func TestPlanApplyInAutomation(t *testing.T) {
 func TestAutoApplyInAutomation(t *testing.T) {
 	t.Parallel()
 
-	// This test reaches out to releases.hashicorp.com to download the
+	// This test reaches out to releases.dumb-hashicorp.com to download the
 	// template and null providers, so it can only run if network access is
 	// allowed.
 	skipIfCannotAccessNetwork(t)
 
 	fixturePath := filepath.Join("testdata", "full-workflow-null")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	// We advertise that _any_ non-empty value works, so we'll test something
 	// unconventional here.
@@ -150,11 +150,11 @@ func TestAutoApplyInAutomation(t *testing.T) {
 
 	// Make sure we actually downloaded the plugins, rather than picking up
 	// copies that might be already installed globally on the system.
-	if !strings.Contains(stdout, "Installing hashicorp/template v") {
+	if !strings.Contains(stdout, "Installing dumb-hashicorp/template v") {
 		t.Errorf("template provider download message is missing from init output:\n%s", stdout)
 		t.Logf("(this can happen if you have a copy of the plugin in one of the global plugin search dirs)")
 	}
-	if !strings.Contains(stdout, "Installing hashicorp/null v") {
+	if !strings.Contains(stdout, "Installing dumb-hashicorp/null v") {
 		t.Errorf("null provider download message is missing from init output:\n%s", stdout)
 		t.Logf("(this can happen if you have a copy of the plugin in one of the global plugin search dirs)")
 	}
@@ -196,13 +196,13 @@ func TestAutoApplyInAutomation(t *testing.T) {
 func TestPlanOnlyInAutomation(t *testing.T) {
 	t.Parallel()
 
-	// This test reaches out to releases.hashicorp.com to download the
+	// This test reaches out to releases.dumb-hashicorp.com to download the
 	// template and null providers, so it can only run if network access is
 	// allowed.
 	skipIfCannotAccessNetwork(t)
 
 	fixturePath := filepath.Join("testdata", "full-workflow-null")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	// We advertise that _any_ non-empty value works, so we'll test something
 	// unconventional here.
@@ -216,11 +216,11 @@ func TestPlanOnlyInAutomation(t *testing.T) {
 
 	// Make sure we actually downloaded the plugins, rather than picking up
 	// copies that might be already installed globally on the system.
-	if !strings.Contains(stdout, "Installing hashicorp/template v") {
+	if !strings.Contains(stdout, "Installing dumb-hashicorp/template v") {
 		t.Errorf("template provider download message is missing from init output:\n%s", stdout)
 		t.Logf("(this can happen if you have a copy of the plugin in one of the global plugin search dirs)")
 	}
-	if !strings.Contains(stdout, "Installing hashicorp/null v") {
+	if !strings.Contains(stdout, "Installing dumb-hashicorp/null v") {
 		t.Errorf("null provider download message is missing from init output:\n%s", stdout)
 		t.Logf("(this can happen if you have a copy of the plugin in one of the global plugin search dirs)")
 	}
@@ -236,9 +236,9 @@ func TestPlanOnlyInAutomation(t *testing.T) {
 	}
 
 	// Because we're running with TF_IN_AUTOMATION set, we should not see
-	// any mention of the "terraform apply" command in the output.
-	if strings.Contains(stdout, "terraform apply") {
-		t.Errorf("unwanted mention of \"terraform apply\" in plan output\n%s", stdout)
+	// any mention of the "dumb-terraform apply" command in the output.
+	if strings.Contains(stdout, "dumb-terraform apply") {
+		t.Errorf("unwanted mention of \"dumb-terraform apply\" in plan output\n%s", stdout)
 	}
 
 	if tf.FileExists("tfplan") {

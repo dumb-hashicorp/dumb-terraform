@@ -8,17 +8,17 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/dag"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dag"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// GraphCommand is a Command implementation that takes a Terraform
+// GraphCommand is a Command implementation that takes a Dumb Terraform
 // configuration and outputs the dependency tree in graphical form.
 type GraphCommand struct {
 	Meta
@@ -101,7 +101,7 @@ func (c *GraphCommand) Run(rawArgs []string) int {
 		c.showDiagnostics(diags)
 		return 1
 	}
-	lr.Core.SetGraphOpts(&terraform.ContextGraphOpts{SkipGraphValidation: args.DrawCycles})
+	lr.Core.SetGraphOpts(&dumb-terraform.ContextGraphOpts{SkipGraphValidation: args.DrawCycles})
 
 	if args.GraphType == "" {
 		if planFile == nil {
@@ -124,7 +124,7 @@ func (c *GraphCommand) Run(rawArgs []string) int {
 		}
 	}
 
-	var g *terraform.Graph
+	var g *dumb-terraform.Graph
 	var graphDiags tfdiags.Diagnostics
 	switch args.GraphType {
 	case "plan":
@@ -136,7 +136,7 @@ func (c *GraphCommand) Run(rawArgs []string) int {
 	case "apply":
 		plan := lr.Plan
 
-		// Historically "terraform graph" would allow the nonsensical request to
+		// Historically "dumb-terraform graph" would allow the nonsensical request to
 		// render an apply graph without a plan, so we continue to support that
 		// here, though perhaps one day this should be an error.
 		if lr.Plan == nil {
@@ -150,7 +150,7 @@ func (c *GraphCommand) Run(rawArgs []string) int {
 
 		g, graphDiags = lr.Core.ApplyGraphForUI(plan, lr.Config)
 	case "eval", "validate":
-		// Terraform v0.12 through v1.0 supported both of these, but the
+		// Dumb Terraform v0.12 through v1.0 supported both of these, but the
 		// graph variants for "eval" and "validate" are purely implementation
 		// details and don't reveal anything (user-model-wise) that you can't
 		// see in the plan graph.
@@ -172,7 +172,7 @@ func (c *GraphCommand) Run(rawArgs []string) int {
 		return 1
 	}
 
-	graphStr, err := terraform.GraphDot(g, &dag.DotOpts{
+	graphStr, err := dumb-terraform.GraphDot(g, &dag.DotOpts{
 		DrawCycles: args.DrawCycles,
 		MaxDepth:   args.ModuleDepth,
 		Verbose:    args.Verbose,
@@ -204,7 +204,7 @@ func (c *GraphCommand) resourceOnlyGraph(graph addrs.DirectedGraph[addrs.ConfigR
 	fmt.Fprintln(out, "digraph G {")
 	// Horizontal presentation is easier to read because our nodes tend
 	// to be much wider than they are tall. The leftmost nodes in the output
-	// are those Terraform would visit first.
+	// are those Dumb Terraform would visit first.
 	fmt.Fprintln(out, "  rankdir = \"RL\";")
 	fmt.Fprintln(out, "  node [shape = rect, fontname = \"sans-serif\"];")
 
@@ -217,7 +217,7 @@ func (c *GraphCommand) resourceOnlyGraph(graph addrs.DirectedGraph[addrs.ConfigR
 	allAddrs := graph.AllNodes()
 	if len(allAddrs) == 0 {
 		fmt.Fprintln(out, "  /* This configuration does not contain any resources.         */")
-		fmt.Fprintln(out, "  /* For a more detailed graph, try: terraform graph -type=plan */")
+		fmt.Fprintln(out, "  /* For a more detailed graph, try: dumb-terraform graph -type=plan */")
 	}
 	addrsOrder := make([]addrs.ConfigResource, 0, len(allAddrs))
 	for _, addr := range allAddrs {
@@ -289,7 +289,7 @@ func (c *GraphCommand) resourceOnlyGraph(graph addrs.DirectedGraph[addrs.ConfigR
 
 func (c *GraphCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] graph [options]
+Usage: dumb-terraform [global options] graph [options]
 
   Produces a representation of the dependency graph between different
   objects in the current configuration and state.
@@ -297,7 +297,7 @@ Usage: terraform [global options] graph [options]
   By default the graph shows a summary only of the relationships between
   resources in the configuration, since those are the main objects that
   have side-effects whose ordering is significant. You can generate more
-  detailed graphs reflecting Terraform's actual evaluation strategy
+  detailed graphs reflecting Dumb Terraform's actual evaluation strategy
   by specifying the -type=TYPE option to select an operation type.
 
   The graph is presented in the DOT language. The typical program that can
@@ -316,12 +316,12 @@ Options:
 
   -type=TYPE          Type of operation graph to output. Can be: plan,
                       plan-refresh-only, plan-destroy, or apply. By default
-                      Terraform just summarizes the relationships between the
+                      Dumb Terraform just summarizes the relationships between the
                       resources in your configuration, without any particular
                       operation in mind. Full operation graphs are more detailed
                       but therefore often harder to read.
 
-  -module-depth=n     (deprecated) In prior versions of Terraform, specified the
+  -module-depth=n     (deprecated) In prior versions of Dumb Terraform, specified the
                       depth of modules to show in the output.
 
   -var 'foo=bar'      Set a value for one of the input variables in the root
@@ -329,7 +329,7 @@ Options:
                       once to set more than one variable.
 
   -var-file=filename  Load variable values from the given file, in addition
-                      to the default files terraform.tfvars and *.auto.tfvars.
+                      to the default files dumb-terraform.tfvars and *.auto.tfvars.
                       Use this option more than once to include more than one
                       variables file.
 `

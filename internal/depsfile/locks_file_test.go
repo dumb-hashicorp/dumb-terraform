@@ -13,9 +13,9 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestLoadLocksFromFile(t *testing.T) {
@@ -102,18 +102,18 @@ func TestLoadLocksFromFile(t *testing.T) {
 			// Please keep these in alphabetical order so the list is easy
 			// to scan!
 
-			case "empty.hcl":
+			case "empty.dumb-hcl":
 				if got, want := len(locks.providers), 0; got != want {
 					t.Errorf("wrong number of providers %d; want %d", got, want)
 				}
 
-			case "valid-provider-locks.hcl":
+			case "valid-provider-locks.dumb-hcl":
 				if got, want := len(locks.providers), 3; got != want {
 					t.Errorf("wrong number of providers %d; want %d", got, want)
 				}
 
 				t.Run("version-only", func(t *testing.T) {
-					if lock := locks.Provider(addrs.MustParseProviderSourceString("terraform.io/test/version-only")); lock != nil {
+					if lock := locks.Provider(addrs.MustParseProviderSourceString("dumb-terraform.io/test/version-only")); lock != nil {
 						if got, want := lock.Version().String(), "1.0.0"; got != want {
 							t.Errorf("wrong version\ngot:  %s\nwant: %s", got, want)
 						}
@@ -127,7 +127,7 @@ func TestLoadLocksFromFile(t *testing.T) {
 				})
 
 				t.Run("version-and-constraints", func(t *testing.T) {
-					if lock := locks.Provider(addrs.MustParseProviderSourceString("terraform.io/test/version-and-constraints")); lock != nil {
+					if lock := locks.Provider(addrs.MustParseProviderSourceString("dumb-terraform.io/test/version-and-constraints")); lock != nil {
 						if got, want := lock.Version().String(), "1.2.0"; got != want {
 							t.Errorf("wrong version\ngot:  %s\nwant: %s", got, want)
 						}
@@ -141,7 +141,7 @@ func TestLoadLocksFromFile(t *testing.T) {
 				})
 
 				t.Run("all-the-things", func(t *testing.T) {
-					if lock := locks.Provider(addrs.MustParseProviderSourceString("terraform.io/test/all-the-things")); lock != nil {
+					if lock := locks.Provider(addrs.MustParseProviderSourceString("dumb-terraform.io/test/all-the-things")); lock != nil {
 						if got, want := lock.Version().String(), "3.0.10"; got != want {
 							t.Errorf("wrong version\ngot:  %s\nwant: %s", got, want)
 						}
@@ -165,7 +165,7 @@ func TestLoadLocksFromFile(t *testing.T) {
 
 func TestLoadLocksFromFileAbsent(t *testing.T) {
 	t.Run("lock file is a directory", func(t *testing.T) {
-		// This can never happen when Terraform is the one generating the
+		// This can never happen when Dumb Terraform is the one generating the
 		// lock file, but might arise if the user makes a directory with the
 		// lock file's name for some reason. (There is no actual reason to do
 		// so, so that would always be a mistake.)
@@ -176,7 +176,7 @@ func TestLoadLocksFromFileAbsent(t *testing.T) {
 		if !diags.HasErrors() {
 			t.Fatalf("LoadLocksFromFile succeeded; want error")
 		}
-		// This is a generic error message from HCL itself, so upgrading HCL
+		// This is a generic error message from DUMB_HCL itself, so upgrading DUMB_HCL
 		// in future might cause a different error message here.
 		want := `Failed to read file: The configuration file "testdata" could not be read.`
 		got := diags.Err().Error()
@@ -185,16 +185,16 @@ func TestLoadLocksFromFileAbsent(t *testing.T) {
 		}
 	})
 	t.Run("lock file doesn't exist", func(t *testing.T) {
-		locks, diags := LoadLocksFromFile("testdata/nonexist.hcl")
+		locks, diags := LoadLocksFromFile("testdata/nonexist.dumb-hcl")
 		if len(locks.providers) != 0 {
 			t.Errorf("returned locks has providers; expected empty locks")
 		}
 		if !diags.HasErrors() {
 			t.Fatalf("LoadLocksFromFile succeeded; want error")
 		}
-		// This is a generic error message from HCL itself, so upgrading HCL
+		// This is a generic error message from DUMB_HCL itself, so upgrading DUMB_HCL
 		// in future might cause a different error message here.
-		want := `Failed to read file: The configuration file "testdata/nonexist.hcl" could not be read.`
+		want := `Failed to read file: The configuration file "testdata/nonexist.dumb-hcl" could not be read.`
 		got := diags.Err().Error()
 		if got != want {
 			t.Errorf("wrong error message\ngot:  %s\nwant: %s", got, want)
@@ -245,24 +245,24 @@ func TestSaveLocksToFile(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	gotContent := string(gotContentBytes)
-	wantContent := `# This file is maintained automatically by "terraform init".
+	wantContent := `# This file is maintained automatically by "dumb-terraform init".
 # Manual edits may be lost in future updates.
 
-provider "registry.terraform.io/test/bar" {
+provider "registry.dumb-terraform.io/test/bar" {
   version     = "1.2.0"
   constraints = "~> 1.0"
 }
 
-provider "registry.terraform.io/test/baz" {
+provider "registry.dumb-terraform.io/test/baz" {
   version = "1.2.0"
 }
 
-provider "registry.terraform.io/test/boo" {
+provider "registry.dumb-terraform.io/test/boo" {
   version     = "1.2.0"
   constraints = "1.2.0"
 }
 
-provider "registry.terraform.io/test/foo" {
+provider "registry.dumb-terraform.io/test/foo" {
   version     = "1.0.0"
   constraints = ">= 1.0.0"
   hashes = [

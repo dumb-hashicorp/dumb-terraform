@@ -7,8 +7,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
 )
 
 // Removed encapsulates the somewhat complicated logic for tracking and

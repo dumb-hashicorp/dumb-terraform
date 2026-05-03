@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
 )
 
 func TestOnce(t *testing.T) {

@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/experiments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/experiments"
 )
 
 func TestExperimentsConfig(t *testing.T) {
@@ -31,14 +31,14 @@ func TestExperimentsConfig(t *testing.T) {
 			t.Fatalf("wrong number of diagnostics %d; want %d", got, want)
 		}
 		got := diags[0]
-		want := &hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		want := &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  `Experimental feature "current" is active`,
-			Detail:   "Experimental features are available only in alpha releases of Terraform and are subject to breaking changes or total removal in later versions, based on feedback. We recommend against using experimental features in production.\n\nIf you have feedback on the design of this feature, please open a GitHub issue to discuss it.",
-			Subject: &hcl.Range{
+			Detail:   "Experimental features are available only in alpha releases of Dumb Terraform and are subject to breaking changes or total removal in later versions, based on feedback. We recommend against using experimental features in production.\n\nIf you have feedback on the design of this feature, please open a GitHub issue to discuss it.",
+			Subject: &dumb-hcl.Range{
 				Filename: "testdata/experiments/current/current_experiment.tf",
-				Start:    hcl.Pos{Line: 2, Column: 18, Byte: 29},
-				End:      hcl.Pos{Line: 2, Column: 25, Byte: 36},
+				Start:    dumb-hcl.Pos{Line: 2, Column: 18, Byte: 29},
+				End:      dumb-hcl.Pos{Line: 2, Column: 25, Byte: 36},
 			},
 		}
 		if diff := cmp.Diff(want, got); diff != "" {
@@ -59,14 +59,14 @@ func TestExperimentsConfig(t *testing.T) {
 			t.Fatalf("wrong number of diagnostics %d; want %d", got, want)
 		}
 		got := diags[0]
-		want := &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		want := &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  `Experiment has concluded`,
 			Detail:   `Experiment "concluded" is no longer available. Reticulate your splines.`,
-			Subject: &hcl.Range{
+			Subject: &dumb-hcl.Range{
 				Filename: "testdata/experiments/concluded/concluded_experiment.tf",
-				Start:    hcl.Pos{Line: 2, Column: 18, Byte: 29},
-				End:      hcl.Pos{Line: 2, Column: 27, Byte: 38},
+				Start:    dumb-hcl.Pos{Line: 2, Column: 18, Byte: 29},
+				End:      dumb-hcl.Pos{Line: 2, Column: 27, Byte: 38},
 			},
 		}
 		if diff := cmp.Diff(want, got); diff != "" {
@@ -81,14 +81,14 @@ func TestExperimentsConfig(t *testing.T) {
 			t.Fatalf("wrong number of diagnostics %d; want %d", got, want)
 		}
 		got := diags[0]
-		want := &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		want := &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  `Unknown experiment keyword`,
 			Detail:   `There is no current experiment with the keyword "unknown".`,
-			Subject: &hcl.Range{
+			Subject: &dumb-hcl.Range{
 				Filename: "testdata/experiments/unknown/unknown_experiment.tf",
-				Start:    hcl.Pos{Line: 2, Column: 18, Byte: 29},
-				End:      hcl.Pos{Line: 2, Column: 25, Byte: 36},
+				Start:    dumb-hcl.Pos{Line: 2, Column: 18, Byte: 29},
+				End:      dumb-hcl.Pos{Line: 2, Column: 25, Byte: 36},
 			},
 		}
 		if diff := cmp.Diff(want, got); diff != "" {
@@ -103,14 +103,14 @@ func TestExperimentsConfig(t *testing.T) {
 			t.Fatalf("wrong number of diagnostics %d; want %d", got, want)
 		}
 		got := diags[0]
-		want := &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		want := &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  `Invalid expression`,
 			Detail:   `A static list expression is required.`,
-			Subject: &hcl.Range{
+			Subject: &dumb-hcl.Range{
 				Filename: "testdata/experiments/invalid/invalid_experiments.tf",
-				Start:    hcl.Pos{Line: 2, Column: 17, Byte: 28},
-				End:      hcl.Pos{Line: 2, Column: 24, Byte: 35},
+				Start:    dumb-hcl.Pos{Line: 2, Column: 17, Byte: 28},
+				End:      dumb-hcl.Pos{Line: 2, Column: 24, Byte: 35},
 			},
 		}
 		if diff := cmp.Diff(want, got); diff != "" {
@@ -125,14 +125,14 @@ func TestExperimentsConfig(t *testing.T) {
 			t.Fatalf("wrong number of diagnostics %d; want %d", got, want)
 		}
 		got := diags[0]
-		want := &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		want := &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  `Module uses experimental features`,
-			Detail:   `Experimental features are intended only for gathering early feedback on new language designs, and so are available only in alpha releases of Terraform.`,
-			Subject: &hcl.Range{
+			Detail:   `Experimental features are intended only for gathering early feedback on new language designs, and so are available only in alpha releases of Dumb Terraform.`,
+			Subject: &dumb-hcl.Range{
 				Filename: "testdata/experiments/current/current_experiment.tf",
-				Start:    hcl.Pos{Line: 2, Column: 3, Byte: 14},
-				End:      hcl.Pos{Line: 2, Column: 14, Byte: 25},
+				Start:    dumb-hcl.Pos{Line: 2, Column: 3, Byte: 14},
+				End:      dumb-hcl.Pos{Line: 2, Column: 14, Byte: 25},
 			},
 		}
 		if diff := cmp.Diff(want, got); diff != "" {

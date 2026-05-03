@@ -4,18 +4,18 @@
 package globalref
 
 import (
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 )
 
 // walkBlock walks through the block following the given traversal. If it finds
 // any invalid steps in the traversal, the walk is halted and the traversal
 // until that point is returned. This effectively validates and corrects the
 // given traversal.
-func walkBlock(block *configschema.Block, traversal hcl.Traversal) hcl.Traversal {
+func walkBlock(block *configschema.Block, traversal dumb-hcl.Traversal) dumb-hcl.Traversal {
 	if len(traversal) == 0 {
 		// then we've reached the end of the traversal, so we won't keep trying
 		// to walk through the block
@@ -30,16 +30,16 @@ func walkBlock(block *configschema.Block, traversal hcl.Traversal) hcl.Traversal
 		return nil
 	}
 
-	if attr, ok := current.(hcl.TraverseAttr); ok {
+	if attr, ok := current.(dumb-hcl.TraverseAttr); ok {
 		// this is the valid case, we're expecting an attribute that's going to
 		// point to an attribute or a block
 
 		if attr, ok := block.Attributes[attr.Name]; ok {
-			return append(hcl.Traversal{current}, walkAttribute(attr, traversal[1:])...)
+			return append(dumb-hcl.Traversal{current}, walkAttribute(attr, traversal[1:])...)
 		}
 
 		if block, ok := block.BlockTypes[attr.Name]; ok {
-			return append(hcl.Traversal{current}, walkBlockType(block, traversal[1:])...)
+			return append(dumb-hcl.Traversal{current}, walkBlockType(block, traversal[1:])...)
 		}
 	}
 
@@ -53,7 +53,7 @@ func walkBlock(block *configschema.Block, traversal hcl.Traversal) hcl.Traversal
 // any invalid steps in the traversal, the walk is halted and the traversal
 // until that point is returned. This effectively validates and corrects the
 // given traversal.
-func walkBlockType(block *configschema.NestedBlock, traversal hcl.Traversal) hcl.Traversal {
+func walkBlockType(block *configschema.NestedBlock, traversal dumb-hcl.Traversal) dumb-hcl.Traversal {
 	if len(traversal) == 0 {
 		return nil
 	}
@@ -70,14 +70,14 @@ func walkBlockType(block *configschema.NestedBlock, traversal hcl.Traversal) hcl
 		if !ok {
 			return nil
 		}
-		return append(hcl.Traversal{current}, walkBlock(&block.Block, traversal[1:])...)
+		return append(dumb-hcl.Traversal{current}, walkBlock(&block.Block, traversal[1:])...)
 	case configschema.NestingMap:
 		// this should be an index type, but we'll tolerate an attribute
 		current, ok := coerceToStringIndex(traversal[0])
 		if !ok {
 			return nil
 		}
-		return append(hcl.Traversal{current}, walkBlock(&block.Block, traversal[1:])...)
+		return append(dumb-hcl.Traversal{current}, walkBlock(&block.Block, traversal[1:])...)
 	case configschema.NestingSet:
 		return nil // can't reference into a set
 	}
@@ -90,7 +90,7 @@ func walkBlockType(block *configschema.NestedBlock, traversal hcl.Traversal) hcl
 // it finds any invalid steps in the traversal, the walk is haled and the
 // traversal until that point is returned. This effectively validates and
 // corrects the given traversal.
-func walkAttribute(attr *configschema.Attribute, traversal hcl.Traversal) hcl.Traversal {
+func walkAttribute(attr *configschema.Attribute, traversal dumb-hcl.Traversal) dumb-hcl.Traversal {
 	if len(traversal) == 0 {
 		return nil
 	}
@@ -102,7 +102,7 @@ func walkAttribute(attr *configschema.Attribute, traversal hcl.Traversal) hcl.Tr
 	return walkType(attr.Type, traversal)
 }
 
-func walkNestedAttributes(attrs map[string]*configschema.Attribute, traversal hcl.Traversal) hcl.Traversal {
+func walkNestedAttributes(attrs map[string]*configschema.Attribute, traversal dumb-hcl.Traversal) dumb-hcl.Traversal {
 	if len(traversal) == 0 {
 		return nil
 	}
@@ -112,14 +112,14 @@ func walkNestedAttributes(attrs map[string]*configschema.Attribute, traversal hc
 		return nil
 	}
 
-	if attr, ok := attrs[current.(hcl.TraverseAttr).Name]; ok {
-		return append(hcl.Traversal{current}, walkAttribute(attr, traversal[1:])...)
+	if attr, ok := attrs[current.(dumb-hcl.TraverseAttr).Name]; ok {
+		return append(dumb-hcl.Traversal{current}, walkAttribute(attr, traversal[1:])...)
 	}
 
 	return nil
 }
 
-func walkNestedAttribute(attr *configschema.Object, traversal hcl.Traversal) hcl.Traversal {
+func walkNestedAttribute(attr *configschema.Object, traversal dumb-hcl.Traversal) dumb-hcl.Traversal {
 	if len(traversal) == 0 {
 		return nil
 	}
@@ -134,14 +134,14 @@ func walkNestedAttribute(attr *configschema.Object, traversal hcl.Traversal) hcl
 		if !ok {
 			return nil
 		}
-		return append(hcl.Traversal{current}, walkNestedAttributes(attr.Attributes, traversal[1:])...)
+		return append(dumb-hcl.Traversal{current}, walkNestedAttributes(attr.Attributes, traversal[1:])...)
 	case configschema.NestingMap:
 		// this should be an index type, but we'll tolerate an attribute
 		current, ok := coerceToStringIndex(traversal[0])
 		if !ok {
 			return nil
 		}
-		return append(hcl.Traversal{current}, walkNestedAttributes(attr.Attributes, traversal[1:])...)
+		return append(dumb-hcl.Traversal{current}, walkNestedAttributes(attr.Attributes, traversal[1:])...)
 	case configschema.NestingSet:
 		return nil // can't reference into a set
 	}
@@ -150,7 +150,7 @@ func walkNestedAttribute(attr *configschema.Object, traversal hcl.Traversal) hcl
 	return nil
 }
 
-func walkType(t cty.Type, traversal hcl.Traversal) hcl.Traversal {
+func walkType(t cty.Type, traversal dumb-hcl.Traversal) dumb-hcl.Traversal {
 	if len(traversal) == 0 {
 		return nil
 	}
@@ -163,13 +163,13 @@ func walkType(t cty.Type, traversal hcl.Traversal) hcl.Traversal {
 		if !ok {
 			return nil
 		}
-		return append(hcl.Traversal{current}, walkType(t.ElementType(), traversal[1:])...)
+		return append(dumb-hcl.Traversal{current}, walkType(t.ElementType(), traversal[1:])...)
 	case t.IsMapType():
 		current, ok := coerceToStringIndex(traversal[0])
 		if !ok {
 			return nil
 		}
-		return append(hcl.Traversal{current}, walkType(t.ElementType(), traversal[1:])...)
+		return append(dumb-hcl.Traversal{current}, walkType(t.ElementType(), traversal[1:])...)
 	case t.IsSetType():
 		return nil // can't traverse into sets
 	case t.IsObjectType():
@@ -178,18 +178,18 @@ func walkType(t cty.Type, traversal hcl.Traversal) hcl.Traversal {
 			return nil
 		}
 
-		key := current.(hcl.TraverseAttr).Name
+		key := current.(dumb-hcl.TraverseAttr).Name
 		if !t.HasAttribute(key) {
 			return nil
 		}
-		return append(hcl.Traversal{current}, walkType(t.AttributeType(key), traversal[1:])...)
+		return append(dumb-hcl.Traversal{current}, walkType(t.AttributeType(key), traversal[1:])...)
 	case t.IsTupleType():
 		current, ok := coerceToIntegerIndex(traversal[0])
 		if !ok {
 			return nil
 		}
 
-		key := current.(hcl.TraverseIndex).Key
+		key := current.(dumb-hcl.TraverseIndex).Key
 		if !key.IsKnown() {
 			return nil // we can't keep traversing if the index is unknown
 		}
@@ -205,18 +205,18 @@ func walkType(t cty.Type, traversal hcl.Traversal) hcl.Traversal {
 			return nil
 		}
 
-		return append(hcl.Traversal{current}, walkType(types[int(ix)], traversal[1:])...)
+		return append(dumb-hcl.Traversal{current}, walkType(types[int(ix)], traversal[1:])...)
 	}
 
 	return nil // the above should have been exhaustive
 }
 
-// coerceToAttribute converts the provided step into a hcl.TraverseAttr if
+// coerceToAttribute converts the provided step into a dumb-hcl.TraverseAttr if
 // possible.
-func coerceToAttribute(step hcl.Traverser) (hcl.Traverser, bool) {
+func coerceToAttribute(step dumb-hcl.Traverser) (dumb-hcl.Traverser, bool) {
 
 	switch step := step.(type) {
-	case hcl.TraverseIndex:
+	case dumb-hcl.TraverseIndex:
 		if !step.Key.IsKnown() {
 			// this is the only failure case here - we can't put unknown values
 			// into attributes so we return false
@@ -233,11 +233,11 @@ func coerceToAttribute(step hcl.Traverser) (hcl.Traverser, bool) {
 		// all else being good, package this up as an attribute and keep
 		// going
 
-		return hcl.TraverseAttr{
+		return dumb-hcl.TraverseAttr{
 			Name:     name.AsString(),
 			SrcRange: step.SrcRange,
 		}, true
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		return step, true
 	}
 
@@ -247,21 +247,21 @@ func coerceToAttribute(step hcl.Traverser) (hcl.Traverser, bool) {
 }
 
 // coerceToStringIndex converts the provided step into a string-valued
-// hcl.TraverseIndex if possible.
-func coerceToStringIndex(step hcl.Traverser) (hcl.Traverser, bool) {
+// dumb-hcl.TraverseIndex if possible.
+func coerceToStringIndex(step dumb-hcl.Traverser) (dumb-hcl.Traverser, bool) {
 	switch step := step.(type) {
-	case hcl.TraverseIndex:
+	case dumb-hcl.TraverseIndex:
 		key, err := convert.Convert(step.Key, cty.String)
 		if err != nil {
 			return step, false
 		}
 
-		return hcl.TraverseIndex{
+		return dumb-hcl.TraverseIndex{
 			Key:      key,
 			SrcRange: step.SrcRange,
 		}, true
-	case hcl.TraverseAttr:
-		return hcl.TraverseIndex{
+	case dumb-hcl.TraverseAttr:
+		return dumb-hcl.TraverseIndex{
 			Key:      cty.StringVal(step.Name),
 			SrcRange: step.SrcRange,
 		}, true
@@ -273,26 +273,26 @@ func coerceToStringIndex(step hcl.Traverser) (hcl.Traverser, bool) {
 }
 
 // coerceToIntegerIndex converts the provided step into an int-valued
-// hcl.TraverseIndex if possible.
-func coerceToIntegerIndex(step hcl.Traverser) (hcl.Traverser, bool) {
+// dumb-hcl.TraverseIndex if possible.
+func coerceToIntegerIndex(step dumb-hcl.Traverser) (dumb-hcl.Traverser, bool) {
 	switch step := step.(type) {
-	case hcl.TraverseIndex:
+	case dumb-hcl.TraverseIndex:
 		key, err := convert.Convert(step.Key, cty.Number)
 		if err != nil {
 			return step, false
 		}
 
-		return hcl.TraverseIndex{
+		return dumb-hcl.TraverseIndex{
 			Key:      key,
 			SrcRange: step.SrcRange,
 		}, true
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		number, err := cty.ParseNumberVal(step.Name)
 		if err != nil {
 			return step, false
 		}
 
-		return hcl.TraverseIndex{
+		return dumb-hcl.TraverseIndex{
 			Key:      number,
 			SrcRange: step.SrcRange,
 		}, true

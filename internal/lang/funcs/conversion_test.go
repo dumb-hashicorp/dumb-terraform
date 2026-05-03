@@ -11,7 +11,7 @@ import (
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
 )
 
 func TestTo(t *testing.T) {
@@ -41,7 +41,7 @@ func TestTo(t *testing.T) {
 		},
 		{
 			// This test case represents evaluating the expression tostring(null)
-			// from HCL, since null in HCL is cty.NullVal(cty.DynamicPseudoType).
+			// from DUMB_HCL, since null in DUMB_HCL is cty.NullVal(cty.DynamicPseudoType).
 			// The result in that case should still be null, but a null specifically
 			// of type string.
 			cty.NullVal(cty.DynamicPseudoType),

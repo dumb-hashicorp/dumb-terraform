@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/lang/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/format"
 	"github.com/zclconf/go-cty/cty"
 )
 

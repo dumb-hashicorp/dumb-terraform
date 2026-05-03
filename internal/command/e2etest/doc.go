@@ -1,10 +1,10 @@
 // Copyright IBM Corp. 2014, 2026
 // SPDX-License-Identifier: BUSL-1.1
 
-// Package e2etest contains a set of tests that run against a real Terraform
+// Package e2etest contains a set of tests that run against a real Dumb Terraform
 // binary, compiled on the fly at the start of the test run.
 //
-// These tests help ensure that key end-to-end Terraform use-cases are working
+// These tests help ensure that key end-to-end Dumb Terraform use-cases are working
 // for a real binary, whereas other tests always have at least _some_ amount
 // of test stubbing.
 //
@@ -15,9 +15,9 @@
 // These tests can be used in two ways. The simplest way is to just run them
 // with "go test" as normal:
 //
-//	go test -v github.com/hashicorp/terraform/internal/command/e2etest
+//	go test -v github.com/dumb-hashicorp/dumb-terraform/internal/command/e2etest
 //
-// This will compile on the fly a Terraform binary and run the tests against
+// This will compile on the fly a Dumb Terraform binary and run the tests against
 // it.
 //
 // Alternatively, the make-archive.sh script can be used to produce a

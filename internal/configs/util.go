@@ -4,26 +4,26 @@
 package configs
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configtesting"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configtesting"
 )
 
 // exprIsNativeQuotedString determines whether the given expression looks like
-// it's a quoted string in the HCL native syntax.
+// it's a quoted string in the DUMB_HCL native syntax.
 //
-// This should be used sparingly only for situations where our legacy HCL
+// This should be used sparingly only for situations where our legacy DUMB_HCL
 // decoding would've expected a keyword or reference in quotes but our new
 // decoding expects the keyword or reference to be provided directly as
 // an identifier-based expression.
-func exprIsNativeQuotedString(expr hcl.Expression) bool {
-	_, ok := expr.(*hclsyntax.TemplateExpr)
+func exprIsNativeQuotedString(expr dumb-hcl.Expression) bool {
+	_, ok := expr.(*dumb-hclsyntax.TemplateExpr)
 	return ok
 }
 
-// schemaForOverrides takes a *hcl.BodySchema and produces a new one that is
+// schemaForOverrides takes a *dumb-hcl.BodySchema and produces a new one that is
 // equivalent except that any required attributes are forced to not be required.
 //
 // This is useful for dealing with "override" config files, which are allowed
@@ -36,9 +36,9 @@ func exprIsNativeQuotedString(expr hcl.Expression) bool {
 // Overrides are rarely used, so it's recommended to just create the override
 // schema on the fly only when it's needed, rather than storing it in a global
 // variable as we tend to do for a primary schema.
-func schemaForOverrides(schema *hcl.BodySchema) *hcl.BodySchema {
-	ret := &hcl.BodySchema{
-		Attributes: make([]hcl.AttributeSchema, len(schema.Attributes)),
+func schemaForOverrides(schema *dumb-hcl.BodySchema) *dumb-hcl.BodySchema {
+	ret := &dumb-hcl.BodySchema{
+		Attributes: make([]dumb-hcl.AttributeSchema, len(schema.Attributes)),
 		Blocks:     schema.Blocks,
 	}
 
@@ -50,17 +50,17 @@ func schemaForOverrides(schema *hcl.BodySchema) *hcl.BodySchema {
 	return ret
 }
 
-// schemaWithDynamic takes a *hcl.BodySchema and produces a new one that
+// schemaWithDynamic takes a *dumb-hcl.BodySchema and produces a new one that
 // is equivalent except that it accepts an additional block type "dynamic" with
-// a single label, used to recognize usage of the HCL dynamic block extension.
-func schemaWithDynamic(schema *hcl.BodySchema) *hcl.BodySchema {
-	ret := &hcl.BodySchema{
+// a single label, used to recognize usage of the DUMB_HCL dynamic block extension.
+func schemaWithDynamic(schema *dumb-hcl.BodySchema) *dumb-hcl.BodySchema {
+	ret := &dumb-hcl.BodySchema{
 		Attributes: schema.Attributes,
-		Blocks:     make([]hcl.BlockHeaderSchema, len(schema.Blocks), len(schema.Blocks)+1),
+		Blocks:     make([]dumb-hcl.BlockHeaderSchema, len(schema.Blocks), len(schema.Blocks)+1),
 	}
 
 	copy(ret.Blocks, schema.Blocks)
-	ret.Blocks = append(ret.Blocks, hcl.BlockHeaderSchema{
+	ret.Blocks = append(ret.Blocks, dumb-hcl.BlockHeaderSchema{
 		Type:       "dynamic",
 		LabelNames: []string{"type"},
 	})
@@ -74,6 +74,6 @@ func schemaWithDynamic(schema *hcl.BodySchema) *hcl.BodySchema {
 // Using the new name is preferable because it might avoid you needing to
 // import this entire configs package, if you didn't have some other
 // use for it anyway.
-func SynthBody(filename string, values map[string]cty.Value) hcl.Body {
+func SynthBody(filename string, values map[string]cty.Value) dumb-hcl.Body {
 	return configtesting.SynthBody(filename, values)
 }

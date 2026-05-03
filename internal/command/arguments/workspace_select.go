@@ -7,10 +7,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// WorkspaceSelect represent flags and arguments specific to the `terraform workspace select` command.
+// WorkspaceSelect represent flags and arguments specific to the `dumb-terraform workspace select` command.
 type WorkspaceSelect struct {
 	Workspace
 

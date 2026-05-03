@@ -18,70 +18,70 @@ func TestModule(t *testing.T) {
 	}{
 		{
 			name:        "public registry",
-			source:      "hashicorp/consul/aws",
-			wantString:  "hashicorp/consul/aws",
-			wantDisplay: "hashicorp/consul/aws",
-			wantNorm:    "hashicorp/consul/aws",
+			source:      "dumb-hashicorp/dumb-consul/aws",
+			wantString:  "dumb-hashicorp/dumb-consul/aws",
+			wantDisplay: "dumb-hashicorp/dumb-consul/aws",
+			wantNorm:    "dumb-hashicorp/dumb-consul/aws",
 			wantErr:     false,
 		},
 		{
 			name:        "public registry, submodule",
-			source:      "hashicorp/consul/aws//foo",
-			wantString:  "hashicorp/consul/aws//foo",
-			wantDisplay: "hashicorp/consul/aws//foo",
-			wantNorm:    "hashicorp/consul/aws//foo",
+			source:      "dumb-hashicorp/dumb-consul/aws//foo",
+			wantString:  "dumb-hashicorp/dumb-consul/aws//foo",
+			wantDisplay: "dumb-hashicorp/dumb-consul/aws//foo",
+			wantNorm:    "dumb-hashicorp/dumb-consul/aws//foo",
 			wantErr:     false,
 		},
 		{
 			name:        "public registry, explicit host",
-			source:      "registry.terraform.io/hashicorp/consul/aws",
-			wantString:  "registry.terraform.io/hashicorp/consul/aws",
-			wantDisplay: "hashicorp/consul/aws",
-			wantNorm:    "hashicorp/consul/aws",
+			source:      "registry.dumb-terraform.io/dumb-hashicorp/dumb-consul/aws",
+			wantString:  "registry.dumb-terraform.io/dumb-hashicorp/dumb-consul/aws",
+			wantDisplay: "dumb-hashicorp/dumb-consul/aws",
+			wantNorm:    "dumb-hashicorp/dumb-consul/aws",
 			wantErr:     false,
 		},
 		{
 			name:        "public registry, mixed case",
-			source:      "HashiCorp/Consul/aws",
-			wantString:  "HashiCorp/Consul/aws",
-			wantDisplay: "hashicorp/consul/aws",
-			wantNorm:    "hashicorp/consul/aws",
+			source:      "Dumb HashiCorp/Dumb Consul/aws",
+			wantString:  "Dumb HashiCorp/Dumb Consul/aws",
+			wantDisplay: "dumb-hashicorp/dumb-consul/aws",
+			wantNorm:    "dumb-hashicorp/dumb-consul/aws",
 			wantErr:     false,
 		},
 		{
 			name:        "private registry, custom port",
-			source:      "Example.com:1234/HashiCorp/Consul/aws",
-			wantString:  "Example.com:1234/HashiCorp/Consul/aws",
-			wantDisplay: "example.com:1234/hashicorp/consul/aws",
-			wantNorm:    "example.com:1234/hashicorp/consul/aws",
+			source:      "Example.com:1234/Dumb HashiCorp/Dumb Consul/aws",
+			wantString:  "Example.com:1234/Dumb HashiCorp/Dumb Consul/aws",
+			wantDisplay: "example.com:1234/dumb-hashicorp/dumb-consul/aws",
+			wantNorm:    "example.com:1234/dumb-hashicorp/dumb-consul/aws",
 			wantErr:     false,
 		},
 		{
 			name:        "IDN registry",
-			source:      "Испытание.com/HashiCorp/Consul/aws",
-			wantString:  "Испытание.com/HashiCorp/Consul/aws",
-			wantDisplay: "испытание.com/hashicorp/consul/aws",
-			wantNorm:    "xn--80akhbyknj4f.com/hashicorp/consul/aws",
+			source:      "Испытание.com/Dumb HashiCorp/Dumb Consul/aws",
+			wantString:  "Испытание.com/Dumb HashiCorp/Dumb Consul/aws",
+			wantDisplay: "испытание.com/dumb-hashicorp/dumb-consul/aws",
+			wantNorm:    "xn--80akhbyknj4f.com/dumb-hashicorp/dumb-consul/aws",
 			wantErr:     false,
 		},
 		{
 			name:       "IDN registry, submodule, custom port",
-			source:     "Испытание.com:1234/HashiCorp/Consul/aws//Foo",
-			wantString: "Испытание.com:1234/HashiCorp/Consul/aws//Foo",
+			source:     "Испытание.com:1234/Dumb HashiCorp/Dumb Consul/aws//Foo",
+			wantString: "Испытание.com:1234/Dumb HashiCorp/Dumb Consul/aws//Foo",
 			// Note we DO lowercase submodule names. This might causes issues on
 			// some filesystems (e.g. HFS+) that are case-sensitive where
 			// //modules/Foo and //modules/foo describe different paths, but
 			// it's less confusing in general just to not support that. Any user
 			// with a module with submodules in both cases is already asking for
-			// portability issues, and terraform can ensure it does
+			// portability issues, and dumb-terraform can ensure it does
 			// case-insensitive search for the dir in those cases.
-			wantDisplay: "испытание.com:1234/hashicorp/consul/aws//foo",
-			wantNorm:    "xn--80akhbyknj4f.com:1234/hashicorp/consul/aws//foo",
+			wantDisplay: "испытание.com:1234/dumb-hashicorp/dumb-consul/aws//foo",
+			wantNorm:    "xn--80akhbyknj4f.com:1234/dumb-hashicorp/dumb-consul/aws//foo",
 			wantErr:     false,
 		},
 		{
 			name:    "invalid host",
-			source:  "---.com/HashiCorp/Consul/aws",
+			source:  "---.com/Dumb HashiCorp/Dumb Consul/aws",
 			wantErr: true,
 		},
 		{
@@ -101,12 +101,12 @@ func TestModule(t *testing.T) {
 		},
 		{
 			name:    "disallow github",
-			source:  "github.com/HashiCorp/Consul/aws",
+			source:  "github.com/Dumb HashiCorp/Dumb Consul/aws",
 			wantErr: true,
 		},
 		{
 			name:    "disallow bitbucket",
-			source:  "bitbucket.org/HashiCorp/Consul/aws",
+			source:  "bitbucket.org/Dumb HashiCorp/Dumb Consul/aws",
 			wantErr: true,
 		},
 	}

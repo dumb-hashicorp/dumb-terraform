@@ -6,8 +6,8 @@ package command
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/command/jsonfunction"
-	"github.com/hashicorp/terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonfunction"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
 	"github.com/zclconf/go-cty/cty/function"
 )
 
@@ -16,7 +16,7 @@ var (
 )
 
 // MetadataFunctionsCommand is a Command implementation that prints out information
-// about the available functions in Terraform.
+// about the available functions in Dumb Terraform.
 type MetadataFunctionsCommand struct {
 	Meta
 }
@@ -43,7 +43,7 @@ func (c *MetadataFunctionsCommand) Run(args []string) int {
 
 	if !jsonOutput {
 		c.Ui.Error(
-			"The `terraform metadata functions` command requires the `-json` flag.\n")
+			"The `dumb-terraform metadata functions` command requires the `-json` flag.\n")
 		cmdFlags.Usage()
 		return 1
 	}
@@ -69,7 +69,7 @@ func (c *MetadataFunctionsCommand) Run(args []string) int {
 }
 
 const metadataFunctionsCommandHelp = `
-Usage: terraform [global options] metadata functions -json
+Usage: dumb-terraform [global options] metadata functions -json
 
   Prints out a json representation of the available function signatures.
 `

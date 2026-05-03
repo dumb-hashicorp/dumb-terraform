@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
     simple6 = {
-      source = "registry.terraform.io/hashicorp/simple6"
+      source = "registry.dumb-terraform.io/dumb-hashicorp/simple6"
     }
   }
 
@@ -16,6 +16,6 @@ variable "name" {
   default = "world"
 }
 
-resource "terraform_data" "my-data" {
+resource "dumb-terraform_data" "my-data" {
   input = "hello ${var.name}"
 }

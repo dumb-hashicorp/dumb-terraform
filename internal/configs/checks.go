@@ -6,11 +6,11 @@ package configs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/lang/langrefs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/langrefs"
 )
 
 // CheckRule represents a configuration-defined validation rule, precondition,
@@ -25,7 +25,7 @@ type CheckRule struct {
 	// The available variables in a condition expression vary depending on what
 	// a check is attached to. For example, validation rules attached to
 	// input variables can only refer to the variable that is being validated.
-	Condition hcl.Expression
+	Condition dumb-hcl.Expression
 
 	// ErrorMessage should be one or more full sentences, which should be in
 	// English for consistency with the rest of the error message output but
@@ -35,17 +35,17 @@ type CheckRule struct {
 	//
 	// The error message expression has the same variables available for
 	// interpolation as the corresponding condition.
-	ErrorMessage hcl.Expression
+	ErrorMessage dumb-hcl.Expression
 
-	DeclRange hcl.Range
+	DeclRange dumb-hcl.Range
 }
 
 // validateSelfReferences looks for references in the check rule matching the
 // specified resource address, returning error diagnostics if such a reference
 // is found.
-func (cr *CheckRule) validateSelfReferences(checkType string, addr addrs.Resource) hcl.Diagnostics {
-	var diags hcl.Diagnostics
-	exprs := []hcl.Expression{
+func (cr *CheckRule) validateSelfReferences(checkType string, addr addrs.Resource) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
+	exprs := []dumb-hcl.Expression{
 		cr.Condition,
 		cr.ErrorMessage,
 	}
@@ -67,8 +67,8 @@ func (cr *CheckRule) validateSelfReferences(checkType string, addr addrs.Resourc
 			}
 
 			if refAddr.Equal(addr) {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  fmt.Sprintf("Invalid reference in %s", checkType),
 					Detail:   fmt.Sprintf("Configuration for %s may not refer to itself.", addr.String()),
 					Subject:  expr.Range().Ptr(),
@@ -87,8 +87,8 @@ func (cr *CheckRule) validateSelfReferences(checkType string, addr addrs.Resourc
 // function takes the containing block only because some error messages will
 // refer to its location, and the returned object's DeclRange will be the
 // block's header.
-func decodeCheckRuleBlock(block *hcl.Block, override bool) (*CheckRule, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeCheckRuleBlock(block *dumb-hcl.Block, override bool) (*CheckRule, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	cr := &CheckRule{
 		DeclRange: block.DefRange,
 	}
@@ -98,8 +98,8 @@ func decodeCheckRuleBlock(block *hcl.Block, override bool) (*CheckRule, hcl.Diag
 		// the initial design. If we can find a clear use-case for overriding
 		// checks in override files and there's a way to define it that
 		// isn't confusing then we could relax this.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  fmt.Sprintf("Can't override %s blocks", block.Type),
 			Detail:   fmt.Sprintf("Override files cannot override %q blocks.", block.Type),
 			Subject:  cr.DeclRange.Ptr(),
@@ -116,8 +116,8 @@ func decodeCheckRuleBlock(block *hcl.Block, override bool) (*CheckRule, hcl.Diag
 		if len(cr.Condition.Variables()) == 0 {
 			// A condition expression that doesn't refer to any variable is
 			// pointless, because its result would always be a constant.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  fmt.Sprintf("Invalid %s expression", block.Type),
 				Detail:   "The condition expression must refer to at least one object from elsewhere in the configuration, or else its result would not be checking anything.",
 				Subject:  cr.Condition.Range().Ptr(),
@@ -132,8 +132,8 @@ func decodeCheckRuleBlock(block *hcl.Block, override bool) (*CheckRule, hcl.Diag
 	return cr, diags
 }
 
-var checkRuleBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var checkRuleBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name:     "condition",
 			Required: true,
@@ -149,14 +149,14 @@ var checkRuleBlockSchema = &hcl.BodySchema{
 //
 // A check block contains 0-1 data blocks, and 0-n assert blocks. The check
 // block will load the data block, and execute the assert blocks as check rules
-// during the plan and apply Terraform operations.
+// during the plan and apply Dumb Terraform operations.
 type Check struct {
 	Name string
 
 	DataResource *Resource
 	Asserts      []*CheckRule
 
-	DeclRange hcl.Range
+	DeclRange dumb-hcl.Range
 }
 
 func (c Check) Addr() addrs.Check {
@@ -172,8 +172,8 @@ func (c Check) Accessible(addr addrs.Referenceable) bool {
 	return false
 }
 
-func decodeCheckBlock(block *hcl.Block, override bool) (*Check, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeCheckBlock(block *dumb-hcl.Block, override bool) (*Check, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	check := &Check{
 		Name:      block.Labels[0],
@@ -185,8 +185,8 @@ func decodeCheckBlock(block *hcl.Block, override bool) (*Check, hcl.Diagnostics)
 		// the initial design. If we can find a clear use-case for overriding
 		// checks in override files and there's a way to define it that
 		// isn't confusing then we could relax this.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Can't override check blocks",
 			Detail:   "Override files cannot override check blocks.",
 			Subject:  check.DeclRange.Ptr(),
@@ -197,9 +197,9 @@ func decodeCheckBlock(block *hcl.Block, override bool) (*Check, hcl.Diagnostics)
 	content, moreDiags := block.Body.Content(checkBlockSchema)
 	diags = append(diags, moreDiags...)
 
-	if !hclsyntax.ValidIdentifier(check.Name) {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+	if !dumb-hclsyntax.ValidIdentifier(check.Name) {
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid check block name",
 			Detail:   badIdentifierDetail,
 			Subject:  &block.LabelRanges[0],
@@ -211,8 +211,8 @@ func decodeCheckBlock(block *hcl.Block, override bool) (*Check, hcl.Diagnostics)
 		case "data":
 
 			if check.DataResource != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Multiple data resource blocks",
 					Detail:   fmt.Sprintf("This check block already has a data resource defined at %s.", check.DataResource.DeclRange.Ptr()),
 					Subject:  block.DefRange.Ptr(),
@@ -241,8 +241,8 @@ func decodeCheckBlock(block *hcl.Block, override bool) (*Check, hcl.Diagnostics)
 	}
 
 	if len(check.Asserts) == 0 {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Zero assert blocks",
 			Detail:   "Check blocks must have at least one assert block.",
 			Subject:  check.DeclRange.Ptr(),
@@ -252,8 +252,8 @@ func decodeCheckBlock(block *hcl.Block, override bool) (*Check, hcl.Diagnostics)
 	return check, diags
 }
 
-var checkBlockSchema = &hcl.BodySchema{
-	Blocks: []hcl.BlockHeaderSchema{
+var checkBlockSchema = &dumb-hcl.BodySchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "data", LabelNames: []string{"type", "name"}},
 		{Type: "assert"},
 	},

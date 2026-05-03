@@ -7,12 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/refactoring"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/refactoring"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestValidateMoves(t *testing.T) {
@@ -511,18 +511,18 @@ func makeTestMoveStmt(t *testing.T, moduleStr, fromStr, toStr string) refactorin
 		module = addrs.Module(strings.Split(moduleStr, "."))
 	}
 
-	traversal, hclDiags := hclsyntax.ParseTraversalAbs([]byte(fromStr), "", hcl.InitialPos)
-	if hclDiags.HasErrors() {
-		t.Fatalf("invalid from address: %s", hclDiags.Error())
+	traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(fromStr), "", dumb-hcl.InitialPos)
+	if dumb-hclDiags.HasErrors() {
+		t.Fatalf("invalid from address: %s", dumb-hclDiags.Error())
 	}
 	fromEP, diags := addrs.ParseMoveEndpoint(traversal)
 	if diags.HasErrors() {
 		t.Fatalf("invalid from address: %s", diags.Err().Error())
 	}
 
-	traversal, hclDiags = hclsyntax.ParseTraversalAbs([]byte(toStr), "", hcl.InitialPos)
-	if hclDiags.HasErrors() {
-		t.Fatalf("invalid to address: %s", hclDiags.Error())
+	traversal, dumb-hclDiags = dumb-hclsyntax.ParseTraversalAbs([]byte(toStr), "", dumb-hcl.InitialPos)
+	if dumb-hclDiags.HasErrors() {
+		t.Fatalf("invalid to address: %s", dumb-hclDiags.Error())
 	}
 	toEP, diags := addrs.ParseMoveEndpoint(traversal)
 	if diags.HasErrors() {

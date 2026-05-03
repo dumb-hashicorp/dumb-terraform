@@ -7,11 +7,11 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestParseRemovedFrom_Stacks(t *testing.T) {
@@ -65,7 +65,7 @@ func TestParseRemovedFrom_Stacks(t *testing.T) {
 			}
 
 			configAddress := from.TargetStack()
-			instanceAddress, addrDiags := from.TargetStackInstance(&hcl.EvalContext{
+			instanceAddress, addrDiags := from.TargetStackInstance(&dumb-hcl.EvalContext{
 				Variables: tc.vars,
 			}, RootStackInstance)
 			var wantAddrDiags tfdiags.Diagnostics
@@ -289,13 +289,13 @@ func TestParseRemovedFrom_Components(t *testing.T) {
 			from: "component.component_name.attribute_key",
 			parseDiags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid 'from' attribute",
 					Detail:   "The 'from' attribute must designate a component or stack that has been removed, in the form of an address such as `component.component_name` or `stack.stack_name`.",
-					Subject: &hcl.Range{
-						Start: hcl.Pos{Line: 1, Column: 1, Byte: 0},
-						End:   hcl.Pos{Line: 1, Column: 39, Byte: 38},
+					Subject: &dumb-hcl.Range{
+						Start: dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+						End:   dumb-hcl.Pos{Line: 1, Column: 39, Byte: 38},
 					},
 				})
 				return diags
@@ -305,13 +305,13 @@ func TestParseRemovedFrom_Components(t *testing.T) {
 			from: "component.component_name[0].attribute_key",
 			parseDiags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid 'from' attribute",
 					Detail:   "The 'from' attribute must designate a component or stack that has been removed, in the form of an address such as `component.component_name` or `stack.stack_name`.",
-					Subject: &hcl.Range{
-						Start: hcl.Pos{Line: 1, Column: 1, Byte: 0},
-						End:   hcl.Pos{Line: 1, Column: 42, Byte: 41},
+					Subject: &dumb-hcl.Range{
+						Start: dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+						End:   dumb-hcl.Pos{Line: 1, Column: 42, Byte: 41},
 					},
 				})
 				return diags
@@ -321,13 +321,13 @@ func TestParseRemovedFrom_Components(t *testing.T) {
 			from: "component.component_name[\"key\"].attribute_key",
 			parseDiags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid 'from' attribute",
 					Detail:   "The 'from' attribute must designate a component or stack that has been removed, in the form of an address such as `component.component_name` or `stack.stack_name`.",
-					Subject: &hcl.Range{
-						Start: hcl.Pos{Line: 1, Column: 1, Byte: 0},
-						End:   hcl.Pos{Line: 1, Column: 46, Byte: 45},
+					Subject: &dumb-hcl.Range{
+						Start: dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+						End:   dumb-hcl.Pos{Line: 1, Column: 46, Byte: 45},
 					},
 				})
 				return diags
@@ -337,13 +337,13 @@ func TestParseRemovedFrom_Components(t *testing.T) {
 			from: "component.component_name[each.key].attribute_key",
 			parseDiags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid 'from' attribute",
 					Detail:   "The 'from' attribute must designate a component or stack that has been removed, in the form of an address such as `component.component_name` or `stack.stack_name`.",
-					Subject: &hcl.Range{
-						Start: hcl.Pos{Line: 1, Column: 1, Byte: 0},
-						End:   hcl.Pos{Line: 1, Column: 49, Byte: 48},
+					Subject: &dumb-hcl.Range{
+						Start: dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+						End:   dumb-hcl.Pos{Line: 1, Column: 49, Byte: 48},
 					},
 				})
 				return diags
@@ -353,13 +353,13 @@ func TestParseRemovedFrom_Components(t *testing.T) {
 			from: "component.component_name.attribute_key[0]",
 			parseDiags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid 'from' attribute",
 					Detail:   "The 'from' attribute must designate a component or stack that has been removed, in the form of an address such as `component.component_name` or `stack.stack_name`.",
-					Subject: &hcl.Range{
-						Start: hcl.Pos{Line: 1, Column: 1, Byte: 0},
-						End:   hcl.Pos{Line: 1, Column: 42, Byte: 41},
+					Subject: &dumb-hcl.Range{
+						Start: dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+						End:   dumb-hcl.Pos{Line: 1, Column: 42, Byte: 41},
 					},
 				})
 				return diags
@@ -369,13 +369,13 @@ func TestParseRemovedFrom_Components(t *testing.T) {
 			from: "component[0].component_name",
 			parseDiags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid 'from' attribute",
 					Detail:   "The 'from' attribute must designate a component or stack that has been removed, in the form of an address such as `component.component_name` or `stack.stack_name`.",
-					Subject: &hcl.Range{
-						Start: hcl.Pos{Line: 1, Column: 1, Byte: 0},
-						End:   hcl.Pos{Line: 1, Column: 28, Byte: 27},
+					Subject: &dumb-hcl.Range{
+						Start: dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+						End:   dumb-hcl.Pos{Line: 1, Column: 28, Byte: 27},
 					},
 				})
 				return diags
@@ -402,7 +402,7 @@ func TestParseRemovedFrom_Components(t *testing.T) {
 			}
 
 			configAddress := from.TargetConfigComponent()
-			instanceAddress, addrDiags := from.TargetAbsComponentInstance(&hcl.EvalContext{
+			instanceAddress, addrDiags := from.TargetAbsComponentInstance(&dumb-hcl.EvalContext{
 				Variables: tc.vars,
 			}, RootStackInstance)
 			var wantAddrDiags tfdiags.Diagnostics
@@ -427,9 +427,9 @@ func TestParseRemovedFrom_Components(t *testing.T) {
 }
 
 func mustStackInstance(t *testing.T, str string) StackInstance {
-	traversal, hclDiags := hclsyntax.ParseTraversalPartial([]byte(str), "", hcl.InitialPos)
-	if len(hclDiags) > 0 {
-		t.Fatal(hclDiags.Error())
+	traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalPartial([]byte(str), "", dumb-hcl.InitialPos)
+	if len(dumb-hclDiags) > 0 {
+		t.Fatal(dumb-hclDiags.Error())
 	}
 	inst, rest, diags := parseInStackInstancePrefix(traversal)
 	if len(diags) > 0 {
@@ -450,8 +450,8 @@ func mustAbsComponentInstance(t *testing.T, str string) AbsComponentInstance {
 	return inst
 }
 
-func mustExpr(t *testing.T, expr string) hcl.Expression {
-	ret, diags := hclsyntax.ParseExpression([]byte(expr), "", hcl.InitialPos)
+func mustExpr(t *testing.T, expr string) dumb-hcl.Expression {
+	ret, diags := dumb-hclsyntax.ParseExpression([]byte(expr), "", dumb-hcl.InitialPos)
 	if diags.HasErrors() {
 		t.Fatal(diags.Error())
 	}

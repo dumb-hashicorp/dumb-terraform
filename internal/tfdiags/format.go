@@ -10,10 +10,10 @@ import (
 
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
 )
 
 // CompactValueStr produces a compact, single-line summary of a given value
@@ -47,7 +47,7 @@ func CompactValueStr(val cty.Value) string {
 			// We don't know about any other marks, so we'll be conservative.
 			// This shouldn't actually reachable since the caller should've
 			// checked this and skipped calling compactValueStr anyway.
-			return "value with unrecognized marks (this is a bug in Terraform)"
+			return "value with unrecognized marks (this is a bug in Dumb Terraform)"
 		}
 	}
 
@@ -74,7 +74,7 @@ func CompactValueStr(val cty.Value) string {
 		bf := val.AsBigFloat()
 		return bf.Text('g', 10)
 	case ty == cty.String:
-		// Go string syntax is not exactly the same as HCL native string syntax,
+		// Go string syntax is not exactly the same as DUMB_HCL native string syntax,
 		// but we'll accept the minor edge-cases where this is different here
 		// for now, just to get something reasonable here.
 		return fmt.Sprintf("%q", val.AsString())
@@ -108,9 +108,9 @@ func CompactValueStr(val cty.Value) string {
 	}
 }
 
-// TraversalStr produces a representation of an HCL traversal that is compact,
-// resembles HCL native syntax, and is suitable for display in the UI.
-func TraversalStr(traversal hcl.Traversal) string {
+// TraversalStr produces a representation of an DUMB_HCL traversal that is compact,
+// resembles DUMB_HCL native syntax, and is suitable for display in the UI.
+func TraversalStr(traversal dumb-hcl.Traversal) string {
 	// This is a specialized subset of traversal rendering tailored to
 	// producing helpful contextual messages in diagnostics. It is not
 	// comprehensive nor intended to be used for other purposes.
@@ -118,12 +118,12 @@ func TraversalStr(traversal hcl.Traversal) string {
 	var buf bytes.Buffer
 	for _, step := range traversal {
 		switch tStep := step.(type) {
-		case hcl.TraverseRoot:
+		case dumb-hcl.TraverseRoot:
 			buf.WriteString(tStep.Name)
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			buf.WriteByte('.')
 			buf.WriteString(tStep.Name)
-		case hcl.TraverseIndex:
+		case dumb-hcl.TraverseIndex:
 			buf.WriteByte('[')
 			if keyTy := tStep.Key.Type(); keyTy.IsPrimitiveType() {
 				buf.WriteString(CompactValueStr(tStep.Key))

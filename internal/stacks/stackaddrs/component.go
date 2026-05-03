@@ -6,12 +6,12 @@ package stackaddrs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Component is the address of a "component" block within a stack config.
@@ -91,7 +91,7 @@ func ConfigComponentForAbsInstance(instAddr AbsComponentInstance) ConfigComponen
 	}
 }
 
-func ParseAbsComponentInstance(traversal hcl.Traversal) (AbsComponentInstance, tfdiags.Diagnostics) {
+func ParseAbsComponentInstance(traversal dumb-hcl.Traversal) (AbsComponentInstance, tfdiags.Diagnostics) {
 	inst, remain, diags := ParseAbsComponentInstanceOnly(traversal)
 	if diags.HasErrors() {
 		return AbsComponentInstance{}, diags
@@ -107,8 +107,8 @@ func ParseAbsComponentInstance(traversal hcl.Traversal) (AbsComponentInstance, t
 		if len(remain) == 0 {
 			rng = traversal.SourceRange()
 		}
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid component instance address",
 			Detail:   "The component instance address must include the keyword \"component\" followed by a component name.",
 			Subject:  &rng,
@@ -121,8 +121,8 @@ func ParseAbsComponentInstance(traversal hcl.Traversal) (AbsComponentInstance, t
 
 func ParseAbsComponentInstanceStr(s string) (AbsComponentInstance, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	traversal, hclDiags := hclsyntax.ParseTraversalAbs([]byte(s), "", hcl.InitialPos)
-	diags = diags.Append(hclDiags)
+	traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(s), "", dumb-hcl.InitialPos)
+	diags = diags.Append(dumb-hclDiags)
 	if diags.HasErrors() {
 		return AbsComponentInstance{}, diags
 	}
@@ -134,8 +134,8 @@ func ParseAbsComponentInstanceStr(s string) (AbsComponentInstance, tfdiags.Diagn
 
 func ParsePartialComponentInstanceStr(s string) (AbsComponentInstance, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	traversal, hclDiags := hclsyntax.ParseTraversalPartial([]byte(s), "", hcl.InitialPos)
-	diags = diags.Append(hclDiags)
+	traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalPartial([]byte(s), "", dumb-hcl.InitialPos)
+	diags = diags.Append(dumb-hclDiags)
 	if diags.HasErrors() {
 		return AbsComponentInstance{}, diags
 	}
@@ -145,10 +145,10 @@ func ParsePartialComponentInstanceStr(s string) (AbsComponentInstance, tfdiags.D
 	return ret, diags
 }
 
-func ParseAbsComponentInstanceStrOnly(s string) (AbsComponentInstance, hcl.Traversal, tfdiags.Diagnostics) {
+func ParseAbsComponentInstanceStrOnly(s string) (AbsComponentInstance, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	traversal, hclDiags := hclsyntax.ParseTraversalPartial([]byte(s), "", hcl.InitialPos)
-	diags = diags.Append(hclDiags)
+	traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalPartial([]byte(s), "", dumb-hcl.InitialPos)
+	diags = diags.Append(dumb-hclDiags)
 	if diags.HasErrors() {
 		return AbsComponentInstance{}, traversal, diags
 	}
@@ -158,7 +158,7 @@ func ParseAbsComponentInstanceStrOnly(s string) (AbsComponentInstance, hcl.Trave
 	return ret, rest, diags
 }
 
-func ParseAbsComponentInstanceOnly(traversal hcl.Traversal) (AbsComponentInstance, hcl.Traversal, tfdiags.Diagnostics) {
+func ParseAbsComponentInstanceOnly(traversal dumb-hcl.Traversal) (AbsComponentInstance, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	if traversal.IsRelative() {
 		// This is always a caller bug: caller must only pass absolute
 		// traversals in here.
@@ -174,9 +174,9 @@ func ParseAbsComponentInstanceOnly(traversal hcl.Traversal) (AbsComponentInstanc
 	// component name, optionally followed by an instance key.
 	const diagSummary = "Invalid component instance address"
 
-	if kwStep, ok := remain[0].(hcl.TraverseAttr); !ok || kwStep.Name != "component" {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+	if kwStep, ok := remain[0].(dumb-hcl.TraverseAttr); !ok || kwStep.Name != "component" {
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  diagSummary,
 			Detail:   "The component instance address must include the keyword \"component\" followed by a component name.",
 			Subject:  remain[0].SourceRange().Ptr(),
@@ -185,10 +185,10 @@ func ParseAbsComponentInstanceOnly(traversal hcl.Traversal) (AbsComponentInstanc
 	}
 	remain = remain[1:]
 
-	nameStep, ok := remain[0].(hcl.TraverseAttr)
+	nameStep, ok := remain[0].(dumb-hcl.TraverseAttr)
 	if !ok {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  diagSummary,
 			Detail:   "The component instance address must include the keyword \"component\" followed by a component name.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -202,12 +202,12 @@ func ParseAbsComponentInstanceOnly(traversal hcl.Traversal) (AbsComponentInstanc
 
 	if len(remain) > 0 {
 		switch instStep := remain[0].(type) {
-		case hcl.TraverseIndex:
+		case dumb-hcl.TraverseIndex:
 			var err error
 			componentAddr.Key, err = addrs.ParseInstanceKey(instStep.Key)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  diagSummary,
 					Detail:   fmt.Sprintf("Invalid instance key: %s.", err),
 					Subject:  instStep.SourceRange().Ptr(),
@@ -216,7 +216,7 @@ func ParseAbsComponentInstanceOnly(traversal hcl.Traversal) (AbsComponentInstanc
 			}
 
 			remain = remain[1:]
-		case hcl.TraverseSplat:
+		case dumb-hcl.TraverseSplat:
 			componentAddr.Key = addrs.WildcardKey
 			remain = remain[1:]
 		}

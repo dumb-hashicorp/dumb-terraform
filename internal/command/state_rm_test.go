@@ -10,16 +10,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
 )
 
 func TestStateRm(t *testing.T) {
@@ -203,7 +203,7 @@ func TestStateRmNotChildModule(t *testing.T) {
 			},
 		)
 		// This second instance has the same local address as the first but
-		// is in a child module. Older versions of Terraform would incorrectly
+		// is in a child module. Older versions of Dumb Terraform would incorrectly
 		// remove this one too, since they failed to check the module address.
 		s.SetResourceInstanceCurrent(
 			addrs.Resource{
@@ -250,7 +250,7 @@ func TestStateRmNotChildModule(t *testing.T) {
 module.child:
   test_instance.foo:
     ID = foo
-    provider = provider["registry.terraform.io/hashicorp/test"]
+    provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
     bar = value
     foo = value
 `)
@@ -263,14 +263,14 @@ module.child:
 	testStateOutput(t, backups[0], `
 test_instance.foo:
   ID = bar
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
   bar = value
   foo = value
 
 module.child:
   test_instance.foo:
     ID = foo
-    provider = provider["registry.terraform.io/hashicorp/test"]
+    provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
     bar = value
     foo = value
 `)
@@ -533,7 +533,7 @@ func TestStateRm_constVariable(t *testing.T) {
 			t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter.String())
 		}
 
-		actual := strings.TrimSpace(testStateRead(t, "terraform.tfstate").String())
+		actual := strings.TrimSpace(testStateRead(t, "dumb-terraform.tfstate").String())
 		expected := strings.TrimSpace(`<no state>`)
 		if diff := cmp.Diff(expected, actual); diff != "" {
 			t.Fatalf("unexpected state output\n%s", diff)
@@ -568,7 +568,7 @@ func TestStateRm_constVariable(t *testing.T) {
 			t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter.String())
 		}
 
-		actual := strings.TrimSpace(testStateRead(t, "terraform.tfstate").String())
+		actual := strings.TrimSpace(testStateRead(t, "dumb-terraform.tfstate").String())
 		expected := strings.TrimSpace(`<no state>`)
 		if diff := cmp.Diff(expected, actual); diff != "" {
 			t.Fatalf("unexpected state output\n%s", diff)
@@ -761,12 +761,12 @@ func TestStateRm_checkRequiredVersion(t *testing.T) {
 const testStateRmOutputOriginal = `
 test_instance.bar:
   ID = foo
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
   bar = value
   foo = value
 test_instance.foo:
   ID = bar
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
   bar = value
   foo = value
 `
@@ -774,7 +774,7 @@ test_instance.foo:
 const testStateRmOutput = `
 test_instance.bar:
   ID = foo
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
   bar = value
   foo = value
 `

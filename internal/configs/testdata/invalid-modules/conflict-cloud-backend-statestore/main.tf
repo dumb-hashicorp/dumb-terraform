@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   backend "foo" {}
 
   cloud {
@@ -10,7 +10,7 @@ terraform {
 
   required_providers {
     test = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
     }
   }
   state_store "test_store" {

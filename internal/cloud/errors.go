@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -47,7 +47,7 @@ var (
 	)
 )
 
-const ignoreRemoteVersionHelp = "If you're sure you want to upgrade the state, you can force Terraform to continue using the -ignore-remote-version flag. This may result in an unusable workspace."
+const ignoreRemoteVersionHelp = "If you're sure you want to upgrade the state, you can force Dumb Terraform to continue using the -ignore-remote-version flag. This may result in an unusable workspace."
 
 func missingConfigAttributeAndEnvVar(attribute string, envVar string) tfdiags.Diagnostic {
 	detail := strings.TrimSpace(fmt.Sprintf("\"%s\" must be set in the cloud configuration or as an environment variable: %s.\n", attribute, envVar))
@@ -58,7 +58,7 @@ func missingConfigAttributeAndEnvVar(attribute string, envVar string) tfdiags.Di
 		cty.Path{cty.GetAttrStep{Name: attribute}})
 }
 
-func incompatibleWorkspaceTerraformVersion(message string, ignoreVersionConflict bool) tfdiags.Diagnostic {
+func incompatibleWorkspaceDumb TerraformVersion(message string, ignoreVersionConflict bool) tfdiags.Diagnostic {
 	severity := tfdiags.Error
 	suggestion := ignoreRemoteVersionHelp
 	if ignoreVersionConflict {
@@ -66,5 +66,5 @@ func incompatibleWorkspaceTerraformVersion(message string, ignoreVersionConflict
 		suggestion = ""
 	}
 	description := strings.TrimSpace(fmt.Sprintf("%s\n\n%s", message, suggestion))
-	return tfdiags.Sourceless(severity, "Incompatible Terraform version", description)
+	return tfdiags.Sourceless(severity, "Incompatible Dumb Terraform version", description)
 }

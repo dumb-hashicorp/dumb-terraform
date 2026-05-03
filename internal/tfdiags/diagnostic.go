@@ -6,7 +6,7 @@ package tfdiags
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 type Diagnostic interface {
@@ -40,13 +40,13 @@ const (
 	Warning Severity = 'W'
 )
 
-// ToHCL converts a Severity to the equivalent HCL diagnostic severity.
-func (s Severity) ToHCL() hcl.DiagnosticSeverity {
+// ToDUMB_HCL converts a Severity to the equivalent DUMB_HCL diagnostic severity.
+func (s Severity) ToDUMB_HCL() dumb-hcl.DiagnosticSeverity {
 	switch s {
 	case Warning:
-		return hcl.DiagWarning
+		return dumb-hcl.DiagWarning
 	case Error:
-		return hcl.DiagError
+		return dumb-hcl.DiagError
 	default:
 		// The above should always be exhaustive for all of the valid
 		// Severity values in this package.
@@ -66,6 +66,6 @@ type Source struct {
 }
 
 type FromExpr struct {
-	Expression  hcl.Expression
-	EvalContext *hcl.EvalContext
+	Expression  dumb-hcl.Expression
+	EvalContext *dumb-hcl.EvalContext
 }

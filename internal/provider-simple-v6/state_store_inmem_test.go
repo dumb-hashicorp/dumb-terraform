@@ -6,11 +6,11 @@ package simple
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/pluggable"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/pluggable"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -42,7 +42,7 @@ func TestInMemStoreRemoteState(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	b := backend.TestBackendConfig(t, plug, hcl.EmptyBody())
+	b := backend.TestBackendConfig(t, plug, dumb-hcl.EmptyBody())
 
 	// The "default" state doesn't exist by default
 	// (Note that this depends on the factory method used to get the provider above)

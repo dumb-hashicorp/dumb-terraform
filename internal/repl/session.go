@@ -10,12 +10,12 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/lang/types"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/types"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Session represents the state for a single REPL session.
@@ -49,7 +49,7 @@ func (s *Session) handleEval(line string) (string, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	// Parse the given line as an expression
-	expr, parseDiags := hclsyntax.ParseExpression([]byte(line), "<console-input>", hcl.Pos{Line: 1, Column: 1})
+	expr, parseDiags := dumb-hclsyntax.ParseExpression([]byte(line), "<console-input>", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return "", diags
@@ -88,7 +88,7 @@ func (s *Session) handleEval(line string) (string, tfdiags.Diagnostics) {
 
 func (s *Session) handleHelp() (string, tfdiags.Diagnostics) {
 	text := `
-The Terraform console allows you to experiment with Terraform interpolations.
+The Dumb Terraform console allows you to experiment with Dumb Terraform interpolations.
 You may access resources in the state (if you have one) just as you would
 from a configuration. For example: "aws_instance.foo.id" would evaluate
 to the ID of "aws_instance.foo" if it exists in your state.

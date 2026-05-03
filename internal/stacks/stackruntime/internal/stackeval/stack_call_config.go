@@ -8,17 +8,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StackCallConfig represents a "stack" block in a stack configuration,
@@ -125,7 +125,7 @@ func (s *StackCallConfig) validateForEachValueInner(phase EvalPhase) func(contex
 func (s *StackCallConfig) ValidateInputVariableValues(ctx context.Context, phase EvalPhase) (map[stackaddrs.InputVariable]cty.Value, tfdiags.Diagnostics) {
 	return doOnceWithDiags(
 		ctx, s.tracingName()+" inputs", s.inputVariableValues.For(phase),
-		validateStackCallInputsFn(s.config.Inputs, s.config.DeclRange.ToHCL(), s.TargetConfig(), s, phase),
+		validateStackCallInputsFn(s.config.Inputs, s.config.DeclRange.ToDUMB_HCL(), s.TargetConfig(), s, phase),
 	)
 }
 
@@ -226,11 +226,11 @@ func (s *StackCallConfig) ResolveExpressionReference(ctx context.Context, ref st
 	if _, ok := ret.(*ProviderConfig); ok {
 		// We can't reference other providers from anywhere inside an embedded
 		// stack call - they should define their own providers.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   fmt.Sprintf("The object %s is not in scope at this location.", ref.Target.String()),
-			Subject:  ref.SourceRange.ToHCL().Ptr(),
+			Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 		})
 	}
 
@@ -276,7 +276,7 @@ func (s *StackCallConfig) ExprReferenceValue(ctx context.Context, phase EvalPhas
 	return s.ResultValue(ctx, phase)
 }
 
-func validateStackCallInputsFn(inputs hcl.Expression, callRange hcl.Range, config *StackConfig, scope ExpressionScope, phase EvalPhase) func(ctx context.Context) (map[stackaddrs.InputVariable]cty.Value, tfdiags.Diagnostics) {
+func validateStackCallInputsFn(inputs dumb-hcl.Expression, callRange dumb-hcl.Range, config *StackConfig, scope ExpressionScope, phase EvalPhase) func(ctx context.Context) (map[stackaddrs.InputVariable]cty.Value, tfdiags.Diagnostics) {
 	return func(ctx context.Context) (map[stackaddrs.InputVariable]cty.Value, tfdiags.Diagnostics) {
 		var diags tfdiags.Diagnostics
 		vars := config.InputVariables()
@@ -297,8 +297,8 @@ func validateStackCallInputsFn(inputs hcl.Expression, callRange hcl.Range, confi
 		oty := cty.ObjectWithOptionalAttrs(atys, optional)
 
 		var varsObj cty.Value
-		var hclCtx *hcl.EvalContext // NOTE: remains nil when h.config.Inputs is unset
-		var inputsRange hcl.Range
+		var dumb-hclCtx *dumb-hcl.EvalContext // NOTE: remains nil when h.config.Inputs is unset
+		var inputsRange dumb-hcl.Range
 		if inputs != nil {
 			result, moreDiags := EvalExprAndEvalContext(ctx, inputs, phase, scope)
 			v := result.Value
@@ -307,7 +307,7 @@ func validateStackCallInputsFn(inputs hcl.Expression, callRange hcl.Range, confi
 				v = cty.UnknownVal(oty.WithoutOptionalAttributesDeep())
 			}
 			varsObj = v
-			hclCtx = result.EvalContext
+			dumb-hclCtx = result.EvalContext
 			inputsRange = inputs.Range()
 		} else {
 			varsObj = cty.EmptyObjectVal
@@ -321,8 +321,8 @@ func validateStackCallInputsFn(inputs hcl.Expression, callRange hcl.Range, confi
 
 		varsObj, err := convert.Convert(varsObj, oty)
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid input variable definitions",
 				Detail: fmt.Sprintf(
 					"Unsuitable input variable definitions: %s.",
@@ -334,7 +334,7 @@ func validateStackCallInputsFn(inputs hcl.Expression, callRange hcl.Range, confi
 				// actually define the "inputs" argument, but that's okay
 				// because these fields are both optional anyway.
 				Expression:  inputs,
-				EvalContext: hclCtx,
+				EvalContext: dumb-hclCtx,
 			})
 			varsObj = cty.UnknownVal(oty.WithoutOptionalAttributesDeep())
 		}
@@ -347,8 +347,8 @@ func validateStackCallInputsFn(inputs hcl.Expression, callRange hcl.Range, confi
 				if def, ok := defs[addr.Name]; ok {
 					ret[addr] = def
 				} else {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Missing definition for required input variable",
 						Detail:   fmt.Sprintf("The input variable %q is required, so cannot be omitted.", addr.Name),
 						Subject:  inputs.Range().Ptr(),
@@ -357,7 +357,7 @@ func validateStackCallInputsFn(inputs hcl.Expression, callRange hcl.Range, confi
 						// actually define the "inputs" argument, but that's okay
 						// because these fields are both optional anyway.
 						Expression:  inputs,
-						EvalContext: hclCtx,
+						EvalContext: dumb-hclCtx,
 					})
 					ret[addr] = cty.UnknownVal(atys[addr.Name])
 				}

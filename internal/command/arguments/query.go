@@ -4,7 +4,7 @@
 package arguments
 
 import (
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Query represents the command-line arguments for the query command.
@@ -17,7 +17,7 @@ type Query struct {
 	// ViewType specifies which output format to use: human or JSON.
 	ViewType ViewType
 
-	// GenerateConfigPath tells Terraform that config should be generated for
+	// GenerateConfigPath tells Dumb Terraform that config should be generated for
 	// the found resources in the query and which path the generated file should
 	// be written to.
 	GenerateConfigPath string

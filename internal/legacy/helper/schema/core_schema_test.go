@@ -10,7 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 )
 
 // add the implicit "id" attribute for test resources

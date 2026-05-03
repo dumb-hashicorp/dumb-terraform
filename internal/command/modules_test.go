@@ -14,11 +14,11 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	backendCloud "github.com/hashicorp/terraform/internal/cloud"
-	"github.com/hashicorp/terraform/internal/moduleref"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	backendCloud "github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduleref"
 )
 
 func TestModules_noJsonFlag(t *testing.T) {
@@ -181,8 +181,8 @@ func TestModules_uninstalledModules(t *testing.T) {
 		t.Fatalf("expected to see a `not installed` error message: %s\n", output)
 	}
 
-	if !strings.Contains(output, `Run "terraform init"`) {
-		t.Fatalf("expected error message to ask user to run terraform init: %s\n", output)
+	if !strings.Contains(output, `Run "dumb-terraform init"`) {
+		t.Fatalf("expected error message to ask user to run dumb-terraform init: %s\n", output)
 	}
 }
 

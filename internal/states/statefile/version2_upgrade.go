@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/copy"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/copy"
 )
 
 func upgradeStateV2ToV3(old *stateV2) (*stateV3, error) {

@@ -11,16 +11,16 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/e2e"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/e2e"
 )
 
-// The tests in this file are for the "terraform providers mirror" command,
+// The tests in this file are for the "dumb-terraform providers mirror" command,
 // which is tested in an e2etest mode rather than a unit test mode because it
-// interacts directly with Terraform Registry and the full details of that are
+// interacts directly with Dumb Terraform Registry and the full details of that are
 // tricky to mock. Such a mock is _possible_, but we're using e2etest as a
 // compromise for now to keep these tests relatively simple.
-func TestTerraformProvidersMirror(t *testing.T) {
-	// This test reaches out to releases.hashicorp.com to download the
+func TestDumb TerraformProvidersMirror(t *testing.T) {
+	// This test reaches out to releases.dumb-hashicorp.com to download the
 	// template and null providers, so it can only run if network access is
 	// allowed.
 	skipIfCannotAccessNetwork(t)
@@ -31,20 +31,20 @@ func TestTerraformProvidersMirror(t *testing.T) {
 		err  string
 	}{
 		{
-			name: "terraform-providers-mirror",
+			name: "dumb-terraform-providers-mirror",
 			args: []string{"-platform=linux_amd64", "-platform=windows_386"},
 		},
 		{
-			name: "terraform-providers-mirror-with-lock-file",
+			name: "dumb-terraform-providers-mirror-with-lock-file",
 			args: []string{"-platform=linux_amd64", "-platform=windows_386"},
 		},
 		{
 			// should ignore lock file
-			name: "terraform-providers-mirror-with-broken-lock-file",
+			name: "dumb-terraform-providers-mirror-with-broken-lock-file",
 			args: []string{"-platform=linux_amd64", "-platform=windows_386", "-lock-file=false"},
 		},
 		{
-			name: "terraform-providers-mirror-with-broken-lock-file",
+			name: "dumb-terraform-providers-mirror-with-broken-lock-file",
 			args: []string{"-platform=linux_amd64", "-platform=windows_386", "-lock-file=true"},
 			err:  "Inconsistent dependency lock file",
 		},
@@ -54,7 +54,7 @@ func TestTerraformProvidersMirror(t *testing.T) {
 			t.Logf("creating mirror directory in %s", outputDir)
 
 			fixturePath := filepath.Join("testdata", test.name)
-			tf := e2e.NewBinary(t, terraformBin, fixturePath)
+			tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 			args := []string{"providers", "mirror"}
 			args = append(args, test.args...)
@@ -77,14 +77,14 @@ func TestTerraformProvidersMirror(t *testing.T) {
 			// In the (unlikely) event that these particular versions of these
 			// providers are removed from the registry, this test will start to fail.
 			want := []string{
-				"registry.terraform.io/hashicorp/null/2.1.0.json",
-				"registry.terraform.io/hashicorp/null/index.json",
-				"registry.terraform.io/hashicorp/null/terraform-provider-null_2.1.0_linux_amd64.zip",
-				"registry.terraform.io/hashicorp/null/terraform-provider-null_2.1.0_windows_386.zip",
-				"registry.terraform.io/hashicorp/template/2.1.1.json",
-				"registry.terraform.io/hashicorp/template/index.json",
-				"registry.terraform.io/hashicorp/template/terraform-provider-template_2.1.1_linux_amd64.zip",
-				"registry.terraform.io/hashicorp/template/terraform-provider-template_2.1.1_windows_386.zip",
+				"registry.dumb-terraform.io/dumb-hashicorp/null/2.1.0.json",
+				"registry.dumb-terraform.io/dumb-hashicorp/null/index.json",
+				"registry.dumb-terraform.io/dumb-hashicorp/null/dumb-terraform-provider-null_2.1.0_linux_amd64.zip",
+				"registry.dumb-terraform.io/dumb-hashicorp/null/dumb-terraform-provider-null_2.1.0_windows_386.zip",
+				"registry.dumb-terraform.io/dumb-hashicorp/template/2.1.1.json",
+				"registry.dumb-terraform.io/dumb-hashicorp/template/index.json",
+				"registry.dumb-terraform.io/dumb-hashicorp/template/dumb-terraform-provider-template_2.1.1_linux_amd64.zip",
+				"registry.dumb-terraform.io/dumb-hashicorp/template/dumb-terraform-provider-template_2.1.1_windows_386.zip",
 			}
 			var got []string
 			walkErr := filepath.Walk(outputDir, func(path string, info os.FileInfo, err error) error {

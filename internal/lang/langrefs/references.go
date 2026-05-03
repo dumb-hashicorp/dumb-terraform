@@ -4,17 +4,17 @@
 package langrefs
 
 import (
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/lang/blocktoattr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/blocktoattr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ParseRef describes the signature of a function that can attempt to raise
-// a raw HCL traversal into a reference.
-type ParseRef func(traversal hcl.Traversal) (*addrs.Reference, tfdiags.Diagnostics)
+// a raw DUMB_HCL traversal into a reference.
+type ParseRef func(traversal dumb-hcl.Traversal) (*addrs.Reference, tfdiags.Diagnostics)
 
 // References finds all of the references in the given set of traversals,
 // returning diagnostics if any of the traversals cannot be interpreted as a
@@ -29,7 +29,7 @@ type ParseRef func(traversal hcl.Traversal) (*addrs.Reference, tfdiags.Diagnosti
 // incomplete or invalid. Otherwise, the returned slice has one reference per
 // given traversal, though it is not guaranteed that the references will
 // appear in the same order as the given traversals.
-func References(parseRef ParseRef, traversals []hcl.Traversal) ([]*addrs.Reference, tfdiags.Diagnostics) {
+func References(parseRef ParseRef, traversals []dumb-hcl.Traversal) ([]*addrs.Reference, tfdiags.Diagnostics) {
 	if len(traversals) == 0 {
 		return nil, nil
 	}
@@ -55,13 +55,13 @@ func References(parseRef ParseRef, traversals []hcl.Traversal) ([]*addrs.Referen
 //
 // A block schema must be provided so that this function can determine where in
 // the body variables are expected.
-func ReferencesInBlock(parseRef ParseRef, body hcl.Body, schema *configschema.Block) ([]*addrs.Reference, tfdiags.Diagnostics) {
+func ReferencesInBlock(parseRef ParseRef, body dumb-hcl.Body, schema *configschema.Block) ([]*addrs.Reference, tfdiags.Diagnostics) {
 	if body == nil {
 		return nil, nil
 	}
 
-	// We use blocktoattr.ExpandedVariables instead of hcldec.Variables or
-	// dynblock.VariablesHCLDec here because when we evaluate a block we'll
+	// We use blocktoattr.ExpandedVariables instead of dumb-hcldec.Variables or
+	// dynblock.VariablesDUMB_HCLDec here because when we evaluate a block we'll
 	// first apply the dynamic block extension and _then_ the blocktoattr
 	// transform, and so blocktoattr.ExpandedVariables takes into account
 	// both of those transforms when it analyzes the body to ensure we find
@@ -70,7 +70,7 @@ func ReferencesInBlock(parseRef ParseRef, body hcl.Body, schema *configschema.Bl
 	// already know which variables are required.
 	//
 	// The set of cases we want to detect here is covered by the tests for
-	// the plan graph builder in the main 'terraform' package, since it's
+	// the plan graph builder in the main 'dumb-terraform' package, since it's
 	// in a better position to test this due to having mock providers etc
 	// available.
 	traversals := blocktoattr.ExpandedVariables(body, schema)
@@ -80,7 +80,7 @@ func ReferencesInBlock(parseRef ParseRef, body hcl.Body, schema *configschema.Bl
 // ReferencesInExpr is a helper wrapper around References that first searches
 // the given expression for traversals, before converting those traversals
 // to references.
-func ReferencesInExpr(parseRef ParseRef, expr hcl.Expression) ([]*addrs.Reference, tfdiags.Diagnostics) {
+func ReferencesInExpr(parseRef ParseRef, expr dumb-hcl.Expression) ([]*addrs.Reference, tfdiags.Diagnostics) {
 	if expr == nil {
 		return nil, nil
 	}

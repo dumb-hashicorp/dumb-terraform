@@ -8,17 +8,17 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestValidate_modulesWithProviderConfigs(t *testing.T) {
 	// This test checks that we're correctly prohibiting inline provider
-	// configurations in Terraform modules used as stack components, which
+	// configurations in Dumb Terraform modules used as stack components, which
 	// is forbidden because the stacks language is responsible for provider
 	// configurations.
 	//
@@ -58,24 +58,24 @@ func TestValidate_modulesWithProviderConfigs(t *testing.T) {
 		// stacks-compatible, while for the root it's more likely to be
 		// directly intended for stacks use, at least for now while things are
 		// relatively early. (We could revisit this tradeoff later.)
-		wantDiags = wantDiags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		wantDiags = wantDiags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Inline provider configuration not allowed",
 			Detail:   `A module used as a stack component must have all of its provider configurations passed from the stack configuration, using the "providers" argument within the component configuration block.`,
-			Subject: &hcl.Range{
+			Subject: &dumb-hcl.Range{
 				Filename: "https://testing.invalid/validating.tar.gz//modules_with_provider_configs/module-a/modules-with-provider-configs-a.tf",
-				Start:    hcl.Pos{Line: 9, Column: 1, Byte: 104},
-				End:      hcl.Pos{Line: 9, Column: 16, Byte: 119},
+				Start:    dumb-hcl.Pos{Line: 9, Column: 1, Byte: 104},
+				End:      dumb-hcl.Pos{Line: 9, Column: 16, Byte: 119},
 			},
 		})
-		wantDiags = wantDiags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		wantDiags = wantDiags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Inline provider configuration not allowed",
-			Detail:   "This module is not compatible with Terraform Stacks, because it declares an inline provider configuration.\n\nTo be used with stacks, this module must instead accept provider configurations from its caller.",
-			Subject: &hcl.Range{
+			Detail:   "This module is not compatible with Dumb Terraform Stacks, because it declares an inline provider configuration.\n\nTo be used with stacks, this module must instead accept provider configurations from its caller.",
+			Subject: &dumb-hcl.Range{
 				Filename: "https://testing.invalid/validating.tar.gz//modules_with_provider_configs/module-b/modules-with-provider-configs-b.tf",
-				Start:    hcl.Pos{Line: 9, Column: 1, Byte: 104},
-				End:      hcl.Pos{Line: 9, Column: 16, Byte: 119},
+				Start:    dumb-hcl.Pos{Line: 9, Column: 1, Byte: 104},
+				End:      dumb-hcl.Pos{Line: 9, Column: 16, Byte: 119},
 			},
 		})
 		wantDiags = wantDiags.ForRPC()
@@ -121,14 +121,14 @@ func TestValidate_nestedModuleDiagnostics(t *testing.T) {
 			"https://testing.invalid/validating.tar.gz//nested_module_diagnostics/invalid_child/child/invalid_child.tf",
 		}
 		for _, filename := range filenames {
-			wantDiags = wantDiags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			wantDiags = wantDiags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Unsupported block type",
 				Detail:   `Blocks of type "invalid" are not expected here.`,
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: filename,
-					Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-					End:      hcl.Pos{Line: 1, Column: 8, Byte: 7},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+					End:      dumb-hcl.Pos{Line: 1, Column: 8, Byte: 7},
 				},
 			})
 		}

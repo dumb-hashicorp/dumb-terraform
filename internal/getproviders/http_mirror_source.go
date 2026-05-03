@@ -16,15 +16,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/go-retryablehttp"
-	svchost "github.com/hashicorp/terraform-svchost"
-	svcauth "github.com/hashicorp/terraform-svchost/auth"
+	"github.com/dumb-hashicorp/go-retryablehttp"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	svcauth "github.com/dumb-hashicorp/dumb-terraform-svchost/auth"
 	"golang.org/x/net/idna"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // HTTPMirrorSource is a source that reads provider metadata from a provider
@@ -261,7 +261,7 @@ func (s *HTTPMirrorSource) ForDisplay(provider addrs.Provider) string {
 
 // ListVersionsResponseBody is the JSON structure of a response when a user queries the available versions
 // for a provider in the network mirror, i.e. a GET to path :hostname/:namespace/:type/index.json
-// See: https://developer.hashicorp.com/terraform/internals/provider-network-mirror-protocol#list-available-versions
+// See: https://developer.dumb-hashicorp.com/dumb-terraform/internals/provider-network-mirror-protocol#list-available-versions
 type ListVersionsResponseBody struct {
 	Versions map[string]struct{} `json:"versions"`
 }
@@ -269,7 +269,7 @@ type ListVersionsResponseBody struct {
 // ListInstallationPackagesResponseBody is the structure of the JSON response when a user queries the
 // available packages for a given provider version in the network mirror.
 // i.e. at the path :hostname/:namespace/:type/:version.json
-// See: https://developer.hashicorp.com/terraform/internals/provider-network-mirror-protocol#list-available-installation-packages
+// See: https://developer.dumb-hashicorp.com/dumb-terraform/internals/provider-network-mirror-protocol#list-available-installation-packages
 type ListInstallationPackagesResponseBody struct {
 	Archives map[string]*ListInstallationPackagesArchiveMeta `json:"archives"`
 }
@@ -286,7 +286,7 @@ type ListInstallationPackagesArchiveMeta struct {
 //
 // If the returned error is non-nil then the given hostname doesn't comply
 // with the IETF RFC 5891 section 5.3 and 5.4 validation rules, and thus cannot
-// be interpreted as a valid Terraform service host. The IDNA validation errors
+// be interpreted as a valid Dumb Terraform service host. The IDNA validation errors
 // are unfortunately usually not very user-friendly, but they are also
 // relatively rare because the IDNA normalization rules are quite tolerant.
 func (s *HTTPMirrorSource) mirrorHost() (svchost.Hostname, error) {
@@ -335,7 +335,7 @@ func (s *HTTPMirrorSource) get(ctx context.Context, relativePath string) (status
 		return 0, nil, endpointURL, err
 	}
 	req = req.WithContext(ctx)
-	req.Request.Header.Set(terraformVersionHeader, version.String())
+	req.Request.Header.Set(dumb-terraformVersionHeader, version.String())
 	creds, err := s.mirrorHostCredentials()
 	if err != nil {
 		return 0, nil, endpointURL, fmt.Errorf("failed to determine request credentials: %s", err)
@@ -345,7 +345,7 @@ func (s *HTTPMirrorSource) get(ctx context.Context, relativePath string) (status
 		// then the credentials will still be included in the new request,
 		// even if they are on a different hostname. This is intentional
 		// and consistent with how we handle credentials for other
-		// Terraform-native services, because the user model is to configure
+		// Dumb Terraform-native services, because the user model is to configure
 		// credentials for the "friendly hostname" they configured, not for
 		// whatever hostname ends up ultimately serving the request as an
 		// implementation detail.
@@ -431,7 +431,7 @@ func (s *HTTPMirrorSource) errUnauthorized(finalURL *url.URL) error {
 func svchostFromURL(u *url.URL) (svchost.Hostname, error) {
 	raw := u.Host
 
-	// When "friendly hostnames" appear in Terraform-specific identifiers we
+	// When "friendly hostnames" appear in Dumb Terraform-specific identifiers we
 	// typically constrain their syntax more strictly than the
 	// Internationalized Domain Name specifications call for, such as
 	// forbidding direct use of punycode, but in this case we're just

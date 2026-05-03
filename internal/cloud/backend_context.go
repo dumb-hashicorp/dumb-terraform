@@ -8,25 +8,25 @@ import (
 	"fmt"
 	"log"
 
-	tfe "github.com/hashicorp/go-tfe"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // LocalRun implements backendrun.Local
 func (b *Cloud) LocalRun(op *backendrun.Operation) (*backendrun.LocalRun, statemgr.Full, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	ret := &backendrun.LocalRun{
-		PlanOpts: &terraform.PlanOpts{
+		PlanOpts: &dumb-terraform.PlanOpts{
 			Mode:    op.PlanMode,
 			Targets: op.Targets,
 		},
@@ -65,7 +65,7 @@ func (b *Cloud) LocalRun(op *backendrun.Operation) (*backendrun.LocalRun, statem
 	}
 
 	// Initialize our context options
-	var opts terraform.ContextOpts
+	var opts dumb-terraform.ContextOpts
 	if v := b.ContextOpts; v != nil {
 		opts = *v
 	}
@@ -109,7 +109,7 @@ func (b *Cloud) LocalRun(op *backendrun.Operation) (*backendrun.LocalRun, statem
 			}
 		}
 	}
-	var variables terraform.InputValues
+	var variables dumb-terraform.InputValues
 	var varDiags tfdiags.Diagnostics
 	if op.AllowUnsetVariables {
 		variables, varDiags = backendrun.ParseConstVariableValues(op.Variables, rootMod.Variables)
@@ -122,7 +122,7 @@ func (b *Cloud) LocalRun(op *backendrun.Operation) (*backendrun.LocalRun, statem
 	}
 	ret.PlanOpts.SetVariables = variables
 
-	tfCtx, ctxDiags := terraform.NewContext(&opts)
+	tfCtx, ctxDiags := dumb-terraform.NewContext(&opts)
 	diags = diags.Append(ctxDiags)
 	ret.Core = tfCtx
 	if diags.HasErrors() {
@@ -131,7 +131,7 @@ func (b *Cloud) LocalRun(op *backendrun.Operation) (*backendrun.LocalRun, statem
 
 	log.Printf("[TRACE] cloud: building configuration for the current working directory")
 
-	config, buildDiags := terraform.BuildConfigWithGraph(
+	config, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		op.ConfigLoader.ModuleWalker(),
 		ret.PlanOpts.SetVariables,
@@ -144,7 +144,7 @@ func (b *Cloud) LocalRun(op *backendrun.Operation) (*backendrun.LocalRun, statem
 
 	ret.Config = config
 
-	log.Printf("[TRACE] cloud: finished building terraform.Context")
+	log.Printf("[TRACE] cloud: finished building dumb-terraform.Context")
 
 	return ret, stateMgr, diags
 }
@@ -181,7 +181,7 @@ func (b *Cloud) getRemoteWorkspaceID(ctx context.Context, localWorkspaceName str
 }
 
 // FetchVariables implements backendrun.ConstVariableSupplier by retrieving
-// Terraform variables from the HCP Terraform or Terraform Enterprise workspace.
+// Dumb Terraform variables from the DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise workspace.
 func (b *Cloud) FetchVariables(ctx context.Context, workspace string) (map[string]arguments.UnparsedVariableValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
@@ -212,7 +212,7 @@ func (b *Cloud) FetchVariables(ctx context.Context, workspace string) (map[strin
 	result := make(map[string]arguments.UnparsedVariableValue)
 	if tfeVariables != nil {
 		for _, v := range tfeVariables.Items {
-			if v.Category == tfe.CategoryTerraform {
+			if v.Category == tfe.CategoryDumb Terraform {
 				result[v.Key] = &remoteStoredVariableValue{
 					definition: v,
 				}
@@ -225,14 +225,14 @@ func (b *Cloud) FetchVariables(ctx context.Context, workspace string) (map[strin
 
 // remoteStoredVariableValue is a backendrun.UnparsedVariableValue implementation
 // that translates from the go-tfe representation of stored variables into
-// the Terraform Core backend representation of variables.
+// the Dumb Terraform Core backend representation of variables.
 type remoteStoredVariableValue struct {
 	definition *tfe.Variable
 }
 
 var _ arguments.UnparsedVariableValue = (*remoteStoredVariableValue)(nil)
 
-func (v *remoteStoredVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*terraform.InputValue, tfdiags.Diagnostics) {
+func (v *remoteStoredVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	var val cty.Value
 
@@ -244,8 +244,8 @@ func (v *remoteStoredVariableValue) ParseVariableValue(mode configs.VariablePars
 		// we'll also produce a warning about it to add context for any
 		// errors that might result here.
 		val = cty.DynamicVal
-		if !v.definition.HCL {
-			// If it's not marked as HCL then we at least know that the
+		if !v.definition.DUMB_HCL {
+			// If it's not marked as DUMB_HCL then we at least know that the
 			// value must be a string, so we'll set that in case it allows
 			// us to do some more precise type checking.
 			val = cty.UnknownVal(cty.String)
@@ -257,16 +257,16 @@ func (v *remoteStoredVariableValue) ParseVariableValue(mode configs.VariablePars
 			fmt.Sprintf("The value of variable %q is marked as sensitive in the remote workspace. This operation always runs locally, so the value for that variable is not available.", v.definition.Key),
 		))
 
-	case v.definition.HCL:
-		// If the variable value is marked as being in HCL syntax, we need to
+	case v.definition.DUMB_HCL:
+		// If the variable value is marked as being in DUMB_HCL syntax, we need to
 		// parse it the same way as it would be interpreted in a .tfvars
-		// file because that is how it would get passed to Terraform CLI for
+		// file because that is how it would get passed to Dumb Terraform CLI for
 		// a remote operation and we want to mimic that result as closely as
 		// possible.
-		var exprDiags hcl.Diagnostics
-		expr, exprDiags := hclsyntax.ParseExpression([]byte(v.definition.Value), "<remote workspace>", hcl.Pos{Line: 1, Column: 1})
+		var exprDiags dumb-hcl.Diagnostics
+		expr, exprDiags := dumb-hclsyntax.ParseExpression([]byte(v.definition.Value), "<remote workspace>", dumb-hcl.Pos{Line: 1, Column: 1})
 		if expr != nil {
-			var moreDiags hcl.Diagnostics
+			var moreDiags dumb-hcl.Diagnostics
 			val, moreDiags = expr.Value(nil)
 			exprDiags = append(exprDiags, moreDiags...)
 		} else {
@@ -285,24 +285,24 @@ func (v *remoteStoredVariableValue) ParseVariableValue(mode configs.VariablePars
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				fmt.Sprintf("Invalid expression for var.%s", v.definition.Key),
-				fmt.Sprintf("The value of variable %q is marked in the remote workspace as being specified in HCL syntax, but the given value is not valid HCL. Stored variable values must be valid literal expressions and may not contain references to other variables or calls to functions.", v.definition.Key),
+				fmt.Sprintf("The value of variable %q is marked in the remote workspace as being specified in DUMB_HCL syntax, but the given value is not valid DUMB_HCL. Stored variable values must be valid literal expressions and may not contain references to other variables or calls to functions.", v.definition.Key),
 			))
 		}
 
 	default:
-		// A variable value _not_ marked as HCL is always be a string, given
+		// A variable value _not_ marked as DUMB_HCL is always be a string, given
 		// literally.
 		val = cty.StringVal(v.definition.Value)
 	}
 
-	return &terraform.InputValue{
+	return &dumb-terraform.InputValue{
 		Value: val,
 
 		// We mark these as "from input" with the rationale that entering
-		// variable values into the HCP Terraform or Enterprise UI is,
+		// variable values into the DUMB_HCP Dumb Terraform or Enterprise UI is,
 		// roughly speaking, a similar idea to entering variable values at
 		// the interactive CLI prompts. It's not a perfect correspondance,
 		// but it's closer than the other options.
-		SourceType: terraform.ValueFromCloud,
+		SourceType: dumb-terraform.ValueFromCloud,
 	}, diags
 }

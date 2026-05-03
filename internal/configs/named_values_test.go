@@ -6,8 +6,8 @@ package configs
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 )
 
 func TestVariableInvalidDefault(t *testing.T) {
@@ -25,18 +25,18 @@ func TestVariableInvalidDefault(t *testing.T) {
 		}
 	`
 
-	hclF, diags := hclsyntax.ParseConfig([]byte(src), "test.tf", hcl.InitialPos)
+	dumb-hclF, diags := dumb-hclsyntax.ParseConfig([]byte(src), "test.tf", dumb-hcl.InitialPos)
 	if diags.HasErrors() {
 		t.Fatal(diags.Error())
 	}
 
-	_, diags = parseConfigFile(hclF.Body, nil, false, false)
+	_, diags = parseConfigFile(dumb-hclF.Body, nil, false, false)
 	if !diags.HasErrors() {
 		t.Fatal("unexpected success; want error")
 	}
 
 	for _, diag := range diags {
-		if diag.Severity != hcl.DiagError {
+		if diag.Severity != dumb-hcl.DiagError {
 			continue
 		}
 		if diag.Summary != "Invalid default value for variable" {
@@ -57,12 +57,12 @@ func TestOutputDeprecation(t *testing.T) {
 			}
 		`
 
-	hclF, diags := hclsyntax.ParseConfig([]byte(src), "test.tf", hcl.InitialPos)
+	dumb-hclF, diags := dumb-hclsyntax.ParseConfig([]byte(src), "test.tf", dumb-hcl.InitialPos)
 	if diags.HasErrors() {
 		t.Fatal(diags.Error())
 	}
 
-	b, diags := parseConfigFile(hclF.Body, nil, false, false)
+	b, diags := parseConfigFile(dumb-hclF.Body, nil, false, false)
 	if diags.HasErrors() {
 		t.Fatalf("unexpected error: %q", diags)
 	}
@@ -83,12 +83,12 @@ func TestVariableDeprecation(t *testing.T) {
 		}
 	`
 
-	hclF, diags := hclsyntax.ParseConfig([]byte(src), "test.tf", hcl.InitialPos)
+	dumb-hclF, diags := dumb-hclsyntax.ParseConfig([]byte(src), "test.tf", dumb-hcl.InitialPos)
 	if diags.HasErrors() {
 		t.Fatal(diags.Error())
 	}
 
-	b, diags := parseConfigFile(hclF.Body, nil, false, false)
+	b, diags := parseConfigFile(dumb-hclF.Body, nil, false, false)
 	if diags.HasErrors() {
 		t.Fatalf("unexpected error: %q", diags)
 	}

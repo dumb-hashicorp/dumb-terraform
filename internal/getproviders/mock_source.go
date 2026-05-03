@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // MockSource is an in-memory-only, statically-configured source intended for
@@ -135,8 +135,8 @@ func FakePackageMeta(provider addrs.Provider, version Version, protocols Version
 
 		// Some fake but somewhat-realistic-looking other metadata. This
 		// points nowhere, so will fail if attempting to actually use it.
-		Filename: fmt.Sprintf("terraform-provider-%s_%s_%s.zip", provider.Type, version.String(), target.String()),
-		Location: PackageHTTPURL(fmt.Sprintf("https://fake.invalid/terraform-provider-%s_%s.zip", provider.Type, version.String())),
+		Filename: fmt.Sprintf("dumb-terraform-provider-%s_%s_%s.zip", provider.Type, version.String(), target.String()),
+		Location: PackageHTTPURL(fmt.Sprintf("https://fake.invalid/dumb-terraform-provider-%s_%s.zip", provider.Type, version.String())),
 	}
 }
 
@@ -145,7 +145,7 @@ func FakePackageMeta(provider addrs.Provider, version Version, protocols Version
 //
 // Installing it will not produce a working provider though: just a fake file
 // posing as an executable. The filename for the executable defaults to the
-// standard terraform-provider-NAME_X.Y.Z format, but can be overridden with
+// standard dumb-terraform-provider-NAME_X.Y.Z format, but can be overridden with
 // the execFilename argument.
 //
 // Cleanup functions are handled internally using t.Cleanup.
@@ -170,7 +170,7 @@ func FakeInstallablePackageMeta(t *testing.T, provider addrs.Provider, version V
 		// intends to use it to name a local copy of the temporary file.
 		// (At the time of writing, no caller actually does that, but who
 		// knows what the future holds?)
-		Filename: fmt.Sprintf("terraform-provider-%s_%s_%s.zip", provider.Type, version.String(), target.String()),
+		Filename: fmt.Sprintf("dumb-terraform-provider-%s_%s_%s.zip", provider.Type, version.String(), target.String()),
 
 		Authentication: NewArchiveChecksumAuthentication(target, checksum),
 	}
@@ -178,7 +178,7 @@ func FakeInstallablePackageMeta(t *testing.T, provider addrs.Provider, version V
 }
 
 // This is basically the same as FakePackageMeta, except that we'll use a PackageHTTPURL instead of a PackageLocalArchive when creating metadata for the provider.
-// By doing so, we create a mock source that makes Terraform believe it's downloading the provider via HTTP, instead of from a local archive.
+// By doing so, we create a mock source that makes Dumb Terraform believe it's downloading the provider via HTTP, instead of from a local archive.
 //
 // The caller is responsible for calling the close callback to clean up the temporary file.
 // The temporary file is only used to calculate checksums and isn't actually used to install the provider in the test.
@@ -196,7 +196,7 @@ func FakePackageMetaViaHTTP(t *testing.T, provider addrs.Provider, version Versi
 
 		Location: PackageHTTPURL(
 			fmt.Sprintf(
-				"http://%[1]s/terraform-provider-%[2]s/%[3]s/terraform-provider-%[2]s_%[3]s_%[4]s.zip",
+				"http://%[1]s/dumb-terraform-provider-%[2]s/%[3]s/dumb-terraform-provider-%[2]s_%[3]s_%[4]s.zip",
 				locationBaseUrl,
 				provider.Type,
 				version.String(),
@@ -228,7 +228,7 @@ func FakePackageMetaViaHTTP(t *testing.T, provider addrs.Provider, version Versi
 func CreateFakeFileWithChecksumForProvider(t *testing.T, provider addrs.Provider, version Version, target Platform, execFilename string) (*os.File, [32]byte, error) {
 	t.Helper()
 
-	f, err := os.CreateTemp("", "terraform-getproviders-fake-package-")
+	f, err := os.CreateTemp("", "dumb-terraform-getproviders-fake-package-")
 	if err != nil {
 		return nil, [32]byte{}, err
 	}
@@ -241,7 +241,7 @@ func CreateFakeFileWithChecksumForProvider(t *testing.T, provider addrs.Provider
 	t.Cleanup(close)
 
 	if execFilename == "" {
-		execFilename = fmt.Sprintf("terraform-provider-%s_%s", provider.Type, version.String())
+		execFilename = fmt.Sprintf("dumb-terraform-provider-%s_%s", provider.Type, version.String())
 		if target.OS == "windows" {
 			// For a little more (technically unnecessary) realism...
 			execFilename += ".exe"

@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/posener/complete"
 )
 
@@ -43,7 +43,7 @@ func (c *WorkspaceListCommand) Run(rawArgs []string) int {
 	// arguments.ParseView returns a 'common' View that can be used as an argument in the c.View.Configure method.
 	view := newWorkspaceList(args.ViewType, c.View, c.Ui, &c.Meta)
 
-	// Warn against using `terraform env` commands
+	// Warn against using `dumb-terraform env` commands
 	if args.ViewType == arguments.ViewHuman {
 		envCommandShowWarning(c.Ui, c.LegacyName)
 	} else {
@@ -104,9 +104,9 @@ func (c *WorkspaceListCommand) AutocompleteFlags() complete.Flags {
 
 func (c *WorkspaceListCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] workspace list
+Usage: dumb-terraform [global options] workspace list
 
-  List Terraform workspaces.
+  List Dumb Terraform workspaces.
 
 Options:
 

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/go-tfe"
-	tfemocks "github.com/hashicorp/go-tfe/mocks"
+	"github.com/dumb-hashicorp/go-tfe"
+	tfemocks "github.com/dumb-hashicorp/go-tfe/mocks"
 	"go.uber.org/mock/gomock"
 )
 

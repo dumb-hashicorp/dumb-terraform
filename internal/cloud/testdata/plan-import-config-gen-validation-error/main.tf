@@ -1,4 +1,4 @@
 import {
   id = "bar"
-  to = terraform_data.foo
+  to = dumb-terraform_data.foo
 }

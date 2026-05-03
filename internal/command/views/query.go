@@ -6,15 +6,15 @@ package views
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Query renders outputs for query executions.
 type Query interface {
 	Operation() Operation
-	Hooks() []terraform.Hook
+	Hooks() []dumb-terraform.Hook
 
 	Diagnostics(diags tfdiags.Diagnostics)
 	HelpPrompt()
@@ -48,8 +48,8 @@ func (v *QueryHuman) Operation() Operation {
 	return NewQueryOperation(arguments.ViewHuman, v.inAutomation, v.view)
 }
 
-func (v *QueryHuman) Hooks() []terraform.Hook {
-	return []terraform.Hook{
+func (v *QueryHuman) Hooks() []dumb-terraform.Hook {
+	return []dumb-terraform.Hook{
 		NewUiHook(v.view),
 	}
 }
@@ -71,8 +71,8 @@ func (v *QueryJSON) Operation() Operation {
 	return &QueryOperationJSON{view: v.view}
 }
 
-func (v *QueryJSON) Hooks() []terraform.Hook {
-	return []terraform.Hook{
+func (v *QueryJSON) Hooks() []dumb-terraform.Hook {
+	return []dumb-terraform.Hook{
 		newJSONHook(v.view),
 	}
 }

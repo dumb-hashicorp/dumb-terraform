@@ -10,7 +10,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -95,12 +95,12 @@ func (f *FunctionResults) CheckPriorProvider(provider addrs.Provider, name strin
 		if !provider.IsZero() {
 			provPrefix = fmt.Sprintf("provider %s ", provider)
 		}
-		// Log the args for debugging in case the hcl context is
+		// Log the args for debugging in case the dumb-hcl context is
 		// insufficient. The error should be adequate most of the time, and
 		// could already be quite long, so we don't want to add all
 		// arguments too.
 		log.Printf("[ERROR] %sfunction %s returned an inconsistent result with args: %#v\n", provPrefix, name, args)
-		// The hcl package will add the necessary context around the error in
+		// The dumb-hcl package will add the necessary context around the error in
 		// the diagnostic, but we add the differing results when we can.
 		if res.value != cty.NilVal {
 			return fmt.Errorf("function returned an inconsistent result,\nwas: %#v,\nnow: %#v", res.value, result)

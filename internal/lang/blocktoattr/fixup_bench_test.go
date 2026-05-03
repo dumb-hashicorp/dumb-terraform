@@ -6,10 +6,10 @@ package blocktoattr
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -68,8 +68,8 @@ maybe_block {
 }
 `
 
-func configBodyForFixupBlockAttrsBenchmark() hcl.Body {
-	f, diags := hclsyntax.ParseConfig([]byte(configForFixupBlockAttrsBenchmark), "", hcl.Pos{Line: 1, Column: 1})
+func configBodyForFixupBlockAttrsBenchmark() dumb-hcl.Body {
+	f, diags := dumb-hclsyntax.ParseConfig([]byte(configForFixupBlockAttrsBenchmark), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	if diags.HasErrors() {
 		panic("test configuration is invalid")
 	}
@@ -85,7 +85,7 @@ func BenchmarkFixUpBlockAttrs(b *testing.B) {
 
 		spec := schema.DecoderSpec()
 		fixedBody := FixUpBlockAttrs(body, schema)
-		val, diags := hcldec.Decode(fixedBody, spec, nil)
+		val, diags := dumb-hcldec.Decode(fixedBody, spec, nil)
 		if diags.HasErrors() {
 			b.Fatal("diagnostics during decoding", diags)
 		}

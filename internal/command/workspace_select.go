@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/posener/complete"
 )
 
@@ -121,13 +121,13 @@ func (c *WorkspaceSelectCommand) AutocompleteFlags() complete.Flags {
 
 func (c *WorkspaceSelectCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] workspace select NAME
+Usage: dumb-terraform [global options] workspace select NAME
 
-  Select a different Terraform workspace.
+  Select a different Dumb Terraform workspace.
 
 Options:
 
-    -or-create=false    Create the Terraform workspace if it doesn't exist.
+    -or-create=false    Create the Dumb Terraform workspace if it doesn't exist.
 
 `
 	return strings.TrimSpace(helpText)

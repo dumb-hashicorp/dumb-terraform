@@ -12,12 +12,12 @@ import (
 	"sort"
 	"strings"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
 )
 
 // A Config is a node in the tree of modules within a configuration.
@@ -62,7 +62,7 @@ type Config struct {
 	// requested this module.
 	//
 	// This field is meaningless for the root module, where its contents are undefined.
-	CallRange hcl.Range
+	CallRange dumb-hcl.Range
 
 	// SourceAddr is the source address that the referenced module was requested
 	// from, as specified in configuration. SourceAddrRaw is the same
@@ -76,7 +76,7 @@ type Config struct {
 	// SourceAddr value was set, for use in diagnostic messages.
 	//
 	// This field is meaningless for the root module, where its contents are undefined.
-	SourceAddrRange hcl.Range
+	SourceAddrRange dumb-hcl.Range
 
 	// Version is the specific version that was selected for this module,
 	// based on version constraints given in configuration.
@@ -250,11 +250,11 @@ func (c *Config) TargetExists(target addrs.Targetable) bool {
 // multiple inconsistencies then it will attempt to describe as many of them
 // as possible, rather than stopping at the first problem.
 //
-// It's typically the responsibility of "terraform init" to change the locked
+// It's typically the responsibility of "dumb-terraform init" to change the locked
 // dependencies to conform with the configuration, and so
 // VerifyDependencySelections is intended for other commands to check whether
 // it did so correctly and to catch if anything has changed in configuration
-// since the last "terraform init" which requires re-initialization. However,
+// since the last "dumb-terraform init" which requires re-initialization. However,
 // it's up to the caller to decide how to advise users recover from these
 // errors, because the advise can vary depending on what operation the user
 // is attempting.
@@ -332,7 +332,7 @@ func (c *Config) VerifyDependencySelections(depLocks *depsfile.Locks) []error {
 //
 // If the returned diagnostics includes errors then the resulting Requirements
 // may be incomplete.
-func (c *Config) ProviderRequirements() (providerreqs.Requirements, hcl.Diagnostics) {
+func (c *Config) ProviderRequirements() (providerreqs.Requirements, dumb-hcl.Diagnostics) {
 	reqs := make(providerreqs.Requirements)
 	diags := c.addProviderRequirements(reqs, true, true)
 
@@ -341,7 +341,7 @@ func (c *Config) ProviderRequirements() (providerreqs.Requirements, hcl.Diagnost
 
 // ProviderRequirementsConfigOnly searches the full tree of configuration
 // files for all providers. This function does not consider any test files.
-func (c *Config) ProviderRequirementsConfigOnly() (providerreqs.Requirements, hcl.Diagnostics) {
+func (c *Config) ProviderRequirementsConfigOnly() (providerreqs.Requirements, dumb-hcl.Diagnostics) {
 	reqs := make(providerreqs.Requirements)
 	diags := c.addProviderRequirements(reqs, true, false)
 
@@ -353,7 +353,7 @@ func (c *Config) ProviderRequirementsConfigOnly() (providerreqs.Requirements, hc
 //
 // If the returned diagnostics includes errors then the resulting Requirements
 // may be incomplete.
-func (c *Config) ProviderRequirementsShallow() (providerreqs.Requirements, hcl.Diagnostics) {
+func (c *Config) ProviderRequirementsShallow() (providerreqs.Requirements, dumb-hcl.Diagnostics) {
 	reqs := make(providerreqs.Requirements)
 	diags := c.addProviderRequirements(reqs, false, true)
 
@@ -366,7 +366,7 @@ func (c *Config) ProviderRequirementsShallow() (providerreqs.Requirements, hcl.D
 //
 // If the returned diagnostics includes errors then the resulting Requirements
 // may be incomplete.
-func (c *Config) ProviderRequirementsByModule() (*ModuleRequirements, hcl.Diagnostics) {
+func (c *Config) ProviderRequirementsByModule() (*ModuleRequirements, dumb-hcl.Diagnostics) {
 	reqs := make(providerreqs.Requirements)
 	diags := c.addProviderRequirements(reqs, false, false)
 
@@ -414,8 +414,8 @@ func (c *Config) ProviderRequirementsByModule() (*ModuleRequirements, hcl.Diagno
 // implementation, gradually mutating a shared requirements object to
 // eventually return. If the recurse argument is true, the requirements will
 // include all descendant modules; otherwise, only the specified module.
-func (c *Config) addProviderRequirements(reqs providerreqs.Requirements, recurse, tests bool) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (c *Config) addProviderRequirements(reqs providerreqs.Requirements, recurse, tests bool) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	// First we'll deal with the requirements directly in _our_ module...
 	if c.Module.ProviderRequirements != nil {
@@ -434,8 +434,8 @@ func (c *Config) addProviderRequirements(reqs providerreqs.Requirements, recurse
 			// better error messages it produces in more situations.
 			constraints, err := providerreqs.ParseVersionConstraints(providerReqs.Requirement.Required.String())
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid version constraint",
 					// The errors returned by ParseVersionConstraint already include
 					// the section of input that was incorrect, so we don't need to
@@ -518,8 +518,8 @@ func (c *Config) addProviderRequirements(reqs providerreqs.Requirements, recurse
 					// This means we have a provider specified in the import
 					// block and not in the resource block. This isn't the right
 					// way round so let's consider this a failure.
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid import provider argument",
 						Detail:   "The provider argument can only be specified in import blocks that will generate configuration.\n\nUse the provider argument in the target resource block to configure the provider for a resource with explicit provider configuration.",
 						Subject:  i.ProviderDeclRange.Ptr(),
@@ -530,7 +530,7 @@ func (c *Config) addProviderRequirements(reqs providerreqs.Requirements, recurse
 				if i.ProviderConfigRef.Name != target.ProviderConfigRef.Name || i.ProviderConfigRef.Alias != target.ProviderConfigRef.Alias {
 					// This means we have a provider specified in both the
 					// import block and the resource block, and they disagree.
-					// This is bad as Terraform now has different instructions
+					// This is bad as Dumb Terraform now has different instructions
 					// about which provider to use.
 					//
 					// The general guidance is that only the resource should be
@@ -538,8 +538,8 @@ func (c *Config) addProviderRequirements(reqs providerreqs.Requirements, recurse
 					// attribute is just for generating config. So, let's just
 					// tell the user to only set the provider argument in the
 					// resource.
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid import provider argument",
 						Detail:   "The provider argument can only be specified in import blocks that will generate configuration.\n\nUse the provider argument in the target resource block to configure the provider for a resource with explicit provider configuration.",
 						Subject:  i.ProviderDeclRange.Ptr(),
@@ -594,8 +594,8 @@ func (c *Config) addProviderRequirements(reqs providerreqs.Requirements, recurse
 	return diags
 }
 
-func (c *Config) addProviderRequirementsFromProviderBlock(reqs providerreqs.Requirements, provider *Provider) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (c *Config) addProviderRequirementsFromProviderBlock(reqs providerreqs.Requirements, provider *Provider) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	fqn := c.Module.ProviderForLocalConfig(addrs.LocalProviderConfig{LocalName: provider.Name})
 	if _, ok := reqs[fqn]; !ok {
@@ -612,8 +612,8 @@ func (c *Config) addProviderRequirementsFromProviderBlock(reqs providerreqs.Requ
 		// better error messages it produces in more situations.
 		constraints, err := providerreqs.ParseVersionConstraints(provider.Version.Required.String())
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid version constraint",
 				// The errors returned by ParseVersionConstraint already include
 				// the section of input that was incorrect, so we don't need to
@@ -682,8 +682,8 @@ func (c *Config) resolveProviderTypes() map[string]addrs.Provider {
 //
 // See the reused function resolveStateStoreProviderType for details about logic.
 // If no match is found, an error diagnostic is returned.
-func (c *Config) resolveStateStoreProviderType() hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (c *Config) resolveStateStoreProviderType() dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	providerType, typeDiags := resolveStateStoreProviderType(c.Root.Module.ProviderRequirements.RequiredProviders,
 		*c.Root.Module.StateStore)
@@ -859,7 +859,7 @@ func (c *Config) ProviderTypes() []addrs.Provider {
 //
 // If the given address is already an AbsProviderConfig then this method returns
 // it verbatim, and will always succeed. If it's a LocalProviderConfig then
-// it will consult the local-to-FQN mapping table for the given module
+// it will dumb-consult the local-to-FQN mapping table for the given module
 // to find the absolute address corresponding to the given local one.
 //
 // The module address to resolve local addresses in must be given in the second
@@ -933,7 +933,7 @@ type RequiredProviderConfig struct {
 // an configuration for a provider even when there is no such declaration
 // inside the module itself.
 //
-// Terraform Core treats root modules differently than downstream modules in
+// Dumb Terraform Core treats root modules differently than downstream modules in
 // that it will implicitly create empty provider configurations for any provider
 // config addresses that are implied in the configuration but not explicitly
 // configured. This function assumes those implied empty configurations don't
@@ -947,7 +947,7 @@ type RequiredProviderConfig struct {
 // This function assumes that the configuration is valid. It may produce under-
 // or over-constrained results if called on an invalid configuration.
 func (c *Config) EffectiveRequiredProviderConfigs() addrs.Map[addrs.RootProviderConfig, RequiredProviderConfig] {
-	// The Terraform language has accumulated so many different ways to imply
+	// The Dumb Terraform language has accumulated so many different ways to imply
 	// the need for a provider configuration that answering this is quite a
 	// complicated process that ends up potentially needing to visit the
 	// entire subtree of modules even though we're only actually answering
@@ -1052,7 +1052,7 @@ func (c *Config) EffectiveRequiredProviderConfigs() addrs.Map[addrs.RootProvider
 		// the module implicitly requires a default configuration
 		// for each provider the child module mentions, since
 		// that would get implicitly passed into the child by
-		// Terraform Core.
+		// Dumb Terraform Core.
 		// (We don't need to visit the child module at all if
 		// the call has an explicit "providers" argument, because
 		// we require that to be exhaustive when present.)
@@ -1075,8 +1075,8 @@ func (c *Config) EffectiveRequiredProviderConfigs() addrs.Map[addrs.RootProvider
 	return ret
 }
 
-func (c *Config) CheckCoreVersionRequirements() hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (c *Config) CheckCoreVersionRequirements() dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	diags = diags.Extend(c.Module.CheckCoreVersionRequirements(c.Path, c.SourceAddr))
 

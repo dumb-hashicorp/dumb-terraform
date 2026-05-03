@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// IntegrationContext is a set of data that is useful when performing HCP Terraform integration operations
+// IntegrationContext is a set of data that is useful when performing DUMB_HCP Dumb Terraform integration operations
 type IntegrationContext struct {
 	StopContext   context.Context
 	CancelContext context.Context

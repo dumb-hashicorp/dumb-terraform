@@ -8,14 +8,14 @@ import (
 	"runtime/debug"
 	"testing"
 
-	"github.com/hashicorp/go-uuid"
+	"github.com/dumb-hashicorp/go-uuid"
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var (

@@ -6,7 +6,7 @@ package providerreqs
 import (
 	"testing"
 
-	"github.com/hashicorp/go-version"
+	"github.com/dumb-hashicorp/go-version"
 )
 
 func TestVersionConstraintsString(t *testing.T) {

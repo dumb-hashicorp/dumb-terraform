@@ -13,11 +13,11 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	tfversion "github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -73,8 +73,8 @@ The configuration does not contain any resources that can be queried.
 			expectedErr: []string{`
 Error: No configuration files
 
-Query requires a query configuration to be present. Create a Terraform query
-configuration file (.tfquery.hcl file) and try again.
+Query requires a query configuration to be present. Create a Dumb Terraform query
+configuration file (.tfquery.dumb-hcl file) and try again.
 `},
 		},
 		{
@@ -85,7 +85,7 @@ configuration file (.tfquery.hcl file) and try again.
 			expectedErr: []string{`
 Error: Unsupported block type
 
-  on query.tfquery.hcl line 11:
+  on query.tfquery.dumb-hcl line 11:
   11: resource "test_instance" "example" {
 
 Blocks of type "resource" are not expected here.
@@ -151,7 +151,7 @@ list.test_instance.example   id=test-instance-2   Test Instance 2
 			expectedErr: []string{`
 Error: No value for required variable
 
-  on query.tfquery.hcl line 7:
+  on query.tfquery.dumb-hcl line 7:
    7: variable "instance_name" {
 
 The root module input variable "instance_name" is not set, and has no default
@@ -182,7 +182,7 @@ this variable.
 			testCopyDir(t, testFixturePath(path.Join("query", ts.directory)), td)
 			t.Chdir(td)
 			providerSource := newMockProviderSource(t, map[string][]string{
-				"hashicorp/test": {"1.0.0"},
+				"dumb-hashicorp/test": {"1.0.0"},
 			})
 
 			p := queryFixtureProvider()
@@ -615,7 +615,7 @@ func TestQuery_JSON(t *testing.T) {
 					"@level":   "error",
 					"@message": "Error: Target generated file already exists",
 					"diagnostic": map[string]any{
-						"detail":   "Terraform can only write generated config into a new file. Either choose a different target location or move all existing configuration out of the target file, delete it and try again.",
+						"detail":   "Dumb Terraform can only write generated config into a new file. Either choose a different target location or move all existing configuration out of the target file, delete it and try again.",
 						"severity": "error",
 						"summary":  "Target generated file already exists",
 					},
@@ -758,7 +758,7 @@ func TestQuery_JSON(t *testing.T) {
 			testCopyDir(t, testFixturePath(path.Join("query", ts.directory)), td)
 			t.Chdir(td)
 			providerSource := newMockProviderSource(t, map[string][]string{
-				"hashicorp/test": {"1.0.0"},
+				"dumb-hashicorp/test": {"1.0.0"},
 			})
 
 			p := queryFixtureProvider()
@@ -847,23 +847,23 @@ func TestQuery_JSON_Raw(t *testing.T) {
 		{
 			name:      "basic query",
 			directory: "basic",
-			expectedOut: `{"@level":"info","@message":"Terraform ` + tfVer + `","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.596469+02:00","terraform":"1.14.0-dev","type":"version","ui":"` + views.JSON_UI_VERSION + `"}
-{"@level":"info","@message":"list.test_instance.example: Starting query...","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.600609+02:00","list_start":{"address":"list.test_instance.example","resource_type":"test_instance","input_config":{"ami":"ami-12345","foo":null}},"type":"list_start"}
-{"@level":"info","@message":"list.test_instance.example: Result found","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.600729+02:00","list_resource_found":{"address":"list.test_instance.example","display_name":"Test Instance 1","identity":{"id":"test-instance-1"},"identity_version":1,"resource_type":"test_instance","resource_object":{"ami":"ami-12345","id":"test-instance-1"}},"type":"list_resource_found"}
-{"@level":"info","@message":"list.test_instance.example: Result found","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.600759+02:00","list_resource_found":{"address":"list.test_instance.example","display_name":"Test Instance 2","identity":{"id":"test-instance-2"},"identity_version":1,"resource_type":"test_instance","resource_object":{"ami":"ami-67890","id":"test-instance-2"}},"type":"list_resource_found"}
-{"@level":"info","@message":"list.test_instance.example: List complete","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.600770+02:00","list_complete":{"address":"list.test_instance.example","resource_type":"test_instance","total":2},"type":"list_complete"}
+			expectedOut: `{"@level":"info","@message":"Dumb Terraform ` + tfVer + `","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.596469+02:00","dumb-terraform":"1.14.0-dev","type":"version","ui":"` + views.JSON_UI_VERSION + `"}
+{"@level":"info","@message":"list.test_instance.example: Starting query...","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.600609+02:00","list_start":{"address":"list.test_instance.example","resource_type":"test_instance","input_config":{"ami":"ami-12345","foo":null}},"type":"list_start"}
+{"@level":"info","@message":"list.test_instance.example: Result found","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.600729+02:00","list_resource_found":{"address":"list.test_instance.example","display_name":"Test Instance 1","identity":{"id":"test-instance-1"},"identity_version":1,"resource_type":"test_instance","resource_object":{"ami":"ami-12345","id":"test-instance-1"}},"type":"list_resource_found"}
+{"@level":"info","@message":"list.test_instance.example: Result found","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.600759+02:00","list_resource_found":{"address":"list.test_instance.example","display_name":"Test Instance 2","identity":{"id":"test-instance-2"},"identity_version":1,"resource_type":"test_instance","resource_object":{"ami":"ami-67890","id":"test-instance-2"}},"type":"list_resource_found"}
+{"@level":"info","@message":"list.test_instance.example: List complete","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.600770+02:00","list_complete":{"address":"list.test_instance.example","resource_type":"test_instance","total":2},"type":"list_complete"}
 `,
 		},
 		{
 			name:      "empty result",
 			directory: "empty-result",
-			expectedOut: `{"@level":"info","@message":"Terraform ` + tfVer + `","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.596469+02:00","terraform":"1.14.0-dev","type":"version","ui":"` + views.JSON_UI_VERSION + `"}
-{"@level":"info","@message":"list.test_instance.example: Starting query...","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.600609+02:00","list_start":{"address":"list.test_instance.example","resource_type":"test_instance","input_config":{"ami":"ami-12345","foo":null}},"type":"list_start"}
-{"@level":"info","@message":"list.test_instance.example: Result found","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.600729+02:00","list_resource_found":{"address":"list.test_instance.example","display_name":"Test Instance 1","identity":{"id":"test-instance-1"},"identity_version":1,"resource_type":"test_instance","resource_object":{"ami":"ami-12345","id":"test-instance-1"}},"type":"list_resource_found"}
-{"@level":"info","@message":"list.test_instance.example: Result found","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.600759+02:00","list_resource_found":{"address":"list.test_instance.example","display_name":"Test Instance 2","identity":{"id":"test-instance-2"},"identity_version":1,"resource_type":"test_instance","resource_object":{"ami":"ami-67890","id":"test-instance-2"}},"type":"list_resource_found"}
-{"@level":"info","@message":"list.test_instance.example: List complete","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.600770+02:00","list_complete":{"address":"list.test_instance.example","resource_type":"test_instance","total":2},"type":"list_complete"}
-{"@level":"info","@message":"list.test_instance.example2: Starting query...","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.600609+02:00","list_start":{"address":"list.test_instance.example2","resource_type":"test_instance","input_config":{"ami":"ami-nonexistent","foo":"test-instance-1"}},"type":"list_start"}
-{"@level":"info","@message":"list.test_instance.example2: List complete","@module":"terraform.ui","@timestamp":"2025-09-12T16:52:57.600770+02:00","list_complete":{"address":"list.test_instance.example2","resource_type":"test_instance","total":0},"type":"list_complete"}
+			expectedOut: `{"@level":"info","@message":"Dumb Terraform ` + tfVer + `","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.596469+02:00","dumb-terraform":"1.14.0-dev","type":"version","ui":"` + views.JSON_UI_VERSION + `"}
+{"@level":"info","@message":"list.test_instance.example: Starting query...","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.600609+02:00","list_start":{"address":"list.test_instance.example","resource_type":"test_instance","input_config":{"ami":"ami-12345","foo":null}},"type":"list_start"}
+{"@level":"info","@message":"list.test_instance.example: Result found","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.600729+02:00","list_resource_found":{"address":"list.test_instance.example","display_name":"Test Instance 1","identity":{"id":"test-instance-1"},"identity_version":1,"resource_type":"test_instance","resource_object":{"ami":"ami-12345","id":"test-instance-1"}},"type":"list_resource_found"}
+{"@level":"info","@message":"list.test_instance.example: Result found","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.600759+02:00","list_resource_found":{"address":"list.test_instance.example","display_name":"Test Instance 2","identity":{"id":"test-instance-2"},"identity_version":1,"resource_type":"test_instance","resource_object":{"ami":"ami-67890","id":"test-instance-2"}},"type":"list_resource_found"}
+{"@level":"info","@message":"list.test_instance.example: List complete","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.600770+02:00","list_complete":{"address":"list.test_instance.example","resource_type":"test_instance","total":2},"type":"list_complete"}
+{"@level":"info","@message":"list.test_instance.example2: Starting query...","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.600609+02:00","list_start":{"address":"list.test_instance.example2","resource_type":"test_instance","input_config":{"ami":"ami-nonexistent","foo":"test-instance-1"}},"type":"list_start"}
+{"@level":"info","@message":"list.test_instance.example2: List complete","@module":"dumb-terraform.ui","@timestamp":"2025-09-12T16:52:57.600770+02:00","list_complete":{"address":"list.test_instance.example2","resource_type":"test_instance","total":0},"type":"list_complete"}
 `,
 		},
 	}
@@ -874,7 +874,7 @@ func TestQuery_JSON_Raw(t *testing.T) {
 			testCopyDir(t, testFixturePath(path.Join("query", ts.directory)), td)
 			t.Chdir(td)
 			providerSource := newMockProviderSource(t, map[string][]string{
-				"hashicorp/test": {"1.0.0"},
+				"dumb-hashicorp/test": {"1.0.0"},
 			})
 
 			p := queryFixtureProvider()
@@ -906,17 +906,17 @@ func TestQuery_JSON_Raw(t *testing.T) {
 
 			// Use regex to normalize timestamps and version numbers for comparison
 			timestampRegex := regexp.MustCompile(`"@timestamp":"[^"]*"`)
-			versionRegex := regexp.MustCompile(`"terraform":"[^"]*"`)
+			versionRegex := regexp.MustCompile(`"dumb-terraform":"[^"]*"`)
 
 			actualOutput := output.Stdout()
 			expectedOutput := ts.expectedOut
 
 			// Replace timestamps and version numbers with placeholders
 			actualNormalized := timestampRegex.ReplaceAllString(actualOutput, `"@timestamp":"TIMESTAMP"`)
-			actualNormalized = versionRegex.ReplaceAllString(actualNormalized, `"terraform":"VERSION"`)
+			actualNormalized = versionRegex.ReplaceAllString(actualNormalized, `"dumb-terraform":"VERSION"`)
 
 			expectedNormalized := timestampRegex.ReplaceAllString(expectedOutput, `"@timestamp":"TIMESTAMP"`)
-			expectedNormalized = versionRegex.ReplaceAllString(expectedNormalized, `"terraform":"VERSION"`)
+			expectedNormalized = versionRegex.ReplaceAllString(expectedNormalized, `"dumb-terraform":"VERSION"`)
 			if diff := cmp.Diff(expectedNormalized, actualNormalized); diff != "" {
 				t.Errorf("expected query output to match, diff: %s", diff)
 			}

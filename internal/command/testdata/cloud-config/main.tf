@@ -1,6 +1,6 @@
-terraform {
+dumb-terraform {
 	cloud {
-		organization = "hashicorp"
+		organization = "dumb-hashicorp"
 
 		workspaces {
 			name = "test"

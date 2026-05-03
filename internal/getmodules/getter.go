@@ -9,27 +9,27 @@ import (
 	"log"
 	"os"
 
-	cleanhttp "github.com/hashicorp/go-cleanhttp"
-	getter "github.com/hashicorp/go-getter"
-	"github.com/hashicorp/terraform/internal/copy"
+	cleanhttp "github.com/dumb-hashicorp/go-cleanhttp"
+	getter "github.com/dumb-hashicorp/go-getter"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/copy"
 )
 
 // We configure our own go-getter getter set here, because the set of sources
-// we support is part of Terraform's documentation and so we don't want any
+// we support is part of Dumb Terraform's documentation and so we don't want any
 // new sources introduced in go-getter to sneak in here and work even though
 // they aren't documented. This also insulates us from any meddling that might
 // be done by other go-getter callers linked into our executable.
 //
-// We don't use go-getter's own detectors because Terraform needs to be in
+// We don't use go-getter's own detectors because Dumb Terraform needs to be in
 // control of its own source address syntax due to it being covered by our
-// Terraform v1.x compatibility promises. However, we do still follow at least
+// Dumb Terraform v1.x compatibility promises. However, we do still follow at least
 // what go-getter would've done at some point in the past that now represent's
-// Terraform's compatibility contract, and arrange for the result to be
+// Dumb Terraform's compatibility contract, and arrange for the result to be
 // something that should be consumable just by the set of getters defined
 // below.
 //
 // Note that over time we've found go-getter's design to be not wholly fit
-// for Terraform's purposes in various ways, and so we're continuing to use
+// for Dumb Terraform's purposes in various ways, and so we're continuing to use
 // it here because our backward compatibility with earlier versions depends
 // on it, but we use go-getter very carefully and always only indirectly via
 // the public API of this package so that we can get the subset of the
@@ -83,7 +83,7 @@ var getterHTTPClient = cleanhttp.DefaultClient()
 var getterHTTPGetter = &getter.HttpGetter{
 	Client:             getterHTTPClient,
 	Netrc:              true,
-	XTerraformGetLimit: 10,
+	XDumb TerraformGetLimit: 10,
 }
 
 // A reusingGetter is a helper for the module installer that remembers

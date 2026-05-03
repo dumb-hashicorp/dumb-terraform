@@ -8,14 +8,14 @@ import (
 
 	"github.com/go-test/deep"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 	"github.com/zclconf/go-cty/cty"
 )
 
 func TestProviderAddrs(t *testing.T) {
 	// Inputs for plan
 	provider := &Provider{}
-	err := provider.SetSource("registry.terraform.io/hashicorp/pluggable")
+	err := provider.SetSource("registry.dumb-terraform.io/dumb-hashicorp/pluggable")
 	if err != nil {
 		panic(err)
 	}

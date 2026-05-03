@@ -11,8 +11,8 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type withDiagnostics[T any] struct {
@@ -309,7 +309,7 @@ func (diag taskSelfDependencyDiagnostic) Description() tfdiags.Description {
 		return tfdiags.Description{
 			Summary: "Self-dependent items in configuration",
 			Detail: fmt.Sprintf(
-				"The following items in your configuration form a circular dependency chain through their references:%s\n\nTerraform uses references to decide a suitable order for performing operations, so configuration items may not refer to their own results either directly or indirectly.",
+				"The following items in your configuration form a circular dependency chain through their references:%s\n\nDumb Terraform uses references to decide a suitable order for performing operations, so configuration items may not refer to their own results either directly or indirectly.",
 				nameList.String(),
 			),
 		}

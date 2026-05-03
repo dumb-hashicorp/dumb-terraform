@@ -4,8 +4,8 @@
 package graph
 
 import (
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 // TestRunTransformer is a GraphTransformer that adds all the test runs,
@@ -15,7 +15,7 @@ type TestRunTransformer struct {
 	mode moduletest.CommandMode
 }
 
-func (t *TestRunTransformer) Transform(g *terraform.Graph) error {
+func (t *TestRunTransformer) Transform(g *dumb-terraform.Graph) error {
 
 	switch t.mode {
 	case moduletest.CleanupMode:

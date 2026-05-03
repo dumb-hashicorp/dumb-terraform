@@ -16,16 +16,16 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var equateEmpty = cmpopts.EquateEmpty()
@@ -479,7 +479,7 @@ func TestRefresh_varFileDefault(t *testing.T) {
 	}
 	p.GetProviderSchemaResponse = refreshVarFixtureSchema()
 
-	varFilePath := filepath.Join(td, "terraform.tfvars")
+	varFilePath := filepath.Join(td, "dumb-terraform.tfvars")
 	if err := ioutil.WriteFile(varFilePath, []byte(refreshVarFile), 0644); err != nil {
 		t.Fatalf("err: %s", err)
 	}
@@ -911,7 +911,7 @@ func TestRefresh_warnings(t *testing.T) {
 		wantWarnings := []string{
 			"warning 1",
 			"warning 2",
-			"To see the full warning notes, run Terraform without -compact-warnings.",
+			"To see the full warning notes, run Dumb Terraform without -compact-warnings.",
 		}
 		for _, want := range wantWarnings {
 			if !strings.Contains(output.Stdout(), want) {
@@ -969,10 +969,10 @@ foo = "bar"
 const testRefreshStr = `
 test_instance.foo:
   ID = yes
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
 `
 const testRefreshCwdStr = `
 test_instance.foo:
   ID = yes
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
 `

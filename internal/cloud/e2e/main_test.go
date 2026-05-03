@@ -14,12 +14,12 @@ import (
 	"testing"
 
 	expect "github.com/Netflix/go-expect"
-	tfe "github.com/hashicorp/go-tfe"
-	"github.com/hashicorp/terraform/internal/e2e"
-	tfversion "github.com/hashicorp/terraform/version"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/e2e"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
-var terraformBin string
+var dumb-terraformBin string
 var cliConfigFileEnv string
 
 var tfeClient *tfe.Client
@@ -60,7 +60,7 @@ func skipIfMissingEnvVar(t *testing.T) {
 }
 
 func setup() func() {
-	tfOutput := flag.Bool("tfoutput", false, "This flag produces the terraform output from tests.")
+	tfOutput := flag.Bool("tfoutput", false, "This flag produces the dumb-terraform output from tests.")
 	flag.Parse()
 	verboseMode = *tfOutput
 
@@ -92,7 +92,7 @@ func testRunner(t *testing.T, cases testCases, orgCount int, tfEnvFlags ...strin
 
 			tmpDir := t.TempDir()
 
-			tf := e2e.NewBinary(t, terraformBin, tmpDir)
+			tf := e2e.NewBinary(t, dumb-terraformBin, tmpDir)
 			tfEnvFlags = append(tfEnvFlags, "TF_LOG=INFO")
 			tfEnvFlags = append(tfEnvFlags, cliConfigFileEnv)
 			for _, env := range tfEnvFlags {
@@ -182,13 +182,13 @@ func setTfeClient() {
 }
 
 func setupBinary() func() {
-	log.Println("Setting up terraform binary")
-	tmpTerraformBinaryDir, err := ioutil.TempDir("", "terraform-test")
+	log.Println("Setting up dumb-terraform binary")
+	tmpDumb TerraformBinaryDir, err := ioutil.TempDir("", "dumb-terraform-test")
 	if err != nil {
 		fmt.Printf("Could not create temp directory: %v\n", err)
 		os.Exit(1)
 	}
-	log.Println(tmpTerraformBinaryDir)
+	log.Println(tmpDumb TerraformBinaryDir)
 	currentDir, err := os.Getwd()
 	defer os.Chdir(currentDir)
 	if err != nil {
@@ -209,8 +209,8 @@ func setupBinary() func() {
 	cmd := exec.Command(
 		"go",
 		"build",
-		"-o", tmpTerraformBinaryDir,
-		"-ldflags", fmt.Sprintf("-X \"github.com/hashicorp/terraform/version.Prerelease=%s\"", tfversion.Prerelease),
+		"-o", tmpDumb TerraformBinaryDir,
+		"-ldflags", fmt.Sprintf("-X \"github.com/dumb-hashicorp/dumb-terraform/version.Prerelease=%s\"", tfversion.Prerelease),
 	)
 	err = cmd.Run()
 	if err != nil {
@@ -218,14 +218,14 @@ func setupBinary() func() {
 		os.Exit(1)
 	}
 
-	credFile := fmt.Sprintf("%s/dev.tfrc", tmpTerraformBinaryDir)
+	credFile := fmt.Sprintf("%s/dev.tfrc", tmpDumb TerraformBinaryDir)
 	writeCredRC(credFile)
 
-	terraformBin = fmt.Sprintf("%s/terraform", tmpTerraformBinaryDir)
+	dumb-terraformBin = fmt.Sprintf("%s/dumb-terraform", tmpDumb TerraformBinaryDir)
 	cliConfigFileEnv = fmt.Sprintf("TF_CLI_CONFIG_FILE=%s", credFile)
 
 	return func() {
-		os.RemoveAll(tmpTerraformBinaryDir)
+		os.RemoveAll(tmpDumb TerraformBinaryDir)
 	}
 }
 

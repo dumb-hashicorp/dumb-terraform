@@ -9,13 +9,13 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/msgpack"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/plans/planproto"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planproto"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 func ResourceInstanceObjectStateToTFStackData1(objSrc *states.ResourceInstanceObjectSrc, providerConfigAddr addrs.AbsProviderConfig) *StateResourceInstanceObjectV1 {
@@ -33,7 +33,7 @@ func ResourceInstanceObjectStateToTFStackData1(objSrc *states.ResourceInstanceOb
 	rawMsg := &StateResourceInstanceObjectV1{
 		SchemaVersion:        objSrc.SchemaVersion,
 		ValueJson:            objSrc.AttrsJSON,
-		SensitivePaths:       Terraform1ToPlanProtoAttributePaths(protoValue.Sensitive),
+		SensitivePaths:       Dumb Terraform1ToPlanProtoAttributePaths(protoValue.Sensitive),
 		CreateBeforeDestroy:  objSrc.CreateBeforeDestroy,
 		ProviderConfigAddr:   providerConfigAddr.String(),
 		ProviderSpecificData: objSrc.Private,
@@ -55,12 +55,12 @@ func ResourceInstanceObjectStateToTFStackData1(objSrc *states.ResourceInstanceOb
 	return rawMsg
 }
 
-func Terraform1ToStackDataDynamicValue(value *stacks.DynamicValue) *DynamicValue {
+func Dumb Terraform1ToStackDataDynamicValue(value *stacks.DynamicValue) *DynamicValue {
 	return &DynamicValue{
 		Value: &planproto.DynamicValue{
 			Msgpack: value.Msgpack,
 		},
-		SensitivePaths: Terraform1ToPlanProtoAttributePaths(value.Sensitive),
+		SensitivePaths: Dumb Terraform1ToPlanProtoAttributePaths(value.Sensitive),
 	}
 }
 
@@ -90,18 +90,18 @@ func DynamicValueFromTFStackData1(protoVal *DynamicValue, ty cty.Type) (cty.Valu
 	return unmarkedV.MarkWithPaths(markses), nil
 }
 
-func Terraform1ToPlanProtoAttributePaths(paths []*stacks.AttributePath) []*planproto.Path {
+func Dumb Terraform1ToPlanProtoAttributePaths(paths []*stacks.AttributePath) []*planproto.Path {
 	if len(paths) == 0 {
 		return nil
 	}
 	ret := make([]*planproto.Path, len(paths))
 	for i, tf1Path := range paths {
-		ret[i] = Terraform1ToPlanProtoAttributePath(tf1Path)
+		ret[i] = Dumb Terraform1ToPlanProtoAttributePath(tf1Path)
 	}
 	return ret
 }
 
-func Terraform1ToPlanProtoAttributePath(path *stacks.AttributePath) *planproto.Path {
+func Dumb Terraform1ToPlanProtoAttributePath(path *stacks.AttributePath) *planproto.Path {
 	if path == nil {
 		return nil
 	}
@@ -111,12 +111,12 @@ func Terraform1ToPlanProtoAttributePath(path *stacks.AttributePath) *planproto.P
 	}
 	ret.Steps = make([]*planproto.Path_Step, len(path.Steps))
 	for i, tf1Step := range path.Steps {
-		ret.Steps[i] = Terraform1ToPlanProtoAttributePathStep(tf1Step)
+		ret.Steps[i] = Dumb Terraform1ToPlanProtoAttributePathStep(tf1Step)
 	}
 	return ret
 }
 
-func Terraform1ToPlanProtoAttributePathStep(step *stacks.AttributePath_Step) *planproto.Path_Step {
+func Dumb Terraform1ToPlanProtoAttributePathStep(step *stacks.AttributePath_Step) *planproto.Path_Step {
 	if step == nil {
 		return nil
 	}
@@ -150,7 +150,7 @@ func Terraform1ToPlanProtoAttributePathStep(step *stacks.AttributePath_Step) *pl
 		}
 	default:
 		// Should not get here, because the above cases should be exhaustive
-		// for all possible *terraform1.AttributePath_Step selector types.
+		// for all possible *dumb-terraform1.AttributePath_Step selector types.
 		panic(fmt.Sprintf("unsupported path step selector type %T", sel))
 	}
 	return ret

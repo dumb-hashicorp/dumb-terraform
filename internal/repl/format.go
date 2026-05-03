@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
 	"github.com/zclconf/go-cty/cty"
 )
 
-// FormatValue formats a value in a way that resembles Terraform language syntax
+// FormatValue formats a value in a way that resembles Dumb Terraform language syntax
 // and uses the type conversion functions where necessary to indicate exactly
 // what type it is given, so that equality test failures can be quickly
 // understood.

@@ -10,7 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestParseStateReplaceProvider_valid(t *testing.T) {
@@ -19,23 +19,23 @@ func TestParseStateReplaceProvider_valid(t *testing.T) {
 		want *StateReplaceProvider
 	}{
 		"provider addresses only": {
-			[]string{"hashicorp/aws", "acmecorp/aws"},
+			[]string{"dumb-hashicorp/aws", "acmecorp/aws"},
 			&StateReplaceProvider{
 				Vars:             &Vars{},
 				BackupPath:       "-",
 				StateLock:        true,
-				FromProviderAddr: "hashicorp/aws",
+				FromProviderAddr: "dumb-hashicorp/aws",
 				ToProviderAddr:   "acmecorp/aws",
 			},
 		},
 		"auto approve": {
-			[]string{"-auto-approve", "hashicorp/aws", "acmecorp/aws"},
+			[]string{"-auto-approve", "dumb-hashicorp/aws", "acmecorp/aws"},
 			&StateReplaceProvider{
 				Vars:             &Vars{},
 				AutoApprove:      true,
 				BackupPath:       "-",
 				StateLock:        true,
-				FromProviderAddr: "hashicorp/aws",
+				FromProviderAddr: "dumb-hashicorp/aws",
 				ToProviderAddr:   "acmecorp/aws",
 			},
 		},
@@ -47,7 +47,7 @@ func TestParseStateReplaceProvider_valid(t *testing.T) {
 				"-lock-timeout=5s",
 				"-state=state.tfstate",
 				"-ignore-remote-version",
-				"hashicorp/aws",
+				"dumb-hashicorp/aws",
 				"acmecorp/aws",
 			},
 			&StateReplaceProvider{
@@ -58,7 +58,7 @@ func TestParseStateReplaceProvider_valid(t *testing.T) {
 				StateLockTimeout:    5 * time.Second,
 				StatePath:           "state.tfstate",
 				IgnoreRemoteVersion: true,
-				FromProviderAddr:    "hashicorp/aws",
+				FromProviderAddr:    "dumb-hashicorp/aws",
 				ToProviderAddr:      "acmecorp/aws",
 			},
 		},
@@ -85,13 +85,13 @@ func TestParseStateReplaceProvider_vars(t *testing.T) {
 		want []FlagNameValue
 	}{
 		"var": {
-			args: []string{"-var", "foo=bar", "hashicorp/aws", "acmecorp/aws"},
+			args: []string{"-var", "foo=bar", "dumb-hashicorp/aws", "acmecorp/aws"},
 			want: []FlagNameValue{
 				{Name: "-var", Value: "foo=bar"},
 			},
 		},
 		"var-file": {
-			args: []string{"-var-file", "cool.tfvars", "hashicorp/aws", "acmecorp/aws"},
+			args: []string{"-var-file", "cool.tfvars", "dumb-hashicorp/aws", "acmecorp/aws"},
 			want: []FlagNameValue{
 				{Name: "-var-file", Value: "cool.tfvars"},
 			},
@@ -101,7 +101,7 @@ func TestParseStateReplaceProvider_vars(t *testing.T) {
 				"-var", "foo=bar",
 				"-var-file", "cool.tfvars",
 				"-var", "boop=beep",
-				"hashicorp/aws", "acmecorp/aws",
+				"dumb-hashicorp/aws", "acmecorp/aws",
 			},
 			want: []FlagNameValue{
 				{Name: "-var", Value: "foo=bar"},
@@ -161,12 +161,12 @@ func TestParseStateReplaceProvider_invalid(t *testing.T) {
 			},
 		},
 		"unknown flag": {
-			[]string{"-invalid", "hashicorp/google", "acmecorp/google"},
+			[]string{"-invalid", "dumb-hashicorp/google", "acmecorp/google"},
 			&StateReplaceProvider{
 				Vars:             &Vars{},
 				BackupPath:       "-",
 				StateLock:        true,
-				FromProviderAddr: "hashicorp/google",
+				FromProviderAddr: "dumb-hashicorp/google",
 				ToProviderAddr:   "acmecorp/google",
 			},
 			tfdiags.Diagnostics{

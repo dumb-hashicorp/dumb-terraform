@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// WorkspaceNew represent flags and arguments specific to the `terraform workspace new` command.
+// WorkspaceNew represent flags and arguments specific to the `dumb-terraform workspace new` command.
 type WorkspaceNew struct {
 	Workspace
 
@@ -36,7 +36,7 @@ func ParseWorkspaceNew(args []string) (*WorkspaceNew, tfdiags.Diagnostics) {
 	cmdFlags := defaultFlagSet("workspace new")
 	cmdFlags.BoolVar(&stateLock, "lock", true, "lock state")
 	cmdFlags.DurationVar(&stateLockTimeout, "lock-timeout", 0, "lock timeout")
-	cmdFlags.StringVar(&statePath, "state", "", "terraform state file")
+	cmdFlags.StringVar(&statePath, "state", "", "dumb-terraform state file")
 	if err := cmdFlags.Parse(args); err != nil {
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,

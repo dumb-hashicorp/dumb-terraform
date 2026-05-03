@@ -1,6 +1,6 @@
 variable "foo" { default = "bar" }
 
-terraform {
+dumb-terraform {
     backend "local" {
         path = "${var.foo}"
     }

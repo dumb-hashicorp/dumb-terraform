@@ -11,10 +11,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
 )
 
 func TestStateIdentities(t *testing.T) {
@@ -243,7 +243,7 @@ func TestStateIdentities_backendOverrideState(t *testing.T) {
 	testCopyDir(t, testFixturePath("state-identities-backend-default"), td)
 
 	// Rename the state file to a custom name to simulate a custom state file
-	err := os.Rename(filepath.Join(td, "terraform.tfstate"), filepath.Join(td, "custom.tfstate"))
+	err := os.Rename(filepath.Join(td, "dumb-terraform.tfstate"), filepath.Join(td, "custom.tfstate"))
 	if err != nil {
 		t.Fatalf("Failed to rename state file: %s", err)
 	}

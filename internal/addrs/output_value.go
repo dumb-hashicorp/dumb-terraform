@@ -6,10 +6,10 @@ package addrs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // OutputValue is the address of an output value, in the context of the module
@@ -17,7 +17,7 @@ import (
 //
 // This is related to but separate from ModuleCallOutput, which represents
 // a module output from the perspective of its parent module. Outputs are
-// referencable from the testing scope, in general terraform operation users
+// referencable from the testing scope, in general dumb-terraform operation users
 // will be referencing ModuleCallOutput.
 type OutputValue struct {
 	referenceable
@@ -130,15 +130,15 @@ type absOutputValueUniqueKey string
 
 func (k absOutputValueUniqueKey) uniqueKeySigil() {}
 
-func ParseAbsOutputValue(traversal hcl.Traversal) (AbsOutputValue, tfdiags.Diagnostics) {
+func ParseAbsOutputValue(traversal dumb-hcl.Traversal) (AbsOutputValue, tfdiags.Diagnostics) {
 	path, remain, diags := parseModuleInstancePrefix(traversal, false)
 	if diags.HasErrors() {
 		return AbsOutputValue{}, diags
 	}
 
 	if len(remain) != 2 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "An output name is required.",
 			Subject:  traversal.SourceRange().Ptr(),
@@ -147,8 +147,8 @@ func ParseAbsOutputValue(traversal hcl.Traversal) (AbsOutputValue, tfdiags.Diagn
 	}
 
 	if remain.RootName() != "output" {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Output address must start with \"output.\".",
 			Subject:  remain[0].SourceRange().Ptr(),
@@ -158,11 +158,11 @@ func ParseAbsOutputValue(traversal hcl.Traversal) (AbsOutputValue, tfdiags.Diagn
 
 	var name string
 	switch tt := remain[1].(type) {
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		name = tt.Name
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "An output name is required.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -181,7 +181,7 @@ func ParseAbsOutputValue(traversal hcl.Traversal) (AbsOutputValue, tfdiags.Diagn
 func ParseAbsOutputValueStr(str string) (AbsOutputValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return AbsOutputValue{}, diags

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 )
 
 func TestInit2_dynamicSourceErrors(t *testing.T) {
@@ -52,8 +52,8 @@ func TestInit2_dynamicSourceErrors(t *testing.T) {
 			fixture:   "count-in-module-source",
 			wantError: "Invalid module source",
 		},
-		"terraform.workspace in module source": {
-			fixture:   "terraform-attr-in-module-source",
+		"dumb-terraform.workspace in module source": {
+			fixture:   "dumb-terraform-attr-in-module-source",
 			wantError: "Invalid module source",
 		},
 		"required const variable not set": {
@@ -105,7 +105,7 @@ func TestInit2_dynamicSourceErrors(t *testing.T) {
 			t.Chdir(td)
 
 			providerSource := newMockProviderSource(t, map[string][]string{
-				"hashicorp/test": {"1.0.0"},
+				"dumb-hashicorp/test": {"1.0.0"},
 			})
 
 			ui := new(cli.MockUi)
@@ -188,7 +188,7 @@ func TestInit2_dynamicSourceSuccess(t *testing.T) {
 			t.Chdir(td)
 
 			providerSource := newMockProviderSource(t, map[string][]string{
-				"hashicorp/test": {"1.0.0"},
+				"dumb-hashicorp/test": {"1.0.0"},
 			})
 
 			ui := new(cli.MockUi)
@@ -364,7 +364,7 @@ func TestPlan_dynamicModuleSource(t *testing.T) {
 
 	p := planFixtureProvider()
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 
 	args := []string{"-var", "module_name=example"}
@@ -416,7 +416,7 @@ func TestPlan_dynamicModuleSourceMismatch(t *testing.T) {
 
 	p := planFixtureProvider()
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 	args := []string{"-var", "module_name=example"}
 
@@ -463,7 +463,7 @@ func TestApply_dynamicModuleSource(t *testing.T) {
 
 	p := planFixtureProvider()
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 	args := []string{"-var", "module_name=example"}
 
@@ -514,7 +514,7 @@ func TestApply_dynamicModuleSourceWithDefaultPlanFile(t *testing.T) {
 
 	p := planFixtureProvider()
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 
 	initUi := new(cli.MockUi)
@@ -589,7 +589,7 @@ func TestPlan_dynamicModuleSourceWithCount(t *testing.T) {
 
 	p := planFixtureProvider()
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 
 	args := []string{"-var", "module_name=example"}
@@ -641,7 +641,7 @@ func TestPlan_dynamicModuleSourceWithForEach(t *testing.T) {
 
 	p := planFixtureProvider()
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 
 	args := []string{"-var", "module_name=example"}

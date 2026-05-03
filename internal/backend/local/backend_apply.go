@@ -10,22 +10,22 @@ import (
 	"log"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // test hook called between plan+apply during opApply
@@ -48,7 +48,7 @@ func (b *Local) opApply(
 			"No configuration files",
 			"Apply requires configuration to be present. Applying without a configuration "+
 				"would mark everything for destruction, which is normally not what is desired. "+
-				"If you would like to destroy everything, run 'terraform destroy' instead.",
+				"If you would like to destroy everything, run 'dumb-terraform destroy' instead.",
 		))
 		op.ReportResult(runningOp, diags)
 		return
@@ -100,8 +100,8 @@ func (b *Local) opApply(
 		plan, moreDiags = lr.Core.Plan(lr.Config, lr.InputState, lr.PlanOpts)
 		diags = diags.Append(moreDiags)
 		if moreDiags.HasErrors() {
-			// If Terraform Core generated a partial plan despite the errors
-			// then we'll make a best effort to render it. Terraform Core
+			// If Dumb Terraform Core generated a partial plan despite the errors
+			// then we'll make a best effort to render it. Dumb Terraform Core
 			// promises that if it returns a non-nil plan along with errors
 			// then the plan won't necessarily contain all of the needed
 			// actions but that any it does include will be properly-formed.
@@ -144,20 +144,20 @@ func (b *Local) opApply(
 				} else {
 					query = "Do you really want to destroy all resources?"
 				}
-				desc = "Terraform will destroy all your managed infrastructure, as shown above.\n" +
+				desc = "Dumb Terraform will destroy all your managed infrastructure, as shown above.\n" +
 					"There is no undo. Only 'yes' will be accepted to confirm."
 			case plans.RefreshOnlyMode:
 				if len(plan.ActionTargetAddrs) > 0 {
 					query = "Would you like to invoke the specified actions?"
-					desc = "Terraform will invoke the actions described above, and any changes will be written to the state without modifying real infrastructure\n" +
+					desc = "Dumb Terraform will invoke the actions described above, and any changes will be written to the state without modifying real infrastructure\n" +
 						"There is no undo. Only 'yes' will be accepted to confirm."
 				} else {
 					if op.Workspace != "default" {
-						query = "Would you like to update the Terraform state for \"" + op.Workspace + "\" to reflect these detected changes?"
+						query = "Would you like to update the Dumb Terraform state for \"" + op.Workspace + "\" to reflect these detected changes?"
 					} else {
-						query = "Would you like to update the Terraform state to reflect these detected changes?"
+						query = "Would you like to update the Dumb Terraform state to reflect these detected changes?"
 					}
-					desc = "Terraform will write these changes to the state without modifying any real infrastructure.\n" +
+					desc = "Dumb Terraform will write these changes to the state without modifying any real infrastructure.\n" +
 						"There is no undo. Only 'yes' will be accepted to confirm."
 				}
 			default:
@@ -166,7 +166,7 @@ func (b *Local) opApply(
 				} else {
 					query = "Do you want to perform these actions?"
 				}
-				desc = "Terraform will perform the actions described above.\n" +
+				desc = "Dumb Terraform will perform the actions described above.\n" +
 					"Only 'yes' will be accepted to approve."
 			}
 
@@ -177,7 +177,7 @@ func (b *Local) opApply(
 				diags = nil // reset so we won't show the same diagnostics again later
 			}
 
-			v, err := op.UIIn.Input(stopCtx, &terraform.InputOpts{
+			v, err := op.UIIn.Input(stopCtx, &dumb-terraform.InputOpts{
 				Id:          "approve",
 				Query:       "\n" + query,
 				Description: desc,
@@ -226,7 +226,7 @@ func (b *Local) opApply(
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Cannot apply incomplete plan",
-				"Terraform encountered an error when generating this plan, so it cannot be applied.",
+				"Dumb Terraform encountered an error when generating this plan, so it cannot be applied.",
 			))
 			op.ReportResult(runningOp, diags)
 			return
@@ -241,7 +241,7 @@ func (b *Local) opApply(
 	// Set up our hook for continuous state updates
 	stateHook.StateMgr = opState
 
-	applyTimeValues := make(terraform.InputValues, plan.ApplyTimeVariables.Len())
+	applyTimeValues := make(dumb-terraform.InputValues, plan.ApplyTimeVariables.Len())
 
 	// In a combined plan/apply run, getting the context already gathers the interactive
 	// input, therefore we need to make sure to pass the ephemeral variables to the applyOpts.
@@ -252,7 +252,7 @@ func (b *Local) opApply(
 				continue // This should never happen, but we'll ignore it if it does.
 			}
 
-			if v.SourceType == terraform.ValueFromInput && decl.Ephemeral {
+			if v.SourceType == dumb-terraform.ValueFromInput && decl.Ephemeral {
 				applyTimeValues[varName] = v
 			}
 		}
@@ -279,9 +279,9 @@ func (b *Local) opApply(
 				continue
 			}
 
-			var rng *hcl.Range
+			var rng *dumb-hcl.Range
 			if parsedVar.HasSourceRange() {
-				rng = parsedVar.SourceRange.ToHCL().Ptr()
+				rng = parsedVar.SourceRange.ToDUMB_HCL().Ptr()
 			}
 
 			// If the var is declared as ephemeral in config, go ahead and handle it
@@ -299,8 +299,8 @@ func (b *Local) opApply(
 				// If this isn't an apply-time variable, it's not valid to
 				// set it during apply.
 				if !applyTimeVar {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Ephemeral variable was not set during planning",
 						Detail: fmt.Sprintf(
 							"The ephemeral input variable %q was not set during the planning phase, and so must remain unset during the apply phase.",
@@ -314,8 +314,8 @@ func (b *Local) opApply(
 				// If this is an apply-time variable, the user must supply a
 				// value during apply: it can't be null.
 				if applyTimeVar && parsedVar.Value.IsNull() {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Ephemeral variable must be set for apply",
 						Detail: fmt.Sprintf(
 							"The ephemeral input variable %q was set during the planning phase, and so must be set again during the apply phase.",
@@ -340,10 +340,10 @@ func (b *Local) opApply(
 
 				plannedVar, err := plannedVariableValue.Decode(cty.DynamicPseudoType)
 				if err != nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Could not decode variable value from plan",
-						Detail:   fmt.Sprintf("The variable %s could not be decoded from the plan. %s. This is a bug in Terraform, please report it.", varName, err),
+						Detail:   fmt.Sprintf("The variable %s could not be decoded from the plan. %s. This is a bug in Dumb Terraform, please report it.", varName, err),
 						Subject:  rng,
 					})
 				} else {
@@ -359,13 +359,13 @@ func (b *Local) opApply(
 					// error when possible to avoid confusion.
 					if parsedVar.Value.Equals(plannedVar).False() {
 						switch parsedVar.SourceType {
-						case terraform.ValueFromAutoFile:
+						case dumb-terraform.ValueFromAutoFile:
 							// If the parsed variables comes from an auto-file,
 							// it's not input directly by the user so we have to ignore it.
 							continue
-						case terraform.ValueFromEnvVar:
-							diags = diags.Append(&hcl.Diagnostic{
-								Severity: hcl.DiagWarning,
+						case dumb-terraform.ValueFromEnvVar:
+							diags = diags.Append(&dumb-hcl.Diagnostic{
+								Severity: dumb-hcl.DiagWarning,
 								Summary:  "Ignoring variable when applying a saved plan",
 								Detail: fmt.Sprintf("The variable %s cannot be overriden when applying a saved plan file, "+
 									"because a saved plan includes the variable values that were set when it was created. "+
@@ -375,9 +375,9 @@ func (b *Local) opApply(
 									parsedVar.SourceType.DiagnosticLabel()),
 								Subject: rng,
 							})
-						case terraform.ValueFromCLIArg, terraform.ValueFromNamedFile:
-							diags = diags.Append(&hcl.Diagnostic{
-								Severity: hcl.DiagError,
+						case dumb-terraform.ValueFromCLIArg, dumb-terraform.ValueFromNamedFile:
+							diags = diags.Append(&dumb-hcl.Diagnostic{
+								Severity: dumb-hcl.DiagError,
 								Summary:  "Can't change variable when applying a saved plan",
 								Detail: fmt.Sprintf("The variable %s cannot be set using the -var and -var-file options when "+
 									"applying a saved plan file, because a saved plan includes the variable values that were "+
@@ -395,7 +395,7 @@ func (b *Local) opApply(
 							//  - ValueFromCaller - only used in tests
 							panic(fmt.Sprintf("Attempted to change variable %s when applying a saved plan. "+
 								"The saved plan specifies %s as the value whereas during apply the value %s was %s. "+
-								"This is a bug in Terraform, please report it.",
+								"This is a bug in Dumb Terraform, please report it.",
 								varName, tfdiags.CompactValueStr(markedPlannedVar), tfdiags.CompactValueStr(markedParsedVar),
 								parsedVar.SourceType.DiagnosticLabel()))
 						}
@@ -426,7 +426,7 @@ func (b *Local) opApply(
 		defer close(doneCh)
 
 		log.Printf("[INFO] backend/local: apply calling Apply")
-		applyState, applyDiags = lr.Core.Apply(plan, lr.Config, &terraform.ApplyOpts{
+		applyState, applyDiags = lr.Core.Apply(plan, lr.Config, &dumb-terraform.ApplyOpts{
 			SetVariables: applyTimeValues,
 		})
 	}()
@@ -525,29 +525,29 @@ func (b *Local) backupStateForError(stateFile *statefile.File, err error, view v
 	return diags
 }
 
-const stateWriteBackedUpError = `The error shown above has prevented Terraform from writing the updated state to the configured backend. To allow for recovery, the state has been written to the file "errored.tfstate" in the current working directory.
+const stateWriteBackedUpError = `The error shown above has prevented Dumb Terraform from writing the updated state to the configured backend. To allow for recovery, the state has been written to the file "errored.tfstate" in the current working directory.
 
-Running "terraform apply" again at this point will create a forked state, making it harder to recover.
+Running "dumb-terraform apply" again at this point will create a forked state, making it harder to recover.
 
 To retry writing this state, use the following command:
-    terraform state push errored.tfstate
+    dumb-terraform state push errored.tfstate
 `
 
-const stateWriteConsoleFallbackError = `The errors shown above prevented Terraform from writing the updated state to
+const stateWriteConsoleFallbackError = `The errors shown above prevented Dumb Terraform from writing the updated state to
 the configured backend and from creating a local backup file. As a fallback,
 the raw state data is printed above as a JSON object.
 
 To retry writing this state, copy the state data (from the first { to the last } inclusive) and save it into a local file called errored.tfstate, then run the following command:
-    terraform state push errored.tfstate
+    dumb-terraform state push errored.tfstate
 `
 
 const stateWriteFatalErrorFmt = `Failed to save state after apply.
 
 Error serializing state: %s
 
-A catastrophic error has prevented Terraform from persisting the state file or creating a backup. Unfortunately this means that the record of any resources created during this apply has been lost, and such resources may exist outside of Terraform's management.
+A catastrophic error has prevented Dumb Terraform from persisting the state file or creating a backup. Unfortunately this means that the record of any resources created during this apply has been lost, and such resources may exist outside of Dumb Terraform's management.
 
 For resources that support import, it is possible to recover by manually importing each resource using its id from the target system.
 
-This is a serious bug in Terraform and should be reported.
+This is a serious bug in Dumb Terraform and should be reported.
 `

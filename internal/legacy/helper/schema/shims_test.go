@@ -14,12 +14,12 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	"github.com/hashicorp/terraform/internal/legacy/helper/hashcode"
-	"github.com/hashicorp/terraform/internal/legacy/terraform"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/legacy/helper/hashcode"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/legacy/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -31,8 +31,8 @@ var (
 
 func testApplyDiff(t *testing.T,
 	resource *Resource,
-	state, expected *terraform.InstanceState,
-	diff *terraform.InstanceDiff) {
+	state, expected *dumb-terraform.InstanceState,
+	diff *dumb-terraform.InstanceDiff) {
 
 	testSchema := providers.Schema{
 		Version: int64(resource.SchemaVersion),
@@ -94,9 +94,9 @@ func TestShimResourcePlan_destroyCreate(t *testing.T) {
 		},
 	}
 
-	d := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	d := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				RequiresNew: true,
 				Old:         "3",
 				New:         "42",
@@ -104,14 +104,14 @@ func TestShimResourcePlan_destroyCreate(t *testing.T) {
 		},
 	}
 
-	state := &terraform.InstanceState{
+	state := &dumb-terraform.InstanceState{
 		Attributes: map[string]string{"foo": "3"},
 	}
 
-	expected := &terraform.InstanceState{
-		ID: hcl2shim.UnknownVariableValue,
+	expected := &dumb-terraform.InstanceState{
+		ID: dumb-hcl2shim.UnknownVariableValue,
 		Attributes: map[string]string{
-			"id":  hcl2shim.UnknownVariableValue,
+			"id":  dumb-hcl2shim.UnknownVariableValue,
 			"foo": "42",
 		},
 		Meta: map[string]interface{}{
@@ -140,11 +140,11 @@ func TestShimResourceApply_create(t *testing.T) {
 		return nil
 	}
 
-	var s *terraform.InstanceState = nil
+	var s *dumb-terraform.InstanceState = nil
 
-	d := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	d := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				New: "42",
 			},
 		},
@@ -159,7 +159,7 @@ func TestShimResourceApply_create(t *testing.T) {
 		t.Fatal("not called")
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":  "foo",
@@ -178,7 +178,7 @@ func TestShimResourceApply_create(t *testing.T) {
 	// now that we have our diff and desired state, see if we can reproduce
 	// that with the shim
 	// we're not testing Resource.Create, so we need to start with the "created" state
-	createdState := &terraform.InstanceState{
+	createdState := &dumb-terraform.InstanceState{
 		ID:         "foo",
 		Attributes: map[string]string{"id": "foo"},
 	}
@@ -209,11 +209,11 @@ func TestShimResourceApply_Timeout_state(t *testing.T) {
 		return nil
 	}
 
-	var s *terraform.InstanceState = nil
+	var s *dumb-terraform.InstanceState = nil
 
-	d := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	d := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				New: "42",
 			},
 		},
@@ -238,7 +238,7 @@ func TestShimResourceApply_Timeout_state(t *testing.T) {
 		t.Fatal("not called")
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":  "foo",
@@ -256,7 +256,7 @@ func TestShimResourceApply_Timeout_state(t *testing.T) {
 
 	// Shim
 	// we're not testing Resource.Create, so we need to start with the "created" state
-	createdState := &terraform.InstanceState{
+	createdState := &dumb-terraform.InstanceState{
 		ID:         "foo",
 		Attributes: map[string]string{"id": "foo"},
 	}
@@ -284,22 +284,22 @@ func TestShimResourceDiff_Timeout_diff(t *testing.T) {
 		return nil
 	}
 
-	conf := terraform.NewResourceConfigRaw(map[string]interface{}{
+	conf := dumb-terraform.NewResourceConfigRaw(map[string]interface{}{
 		"foo": 42,
 		TimeoutsConfigKey: map[string]interface{}{
 			"create": "2h",
 		},
 	})
-	var s *terraform.InstanceState
+	var s *dumb-terraform.InstanceState
 
 	actual, err := r.Diff(s, conf, nil)
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
 
-	expected := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	expected := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				New: "42",
 			},
 		},
@@ -327,7 +327,7 @@ func TestShimResourceDiff_Timeout_diff(t *testing.T) {
 	}
 
 	// we're not testing Resource.Create, so we need to start with the "created" state
-	createdState := &terraform.InstanceState{
+	createdState := &dumb-terraform.InstanceState{
 		ID:         "foo",
 		Attributes: map[string]string{"id": "foo"},
 	}
@@ -372,11 +372,11 @@ func TestShimResourceApply_destroy(t *testing.T) {
 		return nil
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 	}
 
-	d := &terraform.InstanceDiff{
+	d := &dumb-terraform.InstanceDiff{
 		Destroy: true,
 	}
 
@@ -426,7 +426,7 @@ func TestShimResourceApply_destroyCreate(t *testing.T) {
 		return nil
 	}
 
-	var s *terraform.InstanceState = &terraform.InstanceState{
+	var s *dumb-terraform.InstanceState = &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"foo":       "7",
@@ -434,17 +434,17 @@ func TestShimResourceApply_destroyCreate(t *testing.T) {
 		},
 	}
 
-	d := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"id": &terraform.ResourceAttrDiff{
+	d := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"id": &dumb-terraform.ResourceAttrDiff{
 				New: "foo",
 			},
-			"foo": &terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				Old:         "7",
 				New:         "42",
 				RequiresNew: true,
 			},
-			"tags.Name": &terraform.ResourceAttrDiff{
+			"tags.Name": &dumb-terraform.ResourceAttrDiff{
 				Old:         "foo",
 				New:         "foo",
 				RequiresNew: true,
@@ -461,7 +461,7 @@ func TestShimResourceApply_destroyCreate(t *testing.T) {
 		t.Fatal("should have change")
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":        "foo",
@@ -479,7 +479,7 @@ func TestShimResourceApply_destroyCreate(t *testing.T) {
 	// now that we have our diff and desired state, see if we can reproduce
 	// that with the shim
 	// we're not testing Resource.Create, so we need to start with the "created" state
-	createdState := &terraform.InstanceState{
+	createdState := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":        "foo",
@@ -496,10 +496,10 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 	cases := []struct {
 		Name          string
 		Schema        map[string]*Schema
-		State         *terraform.InstanceState
+		State         *dumb-terraform.InstanceState
 		Config        map[string]interface{}
 		CustomizeDiff CustomizeDiffFunc
-		Diff          *terraform.InstanceDiff
+		Diff          *dumb-terraform.InstanceDiff
 		Err           bool
 	}{
 		{
@@ -519,9 +519,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"availability_zone": "foo",
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "foo",
 						RequiresNew: true,
@@ -547,9 +547,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: map[string]interface{}{},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						NewComputed: true,
 						RequiresNew: true,
@@ -571,7 +571,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "foo",
 			},
 
@@ -592,7 +592,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"availability_zone": "foo",
@@ -603,9 +603,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"availability_zone": "bar",
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old: "foo",
 						New: "bar",
 					},
@@ -629,9 +629,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: nil,
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "foo",
 					},
@@ -657,9 +657,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: nil,
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "foo",
 					},
@@ -687,9 +687,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"availability_zone": "bar",
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "bar",
 					},
@@ -718,9 +718,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"availability_zone": "foo",
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old:      "",
 						New:      "foo!",
 						NewExtra: "foo",
@@ -749,9 +749,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: map[string]interface{}{},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "",
 						NewComputed: true,
@@ -774,14 +774,14 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			State: nil,
 
 			Config: map[string]interface{}{
-				"availability_zone": hcl2shim.UnknownVariableValue,
+				"availability_zone": dumb-hcl2shim.UnknownVariableValue,
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
-						New:         hcl2shim.UnknownVariableValue,
+						New:         dumb-hcl2shim.UnknownVariableValue,
 						NewComputed: true,
 					},
 				},
@@ -807,9 +807,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"port": 27,
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"port": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"port": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "27",
 						RequiresNew: true,
@@ -837,9 +837,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"port": false,
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"port": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"port": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "false",
 						RequiresNew: true,
@@ -860,7 +860,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"delete": "false",
@@ -890,21 +890,21 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"ports": []interface{}{1, 2, 5},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "3",
 					},
-					"ports.0": &terraform.ResourceAttrDiff{
+					"ports.0": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "1",
 					},
-					"ports.1": &terraform.ResourceAttrDiff{
+					"ports.1": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "2",
 					},
-					"ports.2": &terraform.ResourceAttrDiff{
+					"ports.2": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "5",
 					},
@@ -931,13 +931,13 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"ports": []interface{}{"5"},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "1",
 					},
-					"ports.0": &terraform.ResourceAttrDiff{
+					"ports.0": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "5",
 					},
@@ -962,21 +962,21 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"ports": []interface{}{1, 2, 5},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "3",
 					},
-					"ports.0": &terraform.ResourceAttrDiff{
+					"ports.0": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "1",
 					},
-					"ports.1": &terraform.ResourceAttrDiff{
+					"ports.1": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "2",
 					},
-					"ports.2": &terraform.ResourceAttrDiff{
+					"ports.2": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "5",
 					},
@@ -998,12 +998,12 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			State: nil,
 
 			Config: map[string]interface{}{
-				"ports": []interface{}{1, hcl2shim.UnknownVariableValue, "5"},
+				"ports": []interface{}{1, dumb-hcl2shim.UnknownVariableValue, "5"},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "0",
 						New:         "",
 						NewComputed: true,
@@ -1023,7 +1023,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"ports.#": "3",
@@ -1052,7 +1052,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"ports.#": "2",
@@ -1065,13 +1065,13 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"ports": []interface{}{1, 2, 5},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "2",
 						New: "3",
 					},
-					"ports.2": &terraform.ResourceAttrDiff{
+					"ports.2": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "5",
 					},
@@ -1098,24 +1098,24 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"ports": []interface{}{1, 2, 5},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "0",
 						New:         "3",
 						RequiresNew: true,
 					},
-					"ports.0": &terraform.ResourceAttrDiff{
+					"ports.0": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "1",
 						RequiresNew: true,
 					},
-					"ports.1": &terraform.ResourceAttrDiff{
+					"ports.1": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "2",
 						RequiresNew: true,
 					},
-					"ports.2": &terraform.ResourceAttrDiff{
+					"ports.2": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "5",
 						RequiresNew: true,
@@ -1141,9 +1141,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: map[string]interface{}{},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						NewComputed: true,
 					},
@@ -1189,20 +1189,20 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"config.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"config.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "0",
 						New:         "1",
 						RequiresNew: true,
 					},
 
-					"config.0.name": &terraform.ResourceAttrDiff{
+					"config.0.name": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "hello",
 					},
 
-					"config.0.rules.#": &terraform.ResourceAttrDiff{
+					"config.0.rules.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						NewComputed: true,
 					},
@@ -1231,21 +1231,21 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"ports": []interface{}{5, 2, 1},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "3",
 					},
-					"ports.1": &terraform.ResourceAttrDiff{
+					"ports.1": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "1",
 					},
-					"ports.2": &terraform.ResourceAttrDiff{
+					"ports.2": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "2",
 					},
-					"ports.5": &terraform.ResourceAttrDiff{
+					"ports.5": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "5",
 					},
@@ -1269,7 +1269,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"ports.#": "0",
@@ -1301,9 +1301,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: nil,
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						NewComputed: true,
 					},
@@ -1332,21 +1332,21 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"ports": []interface{}{"2", "5", 1},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "3",
 					},
-					"ports.1": &terraform.ResourceAttrDiff{
+					"ports.1": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "1",
 					},
-					"ports.2": &terraform.ResourceAttrDiff{
+					"ports.2": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "2",
 					},
-					"ports.5": &terraform.ResourceAttrDiff{
+					"ports.5": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "5",
 					},
@@ -1372,12 +1372,12 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			State: nil,
 
 			Config: map[string]interface{}{
-				"ports": []interface{}{1, hcl2shim.UnknownVariableValue, 5},
+				"ports": []interface{}{1, dumb-hcl2shim.UnknownVariableValue, 5},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "",
 						NewComputed: true,
@@ -1401,7 +1401,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"ports.#": "2",
@@ -1414,21 +1414,21 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"ports": []interface{}{5, 2, 1},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "2",
 						New: "3",
 					},
-					"ports.1": &terraform.ResourceAttrDiff{
+					"ports.1": &dumb-terraform.ResourceAttrDiff{
 						Old: "1",
 						New: "1",
 					},
-					"ports.2": &terraform.ResourceAttrDiff{
+					"ports.2": &dumb-terraform.ResourceAttrDiff{
 						Old: "2",
 						New: "2",
 					},
-					"ports.5": &terraform.ResourceAttrDiff{
+					"ports.5": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "5",
 					},
@@ -1452,7 +1452,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"availability_zone": "bar",
@@ -1495,7 +1495,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"ingress.#":           "2",
@@ -1549,13 +1549,13 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ingress.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ingress.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "1",
 					},
-					"ingress.0.from": &terraform.ResourceAttrDiff{
+					"ingress.0.from": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "8080",
 					},
@@ -1580,7 +1580,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"availability_zone": "foo",
@@ -1618,12 +1618,12 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"port": 80,
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						NewComputed: true,
 					},
-					"port": &terraform.ResourceAttrDiff{
+					"port": &dumb-terraform.ResourceAttrDiff{
 						New: "80",
 					},
 				},
@@ -1647,7 +1647,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"port": "80",
@@ -1680,14 +1680,14 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"config_vars.%": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"config_vars.%": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "1",
 					},
 
-					"config_vars.bar": &terraform.ResourceAttrDiff{
+					"config_vars.bar": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "baz",
 					},
@@ -1705,7 +1705,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"config_vars.%":   "1",
@@ -1719,13 +1719,13 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"config_vars.foo": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"config_vars.foo": &dumb-terraform.ResourceAttrDiff{
 						Old:        "bar",
 						NewRemoved: true,
 					},
-					"config_vars.bar": &terraform.ResourceAttrDiff{
+					"config_vars.bar": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "baz",
 					},
@@ -1745,7 +1745,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"vars.%":   "1",
@@ -1759,14 +1759,14 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"vars.foo": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"vars.foo": &dumb-terraform.ResourceAttrDiff{
 						Old:        "bar",
 						New:        "",
 						NewRemoved: true,
 					},
-					"vars.bar": &terraform.ResourceAttrDiff{
+					"vars.bar": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "baz",
 					},
@@ -1785,7 +1785,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"vars.%":   "1",
@@ -1809,7 +1809,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"config_vars.#":     "1",
@@ -1826,13 +1826,13 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"config_vars.0.foo": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"config_vars.0.foo": &dumb-terraform.ResourceAttrDiff{
 						Old:        "bar",
 						NewRemoved: true,
 					},
-					"config_vars.0.bar": &terraform.ResourceAttrDiff{
+					"config_vars.0.bar": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "baz",
 					},
@@ -1852,7 +1852,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"config_vars.#":     "1",
@@ -1864,21 +1864,21 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: map[string]interface{}{},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"config_vars.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"config_vars.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "1",
 						New: "0",
 					},
-					"config_vars.0.%": &terraform.ResourceAttrDiff{
+					"config_vars.0.%": &dumb-terraform.ResourceAttrDiff{
 						Old: "2",
 						New: "0",
 					},
-					"config_vars.0.foo": &terraform.ResourceAttrDiff{
+					"config_vars.0.foo": &dumb-terraform.ResourceAttrDiff{
 						Old:        "bar",
 						NewRemoved: true,
 					},
-					"config_vars.0.bar": &terraform.ResourceAttrDiff{
+					"config_vars.0.bar": &dumb-terraform.ResourceAttrDiff{
 						Old:        "baz",
 						NewRemoved: true,
 					},
@@ -1904,7 +1904,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"availability_zone": "bar",
@@ -1916,9 +1916,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"availability_zone": "foo",
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old:         "bar",
 						New:         "foo",
 						RequiresNew: true,
@@ -1949,7 +1949,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"availability_zone": "bar",
@@ -1962,9 +1962,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"availability_zone": "foo",
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old:         "bar",
 						New:         "foo",
 						RequiresNew: true,
@@ -1989,7 +1989,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"instances.#": "0",
@@ -1997,12 +1997,12 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			},
 
 			Config: map[string]interface{}{
-				"instances": []interface{}{hcl2shim.UnknownVariableValue},
+				"instances": []interface{}{dumb-hcl2shim.UnknownVariableValue},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"instances.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"instances.#": &dumb-terraform.ResourceAttrDiff{
 						NewComputed: true,
 					},
 				},
@@ -2043,24 +2043,24 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"route": []interface{}{
 					map[string]interface{}{
 						"index":   "1",
-						"gateway": hcl2shim.UnknownVariableValue,
+						"gateway": dumb-hcl2shim.UnknownVariableValue,
 					},
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"route.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"route.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "1",
 					},
-					"route.~1.index": &terraform.ResourceAttrDiff{
+					"route.~1.index": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "1",
 					},
-					"route.~1.gateway": &terraform.ResourceAttrDiff{
+					"route.~1.gateway": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
-						New:         hcl2shim.UnknownVariableValue,
+						New:         dumb-hcl2shim.UnknownVariableValue,
 						NewComputed: true,
 					},
 				},
@@ -2106,23 +2106,23 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 					map[string]interface{}{
 						"index": "1",
 						"gateway": []interface{}{
-							hcl2shim.UnknownVariableValue,
+							dumb-hcl2shim.UnknownVariableValue,
 						},
 					},
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"route.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"route.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "1",
 					},
-					"route.~1.index": &terraform.ResourceAttrDiff{
+					"route.~1.index": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "1",
 					},
-					"route.~1.gateway.#": &terraform.ResourceAttrDiff{
+					"route.~1.gateway.#": &dumb-terraform.ResourceAttrDiff{
 						NewComputed: true,
 					},
 				},
@@ -2144,9 +2144,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: nil,
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"vars.%": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"vars.%": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						NewComputed: true,
 					},
@@ -2165,7 +2165,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"vars.%": "0",
@@ -2174,13 +2174,13 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: map[string]interface{}{
 				"vars": map[string]interface{}{
-					"bar": hcl2shim.UnknownVariableValue,
+					"bar": dumb-hcl2shim.UnknownVariableValue,
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"vars.%": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"vars.%": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						NewComputed: true,
 					},
@@ -2194,7 +2194,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			Name:   "Empty",
 			Schema: map[string]*Schema{},
 
-			State: &terraform.InstanceState{},
+			State: &dumb-terraform.InstanceState{},
 
 			Config: map[string]interface{}{},
 
@@ -2211,7 +2211,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"some_threshold": "567.8",
@@ -2222,9 +2222,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"some_threshold": 12.34,
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"some_threshold": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"some_threshold": &dumb-terraform.ResourceAttrDiff{
 						Old: "567.8",
 						New: "12.34",
 					},
@@ -2235,7 +2235,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 		},
 
 		{
-			Name: "https://github.com/hashicorp/terraform/issues/824",
+			Name: "https://github.com/dumb-hashicorp/dumb-terraform/issues/824",
 			Schema: map[string]*Schema{
 				"block_device": &Schema{
 					Type:     TypeSet,
@@ -2264,7 +2264,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"block_device.#": "2",
@@ -2299,7 +2299,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"port": "false",
@@ -2343,7 +2343,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"route.#": "0",
@@ -2367,7 +2367,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"active": "true",
@@ -2395,7 +2395,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"instances.#": "1",
@@ -2405,14 +2405,14 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: map[string]interface{}{},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"instances.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"instances.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "1",
 						New:         "0",
 						RequiresNew: true,
 					},
-					"instances.3": &terraform.ResourceAttrDiff{
+					"instances.3": &dumb-terraform.ResourceAttrDiff{
 						Old:         "foo",
 						New:         "",
 						NewRemoved:  true,
@@ -2440,13 +2440,13 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"vars.%": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"vars.%": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "1",
 					},
-					"vars.foo": &terraform.ResourceAttrDiff{
+					"vars.foo": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "",
 					},
@@ -2508,7 +2508,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"metadata_keys.#": "0",
@@ -2533,7 +2533,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: nil,
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"tags.%": "0",
@@ -2582,17 +2582,17 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"route.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"route.#": &dumb-terraform.ResourceAttrDiff{
 						Old: "0",
 						New: "1",
 					},
-					"route.1.index": &terraform.ResourceAttrDiff{
+					"route.1.index": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "1",
 					},
-					"route.1.gateway-name": &terraform.ResourceAttrDiff{
+					"route.1.gateway-name": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "hello",
 					},
@@ -2644,19 +2644,19 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"service_account.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"service_account.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "0",
 						New:         "1",
 						RequiresNew: true,
 					},
-					"service_account.0.scopes.#": &terraform.ResourceAttrDiff{
+					"service_account.0.scopes.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "0",
 						New:         "1",
 						RequiresNew: true,
 					},
-					"service_account.0.scopes.123": &terraform.ResourceAttrDiff{
+					"service_account.0.scopes.123": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "123!",
 						NewExtra:    "123",
@@ -2682,7 +2682,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"instances.#": "2",
@@ -2695,19 +2695,19 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"instances": []interface{}{"333", "4444"},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"instances.2": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"instances.2": &dumb-terraform.ResourceAttrDiff{
 						Old:         "22",
 						New:         "",
 						NewRemoved:  true,
 						RequiresNew: true,
 					},
-					"instances.3": &terraform.ResourceAttrDiff{
+					"instances.3": &dumb-terraform.ResourceAttrDiff{
 						Old: "333",
 						New: "333",
 					},
-					"instances.4": &terraform.ResourceAttrDiff{
+					"instances.4": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "4444",
 						RequiresNew: true,
@@ -2735,7 +2735,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"one":   "false",
@@ -2749,17 +2749,17 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"two": "0",
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"one": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"one": &dumb-terraform.ResourceAttrDiff{
 						Old: "false",
 						New: "true",
 					},
-					"two": &terraform.ResourceAttrDiff{
+					"two": &dumb-terraform.ResourceAttrDiff{
 						Old: "true",
 						New: "false",
 					},
-					"three": &terraform.ResourceAttrDiff{
+					"three": &dumb-terraform.ResourceAttrDiff{
 						Old:        "true",
 						New:        "false",
 						NewRemoved: true,
@@ -2774,7 +2774,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			Name:   "tainted in state w/ no attr changes is still a replacement",
 			Schema: map[string]*Schema{},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"id": "someid",
@@ -2784,8 +2784,8 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: map[string]interface{}{},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes:     map[string]*terraform.ResourceAttrDiff{},
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes:     map[string]*dumb-terraform.ResourceAttrDiff{},
 				DestroyTainted: true,
 			},
 		},
@@ -2804,7 +2804,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"ports.#": "3",
@@ -2818,22 +2818,22 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				"ports": []interface{}{5, 2, 1},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.1": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.1": &dumb-terraform.ResourceAttrDiff{
 						Old: "1",
 						New: "1",
 					},
-					"ports.2": &terraform.ResourceAttrDiff{
+					"ports.2": &dumb-terraform.ResourceAttrDiff{
 						Old: "2",
 						New: "2",
 					},
-					"ports.5": &terraform.ResourceAttrDiff{
+					"ports.5": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "5",
 						RequiresNew: true,
 					},
-					"ports.4": &terraform.ResourceAttrDiff{
+					"ports.4": &dumb-terraform.ResourceAttrDiff{
 						Old:         "4",
 						New:         "0",
 						NewRemoved:  true,
@@ -2853,7 +2853,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"description": "foo",
@@ -2862,9 +2862,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 			Config: map[string]interface{}{},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"description": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"description": &dumb-terraform.ResourceAttrDiff{
 						Old:         "foo",
 						New:         "",
 						RequiresNew: true,
@@ -2888,17 +2888,17 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 			},
 
 			Config: map[string]interface{}{
-				"foo": hcl2shim.UnknownVariableValue,
+				"foo": dumb-hcl2shim.UnknownVariableValue,
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"foo": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"foo": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "false",
 						NewComputed: true,
@@ -2924,7 +2924,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"ports.#": "3",
@@ -2935,12 +2935,12 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			},
 
 			Config: map[string]interface{}{
-				"ports": []interface{}{hcl2shim.UnknownVariableValue, 2, 1},
+				"ports": []interface{}{dumb-hcl2shim.UnknownVariableValue, 2, 1},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.#": &dumb-terraform.ResourceAttrDiff{
 						NewComputed: true,
 						RequiresNew: true,
 					},
@@ -2961,7 +2961,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"config.#": "2",
@@ -2971,12 +2971,12 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			},
 
 			Config: map[string]interface{}{
-				"config": []interface{}{hcl2shim.UnknownVariableValue, hcl2shim.UnknownVariableValue},
+				"config": []interface{}{dumb-hcl2shim.UnknownVariableValue, dumb-hcl2shim.UnknownVariableValue},
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"config.#": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"config.#": &dumb-terraform.ResourceAttrDiff{
 						Old:         "2",
 						New:         "",
 						RequiresNew: true,
@@ -3014,9 +3014,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				return nil
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "bar",
 						RequiresNew: true,
@@ -3055,9 +3055,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				return nil
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "bar",
 						RequiresNew: true,
@@ -3093,9 +3093,9 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				return nil
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"availability_zone": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"availability_zone": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "bar",
 						RequiresNew: true,
@@ -3132,13 +3132,13 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				return nil
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ami_id": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ami_id": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "foo",
 					},
-					"instance_id": &terraform.ResourceAttrDiff{
+					"instance_id": &dumb-terraform.ResourceAttrDiff{
 						Old: "",
 						New: "bar",
 					},
@@ -3162,7 +3162,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"ports.#": "3",
@@ -3186,22 +3186,22 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				return nil
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"ports.1": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"ports.1": &dumb-terraform.ResourceAttrDiff{
 						Old: "1",
 						New: "1",
 					},
-					"ports.2": &terraform.ResourceAttrDiff{
+					"ports.2": &dumb-terraform.ResourceAttrDiff{
 						Old: "2",
 						New: "2",
 					},
-					"ports.5": &terraform.ResourceAttrDiff{
+					"ports.5": &dumb-terraform.ResourceAttrDiff{
 						Old:         "",
 						New:         "5",
 						RequiresNew: true,
 					},
-					"ports.4": &terraform.ResourceAttrDiff{
+					"ports.4": &dumb-terraform.ResourceAttrDiff{
 						Old:         "4",
 						New:         "0",
 						NewRemoved:  true,
@@ -3215,7 +3215,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			Name:   "tainted resource does not run CustomizeDiffFunc",
 			Schema: map[string]*Schema{},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "someid",
 				Attributes: map[string]string{
 					"id": "someid",
@@ -3229,8 +3229,8 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				return errors.New("diff customization should not have run")
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes:     map[string]*terraform.ResourceAttrDiff{},
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes:     map[string]*dumb-terraform.ResourceAttrDiff{},
 				DestroyTainted: true,
 			},
 
@@ -3251,7 +3251,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"etag":       "foo",
@@ -3270,13 +3270,13 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				return nil
 			},
 
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
-					"etag": &terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+					"etag": &dumb-terraform.ResourceAttrDiff{
 						Old: "foo",
 						New: "bar",
 					},
-					"version_id": &terraform.ResourceAttrDiff{
+					"version_id": &dumb-terraform.ResourceAttrDiff{
 						Old:         "1",
 						New:         "",
 						NewComputed: true,
@@ -3297,7 +3297,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"foo": "bar",
@@ -3327,7 +3327,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"attr": "bar",
@@ -3358,7 +3358,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				},
 			},
 
-			State: &terraform.InstanceState{
+			State: &dumb-terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
 					"unrelated_set.#":  "0",
@@ -3377,8 +3377,8 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 				}
 				return nil
 			},
-			Diff: &terraform.InstanceDiff{
-				Attributes: map[string]*terraform.ResourceAttrDiff{
+			Diff: &dumb-terraform.InstanceDiff{
+				Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
 					"stream_enabled": {
 						Old: "true",
 						New: "false",
@@ -3390,7 +3390,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("%d-%s", i, tc.Name), func(t *testing.T) {
-			c := terraform.NewResourceConfigRaw(tc.Config)
+			c := dumb-terraform.NewResourceConfigRaw(tc.Config)
 
 			{
 				d, err := schemaMap(tc.Schema).Diff(tc.State, c, tc.CustomizeDiff, nil, false)
@@ -3414,10 +3414,10 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			}
 
 			// this is the desired cty.Value from the configuration
-			configVal := hcl2shim.HCL2ValueFromConfigValue(c.Config)
+			configVal := dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(c.Config)
 
 			// verify that we can round-trip the config
-			origConfig := hcl2shim.ConfigValueFromHCL2(configVal)
+			origConfig := dumb-hcl2shim.ConfigValueFromDUMB_HCL2(configVal)
 			if !cmp.Equal(c.Config, origConfig, equateEmpty) {
 				t.Fatal(cmp.Diff(c.Config, origConfig, equateEmpty))
 			}
@@ -3459,7 +3459,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			// expected value here for the test fixtures
 			if tainted {
 				if d == nil {
-					d = &terraform.InstanceDiff{}
+					d = &dumb-terraform.InstanceDiff{}
 				}
 				d.DestroyTainted = true
 			}

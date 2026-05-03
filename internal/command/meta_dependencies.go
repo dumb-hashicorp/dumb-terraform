@@ -7,14 +7,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // dependenclyLockFilename is the filename of the dependency lock file.
 //
 // This file should live in the same directory as the .tf files for the
-// root module of the configuration, alongside the .terraform directory
+// root module of the configuration, alongside the .dumb-terraform directory
 // as long as that directory's path isn't overridden by the TF_DATA_DIR
 // environment variable.
 //
@@ -25,11 +25,11 @@ import (
 // directory something other than the root module directory; when using those,
 // the lock file will be written in the "wrong" place (the current working
 // directory instead of the root module directory) but we do that intentionally
-// to match where the ".terraform" directory would also be written in that
+// to match where the ".dumb-terraform" directory would also be written in that
 // case. Eventually we will phase out those legacy arguments in favor of the
 // global -chdir=... option, which _does_ preserve the intended invariant
 // that the root module directory is always the current working directory.
-const dependencyLockFilename = ".terraform.lock.hcl"
+const dependencyLockFilename = ".dumb-terraform.lock.dumb-hcl"
 
 // lockedDependencies reads the dependency lock information from the lock file
 // in the current working directory.
@@ -44,7 +44,7 @@ const dependencyLockFilename = ".terraform.lock.hcl"
 // and does not update as a result of calling replaceLockedDependencies
 // or any other modification method.
 func (m *Meta) lockedDependencies() (*depsfile.Locks, tfdiags.Diagnostics) {
-	// We check that the file exists first, because the underlying HCL
+	// We check that the file exists first, because the underlying DUMB_HCL
 	// parser doesn't distinguish that error from other error types
 	// in a machine-readable way but we want to treat that as a success
 	// with no locks. There is in theory a race condition here in that

@@ -10,12 +10,12 @@ import (
 	"log"
 	"sync"
 
-	uuid "github.com/hashicorp/go-uuid"
+	uuid "github.com/dumb-hashicorp/go-uuid"
 
-	"github.com/hashicorp/terraform/internal/schemarepo"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/schemarepo"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
 )
 
 // State implements the State interfaces in the state package to handle
@@ -42,7 +42,7 @@ type State struct {
 	disableLocks         bool
 
 	// If this is set then the state manager will decline to store intermediate
-	// state snapshots created while a Terraform Core apply operation is in
+	// state snapshots created while a Dumb Terraform Core apply operation is in
 	// progress. Otherwise (by default) it will accept persistent snapshots
 	// using the default rules defined in the local backend.
 	DisableIntermediateSnapshots bool

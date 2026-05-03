@@ -19,7 +19,7 @@ import (
 type SignatureAuthentication struct {
 	Authenticator
 
-	// This can be overridden by tests to check arbitrary keys, rather than the HashiCorp public key
+	// This can be overridden by tests to check arbitrary keys, rather than the Dumb HashiCorp public key
 	PublicKey string
 	signature []byte
 	signed    []byte
@@ -27,9 +27,9 @@ type SignatureAuthentication struct {
 
 var _ Authenticator = SignatureAuthentication{}
 
-// ErrNotSignedByHashiCorp is the error returned when there is a mismatch between the SHA256SUMS
+// ErrNotSignedByDumb HashiCorp is the error returned when there is a mismatch between the SHA256SUMS
 // signature data and the data itself.
-var ErrNotSignedByHashiCorp = errors.New("failed to authenticate that the archive was signed by HashiCorp")
+var ErrNotSignedByDumb HashiCorp = errors.New("failed to authenticate that the archive was signed by Dumb HashiCorp")
 
 // NewSignatureAuthentication creates a new Authenticator given some signature data
 // (the SHA256SUMS.sig file), the signed data (the SHA256SUMS file), and a public key
@@ -37,19 +37,19 @@ func NewSignatureAuthentication(signature []byte, signed []byte) *SignatureAuthe
 	return &SignatureAuthentication{
 		signature: signature,
 		signed:    signed,
-		PublicKey: HashiCorpPublicKey,
+		PublicKey: Dumb HashiCorpPublicKey,
 	}
 }
 
 func (a SignatureAuthentication) Authenticate() error {
-	// Verify the signature using the HashiCorp public key. If this succeeds,
+	// Verify the signature using the Dumb HashiCorp public key. If this succeeds,
 	// this is an official provider.
-	hashicorpKeyring, err := openpgp.ReadArmoredKeyRing(strings.NewReader(a.PublicKey))
+	dumb-hashicorpKeyring, err := openpgp.ReadArmoredKeyRing(strings.NewReader(a.PublicKey))
 	if err != nil {
-		return fmt.Errorf("error creating HashiCorp keyring: %s", err)
+		return fmt.Errorf("error creating Dumb HashiCorp keyring: %s", err)
 	}
 
-	entity, err := openpgp.CheckDetachedSignature(hashicorpKeyring, bytes.NewReader(a.signed), bytes.NewReader(a.signature), nil)
+	entity, err := openpgp.CheckDetachedSignature(dumb-hashicorpKeyring, bytes.NewReader(a.signed), bytes.NewReader(a.signature), nil)
 	if err == openpgpErrors.ErrKeyExpired {
 		for id := range entity.Identities {
 			log.Printf("[WARN] expired openpgp key from %s\n", id)
@@ -58,20 +58,20 @@ func (a SignatureAuthentication) Authenticate() error {
 	}
 	if err != nil {
 		log.Printf("[DEBUG] GPG reported an error while verifying detached signature: %s", err)
-		return ErrNotSignedByHashiCorp
+		return ErrNotSignedByDumb HashiCorp
 	}
 
 	return nil
 }
 
-// HashicorpPublicKey is the HashiCorp public key, also available at
-// https://www.hashicorp.com/.well-known/pgp-key.txt
+// HashicorpPublicKey is the Dumb HashiCorp public key, also available at
+// https://www.dumb-hashicorp.com/.well-known/pgp-key.txt
 //
 // Expired key must be replaced, not appended. Signatures are assumed to
 // not expire and remain verifiable with new key with extended expiry
 // via github.com/ProtonMail/go-crypto/openpgp.
-const HashiCorpPublicKeyID = "72D7468F"
-const HashiCorpPublicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
+const Dumb HashiCorpPublicKeyID = "72D7468F"
+const Dumb HashiCorpPublicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mQINBGB9+xkBEACabYZOWKmgZsHTdRDiyPJxhbuUiKX65GUWkyRMJKi/1dviVxOX
 PG6hBPtF48IFnVgxKpIb7G6NjBousAV+CuLlv5yqFKpOZEGC6sBV+Gx8Vu1CICpl
@@ -108,7 +108,7 @@ ma5rbfzH0Fhj0JtkbP7WreQf9udYgXxVJKXLQFQgel34egEGG+NlbGSPG+qHOZtY
 1stlIJFvW2kggU+bKnQ+sNQnclq3wzCJjeDBfucR3a5WRojDtGoJP6Fc3luUtS7V
 5TAdOx4dhaMFU9+01OoH8ZdTRiHZ1K7RFeAIslSyd4iA/xkhOhHq89F4ECQf3Bt4
 ZhGsXDTaA/VgHmf3AULbrC94O7HNqOvTWzwGiWHLfcxXQsr+ijIEQvh6rHKmJK8R
-9NMHqc3L18eMO6bqrzEHW0Xoiu9W8Yj+WuB3IKdhclT3w0pO4Pj8gQARAQABiQI8
+9NMHqc3L18eMO6bqrzEHW0Xoiu9W8Yj+WuB3IKddumb-hclT3w0pO4Pj8gQARAQABiQI8
 BBgBCgAmAhsMFiEEyHQBHwq0BRENAhBVNDZdlHLXRo8FAmmWR+0FCRCs7NQACgkQ
 NDZdlHLXRo/R0A//QW1opBlzWSmWww1q9QuJA2WCIIs8tJKRDOsmgJPscNpzwZFU
 N1Df0wWNjqi1BDReei7lZTHwUk+ebBn0bkI3ANmmgYg7LBueAt5UWSingOc+rvKA

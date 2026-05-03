@@ -11,16 +11,16 @@ import (
 	"github.com/mitchellh/colorstring"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command/jsonprovider"
-	"github.com/hashicorp/terraform/internal/command/jsonstate"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonprovider"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 func TestState(t *testing.T) {
@@ -28,12 +28,12 @@ func TestState(t *testing.T) {
 
 	tests := []struct {
 		State   *states.State
-		Schemas *terraform.Schemas
+		Schemas *dumb-terraform.Schemas
 		Want    string
 	}{
 		0: {
 			State:   &states.State{},
-			Schemas: &terraform.Schemas{},
+			Schemas: &dumb-terraform.Schemas{},
 			Want:    "The state file is empty. No resources are represented.\n",
 		},
 		1: {
@@ -152,9 +152,9 @@ func testProviderSchema() *providers.GetProviderSchemaResponse {
 	}
 }
 
-func testSchemas() *terraform.Schemas {
+func testSchemas() *dumb-terraform.Schemas {
 	provider := testProvider()
-	return &terraform.Schemas{
+	return &dumb-terraform.Schemas{
 		Providers: map[addrs.Provider]providers.ProviderSchema{
 			addrs.NewDefaultProvider("test"): provider.GetProviderSchema(),
 		},

@@ -11,22 +11,22 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/hashicorp/go-hclog"
+	"github.com/dumb-hashicorp/go-dumb-hclog"
 )
 
 // This output is shown if a panic happens.
 const panicOutput = `
-!!!!!!!!!!!!!!!!!!!!!!!!!!! TERRAFORM CRASH !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!! DUMB_TERRAFORM CRASH !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-Terraform crashed! This is always indicative of a bug within Terraform.
-Please report the crash with Terraform[1] so that we can fix this.
+Dumb Terraform crashed! This is always indicative of a bug within Dumb Terraform.
+Please report the crash with Dumb Terraform[1] so that we can fix this.
 
-When reporting bugs, please include your terraform version, the stack trace
+When reporting bugs, please include your dumb-terraform version, the stack trace
 shown below, and any additional information which may help replicate the issue.
 
-[1]: https://github.com/hashicorp/terraform/issues
+[1]: https://github.com/dumb-hashicorp/dumb-terraform/issues
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!! TERRAFORM CRASH !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!! DUMB_TERRAFORM CRASH !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 `
 
@@ -34,14 +34,14 @@ shown below, and any additional information which may help replicate the issue.
 // recovered by PanicHandler starts printing.
 var panicMutex sync.Mutex
 
-// PanicHandler is called to recover from an internal panic in Terraform, and
+// PanicHandler is called to recover from an internal panic in Dumb Terraform, and
 // augments the standard stack trace with a more user friendly error message.
 // PanicHandler must be called as a defered function, and must be the first
 // defer called at the start of a new goroutine.
 func PanicHandler() {
 	// Have all managed goroutines checkin here, and prevent them from exiting
 	// if there's a panic in progress. While this can't lock the entire runtime
-	// to block progress, we can prevent some cases where Terraform may return
+	// to block progress, we can prevent some cases where Dumb Terraform may return
 	// early before the panic has been printed out.
 	panicMutex.Lock()
 	defer panicMutex.Unlock()
@@ -63,13 +63,13 @@ func PanicHandler() {
 	// (At the time of writing, the go-plugin Serve function is an example
 	// of modifying the global os.Stderr, causing it to get routed over a
 	// plugin-specific stream rather than to the real process stderr. If
-	// we used os.Stderr here then panics under "terraform rpcapi" would
+	// we used os.Stderr here then panics under "dumb-terraform rpcapi" would
 	// end up in the wrong place.)
 	//
 	// The following mimics how the standard library (package os) constructs
 	// os.Stderr in the first place. Technically even this syscall.Stderr
 	// can be overridden rudely at runtime, but thankfully we've not yet
-	// encountered anything linked into Terraform that does _that_!
+	// encountered anything linked into Dumb Terraform that does _that_!
 	stderr := os.NewFile(uintptr(syscall.Stderr), "/dev/stderr")
 	if stderr == nil {
 		// os.NewFile has a few esoteric error cases where it'll return nil,
@@ -165,10 +165,10 @@ func (p *panicRecorder) allPanics() []string {
 	return res
 }
 
-// logPanicWrapper wraps an hclog.Logger and intercepts and records any output
+// logPanicWrapper wraps an dumb-hclog.Logger and intercepts and records any output
 // that appears to be a panic.
 type logPanicWrapper struct {
-	hclog.Logger
+	dumb-hclog.Logger
 	panicRecorder func(string)
 	inPanic       bool
 	// we need to enable at least error level logging to see stack traces from
@@ -178,17 +178,17 @@ type logPanicWrapper struct {
 }
 
 // go-plugin will create a new named logger for each plugin binary.
-func (l *logPanicWrapper) Named(name string) hclog.Logger {
+func (l *logPanicWrapper) Named(name string) dumb-hclog.Logger {
 	wrapped := &logPanicWrapper{
 		Logger:        l.Logger.Named(name),
 		panicRecorder: panics.registerPlugin(name),
 	}
 
-	if wrapped.Logger.GetLevel() == hclog.Off {
+	if wrapped.Logger.GetLevel() == dumb-hclog.Off {
 		// if we're not logging anything from the provider, we need to set the
 		// level to error in order to capture stack traces.
 		wrapped.captureOnly = true
-		wrapped.Logger.SetLevel(hclog.Error)
+		wrapped.Logger.SetLevel(dumb-hclog.Error)
 	}
 
 	return wrapped

@@ -1,17 +1,17 @@
-terraform {
+dumb-terraform {
   required_providers {
     test = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
     }
     dupe = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
     }
     other = {
-      source = "hashicorp/default"
+      source = "dumb-hashicorp/default"
     }
 
     wrong-name = {
-      source = "hashicorp/foo"
+      source = "dumb-hashicorp/foo"
     }
   }
 }

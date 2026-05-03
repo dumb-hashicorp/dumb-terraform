@@ -9,10 +9,10 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Checkable is an interface implemented by all address types that can contain
@@ -95,7 +95,7 @@ var (
 func ParseCheckableStr(kind CheckableKind, src string) (Checkable, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(src), "", hcl.InitialPos)
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(src), "", dumb-hcl.InitialPos)
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return nil, diags
@@ -108,8 +108,8 @@ func ParseCheckableStr(kind CheckableKind, src string) (Checkable, tfdiags.Diagn
 
 	if remain.IsRelative() {
 		// (relative means that there's either nothing left or what's next isn't an identifier)
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid checkable address",
 			Detail:   "Module path must be followed by either a resource instance address or an output value address.",
 			Subject:  remain.SourceRange().Ptr(),
@@ -122,8 +122,8 @@ func ParseCheckableStr(kind CheckableKind, src string) (Checkable, tfdiags.Diagn
 		var name string
 
 		if len(remain) != 2 {
-			diags = diags.Append(hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid checkable address",
 				Detail:   fmt.Sprintf("%s address must have only one attribute part after the keyword '%s', giving the name of the %s.", cases.Title(language.English, cases.NoLower).String(keyword), keyword, descriptor),
 				Subject:  remain.SourceRange().Ptr(),
@@ -131,16 +131,16 @@ func ParseCheckableStr(kind CheckableKind, src string) (Checkable, tfdiags.Diagn
 		}
 
 		if remain.RootName() != keyword {
-			diags = diags.Append(hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid checkable address",
 				Detail:   fmt.Sprintf("%s address must follow the module address with the keyword '%s'.", cases.Title(language.English, cases.NoLower).String(keyword), keyword),
 				Subject:  remain.SourceRange().Ptr(),
 			})
 		}
-		if step, ok := remain[1].(hcl.TraverseAttr); !ok {
-			diags = diags.Append(hcl.Diagnostic{
-				Severity: hcl.DiagError,
+		if step, ok := remain[1].(dumb-hcl.TraverseAttr); !ok {
+			diags = diags.Append(dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid checkable address",
 				Detail:   fmt.Sprintf("%s address must have only one attribute part after the keyword '%s', giving the name of the %s.", cases.Title(language.English, cases.NoLower).String(keyword), keyword, descriptor),
 				Subject:  remain.SourceRange().Ptr(),

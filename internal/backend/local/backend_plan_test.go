@@ -12,21 +12,21 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/go-version"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
-	tftesting "github.com/hashicorp/terraform/internal/terraform/testing"
+	"github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	tftesting "github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform/testing"
 )
 
 func TestLocal_planBasic(t *testing.T) {
@@ -122,19 +122,19 @@ func TestLocal_planNoConfig(t *testing.T) {
 func TestLocal_plan_context_error(t *testing.T) {
 	b := TestLocal(t)
 
-	// This is an intentionally-invalid value to make terraform.NewContext fail
+	// This is an intentionally-invalid value to make dumb-terraform.NewContext fail
 	// when b.Operation calls it.
 	// NOTE: This test was originally using a provider initialization failure
-	// as its forced error condition, but terraform.NewContext is no longer
+	// as its forced error condition, but dumb-terraform.NewContext is no longer
 	// responsible for checking that. Invalid parallelism is the last situation
-	// where terraform.NewContext can return error diagnostics, and arguably
+	// where dumb-terraform.NewContext can return error diagnostics, and arguably
 	// we should be validating this argument at the UI layer anyway, so perhaps
-	// in future we'll make terraform.NewContext never return errors and then
+	// in future we'll make dumb-terraform.NewContext never return errors and then
 	// this test will become redundant, because its purpose is specifically
-	// to test that we properly unlock the state if terraform.NewContext
+	// to test that we properly unlock the state if dumb-terraform.NewContext
 	// returns an error.
 	if b.ContextOpts == nil {
-		b.ContextOpts = &terraform.ContextOpts{}
+		b.ContextOpts = &dumb-terraform.ContextOpts{}
 	}
 	b.ContextOpts.Parallelism = -1
 
@@ -231,7 +231,7 @@ Changes to Outputs:
   ~ sensitive_after  = (sensitive value)
   ~ sensitive_before = (sensitive value)
 
-You can apply this plan to save these new output values to the Terraform
+You can apply this plan to save these new output values to the Dumb Terraform
 state, without changing any real infrastructure.
 `)
 
@@ -326,11 +326,11 @@ func TestLocal_planTainted(t *testing.T) {
 		t.Fatal("plan should not be empty")
 	}
 
-	expectedOutput := `Terraform used the selected providers to generate the following execution
+	expectedOutput := `Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
 -/+ destroy and then create replacement
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_instance.foo is tainted, so must be replaced
 -/+ resource "test_instance" "foo" {
@@ -408,12 +408,12 @@ func TestLocal_planDeposedOnly(t *testing.T) {
 
 	// The deposed object and the current object are distinct, so our
 	// plan includes separate actions for each of them. This strange situation
-	// is not common: it should arise only if Terraform fails during
+	// is not common: it should arise only if Dumb Terraform fails during
 	// a create-before-destroy when the create hasn't completed yet but
 	// in a severe way that prevents the previous object from being restored
 	// as "current".
 	//
-	// However, that situation was more common in some earlier Terraform
+	// However, that situation was more common in some earlier Dumb Terraform
 	// versions where deposed objects were not managed properly, so this
 	// can arise when upgrading from an older version with deposed objects
 	// already in the state.
@@ -421,16 +421,16 @@ func TestLocal_planDeposedOnly(t *testing.T) {
 	// This is one of the few cases where we expose the idea of "deposed" in
 	// the UI, including the user-unfriendly "deposed key" (00000000 in this
 	// case) just so that users can correlate this with what they might
-	// see in `terraform show` and in the subsequent apply output, because
+	// see in `dumb-terraform show` and in the subsequent apply output, because
 	// it's also possible for there to be _multiple_ deposed objects, in the
 	// unlikely event that create_before_destroy _keeps_ crashing across
 	// subsequent runs.
-	expectedOutput := `Terraform used the selected providers to generate the following execution
+	expectedOutput := `Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   + create
   - destroy
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_instance.foo will be created
   + resource "test_instance" "foo" {
@@ -498,11 +498,11 @@ func TestLocal_planTainted_createBeforeDestroy(t *testing.T) {
 		t.Fatal("plan should not be empty")
 	}
 
-	expectedOutput := `Terraform used the selected providers to generate the following execution
+	expectedOutput := `Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
 +/- create replacement and then destroy
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_instance.foo is tainted, so must be replaced
 +/- resource "test_instance" "foo" {
@@ -650,7 +650,7 @@ func TestLocal_planDestroy_withDataSources(t *testing.T) {
 	}
 
 	// Data source should not be rendered in the output
-	expectedOutput := `Terraform will perform the following actions:
+	expectedOutput := `Dumb Terraform will perform the following actions:
 
   # test_instance.foo[0] will be destroyed
   - resource "test_instance" "foo" {
@@ -734,7 +734,7 @@ func testOperationPlan(t *testing.T, configDir string) (*backendrun.Operation, f
 	// Many of our tests use an overridden "test" provider that's just in-memory
 	// inside the test process, not a separate plugin on disk.
 	depLocks := depsfile.NewLocks()
-	depLocks.SetProviderOverridden(addrs.MustParseProviderSourceString("registry.terraform.io/hashicorp/test"))
+	depLocks.SetProviderOverridden(addrs.MustParseProviderSourceString("registry.dumb-terraform.io/dumb-hashicorp/test"))
 
 	return &backendrun.Operation{
 		Type:            backendrun.OperationTypePlan,

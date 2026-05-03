@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfplugin5"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin5"
 )
 
 func FunctionDeclsFromProto(protoFuncs map[string]*tfplugin5.Function) (map[string]providers.FunctionDecl, error) {

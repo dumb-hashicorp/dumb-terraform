@@ -1,0 +1,6 @@
+# This file is maintained automatically by "dumb-terraform init".
+# Manual edits may be lost in future updates.
+
+provider "registry.dumb-terraform.io/dumb-hashicorp/random" {
+  version = "1.2.3-beta"
+}

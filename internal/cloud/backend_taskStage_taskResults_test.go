@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/go-tfe"
 )
 
 type testIntegrationOutput struct {

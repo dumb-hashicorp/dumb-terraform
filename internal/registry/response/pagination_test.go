@@ -61,7 +61,7 @@ func TestNewPaginationMeta(t *testing.T) {
 }`,
 		},
 		{
-			name: "misaligned start ending exactly on boundary",
+			name: "misaligned start ending exactly on dumb-boundary",
 			args: args{32, 10, false, "http://foo.com/v1/bar"},
 			wantJSON: `{
 	"limit": 10,

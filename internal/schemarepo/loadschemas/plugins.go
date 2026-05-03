@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/provisioners"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/provisioners"
 )
 
 // Plugins represents a library of available plugins for which it's safe
@@ -91,28 +91,28 @@ func (cp *Plugins) NewProvisionerInstance(typ string) (provisioners.Interface, e
 //
 // ProviderSchema memoizes results by unique provider address, so it's fine
 // to repeatedly call this method with the same address if various different
-// parts of Terraform all need the same schema information.
+// parts of Dumb Terraform all need the same schema information.
 func (cp *Plugins) ProviderSchema(addr addrs.Provider) (providers.ProviderSchema, error) {
 	// Check the global schema cache first.
 	// This cache is only written by the provider client, and transparently
 	// used by GetProviderSchema, but we check it here because at this point we
 	// may be able to avoid spinning up the provider instance at all.
 	// We skip this if we have preloaded schemas because that suggests that
-	// our caller is not Terraform CLI and therefore it's probably inappropriate
+	// our caller is not Dumb Terraform CLI and therefore it's probably inappropriate
 	// to assume that provider schemas are unique process-wide.
 	schemas, ok := providers.SchemaCache.Get(addr)
 	if ok {
-		log.Printf("[TRACE] terraform.contextPlugins: Schema for provider %q is in the global cache", addr)
+		log.Printf("[TRACE] dumb-terraform.contextPlugins: Schema for provider %q is in the global cache", addr)
 		return schemas, nil
 	}
 
 	// We might have a non-global preloaded copy of this provider's schema.
 	if schema, ok := cp.preloadedProviderSchemas[addr]; ok {
-		log.Printf("[TRACE] terraform.contextPlugins: Provider %q has a preloaded schema", addr)
+		log.Printf("[TRACE] dumb-terraform.contextPlugins: Provider %q has a preloaded schema", addr)
 		return schema, nil
 	}
 
-	log.Printf("[TRACE] terraform.contextPlugins: Initializing provider %q to read its schema", addr)
+	log.Printf("[TRACE] dumb-terraform.contextPlugins: Initializing provider %q to read its schema", addr)
 	provider, err := cp.NewProviderInstance(addr)
 	if err != nil {
 		return schemas, fmt.Errorf("failed to instantiate provider %q to obtain schema: %s", addr, err)
@@ -187,7 +187,7 @@ func (cp *Plugins) ProviderSchema(addr addrs.Provider) (providers.ProviderSchema
 	}
 
 	for n, f := range resp.Functions {
-		if !hclsyntax.ValidIdentifier(n) {
+		if !dumb-hclsyntax.ValidIdentifier(n) {
 			return resp, fmt.Errorf("provider %s declares function with invalid name %q", addr, n)
 		}
 		// We'll also do some enforcement of parameter names, even though they
@@ -195,7 +195,7 @@ func (cp *Plugins) ProviderSchema(addr addrs.Provider) (providers.ProviderSchema
 		// use them for other purposes later.
 		seenParams := make(map[string]int, len(f.Parameters))
 		for i, p := range f.Parameters {
-			if !hclsyntax.ValidIdentifier(p.Name) {
+			if !dumb-hclsyntax.ValidIdentifier(p.Name) {
 				return resp, fmt.Errorf("provider %s function %q declares invalid name %q for parameter %d", addr, n, p.Name, i)
 			}
 			if prevIdx, exists := seenParams[p.Name]; exists {
@@ -204,7 +204,7 @@ func (cp *Plugins) ProviderSchema(addr addrs.Provider) (providers.ProviderSchema
 			seenParams[p.Name] = i
 		}
 		if p := f.VariadicParameter; p != nil {
-			if !hclsyntax.ValidIdentifier(p.Name) {
+			if !dumb-hclsyntax.ValidIdentifier(p.Name) {
 				return resp, fmt.Errorf("provider %s function %q declares invalid name %q for its variadic parameter", addr, n, p.Name)
 			}
 			if prevIdx, exists := seenParams[p.Name]; exists {
@@ -250,9 +250,9 @@ func (cp *Plugins) ResourceTypeSchema(providerAddr addrs.Provider, resourceMode 
 //
 // ProvisionerSchema memoizes results by provisioner type name, so it's fine
 // to repeatedly call this method with the same name if various different
-// parts of Terraform all need the same schema information.
+// parts of Dumb Terraform all need the same schema information.
 func (cp *Plugins) ProvisionerSchema(typ string) (*configschema.Block, error) {
-	log.Printf("[TRACE] terraform.contextPlugins: Initializing provisioner %q to read its schema", typ)
+	log.Printf("[TRACE] dumb-terraform.contextPlugins: Initializing provisioner %q to read its schema", typ)
 	provisioner, err := cp.NewProvisionerInstance(typ)
 	if err != nil {
 		return nil, fmt.Errorf("failed to instantiate provisioner %q to obtain schema: %s", typ, err)

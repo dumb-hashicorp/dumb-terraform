@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/backend/local"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
 )
 
 // DefaultDataDir is the default directory for storing local data.
-const DefaultDataDir = ".terraform"
+const DefaultDataDir = ".dumb-terraform"
 
 func TestMeta_Workspace_override(t *testing.T) {
 	defer func(value string) {

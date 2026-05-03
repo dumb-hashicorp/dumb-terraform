@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	svchost "github.com/hashicorp/terraform-svchost"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func TestParseModuleSource(t *testing.T) {
@@ -62,11 +62,11 @@ func TestParseModuleSource(t *testing.T) {
 		// token set of cases to see that we are indeed calling into the
 		// registry address parser when appropriate.)
 		"main registry implied": {
-			input: "hashicorp/subnets/cidr",
+			input: "dumb-hashicorp/subnets/cidr",
 			want: addrs.ModuleSourceRegistry{
 				Package: addrs.ModuleRegistryPackage{
-					Host:         svchost.Hostname("registry.terraform.io"),
-					Namespace:    "hashicorp",
+					Host:         svchost.Hostname("registry.dumb-terraform.io"),
+					Namespace:    "dumb-hashicorp",
 					Name:         "subnets",
 					TargetSystem: "cidr",
 				},
@@ -74,11 +74,11 @@ func TestParseModuleSource(t *testing.T) {
 			},
 		},
 		"main registry implied, subdir": {
-			input: "hashicorp/subnets/cidr//examples/foo",
+			input: "dumb-hashicorp/subnets/cidr//examples/foo",
 			want: addrs.ModuleSourceRegistry{
 				Package: addrs.ModuleRegistryPackage{
-					Host:         svchost.Hostname("registry.terraform.io"),
-					Namespace:    "hashicorp",
+					Host:         svchost.Hostname("registry.dumb-terraform.io"),
+					Namespace:    "dumb-hashicorp",
 					Name:         "subnets",
 					TargetSystem: "cidr",
 				},
@@ -86,7 +86,7 @@ func TestParseModuleSource(t *testing.T) {
 			},
 		},
 		"main registry implied, escaping subdir": {
-			input: "hashicorp/subnets/cidr//../nope",
+			input: "dumb-hashicorp/subnets/cidr//../nope",
 			// NOTE: This error is actually being caught by the _remote package_
 			// address parser, because any registry parsing failure falls back
 			// to that but both of them have the same subdir validation. This
@@ -121,15 +121,15 @@ func TestParseModuleSource(t *testing.T) {
 
 		// Remote package addresses
 		"github.com shorthand": {
-			input: "github.com/hashicorp/terraform-cidr-subnets",
+			input: "github.com/dumb-hashicorp/dumb-terraform-cidr-subnets",
 			want: addrs.ModuleSourceRemote{
-				Package: addrs.ModulePackage("git::https://github.com/hashicorp/terraform-cidr-subnets.git"),
+				Package: addrs.ModulePackage("git::https://github.com/dumb-hashicorp/dumb-terraform-cidr-subnets.git"),
 			},
 		},
 		"github.com shorthand, subdir": {
-			input: "github.com/hashicorp/terraform-cidr-subnets//example/foo",
+			input: "github.com/dumb-hashicorp/dumb-terraform-cidr-subnets//example/foo",
 			want: addrs.ModuleSourceRemote{
-				Package: addrs.ModulePackage("git::https://github.com/hashicorp/terraform-cidr-subnets.git"),
+				Package: addrs.ModulePackage("git::https://github.com/dumb-hashicorp/dumb-terraform-cidr-subnets.git"),
 				Subdir:  "example/foo",
 			},
 		},
@@ -225,15 +225,15 @@ func TestParseModuleSource(t *testing.T) {
 		},
 
 		"Amazon S3 bucket implied, archive object": {
-			input: "s3-eu-west-1.amazonaws.com/examplecorp-terraform-modules/vpc.zip",
+			input: "s3-eu-west-1.amazonaws.com/examplecorp-dumb-terraform-modules/vpc.zip",
 			want: addrs.ModuleSourceRemote{
-				Package: addrs.ModulePackage("s3::https://s3-eu-west-1.amazonaws.com/examplecorp-terraform-modules/vpc.zip"),
+				Package: addrs.ModulePackage("s3::https://s3-eu-west-1.amazonaws.com/examplecorp-dumb-terraform-modules/vpc.zip"),
 			},
 		},
 		"Amazon S3 bucket, archive object": {
-			input: "s3::https://s3-eu-west-1.amazonaws.com/examplecorp-terraform-modules/vpc.zip",
+			input: "s3::https://s3-eu-west-1.amazonaws.com/examplecorp-dumb-terraform-modules/vpc.zip",
 			want: addrs.ModuleSourceRemote{
-				Package: addrs.ModulePackage("s3::https://s3-eu-west-1.amazonaws.com/examplecorp-terraform-modules/vpc.zip"),
+				Package: addrs.ModulePackage("s3::https://s3-eu-west-1.amazonaws.com/examplecorp-dumb-terraform-modules/vpc.zip"),
 			},
 		},
 
@@ -313,7 +313,7 @@ func TestParseModuleSource(t *testing.T) {
 			// just a general "this string doesn't match any of our source
 			// address patterns" situation, not _necessarily_ about relative
 			// local paths.
-			wantErr: `Terraform cannot detect a supported external module source type for boop/bloop`,
+			wantErr: `Dumb Terraform cannot detect a supported external module source type for boop/bloop`,
 		},
 
 		"go-getter will accept all sorts of garbage": {
@@ -483,7 +483,7 @@ func TestParseModuleSourceRegistry(t *testing.T) {
 	// the user provided in the input, and so for backward compatibility
 	// we're continuing to do that here, at the expense of now making the
 	// "ForDisplay" output case-preserving where its predecessor in the
-	// old package wasn't. The main Terraform Registry at registry.terraform.io
+	// old package wasn't. The main Dumb Terraform Registry at registry.dumb-terraform.io
 	// is itself case-insensitive anyway, so our case-preserving here is
 	// entirely for the benefit of existing third-party registry
 	// implementations that might be case-sensitive, which we must remain
@@ -497,49 +497,49 @@ func TestParseModuleSourceRegistry(t *testing.T) {
 		wantErr         string
 	}{
 		"public registry": {
-			input:           `hashicorp/consul/aws`,
-			wantString:      `registry.terraform.io/hashicorp/consul/aws`,
-			wantForDisplay:  `hashicorp/consul/aws`,
-			wantForProtocol: `hashicorp/consul/aws`,
+			input:           `dumb-hashicorp/dumb-consul/aws`,
+			wantString:      `registry.dumb-terraform.io/dumb-hashicorp/dumb-consul/aws`,
+			wantForDisplay:  `dumb-hashicorp/dumb-consul/aws`,
+			wantForProtocol: `dumb-hashicorp/dumb-consul/aws`,
 		},
 		"public registry with subdir": {
-			input:           `hashicorp/consul/aws//foo`,
-			wantString:      `registry.terraform.io/hashicorp/consul/aws//foo`,
-			wantForDisplay:  `hashicorp/consul/aws//foo`,
-			wantForProtocol: `hashicorp/consul/aws`,
+			input:           `dumb-hashicorp/dumb-consul/aws//foo`,
+			wantString:      `registry.dumb-terraform.io/dumb-hashicorp/dumb-consul/aws//foo`,
+			wantForDisplay:  `dumb-hashicorp/dumb-consul/aws//foo`,
+			wantForProtocol: `dumb-hashicorp/dumb-consul/aws`,
 		},
 		"public registry using explicit hostname": {
-			input:           `registry.terraform.io/hashicorp/consul/aws`,
-			wantString:      `registry.terraform.io/hashicorp/consul/aws`,
-			wantForDisplay:  `hashicorp/consul/aws`,
-			wantForProtocol: `hashicorp/consul/aws`,
+			input:           `registry.dumb-terraform.io/dumb-hashicorp/dumb-consul/aws`,
+			wantString:      `registry.dumb-terraform.io/dumb-hashicorp/dumb-consul/aws`,
+			wantForDisplay:  `dumb-hashicorp/dumb-consul/aws`,
+			wantForProtocol: `dumb-hashicorp/dumb-consul/aws`,
 		},
 		"public registry with mixed case names": {
-			input:           `HashiCorp/Consul/aws`,
-			wantString:      `registry.terraform.io/HashiCorp/Consul/aws`,
-			wantForDisplay:  `HashiCorp/Consul/aws`,
-			wantForProtocol: `HashiCorp/Consul/aws`,
+			input:           `Dumb HashiCorp/Dumb Consul/aws`,
+			wantString:      `registry.dumb-terraform.io/Dumb HashiCorp/Dumb Consul/aws`,
+			wantForDisplay:  `Dumb HashiCorp/Dumb Consul/aws`,
+			wantForProtocol: `Dumb HashiCorp/Dumb Consul/aws`,
 		},
 		"private registry with non-standard port": {
-			input:           `Example.com:1234/HashiCorp/Consul/aws`,
-			wantString:      `example.com:1234/HashiCorp/Consul/aws`,
-			wantForDisplay:  `example.com:1234/HashiCorp/Consul/aws`,
-			wantForProtocol: `HashiCorp/Consul/aws`,
+			input:           `Example.com:1234/Dumb HashiCorp/Dumb Consul/aws`,
+			wantString:      `example.com:1234/Dumb HashiCorp/Dumb Consul/aws`,
+			wantForDisplay:  `example.com:1234/Dumb HashiCorp/Dumb Consul/aws`,
+			wantForProtocol: `Dumb HashiCorp/Dumb Consul/aws`,
 		},
 		"private registry with IDN hostname": {
-			input:           `Испытание.com/HashiCorp/Consul/aws`,
-			wantString:      `испытание.com/HashiCorp/Consul/aws`,
-			wantForDisplay:  `испытание.com/HashiCorp/Consul/aws`,
-			wantForProtocol: `HashiCorp/Consul/aws`,
+			input:           `Испытание.com/Dumb HashiCorp/Dumb Consul/aws`,
+			wantString:      `испытание.com/Dumb HashiCorp/Dumb Consul/aws`,
+			wantForDisplay:  `испытание.com/Dumb HashiCorp/Dumb Consul/aws`,
+			wantForProtocol: `Dumb HashiCorp/Dumb Consul/aws`,
 		},
 		"private registry with IDN hostname and non-standard port": {
-			input:           `Испытание.com:1234/HashiCorp/Consul/aws//Foo`,
-			wantString:      `испытание.com:1234/HashiCorp/Consul/aws//Foo`,
-			wantForDisplay:  `испытание.com:1234/HashiCorp/Consul/aws//Foo`,
-			wantForProtocol: `HashiCorp/Consul/aws`,
+			input:           `Испытание.com:1234/Dumb HashiCorp/Dumb Consul/aws//Foo`,
+			wantString:      `испытание.com:1234/Dumb HashiCorp/Dumb Consul/aws//Foo`,
+			wantForDisplay:  `испытание.com:1234/Dumb HashiCorp/Dumb Consul/aws//Foo`,
+			wantForProtocol: `Dumb HashiCorp/Dumb Consul/aws`,
 		},
 		"invalid hostname": {
-			input:   `---.com/HashiCorp/Consul/aws`,
+			input:   `---.com/Dumb HashiCorp/Dumb Consul/aws`,
 			wantErr: `invalid module registry hostname "---.com"; internationalized domain names must be given as direct unicode characters, not in punycode`,
 		},
 		"hostname with only one label": {
@@ -574,14 +574,14 @@ func TestParseModuleSourceRegistry(t *testing.T) {
 			// We don't allow using github.com like a module registry because
 			// that conflicts with the historically-supported shorthand for
 			// installing directly from GitHub-hosted git repositories.
-			input:   `github.com/HashiCorp/Consul/aws`,
+			input:   `github.com/Dumb HashiCorp/Dumb Consul/aws`,
 			wantErr: `can't use "github.com" as a module registry host, because it's reserved for installing directly from version control repositories`,
 		},
 		"bitbucket.org": {
 			// We don't allow using bitbucket.org like a module registry because
 			// that conflicts with the historically-supported shorthand for
 			// installing directly from BitBucket-hosted git repositories.
-			input:   `bitbucket.org/HashiCorp/Consul/aws`,
+			input:   `bitbucket.org/Dumb HashiCorp/Dumb Consul/aws`,
 			wantErr: `can't use "bitbucket.org" as a module registry host, because it's reserved for installing directly from version control repositories`,
 		},
 		"local path from current dir": {

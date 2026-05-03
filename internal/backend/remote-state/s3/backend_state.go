@@ -16,19 +16,19 @@ import (
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
 
-	baselogging "github.com/hashicorp/aws-sdk-go-base/v2/logging"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	baselogging "github.com/dumb-hashicorp/aws-sdk-go-base/v2/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const (
 	// defaultWorkspaceKeyPrefix is the default prefix for workspace storage.
 	// The colon is used to reduce the chance of name conflicts with existing objects.
 	defaultWorkspaceKeyPrefix = "env:"
-	// lockFileSuffix defines the suffix for Terraform state lock files.
+	// lockFileSuffix defines the suffix for Dumb Terraform state lock files.
 	lockFileSuffix = ".tflock"
 )
 
@@ -288,7 +288,7 @@ func (err bucketRegionError) Error() string {
 	return fmt.Sprintf("requested bucket from %q, actual location %q", err.requestRegion, err.bucketRegion)
 }
 
-// getLockFilePath returns the path to the lock file for the given Terraform state.
+// getLockFilePath returns the path to the lock file for the given Dumb Terraform state.
 // For `default.tfstate`, the lock file is stored at `default.tfstate.tflock`.
 func (b *Backend) getLockFilePath(name string) string {
 	return b.path(name) + lockFileSuffix

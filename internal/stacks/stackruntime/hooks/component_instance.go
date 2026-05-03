@@ -4,13 +4,13 @@
 package hooks
 
 import (
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
 )
 
 // ComponentInstanceStatus is a UI-focused description of the overall status
-// for a given component instance undergoing a Terraform plan or apply
+// for a given component instance undergoing a Dumb Terraform plan or apply
 // operation. The "pending" and "errored" status are used for both operation
 // types, and the others will be used only for one of plan or apply.
 type ComponentInstanceStatus rune

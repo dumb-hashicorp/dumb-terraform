@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func TestProviderReservedNames(t *testing.T) {
@@ -24,14 +24,14 @@ func TestProviderReservedNames(t *testing.T) {
 	_, diags := parser.LoadConfigFile("config.tf")
 
 	assertExactDiagnostics(t, diags, []string{
-		//TODO: This deprecation warning will be removed in terraform v0.15.
-		`config.tf:4,13-20: Version constraints inside provider configuration blocks are deprecated; Terraform 0.13 and earlier allowed provider version constraints inside the provider configuration block, but that is now deprecated and will be removed in a future version of Terraform. To silence this warning, move the provider version constraint into the required_providers block.`,
-		`config.tf:10,3-8: Reserved argument name in provider block; The provider argument name "count" is reserved for use by Terraform in a future version.`,
-		`config.tf:11,3-13: Reserved argument name in provider block; The provider argument name "depends_on" is reserved for use by Terraform in a future version.`,
-		`config.tf:12,3-11: Reserved argument name in provider block; The provider argument name "for_each" is reserved for use by Terraform in a future version.`,
-		`config.tf:14,3-12: Reserved block type name in provider block; The block type name "lifecycle" is reserved for use by Terraform in a future version.`,
-		`config.tf:15,3-9: Reserved block type name in provider block; The block type name "locals" is reserved for use by Terraform in a future version.`,
-		`config.tf:13,3-9: Reserved argument name in provider block; The provider argument name "source" is reserved for use by Terraform in a future version.`,
+		//TODO: This deprecation warning will be removed in dumb-terraform v0.15.
+		`config.tf:4,13-20: Version constraints inside provider configuration blocks are deprecated; Dumb Terraform 0.13 and earlier allowed provider version constraints inside the provider configuration block, but that is now deprecated and will be removed in a future version of Dumb Terraform. To silence this warning, move the provider version constraint into the required_providers block.`,
+		`config.tf:10,3-8: Reserved argument name in provider block; The provider argument name "count" is reserved for use by Dumb Terraform in a future version.`,
+		`config.tf:11,3-13: Reserved argument name in provider block; The provider argument name "depends_on" is reserved for use by Dumb Terraform in a future version.`,
+		`config.tf:12,3-11: Reserved argument name in provider block; The provider argument name "for_each" is reserved for use by Dumb Terraform in a future version.`,
+		`config.tf:14,3-12: Reserved block type name in provider block; The block type name "lifecycle" is reserved for use by Dumb Terraform in a future version.`,
+		`config.tf:15,3-9: Reserved block type name in provider block; The block type name "locals" is reserved for use by Dumb Terraform in a future version.`,
+		`config.tf:13,3-9: Reserved argument name in provider block; The provider argument name "source" is reserved for use by Dumb Terraform in a future version.`,
 	})
 }
 
@@ -65,7 +65,7 @@ func TestParseProviderConfigCompact(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Input, func(t *testing.T) {
-			traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(test.Input), "", hcl.Pos{})
+			traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(test.Input), "", dumb-hcl.Pos{})
 			if len(parseDiags) != 0 {
 				t.Errorf("unexpected diagnostics during parse")
 				for _, diag := range parseDiags {

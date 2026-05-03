@@ -4,7 +4,7 @@
 package plans
 
 import (
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 // PlannedState merges the set of changes described by the receiver into the

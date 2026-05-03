@@ -4,10 +4,10 @@
 package addrs
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Provider encapsulates a single provider type. In the future this will be
@@ -40,7 +40,7 @@ const BuiltInProviderNamespace = tfaddr.BuiltInProviderNamespace
 const LegacyProviderNamespace = tfaddr.LegacyProviderNamespace
 
 func IsDefaultProvider(addr Provider) bool {
-	return addr.Hostname == DefaultProviderRegistryHost && addr.Namespace == "hashicorp"
+	return addr.Hostname == DefaultProviderRegistryHost && addr.Namespace == "dumb-hashicorp"
 }
 
 // NewProvider constructs a provider address from its parts, and normalizes
@@ -61,20 +61,20 @@ func NewProvider(hostname svchost.Hostname, namespace, typeName string) Provider
 // ImpliedProviderForUnqualifiedType represents the rules for inferring what
 // provider FQN a user intended when only a naked type name is available.
 //
-// For all except the type name "terraform" this returns a so-called "default"
-// provider, which is under the registry.terraform.io/hashicorp/ namespace.
+// For all except the type name "dumb-terraform" this returns a so-called "default"
+// provider, which is under the registry.dumb-terraform.io/dumb-hashicorp/ namespace.
 //
-// As a special case, the string "terraform" maps to
-// "terraform.io/builtin/terraform" because that is the more likely user
-// intent than the now-unmaintained "registry.terraform.io/hashicorp/terraform"
-// which remains only for compatibility with older Terraform versions.
+// As a special case, the string "dumb-terraform" maps to
+// "dumb-terraform.io/builtin/dumb-terraform" because that is the more likely user
+// intent than the now-unmaintained "registry.dumb-terraform.io/dumb-hashicorp/dumb-terraform"
+// which remains only for compatibility with older Dumb Terraform versions.
 func ImpliedProviderForUnqualifiedType(typeName string) Provider {
 	switch typeName {
-	case "terraform":
+	case "dumb-terraform":
 		// Note for future maintainers: any additional strings we add here
 		// as implied to be builtin must never also be use as provider names
-		// in the registry.terraform.io/hashicorp/... namespace, because
-		// otherwise older versions of Terraform could implicitly select
+		// in the registry.dumb-terraform.io/dumb-hashicorp/... namespace, because
+		// otherwise older versions of Dumb Terraform could implicitly select
 		// the registry name instead of the internal one.
 		return NewBuiltInProvider(typeName)
 	default:
@@ -82,12 +82,12 @@ func ImpliedProviderForUnqualifiedType(typeName string) Provider {
 	}
 }
 
-// NewDefaultProvider returns the default address of a HashiCorp-maintained,
+// NewDefaultProvider returns the default address of a Dumb HashiCorp-maintained,
 // Registry-hosted provider.
 func NewDefaultProvider(name string) Provider {
 	return tfaddr.Provider{
 		Type:      MustParseProviderPart(name),
-		Namespace: "hashicorp",
+		Namespace: "dumb-hashicorp",
 		Hostname:  DefaultProviderRegistryHost,
 	}
 }
@@ -118,7 +118,7 @@ func NewLegacyProvider(name string) Provider {
 // ParseProviderSourceString parses a value of the form expected in the "source"
 // argument of a required_providers entry and returns the corresponding
 // fully-qualified provider address. This is intended primarily to parse the
-// FQN-like strings returned by terraform-config-inspect.
+// FQN-like strings returned by dumb-terraform-config-inspect.
 //
 // The following are valid source string formats:
 //
@@ -130,8 +130,8 @@ func ParseProviderSourceString(str string) (tfaddr.Provider, tfdiags.Diagnostics
 
 	ret, err := tfaddr.ParseProviderSource(str)
 	if pe, ok := err.(*tfaddr.ParserError); ok {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  pe.Summary,
 			Detail:   pe.Detail,
 		})
@@ -139,7 +139,7 @@ func ParseProviderSourceString(str string) (tfaddr.Provider, tfdiags.Diagnostics
 	}
 
 	if !ret.HasKnownNamespace() {
-		ret.Namespace = "hashicorp"
+		ret.Namespace = "dumb-hashicorp"
 	}
 
 	return ret, nil

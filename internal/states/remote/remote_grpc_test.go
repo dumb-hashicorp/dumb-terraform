@@ -8,14 +8,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -26,7 +26,7 @@ func Test_grpcClient_Get(t *testing.T) {
 	stateId := "production"
 	stateString := `{
     "version": 4,
-    "terraform_version": "0.13.0",
+    "dumb-terraform_version": "0.13.0",
     "serial": 0,
     "lineage": "",
     "outputs": {
@@ -84,8 +84,8 @@ func Test_grpcClient_Get(t *testing.T) {
 
 	t.Run("state manager made using grpcClient returns expected error from error diagnostic", func(t *testing.T) {
 		var diags tfdiags.Diagnostics
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "error forced from test",
 			Detail:   "error forced from test",
 		})
@@ -186,8 +186,8 @@ func Test_grpcClient_Put(t *testing.T) {
 	t.Run("state manager made using grpcClient returns expected error from error diagnostic", func(t *testing.T) {
 		expectedErr := "error forced from test"
 		var diags tfdiags.Diagnostics
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  expectedErr,
 			Detail:   expectedErr,
 		})
@@ -354,8 +354,8 @@ func Test_grpcClient_Lock(t *testing.T) {
 
 	t.Run("state manager made using grpcClient returns expected error from Lock method's error diagnostic", func(t *testing.T) {
 		var diags tfdiags.Diagnostics
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "error forced from test",
 			Detail:   "error forced from test",
 		})
@@ -391,8 +391,8 @@ func Test_grpcClient_Lock(t *testing.T) {
 
 	t.Run("state manager made using grpcClient currently swallows warning diagnostics returned from the Lock method", func(t *testing.T) {
 		var diags tfdiags.Diagnostics
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "warning forced from test",
 			Detail:   "warning forced from test",
 		})
@@ -468,8 +468,8 @@ func Test_grpcClient_Unlock(t *testing.T) {
 
 	t.Run("state manager made using grpcClient returns expected error from Unlock method's error diagnostic", func(t *testing.T) {
 		var diags tfdiags.Diagnostics
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "error forced from test",
 			Detail:   "error forced from test",
 		})
@@ -505,8 +505,8 @@ func Test_grpcClient_Unlock(t *testing.T) {
 
 	t.Run("state manager made using grpcClient currently swallows warning diagnostics returned from the Unlock method", func(t *testing.T) {
 		var diags tfdiags.Diagnostics
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "warning forced from test",
 			Detail:   "warning forced from test",
 		})

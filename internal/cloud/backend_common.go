@@ -21,14 +21,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-retryablehttp"
-	tfe "github.com/hashicorp/go-tfe"
-	"github.com/hashicorp/jsonapi"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/jsonformat"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/go-retryablehttp"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/jsonapi"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 var (
@@ -408,7 +408,7 @@ func (b *Cloud) checkPolicy(stopCtx, cancelCtx context.Context, op *backendrun.O
 			} else if !b.input {
 				return errPolicyOverrideNeedsUIConfirmation
 			} else {
-				opts := &terraform.InputOpts{
+				opts := &dumb-terraform.InputOpts{
 					Id:          "override",
 					Query:       "\nDo you want to override the soft failed policy check?",
 					Description: "Only 'override' will be accepted to override.",
@@ -439,7 +439,7 @@ func (b *Cloud) checkPolicy(stopCtx, cancelCtx context.Context, op *backendrun.O
 	return nil
 }
 
-func (b *Cloud) confirm(stopCtx context.Context, op *backendrun.Operation, opts *terraform.InputOpts, r *tfe.Run, keyword string) error {
+func (b *Cloud) confirm(stopCtx context.Context, op *backendrun.Operation, opts *dumb-terraform.InputOpts, r *tfe.Run, keyword string) error {
 	doneCtx, cancel := context.WithCancel(stopCtx)
 	result := make(chan error, 2)
 
@@ -587,9 +587,9 @@ func (b *Cloud) uploadConfigurationVersion(stopCtx, cancelCtx context.Context, o
 The remote workspace is configured to work with configuration at
 %s relative to the target repository.
 
-Terraform will upload the contents of the following directory,
-excluding files or directories as defined by a .terraformignore file
-at %s/.terraformignore (if it is present),
+Dumb Terraform will upload the contents of the following directory,
+excluding files or directories as defined by a .dumb-terraformignore file
+at %s/.dumb-terraformignore (if it is present),
 in order to capture the filesystem context the remote workspace expects:
     %s
 `), w.WorkingDirectory, configDir, configDir) + "\n")
@@ -686,7 +686,7 @@ var readRedactedPlan func(context.Context, url.URL, string, string) ([]byte, err
 	client.RetryMax = 10
 	client.RetryWaitMin = 100 * time.Millisecond
 	client.RetryWaitMax = 400 * time.Millisecond
-	client.Logger = logging.HCLogger()
+	client.Logger = logging.DUMB_HCLogger()
 
 	u, err := baseURL.Parse(fmt.Sprintf(
 		"plans/%s/json-output-redacted", url.QueryEscape(planID)))
@@ -771,5 +771,5 @@ func decodeErrorPayload(r *http.Response) ([]string, error) {
 }
 
 func isValidAppName(name string) bool {
-	return name == "HCP Terraform" || name == "Terraform Enterprise"
+	return name == "DUMB_HCP Dumb Terraform" || name == "Dumb Terraform Enterprise"
 }

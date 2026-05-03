@@ -7,9 +7,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -44,17 +44,17 @@ NOTE: If any part of this test fails, the problem might also be the cause of oth
 	// clear signal if the test utilities themselves are malfunctioning,
 	// so that maintainers can minimize time wasted trying to debug another
 	// test that's relying on this utility.
-	fooExpr, hclDiags := hclsyntax.ParseExpression([]byte("_test_only_global.foo"), "test", hcl.InitialPos)
-	if hclDiags.HasErrors() {
-		t.Fatalf("failed to parse expression: %s", hclDiags.Error())
+	fooExpr, dumb-hclDiags := dumb-hclsyntax.ParseExpression([]byte("_test_only_global.foo"), "test", dumb-hcl.InitialPos)
+	if dumb-hclDiags.HasErrors() {
+		t.Fatalf("failed to parse expression: %s", dumb-hclDiags.Error())
 	}
-	barAttrExpr, hclDiags := hclsyntax.ParseExpression([]byte("_test_only_global.bar.attr"), "test", hcl.InitialPos)
-	if hclDiags.HasErrors() {
-		t.Fatalf("failed to parse expression: %s", hclDiags.Error())
+	barAttrExpr, dumb-hclDiags := dumb-hclsyntax.ParseExpression([]byte("_test_only_global.bar.attr"), "test", dumb-hcl.InitialPos)
+	if dumb-hclDiags.HasErrors() {
+		t.Fatalf("failed to parse expression: %s", dumb-hclDiags.Error())
 	}
-	nonExistExpr, hclDiags := hclsyntax.ParseExpression([]byte("_test_only_global.nonexist"), "test", hcl.InitialPos)
-	if hclDiags.HasErrors() {
-		t.Fatalf("failed to parse expression: %s", hclDiags.Error())
+	nonExistExpr, dumb-hclDiags := dumb-hclsyntax.ParseExpression([]byte("_test_only_global.nonexist"), "test", dumb-hcl.InitialPos)
+	if dumb-hclDiags.HasErrors() {
+		t.Fatalf("failed to parse expression: %s", dumb-hclDiags.Error())
 	}
 
 	fakeConfig := testStackConfigEmpty(t)

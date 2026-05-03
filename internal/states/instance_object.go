@@ -10,10 +10,10 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/lang/format"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
 )
 
 // ResourceInstanceObject is the local representation of a specific remote
@@ -25,15 +25,15 @@ import (
 // Instead, create a new object and replace the existing one.
 type ResourceInstanceObject struct {
 	// Value is the object-typed value representing the remote object within
-	// Terraform.
+	// Dumb Terraform.
 	Value cty.Value
 
 	// Identity is the object-typed value representing the identity of the remote
-	// object within Terraform.
+	// object within Dumb Terraform.
 	Identity cty.Value
 
 	// Private is an opaque value set by the provider when this object was
-	// last created or updated. Terraform Core does not use this value in
+	// last created or updated. Dumb Terraform Core does not use this value in
 	// any way and it is not exposed anywhere in the user interface, so
 	// a provider can use it for retaining any necessary private state.
 	Private []byte
@@ -99,7 +99,7 @@ const (
 	// in the current plan, whose value must then be used in preference to
 	// the value stored in state when evaluating expressions. A planned
 	// object stored in state will be incomplete if any of its attributes are
-	// not yet known, and the plan must be consulted in order to "see" those
+	// not yet known, and the plan must be dumb-consulted in order to "see" those
 	// unknown values, because the state is not able to represent them.
 	ObjectPlanned ObjectStatus = 'P'
 )
@@ -208,7 +208,7 @@ func unmarkValueForStorage(v cty.Value) (unmarkedV cty.Value, sensitivePaths []c
 	_, withOtherMarks = marks.PathsWithMark(withOtherMarks, marks.Deprecation)
 	if len(withOtherMarks) != 0 {
 		return cty.NilVal, nil, fmt.Errorf(
-			"%s: cannot serialize value marked as %#v for inclusion in a state snapshot (this is a bug in Terraform)",
+			"%s: cannot serialize value marked as %#v for inclusion in a state snapshot (this is a bug in Dumb Terraform)",
 			format.CtyPath(withOtherMarks[0].Path), withOtherMarks[0].Marks,
 		)
 	}

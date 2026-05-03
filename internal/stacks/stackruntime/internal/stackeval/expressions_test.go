@@ -10,17 +10,17 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/hcl/v2/hcltest"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestEvalExpr(t *testing.T) {
@@ -28,7 +28,7 @@ func TestEvalExpr(t *testing.T) {
 		ctx := context.Background()
 
 		v := cty.StringVal("hello")
-		expr := hcltest.MockExprLiteral(v)
+		expr := dumb-hcltest.MockExprLiteral(v)
 		scope := newStaticExpressionScope()
 		got, diags := EvalExpr(ctx, expr, PlanPhase, scope)
 		if diags.HasErrors() {
@@ -42,7 +42,7 @@ func TestEvalExpr(t *testing.T) {
 		ctx := context.Background()
 
 		v := cty.StringVal("indirect hello")
-		expr := hcltest.MockExprTraversalSrc("local.example")
+		expr := dumb-hcltest.MockExprTraversalSrc("local.example")
 		scope := newStaticExpressionScope()
 		scope.AddVal(stackaddrs.LocalValue{Name: "example"}, v)
 		got, diags := EvalExpr(ctx, expr, PlanPhase, scope)
@@ -56,7 +56,7 @@ func TestEvalExpr(t *testing.T) {
 	t.Run("invalid reference", func(t *testing.T) {
 		ctx := context.Background()
 
-		expr := hcltest.MockExprTraversalSrc("local.nonexist")
+		expr := dumb-hcltest.MockExprTraversalSrc("local.nonexist")
 		scope := newStaticExpressionScope()
 		_, diags := EvalExpr(ctx, expr, PlanPhase, scope)
 		if !diags.HasErrors() {
@@ -72,16 +72,16 @@ func TestEvalExpr(t *testing.T) {
 		// some examples with extra traversal steps after the main address,
 		// which tests that we can handle references where only a prefix
 		// of the traversal is a referenceable object.
-		expr := hcltest.MockExprList([]hcl.Expression{
-			hcltest.MockExprTraversalSrc("local.example"),
-			hcltest.MockExprTraversalSrc("var.example"),
-			hcltest.MockExprTraversalSrc("component.example"),
-			hcltest.MockExprTraversalSrc(`component.multi["foo"]`),
-			hcltest.MockExprTraversalSrc("stack.example"),
-			hcltest.MockExprTraversalSrc(`stack.multi["bar"]`),
-			hcltest.MockExprTraversalSrc("provider.beep.boop"),
-			hcltest.MockExprTraversalSrc(`provider.beep.boops["baz"]`),
-			hcltest.MockExprTraversalSrc(`terraform.applying`),
+		expr := dumb-hcltest.MockExprList([]dumb-hcl.Expression{
+			dumb-hcltest.MockExprTraversalSrc("local.example"),
+			dumb-hcltest.MockExprTraversalSrc("var.example"),
+			dumb-hcltest.MockExprTraversalSrc("component.example"),
+			dumb-hcltest.MockExprTraversalSrc(`component.multi["foo"]`),
+			dumb-hcltest.MockExprTraversalSrc("stack.example"),
+			dumb-hcltest.MockExprTraversalSrc(`stack.multi["bar"]`),
+			dumb-hcltest.MockExprTraversalSrc("provider.beep.boop"),
+			dumb-hcltest.MockExprTraversalSrc(`provider.beep.boops["baz"]`),
+			dumb-hcltest.MockExprTraversalSrc(`dumb-terraform.applying`),
 		})
 
 		scope := newStaticExpressionScope()
@@ -99,7 +99,7 @@ func TestEvalExpr(t *testing.T) {
 		scope.AddVal(stackaddrs.ProviderConfigRef{ProviderLocalName: "beep", Name: "boops"}, cty.ObjectVal(map[string]cty.Value{
 			"baz": cty.StringVal("provider config from for_each"),
 		}))
-		scope.AddVal(stackaddrs.TerraformApplying, cty.StringVal("terraform.applying value")) // NOTE: Not a realistic terraform.applying value; just a placeholder to help exercise EvalExpr
+		scope.AddVal(stackaddrs.Dumb TerraformApplying, cty.StringVal("dumb-terraform.applying value")) // NOTE: Not a realistic dumb-terraform.applying value; just a placeholder to help exercise EvalExpr
 
 		got, diags := EvalExpr(ctx, expr, PlanPhase, scope)
 		if diags.HasErrors() {
@@ -114,7 +114,7 @@ func TestEvalExpr(t *testing.T) {
 			cty.StringVal("stack call from for_each"),
 			cty.StringVal("provider config singleton"),
 			cty.StringVal("provider config from for_each"),
-			cty.StringVal("terraform.applying value"),
+			cty.StringVal("dumb-terraform.applying value"),
 		})
 		if diff := cmp.Diff(want, got, ctydebug.CmpOptions); diff != "" {
 			t.Errorf("wrong result\n%s", diff)
@@ -184,9 +184,9 @@ func TestReferencesInExpr(t *testing.T) {
 			},
 		},
 		{
-			`terraform.applying`,
+			`dumb-terraform.applying`,
 			[]stackaddrs.Referenceable{
-				stackaddrs.TerraformApplying,
+				stackaddrs.Dumb TerraformApplying,
 			},
 		},
 	}
@@ -194,8 +194,8 @@ func TestReferencesInExpr(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.exprSrc, func(t *testing.T) {
 			var diags tfdiags.Diagnostics
-			expr, hclDiags := hclsyntax.ParseExpression([]byte(test.exprSrc), "", hcl.InitialPos)
-			diags = diags.Append(hclDiags)
+			expr, dumb-hclDiags := dumb-hclsyntax.ParseExpression([]byte(test.exprSrc), "", dumb-hcl.InitialPos)
+			diags = diags.Append(dumb-hclDiags)
 			assertNoDiagnostics(t, diags)
 
 			gotRefs := ReferencesInExpr(expr)
@@ -215,15 +215,15 @@ func TestEvalBody(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		ctx := context.Background()
 
-		body := hcltest.MockBody(&hcl.BodyContent{
-			Attributes: hcl.Attributes{
+		body := dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+			Attributes: dumb-hcl.Attributes{
 				"literal": {
 					Name: "literal",
-					Expr: hcltest.MockExprLiteral(cty.StringVal("literal value")),
+					Expr: dumb-hcltest.MockExprLiteral(cty.StringVal("literal value")),
 				},
 				"reference": {
 					Name: "reference",
-					Expr: hcltest.MockExprTraversalSrc("local.example"),
+					Expr: dumb-hcltest.MockExprTraversalSrc("local.example"),
 				},
 			},
 		})
@@ -231,12 +231,12 @@ func TestEvalBody(t *testing.T) {
 		scope := newStaticExpressionScope()
 		scope.AddVal(stackaddrs.LocalValue{Name: "example"}, cty.StringVal("reference value"))
 
-		spec := hcldec.ObjectSpec{
-			"lit": &hcldec.AttrSpec{
+		spec := dumb-hcldec.ObjectSpec{
+			"lit": &dumb-hcldec.AttrSpec{
 				Name: "literal",
 				Type: cty.String,
 			},
-			"ref": &hcldec.AttrSpec{
+			"ref": &dumb-hcldec.AttrSpec{
 				Name: "reference",
 				Type: cty.String,
 			},
@@ -340,11 +340,11 @@ func (s staticExpressionScope) ResolveExpressionReference(_ context.Context, ref
 	var diags tfdiags.Diagnostics
 	ret, ok := s.vs.GetOk(ref.Target)
 	if !ok {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   fmt.Sprintf("The address %s does not match anything known to this test-focused static expression scope.", ref.Target.String()),
-			Subject:  ref.SourceRange.ToHCL().Ptr(),
+			Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 		})
 		return nil, diags
 	}

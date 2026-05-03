@@ -4,12 +4,12 @@
 package moduletest
 
 import (
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/lang/langrefs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/langrefs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func GetRunTargets(config *configs.TestRun) ([]addrs.Targetable, tfdiags.Diagnostics) {
@@ -39,8 +39,8 @@ func GetRunReplaces(config *configs.TestRun) ([]addrs.AbsResourceInstance, tfdia
 		}
 
 		if addr.Resource.Resource.Mode != addrs.ManagedResourceMode {
-			diagnostics = diagnostics.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diagnostics = diagnostics.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Can only target managed resources for forced replacements.",
 				Detail:   addr.String(),
 				Subject:  replace.SourceRange().Ptr(),

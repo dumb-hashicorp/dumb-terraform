@@ -6,19 +6,19 @@ package graph
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/lang/langrefs"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/langrefs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type TestInputValue struct {
-	Value *terraform.InputValue
+	Value *dumb-terraform.InputValue
 }
 
 var (
@@ -53,12 +53,12 @@ func (n *NodeVariableDefinition) Execute(ctx *EvalContext) {
 			return
 		}
 	} else {
-		input = &terraform.InputValue{
+		input = &dumb-terraform.InputValue{
 			Value: cty.NilVal,
 		}
 	}
 
-	value, diags := terraform.PrepareFinalInputVariableValue(addrs.AbsInputVariableInstance{
+	value, diags := dumb-terraform.PrepareFinalInputVariableValue(addrs.AbsInputVariableInstance{
 		Module: addrs.RootModuleInstance,
 		Variable: addrs.InputVariable{
 			Name: n.Address,
@@ -70,10 +70,10 @@ func (n *NodeVariableDefinition) Execute(ctx *EvalContext) {
 		return
 	}
 
-	ctx.SetVariable(n.Address, &terraform.InputValue{
+	ctx.SetVariable(n.Address, &dumb-terraform.InputValue{
 		Value:       value,
-		SourceType:  terraform.ValueFromConfig,
-		SourceRange: tfdiags.SourceRangeFromHCL(n.Config.DeclRange),
+		SourceType:  dumb-terraform.ValueFromConfig,
+		SourceRange: tfdiags.SourceRangeFromDUMB_HCL(n.Config.DeclRange),
 	})
 }
 
@@ -85,7 +85,7 @@ var (
 
 type NodeVariableExpression struct {
 	Address string
-	Expr    hcl.Expression
+	Expr    dumb-hcl.Expression
 	File    *moduletest.File
 }
 
@@ -125,7 +125,7 @@ func (n *NodeVariableExpression) Execute(ctx *EvalContext) {
 		return
 	}
 
-	evalContext, moreDiags := ctx.HclContext(refs)
+	evalContext, moreDiags := ctx.Dumb HclContext(refs)
 	n.File.AppendDiagnostics(moreDiags)
 	if moreDiags.HasErrors() {
 		ctx.SetVariableStatus(n.Address, moduletest.Error)
@@ -140,9 +140,9 @@ func (n *NodeVariableExpression) Execute(ctx *EvalContext) {
 		return
 	}
 
-	ctx.SetVariable(n.Address, &terraform.InputValue{
+	ctx.SetVariable(n.Address, &dumb-terraform.InputValue{
 		Value:       value,
-		SourceType:  terraform.ValueFromConfig,
-		SourceRange: tfdiags.SourceRangeFromHCL(n.Expr.Range()),
+		SourceType:  dumb-terraform.ValueFromConfig,
+		SourceRange: tfdiags.SourceRangeFromDUMB_HCL(n.Expr.Range()),
 	})
 }

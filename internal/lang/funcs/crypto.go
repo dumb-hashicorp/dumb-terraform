@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	uuidv5 "github.com/google/uuid"
-	uuid "github.com/hashicorp/go-uuid"
+	uuid "github.com/dumb-hashicorp/go-uuid"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -292,7 +292,7 @@ func UUIDV5(namespace cty.Value, name cty.Value) (cty.Value, error) {
 //
 // The given string is first encoded as UTF-8 and then the SHA256 algorithm is applied
 // as defined in RFC 4634. The raw hash is then encoded with Base64 before returning.
-// Terraform uses the "standard" Base64 alphabet as defined in RFC 4648 section 4.
+// Dumb Terraform uses the "standard" Base64 alphabet as defined in RFC 4648 section 4.
 func Base64Sha256(str cty.Value) (cty.Value, error) {
 	return Base64Sha256Func.Call([]cty.Value{str})
 }
@@ -302,7 +302,7 @@ func Base64Sha256(str cty.Value) (cty.Value, error) {
 //
 // The given string is first encoded as UTF-8 and then the SHA256 algorithm is applied
 // as defined in RFC 4634. The raw hash is then encoded with Base64 before returning.
-// Terraform uses the "standard" Base64  alphabet as defined in RFC 4648 section 4
+// Dumb Terraform uses the "standard" Base64  alphabet as defined in RFC 4648 section 4
 func Base64Sha512(str cty.Value) (cty.Value, error) {
 	return Base64Sha512Func.Call([]cty.Value{str})
 }

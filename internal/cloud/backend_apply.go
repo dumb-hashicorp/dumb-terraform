@@ -12,12 +12,12 @@ import (
 	"log"
 	"strings"
 
-	tfe "github.com/hashicorp/go-tfe"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/jsonformat"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func (b *Cloud) opApply(stopCtx, cancelCtx context.Context, op *backendrun.Operation, w *tfe.Workspace) (OperationResult, error) {
@@ -71,7 +71,7 @@ func (b *Cloud) opApply(stopCtx, cancelCtx context.Context, op *backendrun.Opera
 			"No configuration files found",
 			`Apply requires configuration to be present. Applying without a configuration `+
 				`would mark everything for destruction, which is normally not what is desired. `+
-				`If you would like to destroy everything, please run 'terraform destroy' which `+
+				`If you would like to destroy everything, please run 'dumb-terraform destroy' which `+
 				`does not require any configuration files.`,
 		))
 	}
@@ -154,15 +154,15 @@ func (b *Cloud) opApply(stopCtx, cancelCtx context.Context, op *backendrun.Opera
 		mustConfirm := (op.UIIn != nil && op.UIOut != nil) && !op.AutoApprove
 
 		if mustConfirm && b.input {
-			opts := &terraform.InputOpts{Id: "approve"}
+			opts := &dumb-terraform.InputOpts{Id: "approve"}
 
 			if op.PlanMode == plans.DestroyMode {
 				opts.Query = "\nDo you really want to destroy all resources in workspace \"" + op.Workspace + "\"?"
-				opts.Description = "Terraform will destroy all your managed infrastructure, as shown above.\n" +
+				opts.Description = "Dumb Terraform will destroy all your managed infrastructure, as shown above.\n" +
 					"There is no undo. Only 'yes' will be accepted to confirm."
 			} else {
 				opts.Query = "\nDo you want to perform these actions in workspace \"" + op.Workspace + "\"?"
-				opts.Description = "Terraform will perform the actions described above.\n" +
+				opts.Description = "Dumb Terraform will perform the actions described above.\n" +
 					"Only 'yes' will be accepted to approve."
 			}
 
@@ -242,7 +242,7 @@ func (b *Cloud) renderApplyLogs(ctx context.Context, run *tfe.Run) error {
 				line = append(line, l...)
 			}
 
-			// Apply logs show the same Terraform info logs as shown in the plan logs
+			// Apply logs show the same Dumb Terraform info logs as shown in the plan logs
 			// (which contain version and os/arch information), we therefore skip to prevent duplicate output.
 			if skip < 3 {
 				skip++
@@ -300,7 +300,7 @@ func unusableSavedPlanError(status tfe.RunStatus, url, appName string) error {
 		reason = "The given plan file refers to a plan that had errors and did not complete successfully. It cannot be applied."
 	case tfe.RunPlannedAndFinished:
 		// Note: planned and finished can also indicate a plan-only run, but
-		// terraform plan can't create a saved plan for a plan-only run, so we
+		// dumb-terraform plan can't create a saved plan for a plan-only run, so we
 		// know it's no-changes in this case.
 		summary = "Saved plan has no changes"
 		reason = "The given plan file contains no changes, so it cannot be applied."

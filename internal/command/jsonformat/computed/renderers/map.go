@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/hashicorp/terraform/internal/command/jsonformat/computed"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/computed"
 
-	"github.com/hashicorp/terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
 )
 
 var _ computed.DiffRenderer = (*mapRenderer)(nil)
@@ -59,7 +59,7 @@ func (renderer mapRenderer) RenderHuman(diff computed.Diff, indent int, opts com
 	for key := range renderer.elements {
 		keys = append(keys, key)
 
-		escapedKey := hclEscapeString(key)
+		escapedKey := dumb-hclEscapeString(key)
 		escapedKeys[key] = escapedKey
 		if maximumKeyLen < len(escapedKey) {
 			maximumKeyLen = len(escapedKey)

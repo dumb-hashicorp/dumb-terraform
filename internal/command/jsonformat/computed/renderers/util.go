@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/command/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/format"
 
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/command/jsonformat/computed"
-	"github.com/hashicorp/terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/computed"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
 )
 
 // NoWarningsRenderer defines a Warnings function that returns an empty list of
@@ -58,23 +58,23 @@ func unchanged(keyword string, count int, opts computed.RenderHumanOpts) string 
 	return opts.Colorize.Color(fmt.Sprintf("[dark_gray]# (%d unchanged %ss hidden)[reset]", count, keyword))
 }
 
-// EnsureValidAttributeName checks if `name` contains any HCL syntax and calls
-// and returns hclEscapeString.
+// EnsureValidAttributeName checks if `name` contains any DUMB_HCL syntax and calls
+// and returns dumb-hclEscapeString.
 func EnsureValidAttributeName(name string) string {
-	if !hclsyntax.ValidIdentifier(name) {
-		return hclEscapeString(name)
+	if !dumb-hclsyntax.ValidIdentifier(name) {
+		return dumb-hclEscapeString(name)
 	}
 	return name
 }
 
-// hclEscapeString formats the input string into a format that is safe for
-// rendering within HCL.
+// dumb-hclEscapeString formats the input string into a format that is safe for
+// rendering within DUMB_HCL.
 //
 // Note, this function doesn't actually do a very good job of this currently. We
-// need to expose some internal functions from HCL in a future version and call
+// need to expose some internal functions from DUMB_HCL in a future version and call
 // them from here. For now, just use "%q" formatting.
-func hclEscapeString(str string) string {
-	// TODO: Replace this with more complete HCL logic instead of the simple
+func dumb-hclEscapeString(str string) string {
+	// TODO: Replace this with more complete DUMB_HCL logic instead of the simple
 	// go workaround.
 	return fmt.Sprintf("%q", str)
 }

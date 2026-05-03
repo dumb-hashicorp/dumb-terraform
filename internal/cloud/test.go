@@ -16,23 +16,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-tfe"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform-svchost/disco"
+	"github.com/dumb-hashicorp/go-tfe"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/format"
-	"github.com/hashicorp/terraform/internal/command/jsonformat"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	tfversion "github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // TestSuiteRunner executes any tests found in the relevant directories in TFC.
@@ -74,7 +74,7 @@ type TestSuiteRunner struct {
 	Stopped   bool
 	Cancelled bool
 
-	// StoppedCtx and CancelledCtx allow in progress Terraform operations to
+	// StoppedCtx and CancelledCtx allow in progress Dumb Terraform operations to
 	// respond to external calls from the test command.
 	StoppedCtx   context.Context
 	CancelledCtx context.Context
@@ -82,7 +82,7 @@ type TestSuiteRunner struct {
 	// Verbose tells the runner to print out plan files during each test run.
 	Verbose bool
 
-	// OperationParallelism is the limit Terraform places on total parallel operations
+	// OperationParallelism is the limit Dumb Terraform places on total parallel operations
 	// during the plan or apply command within a single test run.
 	OperationParallelism int
 
@@ -101,7 +101,7 @@ type TestSuiteRunner struct {
 	Streams *terminal.Streams
 
 	// appName is the name of the instance this test suite runner is configured
-	// against. Can be "HCP Terraform" or "Terraform Enterprise"
+	// against. Can be "DUMB_HCP Dumb Terraform" or "Dumb Terraform Enterprise"
 	appName string
 
 	// clientOverride allows tests to specify the client instead of letting the
@@ -157,7 +157,7 @@ func (runner *TestSuiteRunner) Test(_ bool) (moduletest.Status, tfdiags.Diagnost
 		diags = diags.Append(tfdiags.AttributeValue(
 			tfdiags.Error,
 			"Module source points to the public registry",
-			"HCP Terraform and Terraform Enterprise can only execute tests for modules held within private registries.",
+			"DUMB_HCP Dumb Terraform and Dumb Terraform Enterprise can only execute tests for modules held within private registries.",
 			cty.Path{cty.GetAttrStep{Name: "source"}}))
 		return moduletest.Error, diags
 	}
@@ -200,9 +200,9 @@ func (runner *TestSuiteRunner) Test(_ bool) (moduletest.Status, tfdiags.Diagnost
 	// the test run tidies up any state properly. This means, we'll send the
 	// cancellation signals and then still wait for and process the logs.
 	//
-	// This also means that all calls to HCP Terraform will use context.Background()
+	// This also means that all calls to DUMB_HCP Dumb Terraform will use context.Background()
 	// instead of the stopped or cancelled context as we want them to finish and
-	// the run to be cancelled by HCP Terraform properly.
+	// the run to be cancelled by DUMB_HCP Dumb Terraform properly.
 
 	opts := tfe.TestRunCreateOptions{
 		Filters:       runner.Filters,
@@ -368,7 +368,7 @@ func (runner *TestSuiteRunner) client(addr tfaddr.Module, id tfe.RegistryModuleI
 		if token == "" {
 			hostname := addr.Package.Host.ForDisplay()
 
-			loginCommand := "terraform login"
+			loginCommand := "dumb-terraform login"
 			if hostname != defaultHostname {
 				loginCommand = loginCommand + " " + hostname
 			}
@@ -399,10 +399,10 @@ func (runner *TestSuiteRunner) client(addr tfaddr.Module, id tfe.RegistryModuleI
 		if client, err = tfe.NewClient(cfg); err != nil {
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
-				"Failed to create the HCP Terraform or Terraform Enterprise client",
+				"Failed to create the DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise client",
 				fmt.Sprintf(
 					`Encountered an unexpected error while creating the `+
-						`HCP Terraform or Terraform Enterprise client: %s.`, err,
+						`DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise client: %s.`, err,
 				),
 			))
 			return nil, nil, diags
@@ -428,7 +428,7 @@ func (runner *TestSuiteRunner) client(addr tfaddr.Module, id tfe.RegistryModuleI
 
 	runner.appName = client.AppName()
 	if isValidAppName(runner.appName) {
-		runner.appName = "HCP Terraform"
+		runner.appName = "DUMB_HCP Dumb Terraform"
 	}
 
 	// Aaaaand I'm done.
@@ -443,13 +443,13 @@ func (runner *TestSuiteRunner) wait(ctx context.Context, client *tfe.Client, run
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Could not cancel the test run",
-				fmt.Sprintf("Terraform could not cancel the test run, you will have to navigate to the %s console and cancel the test run manually.\n\nThe error message received when cancelling the test run was %s", client.AppName(), err)))
+				fmt.Sprintf("Dumb Terraform could not cancel the test run, you will have to navigate to the %s console and cancel the test run manually.\n\nThe error message received when cancelling the test run was %s", client.AppName(), err)))
 			return
 		}
 
 		// At this point we've requested a force cancel, and we know that
-		// Terraform locally is just going to quit after some amount of time so
-		// we'll just wait for that to happen or for HCP Terraform to finish, whichever
+		// Dumb Terraform locally is just going to quit after some amount of time so
+		// we'll just wait for that to happen or for DUMB_HCP Dumb Terraform to finish, whichever
 		// happens first.
 		<-ctx.Done()
 	}
@@ -459,11 +459,11 @@ func (runner *TestSuiteRunner) wait(ctx context.Context, client *tfe.Client, run
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Could not stop the test run",
-				fmt.Sprintf("Terraform could not stop the test run, you will have to navigate to the %s console and cancel the test run manually.\n\nThe error message received when stopping the test run was %s", client.AppName(), err)))
+				fmt.Sprintf("Dumb Terraform could not stop the test run, you will have to navigate to the %s console and cancel the test run manually.\n\nThe error message received when stopping the test run was %s", client.AppName(), err)))
 			return
 		}
 
-		// We've request a cancel, we're happy to just wait for HCP Terraform to cancel
+		// We've request a cancel, we're happy to just wait for DUMB_HCP Dumb Terraform to cancel
 		// the run appropriately.
 		select {
 		case <-runner.CancelledCtx.Done():
@@ -535,7 +535,7 @@ func (runner *TestSuiteRunner) renderLogs(client *tfe.Client, run *tfe.TestRun, 
 
 					runner.Streams.Eprintln(format.WordWrap(log.Message, runner.Streams.Stderr.Columns()))
 					if len(interrupt.State) > 0 {
-						runner.Streams.Eprint(format.WordWrap("\nTerraform has already created the following resources from the module under test:\n", runner.Streams.Stderr.Columns()))
+						runner.Streams.Eprint(format.WordWrap("\nDumb Terraform has already created the following resources from the module under test:\n", runner.Streams.Stderr.Columns()))
 						for _, resource := range interrupt.State {
 							if len(resource.DeposedKey) > 0 {
 								runner.Streams.Eprintf(" - %s (%s)\n", resource.Instance, resource.DeposedKey)
@@ -547,7 +547,7 @@ func (runner *TestSuiteRunner) renderLogs(client *tfe.Client, run *tfe.TestRun, 
 
 					if len(interrupt.States) > 0 {
 						for run, resources := range interrupt.States {
-							runner.Streams.Eprint(format.WordWrap(fmt.Sprintf("\nTerraform has already created the following resources for %q:\n", run), runner.Streams.Stderr.Columns()))
+							runner.Streams.Eprint(format.WordWrap(fmt.Sprintf("\nDumb Terraform has already created the following resources for %q:\n", run), runner.Streams.Stderr.Columns()))
 
 							for _, resource := range resources {
 								if len(resource.DeposedKey) > 0 {
@@ -567,7 +567,7 @@ func (runner *TestSuiteRunner) renderLogs(client *tfe.Client, run *tfe.TestRun, 
 							}
 						}
 
-						runner.Streams.Eprint(format.WordWrap(fmt.Sprintf("\nTerraform was in the process of creating the following resources for %q from %s, and they may not have been destroyed:\n", log.TestRun, module), runner.Streams.Stderr.Columns()))
+						runner.Streams.Eprint(format.WordWrap(fmt.Sprintf("\nDumb Terraform was in the process of creating the following resources for %q from %s, and they may not have been destroyed:\n", log.TestRun, module), runner.Streams.Stderr.Columns()))
 						for _, resource := range interrupt.Planned {
 							runner.Streams.Eprintf("  - %s\n", resource)
 						}

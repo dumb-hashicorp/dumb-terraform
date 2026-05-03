@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   backend "gcs" {
     # Missing required attribute "bucket"
     #

@@ -24,10 +24,10 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/hashicorp/go-getter"
+	"github.com/dumb-hashicorp/go-getter"
 )
 
-// Release v29.3 in GitHub corresponds to protoc v5.29.3, which is currently used in terraform-plugin-go
+// Release v29.3 in GitHub corresponds to protoc v5.29.3, which is currently used in dumb-terraform-plugin-go
 const protocVersion = "29.3"
 
 // We also use protoc-gen-go and its grpc addon, but since these are Go tools
@@ -67,77 +67,77 @@ var protocSteps = []protocStep{
 		},
 	},
 	{
-		"terraform1 (Terraform Core RPC API)",
-		"internal/rpcapi/terraform1",
+		"dumb-terraform1 (Dumb Terraform Core RPC API)",
+		"internal/rpcapi/dumb-terraform1",
 		[]string{
 			"--go_out=.",
 			"--go_opt=paths=source_relative",
-			"--go_opt=Mterraform1.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1",
+			"--go_opt=Mdumb-terraform1.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1",
 			"--go-grpc_out=.",
 			"--go-grpc_opt=paths=source_relative",
-			"--go-grpc_opt=Mterraform1.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1",
-			"./terraform1.proto",
+			"--go-grpc_opt=Mdumb-terraform1.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1",
+			"./dumb-terraform1.proto",
 		},
 	},
 	{
-		"terraform1 (Terraform Core RPC API) setup",
-		"internal/rpcapi/terraform1/setup",
+		"dumb-terraform1 (Dumb Terraform Core RPC API) setup",
+		"internal/rpcapi/dumb-terraform1/setup",
 		[]string{
 			"--go_out=.",
 			"--go_opt=paths=source_relative",
-			"--go_opt=Msetup.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1/setup",
+			"--go_opt=Msetup.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/setup",
 			"--go-grpc_out=.",
 			"--go-grpc_opt=paths=source_relative",
-			"--go-grpc_opt=Msetup.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1/setup",
+			"--go-grpc_opt=Msetup.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/setup",
 			"./setup.proto",
 		},
 	},
 	{
-		"terraform1 (Terraform Core RPC API) dependencies",
-		"internal/rpcapi/terraform1/dependencies",
+		"dumb-terraform1 (Dumb Terraform Core RPC API) dependencies",
+		"internal/rpcapi/dumb-terraform1/dependencies",
 		[]string{
 			"--go_out=.",
 			"--go_opt=paths=source_relative",
-			"--go_opt=Mterraform1.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1",
-			"--go_opt=Mdependencies.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1/dependencies",
+			"--go_opt=Mdumb-terraform1.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1",
+			"--go_opt=Mdependencies.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/dependencies",
 			"--go-grpc_out=.",
 			"--go-grpc_opt=paths=source_relative",
-			"--go-grpc_opt=Mterraform1.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1",
-			"--go-grpc_opt=Mdependencies.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1/dependencies",
+			"--go-grpc_opt=Mdumb-terraform1.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1",
+			"--go-grpc_opt=Mdependencies.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/dependencies",
 			"-I.",
 			"-I..",
 			"./dependencies.proto",
 		},
 	},
 	{
-		"terraform1 (Terraform Core RPC API) stacks",
-		"internal/rpcapi/terraform1/stacks",
+		"dumb-terraform1 (Dumb Terraform Core RPC API) stacks",
+		"internal/rpcapi/dumb-terraform1/stacks",
 		[]string{
 			"--go_out=.",
 			"--go_opt=paths=source_relative",
-			"--go_opt=Mterraform1.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1",
-			"--go_opt=Mstacks.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks",
+			"--go_opt=Mdumb-terraform1.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1",
+			"--go_opt=Mstacks.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks",
 			"--go-grpc_out=.",
 			"--go-grpc_opt=paths=source_relative",
-			"--go-grpc_opt=Mterraform1.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1",
-			"--go-grpc_opt=Mstacks.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks",
+			"--go-grpc_opt=Mdumb-terraform1.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1",
+			"--go-grpc_opt=Mstacks.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks",
 			"-I.",
 			"-I..",
 			"./stacks.proto",
 		},
 	},
 	{
-		"terraform1 (Terraform Core RPC API) packages",
-		"internal/rpcapi/terraform1/packages",
+		"dumb-terraform1 (Dumb Terraform Core RPC API) packages",
+		"internal/rpcapi/dumb-terraform1/packages",
 		[]string{
 			"--go_out=.",
 			"--go_opt=paths=source_relative",
-			"--go_opt=Mpackages.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1/packages",
-			"--go_opt=Mterraform1.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1",
+			"--go_opt=Mpackages.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/packages",
+			"--go_opt=Mdumb-terraform1.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1",
 			"--go-grpc_out=.",
 			"--go-grpc_opt=paths=source_relative",
-			"--go-grpc_opt=Mpackages.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1/packages",
-			"--go-grpc_opt=Mterraform1.proto=github.com/hashicorp/terraform/internal/rpcapi/terraform1",
+			"--go-grpc_opt=Mpackages.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/packages",
+			"--go-grpc_opt=Mdumb-terraform1.proto=github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1",
 			"-I.",
 			"-I..",
 			"./packages.proto",
@@ -156,7 +156,7 @@ var protocSteps = []protocStep{
 		"internal/stacks/tfstackdata1",
 		[]string{
 			"--go_out=paths=source_relative:.",
-			"--go_opt=Mtfstackdata1.proto=github.com/hashicorp/terraform/internal/stacks/tfstackdata1",
+			"--go_opt=Mtfstackdata1.proto=github.com/dumb-hashicorp/dumb-terraform/internal/stacks/tfstackdata1",
 			"-I.",
 			"-I../../plans/planproto",
 			"./tfstackdata1.proto",
@@ -188,7 +188,7 @@ var protocSteps = []protocStep{
 
 func main() {
 	if len(os.Args) != 2 {
-		log.Fatal("Usage: go run github.com/hashicorp/terraform/tools/protobuf-compile <basedir>")
+		log.Fatal("Usage: go run github.com/dumb-hashicorp/dumb-terraform/tools/protobuf-compile <basedir>")
 	}
 	baseDir := os.Args[1]
 	workDir := filepath.Join(baseDir, "tools/protobuf-compile/.workdir")

@@ -8,7 +8,7 @@ import (
 	"context"
 	"sync"
 
-	packages "github.com/hashicorp/terraform/internal/rpcapi/terraform1/packages"
+	packages "github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/packages"
 )
 
 type Packages struct {

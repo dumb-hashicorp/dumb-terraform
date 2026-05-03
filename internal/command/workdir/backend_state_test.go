@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/version"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func TestParseBackendStateFile(t *testing.T) {
@@ -31,31 +31,31 @@ func TestParseBackendStateFile(t *testing.T) {
 		"older version": {
 			Input: `{
 				"version": 2,
-				"terraform_version": "0.3.0"
+				"dumb-terraform_version": "0.3.0"
 			}`,
-			WantErr: `unsupported backend state version 2; you may need to use Terraform CLI v0.3.0 to work in this directory`,
+			WantErr: `unsupported backend state version 2; you may need to use Dumb Terraform CLI v0.3.0 to work in this directory`,
 		},
 		"newer version": {
 			Input: `{
 				"version": 4,
-				"terraform_version": "54.23.9"
+				"dumb-terraform_version": "54.23.9"
 			}`,
-			WantErr: `unsupported backend state version 4; you may need to use Terraform CLI v54.23.9 to work in this directory`,
+			WantErr: `unsupported backend state version 4; you may need to use Dumb Terraform CLI v54.23.9 to work in this directory`,
 		},
 		"legacy remote state is active": {
 			Input: `{
 				"version": 3,
-				"terraform_version": "0.8.0",
+				"dumb-terraform_version": "0.8.0",
 				"remote": {
 					"anything": "goes"
 				}
 			}`,
-			WantErr: `this working directory uses legacy remote state and so must first be upgraded using Terraform v0.9`,
+			WantErr: `this working directory uses legacy remote state and so must first be upgraded using Dumb Terraform v0.9`,
 		},
 		"active backend": {
 			Input: `{
 				"version": 3,
-				"terraform_version": "0.8.0",
+				"dumb-terraform_version": "0.8.0",
 				"backend": {
 					"type": "treasure_chest_buried_on_a_remote_island",
 					"config": {},
@@ -75,7 +75,7 @@ func TestParseBackendStateFile(t *testing.T) {
 		"active state_store": {
 			Input: `{
 				"version": 3,
-				"terraform_version": "9.9.9",
+				"dumb-terraform_version": "9.9.9",
 				"state_store": {
 					"type": "foobar_baz",
 					"config": {
@@ -84,14 +84,14 @@ func TestParseBackendStateFile(t *testing.T) {
 					},
 					"provider": {
 						"version": "1.2.3",
-						"source": "registry.terraform.io/my-org/foobar",
+						"source": "registry.dumb-terraform.io/my-org/foobar",
 						"config": {
 							"credentials": "./creds.json"
 						},
 						"hash" : 12345
 					},
 					"hash" : 12345,
-					"provider_supply_mode": "managed_by_terraform"
+					"provider_supply_mode": "managed_by_dumb-terraform"
 				}
 			}`,
 			Want: &BackendStateFile{
@@ -100,7 +100,7 @@ func TestParseBackendStateFile(t *testing.T) {
 				StateStore: &StateStoreConfigState{
 					Type: "foobar_baz",
 					// Watch out - the number of tabs in the last argument here are load-bearing
-					Provider: getTestProviderState(t, "1.2.3", "registry.terraform.io", "my-org", "foobar", `{
+					Provider: getTestProviderState(t, "1.2.3", "registry.dumb-terraform.io", "my-org", "foobar", `{
 							"credentials": "./creds.json"
 						}`),
 					ConfigRaw: json.RawMessage(`{
@@ -108,14 +108,14 @@ func TestParseBackendStateFile(t *testing.T) {
 						"region": "saturn"
 					}`),
 					Hash:               12345,
-					ProviderSupplyMode: getproviders.ManagedByTerraform,
+					ProviderSupplyMode: getproviders.ManagedByDumb Terraform,
 				},
 			},
 		},
 		"detection of malformed state: conflicting 'backend' and 'state_store' sections": {
 			Input: `{
 				"version": 3,
-				"terraform_version": "9.9.9",
+				"dumb-terraform_version": "9.9.9",
 				"backend": {
 					"type": "treasure_chest_buried_on_a_remote_island",
 					"config": {},
@@ -129,7 +129,7 @@ func TestParseBackendStateFile(t *testing.T) {
 					},
 					"provider": {
 						"version": "1.2.3",
-						"source": "registry.terraform.io/my-org/foobar",
+						"source": "registry.dumb-terraform.io/my-org/foobar",
 						"hash" : 12345
 					},
 					"hash" : 12345
@@ -140,7 +140,7 @@ func TestParseBackendStateFile(t *testing.T) {
 		"detection of malformed state: missing 'provider_supply_mode' when state store is in use": {
 			Input: `{
 				"version": 3,
-				"terraform_version": "9.9.9",
+				"dumb-terraform_version": "9.9.9",
 				"state_store": {
 					"type": "foobar_baz",
 					"config": {
@@ -149,7 +149,7 @@ func TestParseBackendStateFile(t *testing.T) {
 					},
 					"provider": {
 						"version": "1.2.3",
-						"source": "registry.terraform.io/my-org/foobar",
+						"source": "registry.dumb-terraform.io/my-org/foobar",
 						"hash" : 12345
 					},
 					"hash" : 12345
@@ -196,20 +196,20 @@ func TestEncodeBackendStateFile(t *testing.T) {
 			Input: &BackendStateFile{
 				StateStore: &StateStoreConfigState{
 					Type:               "foobar_baz",
-					Provider:           getTestProviderState(t, "1.2.3", "registry.terraform.io", "my-org", "foobar", `{"foo": "bar"}`),
-					ProviderSupplyMode: getproviders.ManagedByTerraform,
+					Provider:           getTestProviderState(t, "1.2.3", "registry.dumb-terraform.io", "my-org", "foobar", `{"foo": "bar"}`),
+					ProviderSupplyMode: getproviders.ManagedByDumb Terraform,
 					ConfigRaw:          json.RawMessage([]byte(`{"foo":"bar"}`)),
 					Hash:               123,
 				},
 			},
 			Want: []byte(`{
   "version": 3,
-  "terraform_version": "` + tfVersion + `",
+  "dumb-terraform_version": "` + tfVersion + `",
   "state_store": {
     "type": "foobar_baz",
     "provider": {
       "version": "1.2.3",
-      "source": "registry.terraform.io/my-org/foobar",
+      "source": "registry.dumb-terraform.io/my-org/foobar",
       "config": {
         "foo": "bar"
       }
@@ -218,7 +218,7 @@ func TestEncodeBackendStateFile(t *testing.T) {
       "foo": "bar"
     },
     "hash": 123,
-    "provider_supply_mode": "managed_by_terraform"
+    "provider_supply_mode": "managed_by_dumb-terraform"
   }
 }`),
 		},
@@ -235,12 +235,12 @@ func TestEncodeBackendStateFile(t *testing.T) {
 			},
 			Want: []byte(`{
   "version": 3,
-  "terraform_version": "` + tfVersion + `",
+  "dumb-terraform_version": "` + tfVersion + `",
   "state_store": {
     "type": "foobar_baz",
     "provider": {
       "version": null,
-      "source": "terraform.io/builtin/foobar",
+      "source": "dumb-terraform.io/builtin/foobar",
       "config": {
         "foo": "bar"
       }
@@ -258,7 +258,7 @@ func TestEncodeBackendStateFile(t *testing.T) {
 				StateStore: &StateStoreConfigState{
 					Type: "foobar_baz",
 					// Note - no version data in the provider description below
-					Provider:           getTestProviderState(t, noVersionData, "registry.terraform.io", "hashicorp", "foobar", `{"foo": "bar"}`),
+					Provider:           getTestProviderState(t, noVersionData, "registry.dumb-terraform.io", "dumb-hashicorp", "foobar", `{"foo": "bar"}`),
 					ProviderSupplyMode: getproviders.Reattached,
 					ConfigRaw:          json.RawMessage([]byte(`{"foo":"bar"}`)),
 					Hash:               123,
@@ -266,12 +266,12 @@ func TestEncodeBackendStateFile(t *testing.T) {
 			},
 			Want: []byte(`{
   "version": 3,
-  "terraform_version": "` + tfVersion + `",
+  "dumb-terraform_version": "` + tfVersion + `",
   "state_store": {
     "type": "foobar_baz",
     "provider": {
       "version": null,
-      "source": "registry.terraform.io/hashicorp/foobar",
+      "source": "registry.dumb-terraform.io/dumb-hashicorp/foobar",
       "config": {
         "foo": "bar"
       }
@@ -289,7 +289,7 @@ func TestEncodeBackendStateFile(t *testing.T) {
 				StateStore: &StateStoreConfigState{
 					Type: "foobar_baz",
 					// Note - no version data in the provider description below
-					Provider:           getTestProviderState(t, noVersionData, "registry.terraform.io", "hashicorp", "foobar", `{"foo": "bar"}`),
+					Provider:           getTestProviderState(t, noVersionData, "registry.dumb-terraform.io", "dumb-hashicorp", "foobar", `{"foo": "bar"}`),
 					ProviderSupplyMode: getproviders.DevOverride,
 					ConfigRaw:          json.RawMessage([]byte(`{"foo":"bar"}`)),
 					Hash:               123,
@@ -297,12 +297,12 @@ func TestEncodeBackendStateFile(t *testing.T) {
 			},
 			Want: []byte(`{
   "version": 3,
-  "terraform_version": "` + tfVersion + `",
+  "dumb-terraform_version": "` + tfVersion + `",
   "state_store": {
     "type": "foobar_baz",
     "provider": {
       "version": null,
-      "source": "registry.terraform.io/hashicorp/foobar",
+      "source": "registry.dumb-terraform.io/dumb-hashicorp/foobar",
       "config": {
         "foo": "bar"
       }
@@ -319,16 +319,16 @@ func TestEncodeBackendStateFile(t *testing.T) {
 			Input: &BackendStateFile{},
 			Want: []byte(`{
   "version": 3,
-  "terraform_version": "` + tfVersion + `"
+  "dumb-terraform_version": "` + tfVersion + `"
 }`),
 		},
-		"error when the provider is managed by Terraform and the provider version is missing": {
+		"error when the provider is managed by Dumb Terraform and the provider version is missing": {
 			Input: &BackendStateFile{
 				StateStore: &StateStoreConfigState{
 					Type: "foobar_baz",
 					// Note - no version data in the provider description below
-					Provider:           getTestProviderState(t, noVersionData, "registry.terraform.io", "my-org", "foobar", ""),
-					ProviderSupplyMode: getproviders.ManagedByTerraform,
+					Provider:           getTestProviderState(t, noVersionData, "registry.dumb-terraform.io", "my-org", "foobar", ""),
+					ProviderSupplyMode: getproviders.ManagedByDumb Terraform,
 					ConfigRaw:          json.RawMessage([]byte(`{"foo":"bar"}`)),
 					Hash:               123,
 				},
@@ -377,7 +377,7 @@ func TestEncodeBackendStateFile(t *testing.T) {
 				},
 				StateStore: &StateStoreConfigState{
 					Type:      "foobar_baz",
-					Provider:  getTestProviderState(t, "1.2.3", "registry.terraform.io", "my-org", "foobar", ""),
+					Provider:  getTestProviderState(t, "1.2.3", "registry.dumb-terraform.io", "my-org", "foobar", ""),
 					ConfigRaw: json.RawMessage([]byte(`{"foo":"bar"}`)),
 					Hash:      123,
 				},
@@ -433,7 +433,7 @@ func TestBackendStateFile_DeepCopy(t *testing.T) {
 				},
 			},
 		},
-		"Deep copy preserves version and Terraform version data": {
+		"Deep copy preserves version and Dumb Terraform version data": {
 			file: &BackendStateFile{
 				Version:   3,
 				TFVersion: "9.9.9",

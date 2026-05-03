@@ -13,13 +13,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclwrite"
 
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const (
@@ -30,13 +30,13 @@ var (
 	fmtSupportedExts = []string{
 		".tf",
 		".tfvars",
-		".tftest.hcl",
-		".tfmock.hcl",
-		".tfquery.hcl",
+		".tftest.dumb-hcl",
+		".tfmock.dumb-hcl",
+		".tfquery.dumb-hcl",
 	}
 )
 
-// FmtCommand is a Command implementation that rewrites Terraform config
+// FmtCommand is a Command implementation that rewrites Dumb Terraform config
 // files to a canonical format and style.
 type FmtCommand struct {
 	Meta
@@ -160,7 +160,7 @@ func (c *FmtCommand) fmt(paths []string, stdin io.Reader, stdout io.Writer) tfdi
 			}
 
 			if !fmtd {
-				diags = diags.Append(fmt.Errorf("Only .tf, .tfvars, and .tftest.hcl files can be processed with terraform fmt"))
+				diags = diags.Append(fmt.Errorf("Only .tf, .tfvars, and .tftest.dumb-hcl files can be processed with dumb-terraform fmt"))
 				continue
 			}
 		}
@@ -172,7 +172,7 @@ func (c *FmtCommand) fmt(paths []string, stdin io.Reader, stdout io.Writer) tfdi
 func (c *FmtCommand) processFile(path string, r io.Reader, w io.Writer, isStdout bool) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 
-	log.Printf("[TRACE] terraform fmt: Formatting %s", path)
+	log.Printf("[TRACE] dumb-terraform fmt: Formatting %s", path)
 
 	src, err := io.ReadAll(r)
 	if err != nil {
@@ -184,10 +184,10 @@ func (c *FmtCommand) processFile(path string, r io.Reader, w io.Writer, isStdout
 	// diagnostic errors can include the source code snippet
 	c.registerSynthConfigSource(path, src)
 
-	// File must be parseable as HCL native syntax before we'll try to format
+	// File must be parseable as DUMB_HCL native syntax before we'll try to format
 	// it. If not, the formatter is likely to make drastic changes that would
 	// be hard for the user to undo.
-	_, syntaxDiags := hclsyntax.ParseConfig(src, path, hcl.Pos{Line: 1, Column: 1})
+	_, syntaxDiags := dumb-hclsyntax.ParseConfig(src, path, dumb-hcl.Pos{Line: 1, Column: 1})
 	if syntaxDiags.HasErrors() {
 		diags = diags.Append(syntaxDiags)
 		return diags
@@ -230,7 +230,7 @@ func (c *FmtCommand) processFile(path string, r io.Reader, w io.Writer, isStdout
 func (c *FmtCommand) processDir(path string, stdout io.Writer) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 
-	log.Printf("[TRACE] terraform fmt: looking for files in %s", path)
+	log.Printf("[TRACE] dumb-terraform fmt: looking for files in %s", path)
 
 	entries, err := os.ReadDir(path)
 	if err != nil {
@@ -258,7 +258,7 @@ func (c *FmtCommand) processDir(path string, stdout io.Writer) tfdiags.Diagnosti
 			}
 
 			// We do not recurse into child directories by default because we
-			// want to mimic the file-reading behavior of "terraform plan", etc,
+			// want to mimic the file-reading behavior of "dumb-terraform plan", etc,
 			// operating on one module at a time.
 			continue
 		}
@@ -289,7 +289,7 @@ func (c *FmtCommand) processDir(path string, stdout io.Writer) tfdiags.Diagnosti
 // formatSourceCode is the formatting logic itself, applied to each file that
 // is selected (directly or indirectly) on the command line.
 func (c *FmtCommand) formatSourceCode(src []byte, filename string) []byte {
-	f, diags := hclwrite.ParseConfig(src, filename, hcl.InitialPos)
+	f, diags := dumb-hclwrite.ParseConfig(src, filename, dumb-hcl.InitialPos)
 	if diags.HasErrors() {
 		// It would be weird to get here because the caller should already have
 		// checked for syntax errors and returned them. We'll just do nothing
@@ -302,7 +302,7 @@ func (c *FmtCommand) formatSourceCode(src []byte, filename string) []byte {
 	return f.Bytes()
 }
 
-func (c *FmtCommand) formatBody(body *hclwrite.Body, inBlocks []string) {
+func (c *FmtCommand) formatBody(body *dumb-hclwrite.Body, inBlocks []string) {
 	attrs := body.Attributes()
 	for name, attr := range attrs {
 		if len(inBlocks) == 1 && inBlocks[0] == "variable" && name == "type" {
@@ -326,7 +326,7 @@ func (c *FmtCommand) formatBody(body *hclwrite.Body, inBlocks []string) {
 	}
 }
 
-func (c *FmtCommand) formatValueExpr(tokens hclwrite.Tokens) hclwrite.Tokens {
+func (c *FmtCommand) formatValueExpr(tokens dumb-hclwrite.Tokens) dumb-hclwrite.Tokens {
 	if len(tokens) < 5 {
 		// Can't possibly be a "${ ... }" sequence without at least enough
 		// tokens for the delimiters and one token inside them.
@@ -336,7 +336,7 @@ func (c *FmtCommand) formatValueExpr(tokens hclwrite.Tokens) hclwrite.Tokens {
 	oBrace := tokens[1]
 	cBrace := tokens[len(tokens)-2]
 	cQuote := tokens[len(tokens)-1]
-	if oQuote.Type != hclsyntax.TokenOQuote || oBrace.Type != hclsyntax.TokenTemplateInterp || cBrace.Type != hclsyntax.TokenTemplateSeqEnd || cQuote.Type != hclsyntax.TokenCQuote {
+	if oQuote.Type != dumb-hclsyntax.TokenOQuote || oBrace.Type != dumb-hclsyntax.TokenTemplateInterp || cBrace.Type != dumb-hclsyntax.TokenTemplateSeqEnd || cQuote.Type != dumb-hclsyntax.TokenCQuote {
 		// Not an interpolation sequence at all, then.
 		return tokens
 	}
@@ -351,11 +351,11 @@ func (c *FmtCommand) formatValueExpr(tokens hclwrite.Tokens) hclwrite.Tokens {
 	// here.
 	quotes := 0
 	for _, token := range inside {
-		if token.Type == hclsyntax.TokenOQuote {
+		if token.Type == dumb-hclsyntax.TokenOQuote {
 			quotes++
 			continue
 		}
-		if token.Type == hclsyntax.TokenCQuote {
+		if token.Type == dumb-hclsyntax.TokenCQuote {
 			quotes--
 			continue
 		}
@@ -365,14 +365,14 @@ func (c *FmtCommand) formatValueExpr(tokens hclwrite.Tokens) hclwrite.Tokens {
 			// "${foo("${bar}")}"
 			continue
 		}
-		if token.Type == hclsyntax.TokenTemplateInterp || token.Type == hclsyntax.TokenTemplateSeqEnd {
+		if token.Type == dumb-hclsyntax.TokenTemplateInterp || token.Type == dumb-hclsyntax.TokenTemplateSeqEnd {
 			// We've found another template delimiter within our interior
 			// tokens, which suggests that we've found something like this:
 			// "${foo}${bar}"
 			// That isn't unwrappable, so we'll leave the whole expression alone.
 			return tokens
 		}
-		if token.Type == hclsyntax.TokenQuotedLit {
+		if token.Type == dumb-hclsyntax.TokenQuotedLit {
 			// If there's any literal characters in the outermost
 			// quoted sequence then it is not unwrappable.
 			return tokens
@@ -397,23 +397,23 @@ func (c *FmtCommand) formatValueExpr(tokens hclwrite.Tokens) hclwrite.Tokens {
 	hasTrailingParen := false
 	for i, token := range trimmed {
 		switch {
-		case i == 0 && token.Type == hclsyntax.TokenOParen:
+		case i == 0 && token.Type == dumb-hclsyntax.TokenOParen:
 			hasLeadingParen = true
-		case token.Type == hclsyntax.TokenNewline:
+		case token.Type == dumb-hclsyntax.TokenNewline:
 			isMultiLine = true
-		case i == len(trimmed)-1 && token.Type == hclsyntax.TokenCParen:
+		case i == len(trimmed)-1 && token.Type == dumb-hclsyntax.TokenCParen:
 			hasTrailingParen = true
 		}
 	}
 	if isMultiLine && !(hasLeadingParen && hasTrailingParen) {
-		wrapped := make(hclwrite.Tokens, 0, len(trimmed)+2)
-		wrapped = append(wrapped, &hclwrite.Token{
-			Type:  hclsyntax.TokenOParen,
+		wrapped := make(dumb-hclwrite.Tokens, 0, len(trimmed)+2)
+		wrapped = append(wrapped, &dumb-hclwrite.Token{
+			Type:  dumb-hclsyntax.TokenOParen,
 			Bytes: []byte("("),
 		})
 		wrapped = append(wrapped, trimmed...)
-		wrapped = append(wrapped, &hclwrite.Token{
-			Type:  hclsyntax.TokenCParen,
+		wrapped = append(wrapped, &dumb-hclwrite.Token{
+			Type:  dumb-hclsyntax.TokenCParen,
 			Bytes: []byte(")"),
 		})
 
@@ -423,11 +423,11 @@ func (c *FmtCommand) formatValueExpr(tokens hclwrite.Tokens) hclwrite.Tokens {
 	return trimmed
 }
 
-func (c *FmtCommand) formatTypeExpr(tokens hclwrite.Tokens) hclwrite.Tokens {
+func (c *FmtCommand) formatTypeExpr(tokens dumb-hclwrite.Tokens) dumb-hclwrite.Tokens {
 	switch len(tokens) {
 	case 1:
 		kwTok := tokens[0]
-		if kwTok.Type != hclsyntax.TokenIdent {
+		if kwTok.Type != dumb-hclsyntax.TokenIdent {
 			// Not a single type keyword, then.
 			return tokens
 		}
@@ -436,18 +436,18 @@ func (c *FmtCommand) formatTypeExpr(tokens hclwrite.Tokens) hclwrite.Tokens {
 		// the element type is "any", so we'll normalize that.
 		switch string(kwTok.Bytes) {
 		case "list", "map", "set":
-			return hclwrite.Tokens{
+			return dumb-hclwrite.Tokens{
 				kwTok,
 				{
-					Type:  hclsyntax.TokenOParen,
+					Type:  dumb-hclsyntax.TokenOParen,
 					Bytes: []byte("("),
 				},
 				{
-					Type:  hclsyntax.TokenIdent,
+					Type:  dumb-hclsyntax.TokenIdent,
 					Bytes: []byte("any"),
 				},
 				{
-					Type:  hclsyntax.TokenCParen,
+					Type:  dumb-hclsyntax.TokenCParen,
 					Bytes: []byte(")"),
 				},
 			}
@@ -460,62 +460,62 @@ func (c *FmtCommand) formatTypeExpr(tokens hclwrite.Tokens) hclwrite.Tokens {
 		oQuote := tokens[0]
 		strTok := tokens[1]
 		cQuote := tokens[2]
-		if oQuote.Type != hclsyntax.TokenOQuote || strTok.Type != hclsyntax.TokenQuotedLit || cQuote.Type != hclsyntax.TokenCQuote {
+		if oQuote.Type != dumb-hclsyntax.TokenOQuote || strTok.Type != dumb-hclsyntax.TokenQuotedLit || cQuote.Type != dumb-hclsyntax.TokenCQuote {
 			// Not a quoted string sequence, then.
 			return tokens
 		}
 
-		// Because this quoted syntax is from Terraform 0.11 and
+		// Because this quoted syntax is from Dumb Terraform 0.11 and
 		// earlier, which didn't have the idea of "any" as an,
 		// element type, we use string as the default element
 		// type. That will avoid oddities if somehow the configuration
 		// was relying on numeric values being auto-converted to
-		// string, as 0.11 would do. This mimicks what terraform
+		// string, as 0.11 would do. This mimicks what dumb-terraform
 		// 0.12upgrade used to do, because we'd found real-world
 		// modules that were depending on the auto-stringing.)
 		switch string(strTok.Bytes) {
 		case "string":
-			return hclwrite.Tokens{
+			return dumb-hclwrite.Tokens{
 				{
-					Type:  hclsyntax.TokenIdent,
+					Type:  dumb-hclsyntax.TokenIdent,
 					Bytes: []byte("string"),
 				},
 			}
 		case "list":
-			return hclwrite.Tokens{
+			return dumb-hclwrite.Tokens{
 				{
-					Type:  hclsyntax.TokenIdent,
+					Type:  dumb-hclsyntax.TokenIdent,
 					Bytes: []byte("list"),
 				},
 				{
-					Type:  hclsyntax.TokenOParen,
+					Type:  dumb-hclsyntax.TokenOParen,
 					Bytes: []byte("("),
 				},
 				{
-					Type:  hclsyntax.TokenIdent,
+					Type:  dumb-hclsyntax.TokenIdent,
 					Bytes: []byte("string"),
 				},
 				{
-					Type:  hclsyntax.TokenCParen,
+					Type:  dumb-hclsyntax.TokenCParen,
 					Bytes: []byte(")"),
 				},
 			}
 		case "map":
-			return hclwrite.Tokens{
+			return dumb-hclwrite.Tokens{
 				{
-					Type:  hclsyntax.TokenIdent,
+					Type:  dumb-hclsyntax.TokenIdent,
 					Bytes: []byte("map"),
 				},
 				{
-					Type:  hclsyntax.TokenOParen,
+					Type:  dumb-hclsyntax.TokenOParen,
 					Bytes: []byte("("),
 				},
 				{
-					Type:  hclsyntax.TokenIdent,
+					Type:  dumb-hclsyntax.TokenIdent,
 					Bytes: []byte("string"),
 				},
 				{
-					Type:  hclsyntax.TokenCParen,
+					Type:  dumb-hclsyntax.TokenCParen,
 					Bytes: []byte(")"),
 				},
 			}
@@ -528,18 +528,18 @@ func (c *FmtCommand) formatTypeExpr(tokens hclwrite.Tokens) hclwrite.Tokens {
 	}
 }
 
-func (c *FmtCommand) trimNewlines(tokens hclwrite.Tokens) hclwrite.Tokens {
+func (c *FmtCommand) trimNewlines(tokens dumb-hclwrite.Tokens) dumb-hclwrite.Tokens {
 	if len(tokens) == 0 {
 		return nil
 	}
 	var start, end int
 	for start = 0; start < len(tokens); start++ {
-		if tokens[start].Type != hclsyntax.TokenNewline {
+		if tokens[start].Type != dumb-hclsyntax.TokenNewline {
 			break
 		}
 	}
 	for end = len(tokens); end > 0; end-- {
-		if tokens[end-1].Type != hclsyntax.TokenNewline {
+		if tokens[end-1].Type != dumb-hclsyntax.TokenNewline {
 			break
 		}
 	}
@@ -548,11 +548,11 @@ func (c *FmtCommand) trimNewlines(tokens hclwrite.Tokens) hclwrite.Tokens {
 
 func (c *FmtCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] fmt [options] [target...]
+Usage: dumb-terraform [global options] fmt [options] [target...]
 
-  Rewrites all Terraform configuration files to a canonical format. All
+  Rewrites all Dumb Terraform configuration files to a canonical format. All
   configuration files (.tf), variables files (.tfvars), and testing files
-  (.tftest.hcl) are updated. JSON files (.tf.json, .tfvars.json, or
+  (.tftest.dumb-hcl) are updated. JSON files (.tf.json, .tfvars.json, or
   .tftest.json) are not modified.
 
   By default, fmt scans the current directory for configuration files. If you
@@ -561,7 +561,7 @@ Usage: terraform [global options] fmt [options] [target...]
   file. If you provide a single dash ("-"), then fmt will read from standard
   input (STDIN).
 
-  The content must be in the Terraform language native syntax; JSON is not
+  The content must be in the Dumb Terraform language native syntax; JSON is not
   supported.
 
 Options:

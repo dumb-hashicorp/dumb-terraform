@@ -7,12 +7,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	"github.com/hashicorp/terraform/internal/legacy/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/legacy/dumb-terraform"
 	ctyconvert "github.com/zclconf/go-cty/cty/convert"
 )
 
@@ -112,7 +112,7 @@ func (b *Backend) PrepareConfig(configVal cty.Value) (cty.Value, tfdiags.Diagnos
 		}
 
 		// create a cty.Value and make sure it's the correct type
-		tmpVal := hcl2shim.HCL2ValueFromConfigValue(def)
+		tmpVal := dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(def)
 
 		// helper/schema used to allow setting "" to a bool
 		if val.Type() == cty.Bool && tmpVal.RawEquals(cty.StringVal("")) {
@@ -181,16 +181,16 @@ func (b *Backend) Configure(obj cty.Value) tfdiags.Diagnostics {
 }
 
 // shimConfig turns a new-style cty.Value configuration (which must be of
-// an object type) into a minimal old-style *terraform.ResourceConfig object
+// an object type) into a minimal old-style *dumb-terraform.ResourceConfig object
 // that should be populated enough to appease the not-yet-updated functionality
 // in this package. This should be removed once everything is updated.
-func (b *Backend) shimConfig(obj cty.Value) *terraform.ResourceConfig {
-	shimMap, ok := hcl2shim.ConfigValueFromHCL2(obj).(map[string]interface{})
+func (b *Backend) shimConfig(obj cty.Value) *dumb-terraform.ResourceConfig {
+	shimMap, ok := dumb-hcl2shim.ConfigValueFromDUMB_HCL2(obj).(map[string]interface{})
 	if !ok {
 		// If the configVal was nil, we still want a non-nil map here.
 		shimMap = map[string]interface{}{}
 	}
-	return &terraform.ResourceConfig{
+	return &dumb-terraform.ResourceConfig{
 		Config: shimMap,
 		Raw:    shimMap,
 	}

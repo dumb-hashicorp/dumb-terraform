@@ -3,13 +3,13 @@ package configs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var (
@@ -19,8 +19,8 @@ var (
 	overrideDuringCommand = "override_during"
 )
 
-func decodeMockProviderBlock(block *hcl.Block) (*Provider, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeMockProviderBlock(block *dumb-hcl.Block) (*Provider, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	content, config, moreDiags := block.Body.PartialContent(mockProviderSchema)
 	diags = append(diags, moreDiags...)
@@ -40,20 +40,20 @@ func decodeMockProviderBlock(block *hcl.Block) (*Provider, hcl.Diagnostics) {
 		DeclRange: block.DefRange,
 
 		// Mock providers shouldn't need any additional data.
-		Config: hcl.EmptyBody(),
+		Config: dumb-hcl.EmptyBody(),
 
 		// Mark this provider as being mocked.
 		Mock: true,
 	}
 
 	if attr, exists := content.Attributes["alias"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &provider.Alias)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &provider.Alias)
 		diags = append(diags, valDiags...)
 		provider.AliasRange = attr.Expr.Range().Ptr()
 
-		if !hclsyntax.ValidIdentifier(provider.Alias) {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+		if !dumb-hclsyntax.ValidIdentifier(provider.Alias) {
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid provider configuration alias",
 				Detail:   fmt.Sprintf("An alias must be a valid name. %s", badIdentifierDetail),
 			})
@@ -64,29 +64,29 @@ func decodeMockProviderBlock(block *hcl.Block) (*Provider, hcl.Diagnostics) {
 	diags = append(diags, useForPlanDiags...)
 	provider.MockDataDuringPlan = useForPlan
 
-	var dataDiags hcl.Diagnostics
+	var dataDiags dumb-hcl.Diagnostics
 	provider.MockData, dataDiags = decodeMockDataBody(config, useForPlan, MockProviderOverrideSource)
 	diags = append(diags, dataDiags...)
 
 	if attr, exists := content.Attributes["source"]; exists {
-		sourceDiags := gohcl.DecodeExpression(attr.Expr, nil, &provider.MockDataExternalSource)
+		sourceDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &provider.MockDataExternalSource)
 		diags = append(diags, sourceDiags...)
 	}
 
 	return provider, diags
 }
 
-func useForPlan(content *hcl.BodyContent, def bool) (bool, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func useForPlan(content *dumb-hcl.BodyContent, def bool) (bool, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	if attr, exists := content.Attributes[overrideDuringCommand]; exists {
-		switch hcl.ExprAsKeyword(attr.Expr) {
+		switch dumb-hcl.ExprAsKeyword(attr.Expr) {
 		case "plan":
 			return true, diags
 		case "apply":
 			return false, diags
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  fmt.Sprintf("Invalid %s value", overrideDuringCommand),
 				Detail:   fmt.Sprintf("The %s attribute must be a value of plan or apply.", overrideDuringCommand),
 				Subject:  attr.Range.Ptr(),
@@ -110,7 +110,7 @@ type MockData struct {
 // If skipCollisions is true, then Merge will simply ignore any entries within
 // other that clash with entries already in data. If skipCollisions is false,
 // then we will create diagnostics for each duplicate resource.
-func (data *MockData) Merge(other *MockData, skipCollisions bool) (diags hcl.Diagnostics) {
+func (data *MockData) Merge(other *MockData, skipCollisions bool) (diags dumb-hcl.Diagnostics) {
 	if other == nil {
 		return diags
 	}
@@ -126,8 +126,8 @@ func (data *MockData) Merge(other *MockData, skipCollisions bool) (diags hcl.Dia
 			continue
 		}
 
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate mock resource block",
 			Detail:   fmt.Sprintf("A mock_resource %q block already exists at %s.", name, current.Range),
 			Subject:  resource.TypeRange.Ptr(),
@@ -144,8 +144,8 @@ func (data *MockData) Merge(other *MockData, skipCollisions bool) (diags hcl.Dia
 			continue
 		}
 
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate mock resource block",
 			Detail:   fmt.Sprintf("A mock_data %q block already exists at %s.", name, current.Range),
 			Subject:  datasource.TypeRange.Ptr(),
@@ -164,8 +164,8 @@ func (data *MockData) Merge(other *MockData, skipCollisions bool) (diags hcl.Dia
 			continue
 		}
 
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate override block",
 			Detail:   fmt.Sprintf("An override block for %s already exists at %s.", target, current.Range),
 			Subject:  override.Range.Ptr(),
@@ -181,15 +181,15 @@ type MockResource struct {
 	Type string
 
 	Defaults cty.Value
-	RawExpr  hcl.Expression
+	RawExpr  dumb-hcl.Expression
 
 	// UseForPlan is true if the values should be computed during the planning
 	// phase.
 	UseForPlan bool
 
-	Range         hcl.Range
-	TypeRange     hcl.Range
-	DefaultsRange hcl.Range
+	Range         dumb-hcl.Range
+	TypeRange     dumb-hcl.Range
+	DefaultsRange dumb-hcl.Range
 }
 
 type OverrideSource int
@@ -212,7 +212,7 @@ type Override struct {
 	BlockName string
 
 	// The raw expression of the values/outputs block
-	RawExpr hcl.Expression
+	RawExpr dumb-hcl.Expression
 
 	// UseForPlan is true if the values should be computed during the planning
 	// phase.
@@ -221,14 +221,14 @@ type Override struct {
 	// Source tells us where this Override was defined.
 	Source OverrideSource
 
-	Range       hcl.Range
-	TypeRange   hcl.Range
-	TargetRange hcl.Range
-	ValuesRange hcl.Range
+	Range       dumb-hcl.Range
+	TypeRange   dumb-hcl.Range
+	TargetRange dumb-hcl.Range
+	ValuesRange dumb-hcl.Range
 }
 
-func decodeMockDataBody(body hcl.Body, useForPlanDefault bool, source OverrideSource) (*MockData, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeMockDataBody(body dumb-hcl.Body, useForPlanDefault bool, source OverrideSource) (*MockData, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	content, contentDiags := body.Content(mockDataSchema)
 	diags = append(diags, contentDiags...)
@@ -249,8 +249,8 @@ func decodeMockDataBody(body hcl.Body, useForPlanDefault bool, source OverrideSo
 				switch resource.Mode {
 				case addrs.ManagedResourceMode:
 					if previous, ok := data.MockResources[resource.Type]; ok {
-						diags = append(diags, &hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = append(diags, &dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Duplicate mock_resource block",
 							Detail:   fmt.Sprintf("A mock_resource block for %s has already been defined at %s.", resource.Type, previous.Range),
 							Subject:  resource.TypeRange.Ptr(),
@@ -260,8 +260,8 @@ func decodeMockDataBody(body hcl.Body, useForPlanDefault bool, source OverrideSo
 					data.MockResources[resource.Type] = resource
 				case addrs.DataResourceMode:
 					if previous, ok := data.MockDataSources[resource.Type]; ok {
-						diags = append(diags, &hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = append(diags, &dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Duplicate mock_data block",
 							Detail:   fmt.Sprintf("A mock_data block for %s has already been defined at %s.", resource.Type, previous.Range),
 							Subject:  resource.TypeRange.Ptr(),
@@ -278,8 +278,8 @@ func decodeMockDataBody(body hcl.Body, useForPlanDefault bool, source OverrideSo
 			if override != nil && override.Target != nil {
 				subject := override.Target.Subject
 				if previous, ok := data.Overrides.GetOk(subject); ok {
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Duplicate override_resource block",
 						Detail:   fmt.Sprintf("An override_resource block targeting %s has already been defined at %s.", subject, previous.Range),
 						Subject:  override.Range.Ptr(),
@@ -295,8 +295,8 @@ func decodeMockDataBody(body hcl.Body, useForPlanDefault bool, source OverrideSo
 			if override != nil && override.Target != nil {
 				subject := override.Target.Subject
 				if previous, ok := data.Overrides.GetOk(subject); ok {
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Duplicate override_data block",
 						Detail:   fmt.Sprintf("An override_data block targeting %s has already been defined at %s.", subject, previous.Range),
 						Subject:  override.Range.Ptr(),
@@ -311,8 +311,8 @@ func decodeMockDataBody(body hcl.Body, useForPlanDefault bool, source OverrideSo
 	return data, diags
 }
 
-func decodeMockResourceBlock(block *hcl.Block, useForPlanDefault bool) (*MockResource, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeMockResourceBlock(block *dumb-hcl.Block, useForPlanDefault bool) (*MockResource, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	content, contentDiags := block.Body.Content(mockResourceSchema)
 	diags = append(diags, contentDiags...)
@@ -336,7 +336,7 @@ func decodeMockResourceBlock(block *hcl.Block, useForPlanDefault bool) (*MockRes
 	} else {
 		// It's fine if we don't have any defaults, just means we'll generate
 		// values for everything ourselves.
-		resource.RawExpr = hcl.StaticExpr(cty.EmptyObjectVal, hcl.Range{})
+		resource.RawExpr = dumb-hcl.StaticExpr(cty.EmptyObjectVal, dumb-hcl.Range{})
 	}
 
 	useForPlan, useForPlanDiags := useForPlan(content, useForPlanDefault)
@@ -346,7 +346,7 @@ func decodeMockResourceBlock(block *hcl.Block, useForPlanDefault bool) (*MockRes
 	return resource, diags
 }
 
-func decodeOverrideModuleBlock(block *hcl.Block, useForPlanDefault bool, source OverrideSource) (*Override, hcl.Diagnostics) {
+func decodeOverrideModuleBlock(block *dumb-hcl.Block, useForPlanDefault bool, source OverrideSource) (*Override, dumb-hcl.Diagnostics) {
 	override, diags := decodeOverrideBlock(block, "outputs", "override_module", useForPlanDefault, source)
 
 	if override.Target != nil {
@@ -354,8 +354,8 @@ func decodeOverrideModuleBlock(block *hcl.Block, useForPlanDefault bool, source 
 		case addrs.ModuleAddrType, addrs.ModuleInstanceAddrType:
 			// Do nothing, we're good here.
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid override target",
 				Detail:   fmt.Sprintf("You can only target modules from override_module blocks, not %s.", override.Target.Subject),
 				Subject:  override.TargetRange.Ptr(),
@@ -367,7 +367,7 @@ func decodeOverrideModuleBlock(block *hcl.Block, useForPlanDefault bool, source 
 	return override, diags
 }
 
-func decodeOverrideResourceBlock(block *hcl.Block, useForPlanDefault bool, source OverrideSource) (*Override, hcl.Diagnostics) {
+func decodeOverrideResourceBlock(block *dumb-hcl.Block, useForPlanDefault bool, source OverrideSource) (*Override, dumb-hcl.Diagnostics) {
 	override, diags := decodeOverrideBlock(block, "values", "override_resource", useForPlanDefault, source)
 
 	if override.Target != nil {
@@ -381,8 +381,8 @@ func decodeOverrideResourceBlock(block *hcl.Block, useForPlanDefault bool, sourc
 			subject := override.Target.Subject.(addrs.AbsResource)
 			mode = subject.Resource.Mode
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid override target",
 				Detail:   fmt.Sprintf("You can only target resources from override_resource blocks, not %s.", override.Target.Subject),
 				Subject:  override.TargetRange.Ptr(),
@@ -391,8 +391,8 @@ func decodeOverrideResourceBlock(block *hcl.Block, useForPlanDefault bool, sourc
 		}
 
 		if mode != addrs.ManagedResourceMode {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid override target",
 				Detail:   fmt.Sprintf("You can only target resources from override_resource blocks, not %s.", override.Target.Subject),
 				Subject:  override.TargetRange.Ptr(),
@@ -404,7 +404,7 @@ func decodeOverrideResourceBlock(block *hcl.Block, useForPlanDefault bool, sourc
 	return override, diags
 }
 
-func decodeOverrideDataBlock(block *hcl.Block, useForPlanDefault bool, source OverrideSource) (*Override, hcl.Diagnostics) {
+func decodeOverrideDataBlock(block *dumb-hcl.Block, useForPlanDefault bool, source OverrideSource) (*Override, dumb-hcl.Diagnostics) {
 	override, diags := decodeOverrideBlock(block, "values", "override_data", useForPlanDefault, source)
 
 	if override.Target != nil {
@@ -418,8 +418,8 @@ func decodeOverrideDataBlock(block *hcl.Block, useForPlanDefault bool, source Ov
 			subject := override.Target.Subject.(addrs.AbsResource)
 			mode = subject.Resource.Mode
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid override target",
 				Detail:   fmt.Sprintf("You can only target data sources from override_data blocks, not %s.", override.Target.Subject),
 				Subject:  override.TargetRange.Ptr(),
@@ -428,8 +428,8 @@ func decodeOverrideDataBlock(block *hcl.Block, useForPlanDefault bool, source Ov
 		}
 
 		if mode != addrs.DataResourceMode {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid override target",
 				Detail:   fmt.Sprintf("You can only target data sources from override_data blocks, not %s.", override.Target.Subject),
 				Subject:  override.TargetRange.Ptr(),
@@ -441,11 +441,11 @@ func decodeOverrideDataBlock(block *hcl.Block, useForPlanDefault bool, source Ov
 	return override, diags
 }
 
-func decodeOverrideBlock(block *hcl.Block, attributeName string, blockName string, useForPlanDefault bool, source OverrideSource) (*Override, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeOverrideBlock(block *dumb-hcl.Block, attributeName string, blockName string, useForPlanDefault bool, source OverrideSource) (*Override, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
-	content, contentDiags := block.Body.Content(&hcl.BodySchema{
-		Attributes: []hcl.AttributeSchema{
+	content, contentDiags := block.Body.Content(&dumb-hcl.BodySchema{
+		Attributes: []dumb-hcl.AttributeSchema{
 			{Name: "target"},
 			{Name: overrideDuringCommand},
 			{Name: attributeName},
@@ -462,16 +462,16 @@ func decodeOverrideBlock(block *hcl.Block, attributeName string, blockName strin
 
 	if target, exists := content.Attributes["target"]; exists {
 		override.TargetRange = target.Range
-		traversal, traversalDiags := hcl.AbsTraversalForExpr(target.Expr)
+		traversal, traversalDiags := dumb-hcl.AbsTraversalForExpr(target.Expr)
 		diags = append(diags, traversalDiags...)
 		if traversal != nil {
 			var targetDiags tfdiags.Diagnostics
 			override.Target, targetDiags = addrs.ParseTarget(traversal)
-			diags = append(diags, targetDiags.ToHCL()...)
+			diags = append(diags, targetDiags.ToDUMB_HCL()...)
 		}
 	} else {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Missing target attribute",
 			Detail:   fmt.Sprintf("%s blocks must specify a target address.", blockName),
 			Subject:  override.Range.Ptr(),
@@ -484,7 +484,7 @@ func decodeOverrideBlock(block *hcl.Block, attributeName string, blockName strin
 		// It's fine if we don't have any values, just means we'll generate
 		// values for everything ourselves. We set this to an empty object so
 		// it's equivalent to `values = {}` which makes later processing easier.
-		override.RawExpr = hcl.StaticExpr(cty.EmptyObjectVal, hcl.Range{})
+		override.RawExpr = dumb-hcl.StaticExpr(cty.EmptyObjectVal, dumb-hcl.Range{})
 	}
 
 	useForPlan, useForPlanDiags := useForPlan(content, useForPlanDefault)
@@ -494,8 +494,8 @@ func decodeOverrideBlock(block *hcl.Block, attributeName string, blockName strin
 	return override, diags
 }
 
-var mockProviderSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var mockProviderSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name: "alias",
 		},
@@ -508,8 +508,8 @@ var mockProviderSchema = &hcl.BodySchema{
 	},
 }
 
-var mockDataSchema = &hcl.BodySchema{
-	Blocks: []hcl.BlockHeaderSchema{
+var mockDataSchema = &dumb-hcl.BodySchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "mock_resource", LabelNames: []string{"type"}},
 		{Type: "mock_data", LabelNames: []string{"type"}},
 		{Type: "override_resource"},
@@ -517,8 +517,8 @@ var mockDataSchema = &hcl.BodySchema{
 	},
 }
 
-var mockResourceSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var mockResourceSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "defaults"},
 		{Name: overrideDuringCommand},
 	},

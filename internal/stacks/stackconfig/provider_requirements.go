@@ -7,12 +7,12 @@ import (
 	"fmt"
 
 	"github.com/apparentlymart/go-versions/versions/constraints"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/addrs"
-	builtinProviders "github.com/hashicorp/terraform/internal/builtin/providers"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	builtinProviders "github.com/dumb-hashicorp/dumb-terraform/internal/builtin/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type ProviderRequirements struct {
@@ -30,18 +30,18 @@ type ProviderRequirement struct {
 	DeclRange tfdiags.SourceRange
 }
 
-func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, tfdiags.Diagnostics) {
+func decodeProviderRequirementsBlock(block *dumb-hcl.Block) (*ProviderRequirements, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	var ret *ProviderRequirements
-	attrs, hclDiags := block.Body.JustAttributes()
-	diags = diags.Append(hclDiags)
+	attrs, dumb-hclDiags := block.Body.JustAttributes()
+	diags = diags.Append(dumb-hclDiags)
 
 	// Include built-in providers, if not present
 	includeBuiltInProviders := func(pr *ProviderRequirements) *ProviderRequirements {
 		if pr == nil {
 			pr = &ProviderRequirements{
 				Requirements: make(map[string]ProviderRequirement, len(attrs)),
-				DeclRange:    tfdiags.SourceRangeFromHCL(hcl.Range{}),
+				DeclRange:    tfdiags.SourceRangeFromDUMB_HCL(dumb-hcl.Range{}),
 			}
 		}
 
@@ -65,10 +65,10 @@ func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, t
 
 	ret = &ProviderRequirements{
 		Requirements: make(map[string]ProviderRequirement, len(attrs)),
-		DeclRange:    tfdiags.SourceRangeFromHCL(block.DefRange),
+		DeclRange:    tfdiags.SourceRangeFromDUMB_HCL(block.DefRange),
 	}
 	for name, attr := range attrs {
-		if !hclsyntax.ValidIdentifier(name) {
+		if !dumb-hclsyntax.ValidIdentifier(name) {
 			diags = diags.Append(invalidNameDiagnostic(
 				"Invalid local name for provider",
 				attr.NameRange,
@@ -76,26 +76,26 @@ func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, t
 			continue
 		}
 		if existing, exists := ret.Requirements[name]; exists {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate provider local name",
 				Detail:   fmt.Sprintf("A provider requirement with local name %q was already declared at %s.", name, existing.DeclRange.StartString()),
 				Subject:  attr.NameRange.Ptr(),
 			})
 			continue
 		}
-		declPairs, hclDiags := hcl.ExprMap(attr.Expr)
-		diags = diags.Append(hclDiags)
-		if hclDiags.HasErrors() {
+		declPairs, dumb-hclDiags := dumb-hcl.ExprMap(attr.Expr)
+		diags = diags.Append(dumb-hclDiags)
+		if dumb-hclDiags.HasErrors() {
 			continue
 		}
-		declAttrs := make(map[string]*hcl.KeyValuePair, len(declPairs))
+		declAttrs := make(map[string]*dumb-hcl.KeyValuePair, len(declPairs))
 		for i := range declPairs {
 			pair := &declPairs[i]
-			name := hcl.ExprAsKeyword(pair.Key)
+			name := dumb-hcl.ExprAsKeyword(pair.Key)
 			if name == "" {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid provider requirement attribute",
 					Detail:   "All of the attributes of a required_providers entry must be simple keywords.",
 					Subject:  pair.Key.Range().Ptr(),
@@ -103,8 +103,8 @@ func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, t
 				continue
 			}
 			if existing, exists := declAttrs[name]; exists {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate attribute",
 					Detail:   fmt.Sprintf("The attribute %q was already defined at %s.", name, existing.Key.Range()),
 					Subject:  pair.Key.Range().Ptr(),
@@ -121,16 +121,16 @@ func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, t
 		delete(declAttrs, "version")
 
 		if sourceAddrPair == nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing required attribute",
 				Detail:   "All required_providers entries must include the attribute \"source\", giving the qualified provider source address to use.",
 				Subject:  attr.Expr.StartRange().Ptr(),
 			})
 			continue
 		}
-		hclDiags = gohcl.DecodeExpression(sourceAddrPair.Value, nil, &sourceAddrStr)
-		diags = diags.Append(hclDiags)
+		dumb-hclDiags = godumb-hcl.DecodeExpression(sourceAddrPair.Value, nil, &sourceAddrStr)
+		diags = diags.Append(dumb-hclDiags)
 		if diags.HasErrors() {
 			continue
 		}
@@ -139,8 +139,8 @@ func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, t
 		// so we need to postprocess the diagnostics to add source locations
 		// to them.
 		for _, diag := range moreDiags {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: diag.Severity().ToHCL(),
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: diag.Severity().ToDUMB_HCL(),
 				Summary:  diag.Description().Summary,
 				Detail:   diag.Description().Detail,
 				Subject:  sourceAddrPair.Value.Range().Ptr(),
@@ -153,8 +153,8 @@ func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, t
 		var versionConstraints constraints.IntersectionSpec
 		if !providerAddr.IsBuiltIn() {
 			if versionConstraintsPair == nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Missing required attribute",
 					Detail:   "Each required_providers entry for an installable provider must include the attribute \"version\", specifying the provider versions that this stack is compatible with.",
 					Subject:  attr.Expr.StartRange().Ptr(),
@@ -162,24 +162,24 @@ func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, t
 				continue
 			}
 			for name, pair := range declAttrs {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid provider requirement attribute",
 					Detail:   fmt.Sprintf("An attribute named %q is not expected here.", name),
 					Subject:  pair.Key.Range().Ptr(),
 				})
 				continue
 			}
-			hclDiags = gohcl.DecodeExpression(versionConstraintsPair.Value, nil, &versionConstraintsStr)
-			diags = diags.Append(hclDiags)
+			dumb-hclDiags = godumb-hcl.DecodeExpression(versionConstraintsPair.Value, nil, &versionConstraintsStr)
+			diags = diags.Append(dumb-hclDiags)
 			if diags.HasErrors() {
 				continue
 			}
 			var err error
 			versionConstraints, err = constraints.ParseRubyStyleMulti(versionConstraintsStr)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid version constraint",
 					Detail:   fmt.Sprintf("Cannot use %q as a version constraint: %s.", versionConstraintsStr, err),
 					Subject:  sourceAddrPair.Value.Range().Ptr(),
@@ -188,10 +188,10 @@ func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, t
 			}
 		} else {
 			if versionConstraintsPair != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Unsupported attribute",
-					Detail:   fmt.Sprintf("The provider %q is built in to Terraform, so does not support version constraints.", providerAddr.ForDisplay()),
+					Detail:   fmt.Sprintf("The provider %q is built in to Dumb Terraform, so does not support version constraints.", providerAddr.ForDisplay()),
 					Subject:  attr.Expr.StartRange().Ptr(),
 				})
 				continue
@@ -200,8 +200,8 @@ func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, t
 
 		if existingName, exists := reverseMap[providerAddr]; exists {
 			existing := ret.Requirements[existingName]
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate provider local name",
 				Detail: fmt.Sprintf(
 					"A requirement for provider %s was already declared with local name %q at %s.",
@@ -216,7 +216,7 @@ func decodeProviderRequirementsBlock(block *hcl.Block) (*ProviderRequirements, t
 			LocalName:          name,
 			Provider:           providerAddr,
 			VersionConstraints: versionConstraints,
-			DeclRange:          tfdiags.SourceRangeFromHCL(attr.NameRange),
+			DeclRange:          tfdiags.SourceRangeFromDUMB_HCL(attr.NameRange),
 		}
 		reverseMap[providerAddr] = name
 	}

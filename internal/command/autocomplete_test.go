@@ -7,10 +7,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command/workdir"
-	"github.com/hashicorp/terraform/internal/providers"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/workdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
 	"github.com/posener/complete"
 )
 
@@ -50,7 +50,7 @@ func TestMetaCompletePredictWorkspaceName(t *testing.T) {
 		}
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 		providerSource := newMockProviderSource(t, map[string][]string{
-			"hashicorp/test": {"1.0.0"},
+			"dumb-hashicorp/test": {"1.0.0"},
 		})
 
 		ui := new(cli.MockUi)
@@ -93,7 +93,7 @@ func TestMetaCompletePredictWorkspaceName(t *testing.T) {
 		mockProvider.MockStates = map[string]interface{}{}
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 		providerSource := newMockProviderSource(t, map[string][]string{
-			"hashicorp/test": {"1.0.0"},
+			"dumb-hashicorp/test": {"1.0.0"},
 		})
 
 		ui := new(cli.MockUi)

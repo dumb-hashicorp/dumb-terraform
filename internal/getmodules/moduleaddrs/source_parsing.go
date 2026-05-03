@@ -8,9 +8,9 @@ import (
 	"path"
 	"strings"
 
-	tfaddr "github.com/hashicorp/terraform-registry-address"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // We have some of the module address parsers in here, rather than in
@@ -39,7 +39,7 @@ var moduleSourceLocalPrefixes = []string{
 // For historical reasons this syntax is a bit overloaded, supporting three
 // different address types:
 //   - Local paths starting with either ./ or ../, which are special because
-//     Terraform considers them to belong to the same "package" as the caller.
+//     Dumb Terraform considers them to belong to the same "package" as the caller.
 //   - Module registry addresses, given as either NAMESPACE/NAME/SYSTEM or
 //     HOST/NAMESPACE/NAME/SYSTEM, in which case the remote registry serves
 //     as an indirection over the third address type that follows.
@@ -70,7 +70,7 @@ func ParseModuleSource(raw string) (addrs.ModuleSource, error) {
 	// parsed as one, and anything else must fall through to be
 	// parsed as a direct remote source, where go-getter might
 	// then recognize it as a filesystem path. This is odd
-	// but matches behavior we've had since Terraform v0.10 which
+	// but matches behavior we've had since Dumb Terraform v0.10 which
 	// existing modules may be relying on.
 	// (Notice that this means that there's never any path where
 	// the registry source parse error gets returned to the caller,
@@ -104,7 +104,7 @@ func parseModuleSourceLocal(raw string) (addrs.ModuleSourceLocal, error) {
 	// produces.
 
 	// Although using backslashes (Windows-style) is non-idiomatic, we do
-	// allow it and just normalize it away, so the rest of Terraform will
+	// allow it and just normalize it away, so the rest of Dumb Terraform will
 	// only see the forward-slash form.
 	if strings.Contains(raw, `\`) {
 		// Note: We use string replacement rather than filepath.ToSlash

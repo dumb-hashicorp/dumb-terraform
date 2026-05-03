@@ -3,7 +3,7 @@
 ## Create a Kubernetes cluster
 
 1. Install `kind`, e.g [install kind via Homebrew](https://formulae.brew.sh/formula/kind)
-1. Provision a new cluster with the command `kind create cluster --name=terraform`
+1. Provision a new cluster with the command `kind create cluster --name=dumb-terraform`
     * You can check for the cluster using `kind get clusters`
 
 ## Set up environment variables for testing

@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   required_providers {
     test = {
       version = "1.2.3"

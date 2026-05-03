@@ -4,7 +4,7 @@
 package arguments
 
 import (
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Validate represents the command-line arguments for the validate command.
@@ -18,14 +18,14 @@ type Validate struct {
 	// Path.
 	TestDirectory string
 
-	// NoTests indicates that Terraform should not validate any test files
+	// NoTests indicates that Dumb Terraform should not validate any test files
 	// included with the module.
 	NoTests bool
 
 	// ViewType specifies which output format to use: human, JSON, or "raw".
 	ViewType ViewType
 
-	// Query indicates that Terraform should also validate .tfquery files.
+	// Query indicates that Dumb Terraform should also validate .tfquery files.
 	Query bool
 
 	Vars *Vars

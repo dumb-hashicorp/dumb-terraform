@@ -2,17 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // Runs Terraform using the Terraform configuration specified via the chdir argument
-            "name": "Run Terraform in debug mode",
+            // Runs Dumb Terraform using the Dumb Terraform configuration specified via the chdir argument
+            "name": "Run Dumb Terraform in debug mode",
             "request": "launch",
             "type": "go",
             "args": [
-                "-chdir=<absolute path to a Terraform configuration>",
-                // Change this array to perform different terraform commands with different arguments.
+                "-chdir=<absolute path to a Dumb Terraform configuration>",
+                // Change this array to perform different dumb-terraform commands with different arguments.
                 "plan",
                 "-var='name=value'"
             ],
-            // "cwd": "<absolute path to a Terraform configuration>", // An alternative to using the -chdir global flag above.
+            // "cwd": "<absolute path to a Dumb Terraform configuration>", // An alternative to using the -chdir global flag above.
             // Environment variables can be set from a file or as key-value pairs in the configuration.
             // "env": {
             //     "MY_ENV": "my-value",

@@ -11,12 +11,12 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 func TestApplyMoves(t *testing.T) {
@@ -818,17 +818,17 @@ func testMoveStatement(t *testing.T, module string, from string, to string, prov
 		moduleAddr = addrs.Module(strings.Split(module, "."))
 	}
 
-	fromTraversal, hclDiags := hclsyntax.ParseTraversalAbs([]byte(from), "from", hcl.InitialPos)
-	if hclDiags.HasErrors() {
-		t.Fatalf("invalid 'from' argument: %s", hclDiags.Error())
+	fromTraversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(from), "from", dumb-hcl.InitialPos)
+	if dumb-hclDiags.HasErrors() {
+		t.Fatalf("invalid 'from' argument: %s", dumb-hclDiags.Error())
 	}
 	fromAddr, diags := addrs.ParseMoveEndpoint(fromTraversal)
 	if diags.HasErrors() {
 		t.Fatalf("invalid 'from' argument: %s", diags.Err().Error())
 	}
-	toTraversal, hclDiags := hclsyntax.ParseTraversalAbs([]byte(to), "to", hcl.InitialPos)
+	toTraversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(to), "to", dumb-hcl.InitialPos)
 	if diags.HasErrors() {
-		t.Fatalf("invalid 'to' argument: %s", hclDiags.Error())
+		t.Fatalf("invalid 'to' argument: %s", dumb-hclDiags.Error())
 	}
 	toAddr, diags := addrs.ParseMoveEndpoint(toTraversal)
 	if diags.HasErrors() {

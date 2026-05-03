@@ -6,7 +6,7 @@ package arguments
 import (
 	"time"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Untaint represents the command-line arguments for the untaint command.
@@ -35,7 +35,7 @@ type Untaint struct {
 	StateOutPath string
 
 	// IgnoreRemoteVersion, if true, continues even if remote and local
-	// Terraform versions are incompatible.
+	// Dumb Terraform versions are incompatible.
 	IgnoreRemoteVersion bool
 }
 
@@ -53,7 +53,7 @@ func ParseUntaint(args []string) (*Untaint, tfdiags.Diagnostics) {
 	cmdFlags.DurationVar(&untaint.StateLockTimeout, "lock-timeout", 0, "lock timeout")
 	cmdFlags.StringVar(&untaint.StatePath, "state", "", "path")
 	cmdFlags.StringVar(&untaint.StateOutPath, "state-out", "", "path")
-	cmdFlags.BoolVar(&untaint.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Terraform versions are incompatible")
+	cmdFlags.BoolVar(&untaint.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Dumb Terraform versions are incompatible")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		diags = diags.Append(tfdiags.Sourceless(

@@ -10,7 +10,7 @@ import (
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 )
 
 func TestNormalizeObjectFromLegacySDK(t *testing.T) {

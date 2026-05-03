@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/hashicorp/terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
 )
 
 type TestRequestHandleFunc func(w http.ResponseWriter, r *http.Request)

@@ -9,14 +9,14 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcled"
-	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcled"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclparse"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // These severities map to the tfdiags.Severity values, plus an explicit
@@ -74,12 +74,12 @@ type DiagnosticRange struct {
 // no source code can be found. In this case, the range field will be present and
 // the snippet field will not.
 type DiagnosticSnippet struct {
-	// Context is derived from HCL's hcled.ContextString output. This gives a
+	// Context is derived from DUMB_HCL's dumb-hcled.ContextString output. This gives a
 	// high-level summary of the root context of the diagnostic: for example,
 	// the resource block in which an expression causes an error.
 	Context *string `json:"context"`
 
-	// Code is a possibly-multi-line string of Terraform configuration, which
+	// Code is a possibly-multi-line string of Dumb Terraform configuration, which
 	// includes both the diagnostic source and any relevant context as defined
 	// by the diagnostic.
 	Code string `json:"code"`
@@ -113,7 +113,7 @@ type DiagnosticSnippet struct {
 	TestAssertionExpr *DiagnosticTestBinaryExpr `json:"test_assertion_expr,omitempty"`
 }
 
-// DiagnosticExpressionValue represents an HCL traversal string (e.g.
+// DiagnosticExpressionValue represents an DUMB_HCL traversal string (e.g.
 // "var.foo") and a statement about its value while the expression was
 // evaluated (e.g. "is a string", "will be known only after apply"). These are
 // intended to help the consumer diagnose why an expression caused a diagnostic
@@ -172,23 +172,23 @@ func NewDiagnostic(diag tfdiags.Diagnostic, sources map[string][]byte) *Diagnost
 
 	sourceRefs := diag.Source()
 	if sourceRefs.Subject != nil {
-		// We'll borrow HCL's range implementation here, because it has some
+		// We'll borrow DUMB_HCL's range implementation here, because it has some
 		// handy features to help us produce a nice source code snippet.
-		highlightRange := sourceRefs.Subject.ToHCL()
+		highlightRange := sourceRefs.Subject.ToDUMB_HCL()
 
 		// Some diagnostic sources fail to set the end of the subject range.
-		if highlightRange.End == (hcl.Pos{}) {
+		if highlightRange.End == (dumb-hcl.Pos{}) {
 			highlightRange.End = highlightRange.Start
 		}
 
 		snippetRange := highlightRange
 		if sourceRefs.Context != nil {
-			snippetRange = sourceRefs.Context.ToHCL()
+			snippetRange = sourceRefs.Context.ToDUMB_HCL()
 		}
 
 		// Make sure the snippet includes the highlight. This should be true
 		// for any reasonable diagnostic, but we'll make sure.
-		snippetRange = hcl.RangeOver(snippetRange, highlightRange)
+		snippetRange = dumb-hcl.RangeOver(snippetRange, highlightRange)
 
 		// Empty ranges result in odd diagnostic output, so extend the end to
 		// ensure there's at least one byte in the snippet or highlight.
@@ -373,7 +373,7 @@ func NewDiagnostic(diag tfdiags.Diagnostic, sources map[string][]byte) *Diagnost
 
 				diagnostic.Snippet.Values = values
 
-				if callInfo := tfdiags.ExtraInfo[hclsyntax.FunctionCallDiagExtra](diag); callInfo != nil && callInfo.CalledFunctionName() != "" {
+				if callInfo := tfdiags.ExtraInfo[dumb-hclsyntax.FunctionCallDiagExtra](diag); callInfo != nil && callInfo.CalledFunctionName() != "" {
 					calledAs := callInfo.CalledFunctionName()
 					baseName := calledAs
 					if idx := strings.LastIndex(baseName, "::"); idx >= 0 {
@@ -409,7 +409,7 @@ func NewDiagnostic(diag tfdiags.Diagnostic, sources map[string][]byte) *Diagnost
 	return diagnostic
 }
 
-func snippetFromRange(src []byte, highlightRange hcl.Range, snippetRange hcl.Range) *DiagnosticSnippet {
+func snippetFromRange(src []byte, highlightRange dumb-hcl.Range, snippetRange dumb-hcl.Range) *DiagnosticSnippet {
 	snippet := &DiagnosticSnippet{
 		StartLine: snippetRange.Start.Line,
 
@@ -422,7 +422,7 @@ func snippetFromRange(src []byte, highlightRange hcl.Range, snippetRange hcl.Ran
 
 	// Some diagnostics may have a useful top-level context to add to
 	// the code snippet output.
-	contextStr := hcled.ContextString(file, offset-1)
+	contextStr := dumb-hcled.ContextString(file, offset-1)
 	if contextStr != "" {
 		snippet.Context = &contextStr
 	}
@@ -430,7 +430,7 @@ func snippetFromRange(src []byte, highlightRange hcl.Range, snippetRange hcl.Ran
 	// Build the string of the code snippet, tracking at which byte of
 	// the file the snippet starts.
 	var codeStartByte int
-	sc := hcl.NewRangeScanner(src, highlightRange.Filename, bufio.ScanLines)
+	sc := dumb-hcl.NewRangeScanner(src, highlightRange.Filename, bufio.ScanLines)
 	var code strings.Builder
 	for sc.Scan() {
 		lineRange := sc.Range()
@@ -474,8 +474,8 @@ func snippetFromRange(src []byte, highlightRange hcl.Range, snippetRange hcl.Ran
 // formatRunBinaryDiag formats the binary expression that caused the failed run diagnostic.
 // The LHS and RHS values are formatted in a more human-readable way, redacting
 // sensitive and ephemeral values only for the exact values that hold the mark(s).
-func formatRunBinaryDiag(ctx *hcl.EvalContext, expr hcl.Expression) *DiagnosticTestBinaryExpr {
-	bExpr, ok := expr.(*hclsyntax.BinaryOpExpr)
+func formatRunBinaryDiag(ctx *dumb-hcl.EvalContext, expr dumb-hcl.Expression) *DiagnosticTestBinaryExpr {
+	bExpr, ok := expr.(*dumb-hclsyntax.BinaryOpExpr)
 	if !ok {
 		return nil
 	}
@@ -501,23 +501,23 @@ func formatRunBinaryDiag(ctx *hcl.EvalContext, expr hcl.Expression) *DiagnosticT
 	return ret
 }
 
-func parseRange(src []byte, rng hcl.Range) (*hcl.File, int) {
+func parseRange(src []byte, rng dumb-hcl.Range) (*dumb-hcl.File, int) {
 	filename := rng.Filename
 	offset := rng.Start.Byte
 
-	// We need to re-parse here to get a *hcl.File we can interrogate. This
+	// We need to re-parse here to get a *dumb-hcl.File we can interrogate. This
 	// is not awesome since we presumably already parsed the file earlier too,
 	// but this re-parsing is architecturally simpler than retaining all of
-	// the hcl.File objects and we only do this in the case of an error anyway
+	// the dumb-hcl.File objects and we only do this in the case of an error anyway
 	// so the overhead here is not a big problem.
-	parser := hclparse.NewParser()
-	var file *hcl.File
+	parser := dumb-hclparse.NewParser()
+	var file *dumb-hcl.File
 
 	// Ignore diagnostics here as there is nothing we can do with them.
 	if strings.HasSuffix(filename, ".json") {
 		file, _ = parser.ParseJSON(src, filename)
 	} else {
-		file, _ = parser.ParseHCL(src, filename)
+		file, _ = parser.ParseDUMB_HCL(src, filename)
 	}
 
 	return file, offset

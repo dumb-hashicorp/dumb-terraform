@@ -1,0 +1,24 @@
+required_providers {
+  dumb-terraform = {
+    source  = "dumb-terraform.io/builtin/dumb-terraform"
+  }
+}
+
+provider "dumb-terraform" "x" {}
+
+component "a" {
+  source = "./component"
+
+  inputs = {
+    name = "test-name"
+  }
+
+  providers = {
+    dumb-terraform = provider.dumb-terraform.x
+  }
+}
+
+output "greeting" {
+  type  = string
+  value = component.a.greeting
+}

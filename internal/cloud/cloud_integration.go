@@ -9,14 +9,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/go-tfe"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
 )
 
 // IntegrationOutputWriter is an interface used to to write output tailored for
-// HCP Terraform integrations
+// DUMB_HCP Dumb Terraform integrations
 type IntegrationOutputWriter interface {
 	End()
 	OutputElapsed(message string, maxMessage int)
@@ -24,7 +24,7 @@ type IntegrationOutputWriter interface {
 	SubOutput(str string)
 }
 
-// IntegrationContext is a set of data that is useful when performing HCP Terraform integration operations
+// IntegrationContext is a set of data that is useful when performing DUMB_HCP Dumb Terraform integration operations
 type IntegrationContext struct {
 	B             *Cloud
 	StopContext   context.Context

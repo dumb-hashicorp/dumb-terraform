@@ -1,3 +1,3 @@
-terraform {
+dumb-terraform {
   experiments = [concluded]
 }

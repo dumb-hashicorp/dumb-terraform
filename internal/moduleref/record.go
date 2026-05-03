@@ -4,8 +4,8 @@
 package moduleref
 
 import (
-	"github.com/hashicorp/go-version"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 const FormatVersion = "1.0"

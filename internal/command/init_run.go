@@ -8,15 +8,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/cloud"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -138,11 +138,11 @@ func (c *InitCommand) run(initArgs *arguments.Init, view views.Init) int {
 		// TODO(SarahFrench/radeksimko) - remove when this feature isn't experimental.
 		// This approach for making the feature experimental is required
 		// to let us assert the feature is gated behind an experiment in tests.
-		// See https://github.com/hashicorp/terraform/pull/37350#issuecomment-3168555619
+		// See https://github.com/dumb-hashicorp/dumb-terraform/pull/37350#issuecomment-3168555619
 
 		detail := "Pluggable state store is an experiment which requires"
 		if !c.Meta.AllowExperimentalFeatures {
-			detail += " an experimental build of terraform"
+			detail += " an experimental build of dumb-terraform"
 		}
 		if !initArgs.EnablePssExperiment {
 			if !c.Meta.AllowExperimentalFeatures {
@@ -152,8 +152,8 @@ func (c *InitCommand) run(initArgs *arguments.Init, view views.Init) int {
 		}
 
 		diags = diags.Append(earlyConfDiags)
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Pluggable state store experiment not supported",
 			Detail:   detail,
 			Subject:  &rootModEarly.StateStore.TypeRange,
@@ -183,10 +183,10 @@ func (c *InitCommand) run(initArgs *arguments.Init, view views.Init) int {
 	// - and, the backend/state_store is initialised
 
 	// Before we go further, we'll check to make sure none of the modules in
-	// the configuration declare that they don't support this Terraform
+	// the configuration declare that they don't support this Dumb Terraform
 	// version, so we can produce a version-related error message rather than
 	// potentially-confusing downstream errors.
-	versionDiags := terraform.CheckCoreVersionRequirements(config)
+	versionDiags := dumb-terraform.CheckCoreVersionRequirements(config)
 	if versionDiags.HasErrors() {
 		view.Diagnostics(versionDiags)
 		return 1
@@ -221,7 +221,7 @@ func (c *InitCommand) run(initArgs *arguments.Init, view views.Init) int {
 	}
 
 	// The init command is not allowed to upgrade the provider used for PSS (unless we're reconfiguring the state store).
-	// Unless users choose to reconfigure, they must upgrade the state store provider separately using `terraform state migrate -upgrade`.
+	// Unless users choose to reconfigure, they must upgrade the state store provider separately using `dumb-terraform state migrate -upgrade`.
 	if initArgs.Upgrade && !initArgs.Reconfigure && config.Module.StateStore != nil {
 		pAddr := config.Module.StateStore.ProviderAddr
 		old := previousLocks.Provider(pAddr)
@@ -235,11 +235,11 @@ new lock: %#v`, pAddr.ForDisplay(), old, new))
 			// The upgrade has impacted the provider
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
-				"Cannot upgrade the provider used for pluggable state storage during \"terraform init -upgrade\"",
-				fmt.Sprintf(`While upgrading providers Terraform attempted to upgrade the %s (%q) provider, which is used by the state_store block in your configuration.
-Please use \"terraform state migrate -upgrade\" to upgrade the state store provider and navigate migrating your state between the two versions. You can then re-attempt \"terraform init -upgrade\" to upgrade the rest of your providers.
+				"Cannot upgrade the provider used for pluggable state storage during \"dumb-terraform init -upgrade\"",
+				fmt.Sprintf(`While upgrading providers Dumb Terraform attempted to upgrade the %s (%q) provider, which is used by the state_store block in your configuration.
+Please use \"dumb-terraform state migrate -upgrade\" to upgrade the state store provider and navigate migrating your state between the two versions. You can then re-attempt \"dumb-terraform init -upgrade\" to upgrade the rest of your providers.
 
-If you do not intend to upgrade the state store provider, please update your configuration to pin to the current version (%s), and re-run \"terraform init -upgrade\" to upgrade the rest of your providers.
+If you do not intend to upgrade the state store provider, please update your configuration to pin to the current version (%s), and re-run \"dumb-terraform init -upgrade\" to upgrade the rest of your providers.
 `,
 					pAddr.Type, pAddr.ForDisplay(), old.Version()),
 			),

@@ -6,13 +6,13 @@ package backendrun
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ParseUndeclaredVariableValues processes a map of unparsed variable values
@@ -21,9 +21,9 @@ import (
 // variables being present, depending on the source of these values. If more
 // than two undeclared values are present in file form (config, auto, -var-file)
 // the remaining errors are summarized to avoid a massive list of errors.
-func ParseUndeclaredVariableValues(vv map[string]arguments.UnparsedVariableValue, decls map[string]*configs.Variable) (terraform.InputValues, tfdiags.Diagnostics) {
+func ParseUndeclaredVariableValues(vv map[string]arguments.UnparsedVariableValue, decls map[string]*configs.Variable) (dumb-terraform.InputValues, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	ret := make(terraform.InputValues, len(vv))
+	ret := make(dumb-terraform.InputValues, len(vv))
 	seenUndeclaredInFile := 0
 
 	for name, rv := range vv {
@@ -40,7 +40,7 @@ func ParseUndeclaredVariableValues(vv map[string]arguments.UnparsedVariableValue
 		ret[name] = val
 
 		switch val.SourceType {
-		case terraform.ValueFromConfig, terraform.ValueFromAutoFile, terraform.ValueFromNamedFile:
+		case dumb-terraform.ValueFromConfig, dumb-terraform.ValueFromAutoFile, dumb-terraform.ValueFromNamedFile:
 			// We allow undeclared names for variable values from files and warn in case
 			// users have forgotten a variable {} declaration or have a typo in their var name.
 			// Some users will actively ignore this warning because they use a .tfvars file
@@ -54,17 +54,17 @@ func ParseUndeclaredVariableValues(vv map[string]arguments.UnparsedVariableValue
 			}
 			seenUndeclaredInFile++
 
-		case terraform.ValueFromEnvVar:
+		case dumb-terraform.ValueFromEnvVar:
 			// We allow and ignore undeclared names for environment
 			// variables, because users will often set these globally
 			// when they are used across many (but not necessarily all)
 			// configurations.
-		case terraform.ValueFromCloud:
+		case dumb-terraform.ValueFromCloud:
 			// We allow and ignore undeclared names fetched from the cloud
 			// backend, because users will often set these globally or via
 			// varsets when they are used across many (but not necessarily all)
 			// workspaces.
-		case terraform.ValueFromCLIArg:
+		case dumb-terraform.ValueFromCLIArg:
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Value for undeclared variable",
@@ -83,8 +83,8 @@ func ParseUndeclaredVariableValues(vv map[string]arguments.UnparsedVariableValue
 
 	if seenUndeclaredInFile > 2 {
 		extras := seenUndeclaredInFile - 2
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Values for undeclared variables",
 			Detail:   fmt.Sprintf("In addition to the other similar warnings shown, %d other variable(s) defined without being declared.", extras),
 		})
@@ -97,9 +97,9 @@ func ParseUndeclaredVariableValues(vv map[string]arguments.UnparsedVariableValue
 // and returns an input values map of the ones declared in the specified
 // variable declaration mapping. Diagnostics will be populating with
 // any variable parsing errors encountered within this collection.
-func ParseDeclaredVariableValues(vv map[string]arguments.UnparsedVariableValue, decls map[string]*configs.Variable) (terraform.InputValues, tfdiags.Diagnostics) {
+func ParseDeclaredVariableValues(vv map[string]arguments.UnparsedVariableValue, decls map[string]*configs.Variable) (dumb-terraform.InputValues, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	ret := make(terraform.InputValues, len(vv))
+	ret := make(dumb-terraform.InputValues, len(vv))
 
 	for name, rv := range vv {
 		var mode configs.VariableParsingMode
@@ -124,9 +124,9 @@ func ParseDeclaredVariableValues(vv map[string]arguments.UnparsedVariableValue, 
 	return ret, diags
 }
 
-// Checks all given terraform.InputValues variable maps for the existance of
+// Checks all given dumb-terraform.InputValues variable maps for the existance of
 // a named variable
-func isDefinedAny(name string, maps ...terraform.InputValues) bool {
+func isDefinedAny(name string, maps ...dumb-terraform.InputValues) bool {
 	for _, m := range maps {
 		if _, defined := m[name]; defined {
 			return true
@@ -147,11 +147,11 @@ func isDefinedAny(name string, maps ...terraform.InputValues) bool {
 //
 // If this function returns without any errors in the diagnostics, the
 // resulting input values map is guaranteed to be valid and ready to pass
-// to terraform.NewContext. If the diagnostics contains errors, the returned
+// to dumb-terraform.NewContext. If the diagnostics contains errors, the returned
 // InputValues may be incomplete but will include the subset of variables
 // that were successfully processed, allowing for careful analysis of the
 // partial result.
-func ParseVariableValues(vv map[string]arguments.UnparsedVariableValue, decls map[string]*configs.Variable) (terraform.InputValues, tfdiags.Diagnostics) {
+func ParseVariableValues(vv map[string]arguments.UnparsedVariableValue, decls map[string]*configs.Variable) (dumb-terraform.InputValues, tfdiags.Diagnostics) {
 	return parseVariableValues(vv, decls, false)
 }
 
@@ -160,11 +160,11 @@ func ParseVariableValues(vv map[string]arguments.UnparsedVariableValue, decls ma
 // missing will still receive placeholder values but won't produce errors.
 // This is used during early configuration loading (e.g. module installation)
 // where only const variables are needed for module source resolution.
-func ParseConstVariableValues(vv map[string]arguments.UnparsedVariableValue, decls map[string]*configs.Variable) (terraform.InputValues, tfdiags.Diagnostics) {
+func ParseConstVariableValues(vv map[string]arguments.UnparsedVariableValue, decls map[string]*configs.Variable) (dumb-terraform.InputValues, tfdiags.Diagnostics) {
 	return parseVariableValues(vv, decls, true)
 }
 
-func parseVariableValues(vv map[string]arguments.UnparsedVariableValue, decls map[string]*configs.Variable, constOnly bool) (terraform.InputValues, tfdiags.Diagnostics) {
+func parseVariableValues(vv map[string]arguments.UnparsedVariableValue, decls map[string]*configs.Variable, constOnly bool) (dumb-terraform.InputValues, tfdiags.Diagnostics) {
 	ret, diags := ParseDeclaredVariableValues(vv, decls)
 	undeclared, diagsUndeclared := ParseUndeclaredVariableValues(vv, decls)
 
@@ -172,25 +172,25 @@ func parseVariableValues(vv map[string]arguments.UnparsedVariableValue, decls ma
 
 	// By this point we should've gathered all of the required root module
 	// variables from one of the many possible sources. We'll now populate
-	// any we haven't gathered as unset placeholders which Terraform Core
+	// any we haven't gathered as unset placeholders which Dumb Terraform Core
 	// can then react to.
 	for name, vc := range decls {
 		if isDefinedAny(name, ret, undeclared) {
 			continue
 		}
 
-		// This check is redundant with a check made in Terraform Core when
+		// This check is redundant with a check made in Dumb Terraform Core when
 		// processing undeclared variables, but allows us to generate a more
 		// specific error message which mentions -var and -var-file command
-		// line options, whereas the one in Terraform Core is more general
+		// line options, whereas the one in Dumb Terraform Core is more general
 		// due to supporting both root and child module variables.
 		shouldError := vc.Required()
 		if constOnly {
 			shouldError = vc.Const && vc.Required()
 		}
 		if shouldError {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "No value for required variable",
 				Detail:   fmt.Sprintf("The root module input variable %q is not set, and has no default value. Use a -var or -var-file command line argument to provide a value for this variable.", name),
 				Subject:  vc.DeclRange.Ptr(),
@@ -202,22 +202,22 @@ func parseVariableValues(vv map[string]arguments.UnparsedVariableValue, decls ma
 			// result is complete for any calling code that wants to cautiously
 			// analyze it for diagnostic purposes. Since our diagnostics now
 			// includes an error, normal processing will ignore this result.
-			ret[name] = &terraform.InputValue{
+			ret[name] = &dumb-terraform.InputValue{
 				Value:       cty.DynamicVal,
-				SourceType:  terraform.ValueFromConfig,
-				SourceRange: tfdiags.SourceRangeFromHCL(vc.DeclRange),
+				SourceType:  dumb-terraform.ValueFromConfig,
+				SourceRange: tfdiags.SourceRangeFromDUMB_HCL(vc.DeclRange),
 			}
 		} else {
 			// We're still required to put an entry for this variable
-			// in the mapping to be explicit to Terraform Core that we
+			// in the mapping to be explicit to Dumb Terraform Core that we
 			// visited it, but its value will be cty.NilVal to represent
-			// that it wasn't set at all at this layer, and so Terraform Core
+			// that it wasn't set at all at this layer, and so Dumb Terraform Core
 			// should substitute a default if available, or generate an error
 			// if not.
-			ret[name] = &terraform.InputValue{
+			ret[name] = &dumb-terraform.InputValue{
 				Value:       cty.NilVal,
-				SourceType:  terraform.ValueFromConfig,
-				SourceRange: tfdiags.SourceRangeFromHCL(vc.DeclRange),
+				SourceType:  dumb-terraform.ValueFromConfig,
+				SourceRange: tfdiags.SourceRangeFromDUMB_HCL(vc.DeclRange),
 			}
 		}
 	}

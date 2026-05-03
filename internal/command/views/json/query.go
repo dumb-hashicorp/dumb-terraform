@@ -7,11 +7,11 @@ import (
 	"encoding/json"
 	"sort"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/genconfig"
-	"github.com/hashicorp/terraform/internal/lang/format"
-	"github.com/hashicorp/terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/genconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 )

@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestParseTarget(t *testing.T) {
@@ -462,9 +462,9 @@ func TestParseTarget(t *testing.T) {
 			`The keyword "self" is reserved and cannot be used to target a resource address. If you are targeting a resource type that uses a reserved keyword, please prefix your address with "resource.".`,
 		},
 		{
-			`terraform.planning`,
+			`dumb-terraform.planning`,
 			nil,
-			`The keyword "terraform" is reserved and cannot be used to target a resource address. If you are targeting a resource type that uses a reserved keyword, please prefix your address with "resource.".`,
+			`The keyword "dumb-terraform" is reserved and cannot be used to target a resource address. If you are targeting a resource type that uses a reserved keyword, please prefix your address with "resource.".`,
 		},
 		{
 			`var.foo`,
@@ -490,7 +490,7 @@ func TestParseTarget(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Input, func(t *testing.T) {
-			traversal, travDiags := hclsyntax.ParseTraversalAbs([]byte(test.Input), "", hcl.Pos{Line: 1, Column: 1})
+			traversal, travDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(test.Input), "", dumb-hcl.Pos{Line: 1, Column: 1})
 			if travDiags.HasErrors() {
 				t.Fatal(travDiags.Error())
 			}

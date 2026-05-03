@@ -14,10 +14,10 @@ import (
 	"github.com/zclconf/go-cty/cty/convert"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/repl"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/repl"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // The Output view renders either one or all outputs, depending on whether or
@@ -41,7 +41,7 @@ func NewOutput(vt arguments.ViewType, view *View) Output {
 	}
 }
 
-// The OutputHuman implementation renders outputs in a format equivalent to HCL
+// The OutputHuman implementation renders outputs in a format equivalent to DUMB_HCL
 // source. This uses the same formatting logic as in the console REPL.
 type OutputHuman struct {
 	view *View
@@ -162,7 +162,7 @@ func (v *OutputRaw) Output(name string, outputs map[string]*states.OutputValue) 
 			tfdiags.Error,
 			"Unsupported value for raw output",
 			fmt.Sprintf(
-				"The value for output value %q won't be known until after a successful terraform apply, so -raw mode cannot print it.",
+				"The value for output value %q won't be known until after a successful dumb-terraform apply, so -raw mode cannot print it.",
 				name,
 			),
 		))
@@ -271,10 +271,10 @@ func noOutputsWarning() tfdiags.Diagnostic {
 		"No outputs found",
 		"The state file either has no outputs defined, or all the defined "+
 			"outputs are empty. Please define an output in your configuration "+
-			"with the `output` keyword and run `terraform refresh` for it to "+
+			"with the `output` keyword and run `dumb-terraform refresh` for it to "+
 			"become available. If you are using interpolation, please verify "+
 			"the interpolated value is not empty. You can use the "+
-			"`terraform console` command to assist.",
+			"`dumb-terraform console` command to assist.",
 	)
 }
 
@@ -286,7 +286,7 @@ func missingOutputError(name string) tfdiags.Diagnostic {
 		fmt.Sprintf("Output %q not found", name),
 		"The output variable requested could not be found in the state "+
 			"file. If you recently added this to your configuration, be "+
-			"sure to run `terraform apply`, since the state won't be updated "+
+			"sure to run `dumb-terraform apply`, since the state won't be updated "+
 			"with new output variables until that command is run.",
 	)
 }

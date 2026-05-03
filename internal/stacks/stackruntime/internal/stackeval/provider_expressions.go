@@ -7,16 +7,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig/stackconfigtypes"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/stackconfigtypes"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ConfigComponentExpressionScope is an extension to ExpressionScope that
@@ -24,14 +24,14 @@ import (
 // evaluated by this scope.
 //
 // This is typically used to share code between removed and component blocks
-// which both load and execute Terraform configurations.
+// which both load and execute Dumb Terraform configurations.
 type ConfigComponentExpressionScope[Addr any] interface {
 	ExpressionScope
 
 	Addr() Addr
 	StackConfig() *StackConfig
 	ModuleTree(ctx context.Context) *configs.Config
-	DeclRange() *hcl.Range
+	DeclRange() *dumb-hcl.Range
 }
 
 // EvalProviderTypes evaluates the provider configurations for a component,
@@ -39,7 +39,7 @@ type ConfigComponentExpressionScope[Addr any] interface {
 //
 // This function should be called during static evaluations of components and
 // removed blocks.
-func EvalProviderTypes(ctx context.Context, stack *StackConfig, providers map[addrs.LocalProviderConfig]hcl.Expression, phase EvalPhase, scope ConfigComponentExpressionScope[stackaddrs.ConfigComponent]) (addrs.Set[addrs.RootProviderConfig], tfdiags.Diagnostics) {
+func EvalProviderTypes(ctx context.Context, stack *StackConfig, providers map[addrs.LocalProviderConfig]dumb-hcl.Expression, phase EvalPhase, scope ConfigComponentExpressionScope[stackaddrs.ConfigComponent]) (addrs.Set[addrs.RootProviderConfig], tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	neededProviders := requiredProviderInstances(ctx, scope)
@@ -62,8 +62,8 @@ func EvalProviderTypes(ctx context.Context, stack *StackConfig, providers map[ad
 		if !exists {
 			// Then this provider isn't listed in the `providers` block of this
 			// component. Which is bad!
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing required provider configuration",
 				Detail: fmt.Sprintf(
 					"The root module for %s requires a provider configuration named %q for provider %q, which is not assigned in the block's \"providers\" argument.",
@@ -77,9 +77,9 @@ func EvalProviderTypes(ctx context.Context, stack *StackConfig, providers map[ad
 		// This means we now have an expression that should be providing the
 		// configuration for this required provider. We'll evaluate it now.
 
-		result, hclDiags := EvalExprAndEvalContext(ctx, expr, phase, scope)
-		diags = diags.Append(hclDiags)
-		if hclDiags.HasErrors() {
+		result, dumb-hclDiags := EvalExprAndEvalContext(ctx, expr, phase, scope)
+		diags = diags.Append(dumb-hclDiags)
+		if dumb-hclDiags.HasErrors() {
 			continue
 		}
 
@@ -113,10 +113,10 @@ func EvalProviderTypes(ctx context.Context, stack *StackConfig, providers map[ad
 					// within the module.
 					if !moduleProviderTypeExplicit {
 						// Yes! The provider type within the module has been
-						// implied by Terraform and not explicitly set within
+						// implied by Dumb Terraform and not explicitly set within
 						// the required_providers block. We'll suggest the user
 						// to update the required_providers block of the module.
-						errorDetail = fmt.Sprintf("\n\nThe module does not declare a source address for %q in its required_providers block, so Terraform assumed %q for backward-compatibility with older versions of Terraform", componentAddr.LocalName, elem.Key.Provider.ForDisplay())
+						errorDetail = fmt.Sprintf("\n\nThe module does not declare a source address for %q in its required_providers block, so Dumb Terraform assumed %q for backward-compatibility with older versions of Dumb Terraform", componentAddr.LocalName, elem.Key.Provider.ForDisplay())
 					}
 
 					// Otherwise the user has explicitly set the provider type
@@ -127,8 +127,8 @@ func EvalProviderTypes(ctx context.Context, stack *StackConfig, providers map[ad
 
 				// But, unfortunately, the underlying types of the providers
 				// do not match up.
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  errSummary,
 					Detail: fmt.Sprintf(
 						"The provider configuration slot %q requires a configuration for provider %q, not for provider %q.%s",
@@ -146,8 +146,8 @@ func EvalProviderTypes(ctx context.Context, stack *StackConfig, providers map[ad
 			// during the plan phase) if the type doesn't match up then.
 		} else {
 			// We got something that isn't a provider reference at all.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  errSummary,
 				Detail: fmt.Sprintf(
 					"The provider configuration slot %s requires a configuration for provider %q.",
@@ -175,7 +175,7 @@ func EvalProviderTypes(ctx context.Context, stack *StackConfig, providers map[ad
 //
 // This function should be called during dynamic evaluations of components and
 // removed blocks.
-func EvalProviderValues(ctx context.Context, main *Main, providers map[addrs.LocalProviderConfig]hcl.Expression, phase EvalPhase, scope ConfigComponentExpressionScope[stackaddrs.AbsComponentInstance]) (map[addrs.RootProviderConfig]stackaddrs.AbsProviderConfigInstance, map[addrs.RootProviderConfig]addrs.Provider, tfdiags.Diagnostics) {
+func EvalProviderValues(ctx context.Context, main *Main, providers map[addrs.LocalProviderConfig]dumb-hcl.Expression, phase EvalPhase, scope ConfigComponentExpressionScope[stackaddrs.AbsComponentInstance]) (map[addrs.RootProviderConfig]stackaddrs.AbsProviderConfigInstance, map[addrs.RootProviderConfig]addrs.Provider, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	knownProviders := make(map[addrs.RootProviderConfig]stackaddrs.AbsProviderConfigInstance)
 	unknownProviders := make(map[addrs.RootProviderConfig]addrs.Provider)
@@ -265,8 +265,8 @@ func EvalProviderValues(ctx context.Context, main *Main, providers map[addrs.Loc
 		if _, ok := scope.StackConfig().ProviderLocalName(provider); !ok {
 			// Even though we have an entry for this provider in the declConfigs
 			// doesn't mean we have an entry for this in our required providers.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Block requires undeclared provider",
 				Detail: fmt.Sprintf(
 					"The root module for %s has resources in state that require a configuration for provider %q, which isn't declared as a dependency of this stack configuration.\n\nDeclare this provider in the stack's required_providers block, and then assign a configuration for that provider in this block's \"providers\" argument.",
@@ -296,8 +296,8 @@ func EvalProviderValues(ctx context.Context, main *Main, providers map[addrs.Loc
 			Alias:     previousProvider.Alias,
 		}
 
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Missing required provider configuration",
 			Detail: fmt.Sprintf(
 				"The root module for %s has resources in state that require a provider configuration named %q for provider %q, which is not assigned in the block's \"providers\" argument.",
@@ -310,13 +310,13 @@ func EvalProviderValues(ctx context.Context, main *Main, providers map[addrs.Loc
 	return knownProviders, unknownProviders, diags
 }
 
-func evalProviderValue(ctx context.Context, sourceAddr addrs.RootProviderConfig, componentAddr addrs.LocalProviderConfig, expr hcl.Expression, phase EvalPhase, scope ConfigComponentExpressionScope[stackaddrs.AbsComponentInstance]) (stackaddrs.AbsProviderConfigInstance, bool, tfdiags.Diagnostics) {
+func evalProviderValue(ctx context.Context, sourceAddr addrs.RootProviderConfig, componentAddr addrs.LocalProviderConfig, expr dumb-hcl.Expression, phase EvalPhase, scope ConfigComponentExpressionScope[stackaddrs.AbsComponentInstance]) (stackaddrs.AbsProviderConfigInstance, bool, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	var ret stackaddrs.AbsProviderConfigInstance
 
-	result, hclDiags := EvalExprAndEvalContext(ctx, expr, phase, scope)
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	result, dumb-hclDiags := EvalExprAndEvalContext(ctx, expr, phase, scope)
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return ret, false, diags
 	}
 	v := result.Value
@@ -334,8 +334,8 @@ func evalProviderValue(ctx context.Context, sourceAddr addrs.RootProviderConfig,
 		if actualTypeAddr != sourceAddr.Provider {
 			// But, unfortunately, the underlying types of the providers
 			// do not match up.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  errSummary,
 				Detail: fmt.Sprintf(
 					"The provider configuration slot %s requires a configuration for provider %q, not for provider %q.",
@@ -347,8 +347,8 @@ func evalProviderValue(ctx context.Context, sourceAddr addrs.RootProviderConfig,
 		}
 	} else {
 		// We got something that isn't a provider reference at all.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  errSummary,
 			Detail: fmt.Sprintf(
 				"The provider configuration slot %s requires a configuration for provider %q.",
@@ -363,8 +363,8 @@ func evalProviderValue(ctx context.Context, sourceAddr addrs.RootProviderConfig,
 	// returned a concrete value while we may have got unknown during the
 	// static analysis.
 	if v.IsNull() {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  errSummary,
 			Detail: fmt.Sprintf(
 				"The provider configuration slot %s is required, but this definition returned null.",
@@ -385,7 +385,7 @@ func evalProviderValue(ctx context.Context, sourceAddr addrs.RootProviderConfig,
 }
 
 // requiredProviderInstances returns a description of all of the provider
-// instance slots ("provider configurations" in main Terraform language
+// instance slots ("provider configurations" in main Dumb Terraform language
 // terminology) that are either explicitly declared or implied by the
 // root module of the scope's module tree.
 //
@@ -438,8 +438,8 @@ func neededProviderSchemas[Addr any](ctx context.Context, main *Main, phase Eval
 
 		schema, err := pTy.Schema(ctx)
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Provider initialization error",
 				Detail:   fmt.Sprintf("Failed to fetch the provider schema for %s: %s.", sourceAddr, err),
 				Subject:  scope.DeclRange(),

@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
 )
 
 // NewLoaderForTests is a variant of NewLoader that is intended to be more

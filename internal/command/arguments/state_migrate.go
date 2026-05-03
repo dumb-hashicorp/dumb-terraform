@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-const lockFileName = ".terraform.lock.hcl"
+const lockFileName = ".dumb-terraform.lock.dumb-hcl"
 
 // StateMigrate represents the command-line arguments for the state migrate command.
 type StateMigrate struct {

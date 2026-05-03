@@ -4,7 +4,7 @@
 package statekeys
 
 import (
-	"github.com/hashicorp/terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
 )
 
 type KeySet collections.Set[Key]

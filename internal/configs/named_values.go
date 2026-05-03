@@ -6,15 +6,15 @@ package configs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/ext/typeexpr"
-	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/typeexpr"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // A consistent detail message for all "not a valid identifier" diagnostics.
@@ -55,12 +55,12 @@ type Variable struct {
 
 	Deprecated      string
 	DeprecatedSet   bool
-	DeprecatedRange hcl.Range
+	DeprecatedRange dumb-hcl.Range
 
-	DeclRange hcl.Range
+	DeclRange dumb-hcl.Range
 }
 
-func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagnostics) {
+func decodeVariableBlock(block *dumb-hcl.Block, override bool) (*Variable, dumb-hcl.Diagnostics) {
 	v := &Variable{
 		Name:      block.Labels[0],
 		DeclRange: block.DefRange,
@@ -78,9 +78,9 @@ func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagno
 
 	content, diags := block.Body.Content(variableBlockSchema)
 
-	if !hclsyntax.ValidIdentifier(v.Name) {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+	if !dumb-hclsyntax.ValidIdentifier(v.Name) {
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid variable name",
 			Detail:   badIdentifierDetail,
 			Subject:  &block.LabelRanges[0],
@@ -92,8 +92,8 @@ func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagno
 	// these won't be usable for child modules.
 	for _, attr := range moduleBlockSchema.Attributes {
 		if attr.Name == v.Name {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid variable name",
 				Detail:   fmt.Sprintf("The variable name %q is reserved due to its special meaning inside module blocks.", attr.Name),
 				Subject:  &block.LabelRanges[0],
@@ -102,8 +102,8 @@ func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagno
 	}
 	for _, blockS := range moduleBlockSchema.Blocks {
 		if blockS.Type == v.Name {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid variable name",
 				Detail:   fmt.Sprintf("The variable name %q is reserved due to its special meaning inside module blocks.", blockS.Type),
 				Subject:  &block.LabelRanges[0],
@@ -112,7 +112,7 @@ func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagno
 	}
 
 	if attr, exists := content.Attributes["description"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &v.Description)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &v.Description)
 		diags = append(diags, valDiags...)
 		v.DescriptionSet = true
 	}
@@ -127,35 +127,35 @@ func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagno
 	}
 
 	if attr, exists := content.Attributes["sensitive"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &v.Sensitive)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &v.Sensitive)
 		diags = append(diags, valDiags...)
 		v.SensitiveSet = true
 	}
 
 	if attr, exists := content.Attributes["ephemeral"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &v.Ephemeral)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &v.Ephemeral)
 		diags = append(diags, valDiags...)
 		v.EphemeralSet = true
 	}
 
 	if attr, exists := content.Attributes["const"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &v.Const)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &v.Const)
 		diags = append(diags, valDiags...)
 		v.ConstSet = true
 	}
 
 	if v.Const {
 		if v.Sensitive {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Const variable cannot be sensitive",
 				Detail:   "A variable that is marked as \"const\" cannot also be marked as \"sensitive\".",
 				Subject:  v.DeclRange.Ptr(),
 			})
 		}
 		if v.Ephemeral {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Const variable cannot be ephemeral",
 				Detail:   "A variable that is marked as \"const\" cannot also be marked as \"ephemeral\".",
 				Subject:  v.DeclRange.Ptr(),
@@ -164,7 +164,7 @@ func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagno
 	}
 
 	if attr, exists := content.Attributes["nullable"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &v.Nullable)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &v.Nullable)
 		diags = append(diags, valDiags...)
 		v.NullableSet = true
 	} else {
@@ -195,8 +195,8 @@ func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagno
 			}
 			val, err = convert.Convert(val, v.ConstraintType)
 			if err != nil {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid default value for variable",
 					Detail: fmt.Sprintf(
 						"This default value is not compatible with the variable's type constraint: %s.",
@@ -209,8 +209,8 @@ func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagno
 		}
 
 		if !v.Nullable && val.IsNull() {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid default value for variable",
 				Detail:   "A null default value is not valid when nullable=false.",
 				Subject:  attr.Expr.Range().Ptr(),
@@ -221,7 +221,7 @@ func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagno
 	}
 
 	if attr, exists := content.Attributes["deprecated"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &v.Deprecated)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &v.Deprecated)
 		diags = append(diags, valDiags...)
 		v.DeprecatedSet = true
 		v.DeprecatedRange = attr.Range
@@ -246,7 +246,7 @@ func decodeVariableBlock(block *hcl.Block, override bool) (*Variable, hcl.Diagno
 	return v, diags
 }
 
-func decodeVariableType(expr hcl.Expression) (cty.Type, *typeexpr.Defaults, VariableParsingMode, hcl.Diagnostics) {
+func decodeVariableType(expr dumb-hcl.Expression) (cty.Type, *typeexpr.Defaults, VariableParsingMode, dumb-hcl.Diagnostics) {
 	if exprIsNativeQuotedString(expr) {
 		// If a user provides the pre-0.12 form of variable type argument where
 		// the string values "string", "list" and "map" are accepted, we
@@ -257,37 +257,37 @@ func decodeVariableType(expr hcl.Expression) (cty.Type, *typeexpr.Defaults, Vari
 		// in the normal codepath below.
 		val, diags := expr.Value(nil)
 		if diags.HasErrors() {
-			return cty.DynamicPseudoType, nil, VariableParseHCL, diags
+			return cty.DynamicPseudoType, nil, VariableParseDUMB_HCL, diags
 		}
 		str := val.AsString()
 		switch str {
 		case "string":
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid quoted type constraints",
-				Detail:   "Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Terraform. Remove the quotes around \"string\".",
+				Detail:   "Dumb Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Dumb Terraform. Remove the quotes around \"string\".",
 				Subject:  expr.Range().Ptr(),
 			})
 			return cty.DynamicPseudoType, nil, VariableParseLiteral, diags
 		case "list":
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid quoted type constraints",
-				Detail:   "Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Terraform. Remove the quotes around \"list\" and write list(string) instead to explicitly indicate that the list elements are strings.",
+				Detail:   "Dumb Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Dumb Terraform. Remove the quotes around \"list\" and write list(string) instead to explicitly indicate that the list elements are strings.",
 				Subject:  expr.Range().Ptr(),
 			})
-			return cty.DynamicPseudoType, nil, VariableParseHCL, diags
+			return cty.DynamicPseudoType, nil, VariableParseDUMB_HCL, diags
 		case "map":
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid quoted type constraints",
-				Detail:   "Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Terraform. Remove the quotes around \"map\" and write map(string) instead to explicitly indicate that the map elements are strings.",
+				Detail:   "Dumb Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Dumb Terraform. Remove the quotes around \"map\" and write map(string) instead to explicitly indicate that the map elements are strings.",
 				Subject:  expr.Range().Ptr(),
 			})
-			return cty.DynamicPseudoType, nil, VariableParseHCL, diags
+			return cty.DynamicPseudoType, nil, VariableParseDUMB_HCL, diags
 		default:
-			return cty.DynamicPseudoType, nil, VariableParseHCL, hcl.Diagnostics{{
-				Severity: hcl.DiagError,
+			return cty.DynamicPseudoType, nil, VariableParseDUMB_HCL, dumb-hcl.Diagnostics{{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid legacy variable type hint",
 				Detail:   `To provide a full type expression, remove the surrounding quotes and give the type expression directly.`,
 				Subject:  expr.Range().Ptr(),
@@ -295,20 +295,20 @@ func decodeVariableType(expr hcl.Expression) (cty.Type, *typeexpr.Defaults, Vari
 		}
 	}
 
-	// First we'll deal with some shorthand forms that the HCL-level type
+	// First we'll deal with some shorthand forms that the DUMB_HCL-level type
 	// expression parser doesn't include. These both emulate pre-0.12 behavior
 	// of allowing a list or map of any element type as long as all of the
 	// elements are consistent. This is the same as list(any) or map(any).
-	switch hcl.ExprAsKeyword(expr) {
+	switch dumb-hcl.ExprAsKeyword(expr) {
 	case "list":
-		return cty.List(cty.DynamicPseudoType), nil, VariableParseHCL, nil
+		return cty.List(cty.DynamicPseudoType), nil, VariableParseDUMB_HCL, nil
 	case "map":
-		return cty.Map(cty.DynamicPseudoType), nil, VariableParseHCL, nil
+		return cty.Map(cty.DynamicPseudoType), nil, VariableParseDUMB_HCL, nil
 	}
 
 	ty, typeDefaults, diags := typeexpr.TypeConstraintWithDefaults(expr)
 	if diags.HasErrors() {
-		return cty.DynamicPseudoType, nil, VariableParseHCL, diags
+		return cty.DynamicPseudoType, nil, VariableParseDUMB_HCL, diags
 	}
 
 	switch {
@@ -316,8 +316,8 @@ func decodeVariableType(expr hcl.Expression) (cty.Type, *typeexpr.Defaults, Vari
 		// Primitive types use literal parsing.
 		return ty, typeDefaults, VariableParseLiteral, diags
 	default:
-		// Everything else uses HCL parsing
-		return ty, typeDefaults, VariableParseHCL, diags
+		// Everything else uses DUMB_HCL parsing
+		return ty, typeDefaults, VariableParseDUMB_HCL, diags
 	}
 }
 
@@ -340,9 +340,9 @@ type VariableParsingMode rune
 // string directly as a cty.String value.
 const VariableParseLiteral VariableParsingMode = 'L'
 
-// VariableParseHCL is a variable parsing mode that attempts to parse the given
-// string as an HCL expression and returns the result.
-const VariableParseHCL VariableParsingMode = 'H'
+// VariableParseDUMB_HCL is a variable parsing mode that attempts to parse the given
+// string as an DUMB_HCL expression and returns the result.
+const VariableParseDUMB_HCL VariableParsingMode = 'H'
 
 // Parse uses the receiving parsing mode to process the given variable value
 // string, returning the result along with any diagnostics.
@@ -359,13 +359,13 @@ const VariableParseHCL VariableParsingMode = 'H'
 //
 // If the returned diagnostics has errors, the returned value may not be
 // valid.
-func (m VariableParsingMode) Parse(name, value string) (cty.Value, hcl.Diagnostics) {
+func (m VariableParsingMode) Parse(name, value string) (cty.Value, dumb-hcl.Diagnostics) {
 	switch m {
 	case VariableParseLiteral:
 		return cty.StringVal(value), nil
-	case VariableParseHCL:
+	case VariableParseDUMB_HCL:
 		fakeFilename := fmt.Sprintf("<value for var.%s>", name)
-		expr, diags := hclsyntax.ParseExpression([]byte(value), fakeFilename, hcl.Pos{Line: 1, Column: 1})
+		expr, diags := dumb-hclsyntax.ParseExpression([]byte(value), fakeFilename, dumb-hcl.Pos{Line: 1, Column: 1})
 		if diags.HasErrors() {
 			return cty.DynamicVal, diags
 		}
@@ -382,8 +382,8 @@ func (m VariableParsingMode) Parse(name, value string) (cty.Value, hcl.Diagnosti
 type Output struct {
 	Name        string
 	Description string
-	Expr        hcl.Expression
-	DependsOn   []hcl.Traversal
+	Expr        dumb-hcl.Expression
+	DependsOn   []dumb-hcl.Traversal
 	Sensitive   bool
 	Ephemeral   bool
 	Deprecated  string
@@ -407,12 +407,12 @@ type Output struct {
 	// override files.
 	TypeSet bool
 
-	DeclRange       hcl.Range
-	DeprecatedRange hcl.Range
+	DeclRange       dumb-hcl.Range
+	DeprecatedRange dumb-hcl.Range
 }
 
-func decodeOutputBlock(block *hcl.Block, override bool) (*Output, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeOutputBlock(block *dumb-hcl.Block, override bool) (*Output, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	o := &Output{
 		Name:      block.Labels[0],
@@ -427,9 +427,9 @@ func decodeOutputBlock(block *hcl.Block, override bool) (*Output, hcl.Diagnostic
 	content, moreDiags := block.Body.Content(schema)
 	diags = append(diags, moreDiags...)
 
-	if !hclsyntax.ValidIdentifier(o.Name) {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+	if !dumb-hclsyntax.ValidIdentifier(o.Name) {
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid output name",
 			Detail:   badIdentifierDetail,
 			Subject:  &block.LabelRanges[0],
@@ -437,7 +437,7 @@ func decodeOutputBlock(block *hcl.Block, override bool) (*Output, hcl.Diagnostic
 	}
 
 	if attr, exists := content.Attributes["description"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &o.Description)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &o.Description)
 		diags = append(diags, valDiags...)
 		o.DescriptionSet = true
 	}
@@ -460,19 +460,19 @@ func decodeOutputBlock(block *hcl.Block, override bool) (*Output, hcl.Diagnostic
 	}
 
 	if attr, exists := content.Attributes["sensitive"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &o.Sensitive)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &o.Sensitive)
 		diags = append(diags, valDiags...)
 		o.SensitiveSet = true
 	}
 
 	if attr, exists := content.Attributes["ephemeral"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &o.Ephemeral)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &o.Ephemeral)
 		diags = append(diags, valDiags...)
 		o.EphemeralSet = true
 	}
 
 	if attr, exists := content.Attributes["deprecated"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &o.Deprecated)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &o.Deprecated)
 		diags = append(diags, valDiags...)
 		o.DeprecatedSet = true
 		o.DeprecatedRange = attr.Range
@@ -491,8 +491,8 @@ func decodeOutputBlock(block *hcl.Block, override bool) (*Output, hcl.Diagnostic
 			diags = append(diags, moreDiags...)
 			o.Preconditions = append(o.Preconditions, cr)
 		case "postcondition":
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Postconditions are not allowed",
 				Detail:   "Output values can only have preconditions, not postconditions.",
 				Subject:  block.TypeRange.Ptr(),
@@ -516,13 +516,13 @@ func (o *Output) Addr() addrs.OutputValue {
 // provide context for us to interpret its contents.
 type Local struct {
 	Name string
-	Expr hcl.Expression
-	Body hcl.Body // for better diagnostics
+	Expr dumb-hcl.Expression
+	Body dumb-hcl.Body // for better diagnostics
 
-	DeclRange hcl.Range
+	DeclRange dumb-hcl.Range
 }
 
-func decodeLocalsBlock(block *hcl.Block) ([]*Local, hcl.Diagnostics) {
+func decodeLocalsBlock(block *dumb-hcl.Block) ([]*Local, dumb-hcl.Diagnostics) {
 	attrs, diags := block.Body.JustAttributes()
 	if len(attrs) == 0 {
 		return nil, diags
@@ -530,9 +530,9 @@ func decodeLocalsBlock(block *hcl.Block) ([]*Local, hcl.Diagnostics) {
 
 	locals := make([]*Local, 0, len(attrs))
 	for name, attr := range attrs {
-		if !hclsyntax.ValidIdentifier(name) {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+		if !dumb-hclsyntax.ValidIdentifier(name) {
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid local value name",
 				Detail:   badIdentifierDetail,
 				Subject:  &attr.NameRange,
@@ -557,8 +557,8 @@ func (l *Local) Addr() addrs.LocalValue {
 	}
 }
 
-var variableBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var variableBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name: "description",
 		},
@@ -584,15 +584,15 @@ var variableBlockSchema = &hcl.BodySchema{
 			Name: "const",
 		},
 	},
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{
 			Type: "validation",
 		},
 	},
 }
 
-var outputBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var outputBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name: "description",
 		},
@@ -616,14 +616,14 @@ var outputBlockSchema = &hcl.BodySchema{
 			Name: "type",
 		},
 	},
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "precondition"},
 		{Type: "postcondition"},
 	},
 }
 
-func checkVariableValidationBlock(varName string, vv *CheckRule) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func checkVariableValidationBlock(varName string, vv *CheckRule) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	if vv.Condition != nil {
 		// The validation condition must include a reference to the variable itself
@@ -638,8 +638,8 @@ func checkVariableValidationBlock(varName string, vv *CheckRule) hcl.Diagnostics
 			}
 		}
 
-		return diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid variable validation condition",
 			Detail:   fmt.Sprintf("The condition for variable %q must refer to var.%s in order to test incoming values.", varName, varName),
 			Subject:  vv.Condition.Range().Ptr(),

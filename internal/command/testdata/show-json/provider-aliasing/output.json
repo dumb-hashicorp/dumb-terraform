@@ -1,6 +1,6 @@
 {
   "format_version": "1.0",
-  "terraform_version": "1.1.0-dev",
+  "dumb-terraform_version": "1.1.0-dev",
   "applyable": true,
   "complete": true,
   "planned_values": {
@@ -11,7 +11,7 @@
           "mode": "managed",
           "type": "test_instance",
           "name": "test",
-          "provider_name": "registry.terraform.io/hashicorp/test",
+          "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
           "schema_version": 0,
           "values": {
             "ami": "foo"
@@ -23,7 +23,7 @@
           "mode": "managed",
           "type": "test_instance",
           "name": "test_backup",
-          "provider_name": "registry.terraform.io/hashicorp/test",
+          "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
           "schema_version": 0,
           "values": {
             "ami": "foo-backup"
@@ -39,7 +39,7 @@
               "mode": "managed",
               "type": "test_instance",
               "name": "test_primary",
-              "provider_name": "registry.terraform.io/hashicorp/test",
+              "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
               "schema_version": 0,
               "values": {
                 "ami": "primary"
@@ -51,7 +51,7 @@
               "mode": "managed",
               "type": "test_instance",
               "name": "test_secondary",
-              "provider_name": "registry.terraform.io/hashicorp/test",
+              "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
               "schema_version": 0,
               "values": {
                 "ami": "secondary"
@@ -68,7 +68,7 @@
                   "mode": "managed",
                   "type": "test_instance",
                   "name": "test_alternate",
-                  "provider_name": "registry.terraform.io/hashicorp/test",
+                  "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                   "schema_version": 0,
                   "values": {
                     "ami": "secondary"
@@ -80,7 +80,7 @@
                   "mode": "managed",
                   "type": "test_instance",
                   "name": "test_main",
-                  "provider_name": "registry.terraform.io/hashicorp/test",
+                  "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                   "schema_version": 0,
                   "values": {
                     "ami": "main"
@@ -99,7 +99,7 @@
               "mode": "managed",
               "type": "test_instance",
               "name": "test_primary",
-              "provider_name": "registry.terraform.io/hashicorp/test",
+              "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
               "schema_version": 0,
               "values": {
                 "ami": "primary"
@@ -111,7 +111,7 @@
               "mode": "managed",
               "type": "test_instance",
               "name": "test_secondary",
-              "provider_name": "registry.terraform.io/hashicorp/test",
+              "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
               "schema_version": 0,
               "values": {
                 "ami": "secondary"
@@ -128,7 +128,7 @@
                   "mode": "managed",
                   "type": "test_instance",
                   "name": "test_alternate",
-                  "provider_name": "registry.terraform.io/hashicorp/test",
+                  "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                   "schema_version": 0,
                   "values": {
                     "ami": "secondary"
@@ -140,7 +140,7 @@
                   "mode": "managed",
                   "type": "test_instance",
                   "name": "test_main",
-                  "provider_name": "registry.terraform.io/hashicorp/test",
+                  "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                   "schema_version": 0,
                   "values": {
                     "ami": "main"
@@ -161,7 +161,7 @@
       "mode": "managed",
       "type": "test_instance",
       "name": "test",
-      "provider_name": "registry.terraform.io/hashicorp/test",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
       "change": {
         "actions": [
           "create"
@@ -182,7 +182,7 @@
       "mode": "managed",
       "type": "test_instance",
       "name": "test_backup",
-      "provider_name": "registry.terraform.io/hashicorp/test",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
       "change": {
         "actions": [
           "create"
@@ -204,7 +204,7 @@
       "mode": "managed",
       "type": "test_instance",
       "name": "test_primary",
-      "provider_name": "registry.terraform.io/hashicorp/test",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
       "change": {
         "actions": [
           "create"
@@ -226,7 +226,7 @@
       "mode": "managed",
       "type": "test_instance",
       "name": "test_secondary",
-      "provider_name": "registry.terraform.io/hashicorp/test",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
       "change": {
         "actions": [
           "create"
@@ -248,7 +248,7 @@
       "mode": "managed",
       "type": "test_instance",
       "name": "test_primary",
-      "provider_name": "registry.terraform.io/hashicorp/test",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
       "change": {
         "actions": [
           "create"
@@ -270,7 +270,7 @@
       "mode": "managed",
       "type": "test_instance",
       "name": "test_secondary",
-      "provider_name": "registry.terraform.io/hashicorp/test",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
       "change": {
         "actions": [
           "create"
@@ -292,7 +292,7 @@
       "mode": "managed",
       "type": "test_instance",
       "name": "test_alternate",
-      "provider_name": "registry.terraform.io/hashicorp/test",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
       "change": {
         "actions": [
           "create"
@@ -314,7 +314,7 @@
       "mode": "managed",
       "type": "test_instance",
       "name": "test_main",
-      "provider_name": "registry.terraform.io/hashicorp/test",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
       "change": {
         "actions": [
           "create"
@@ -336,7 +336,7 @@
       "mode": "managed",
       "type": "test_instance",
       "name": "test_alternate",
-      "provider_name": "registry.terraform.io/hashicorp/test",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
       "change": {
         "actions": [
           "create"
@@ -358,7 +358,7 @@
       "mode": "managed",
       "type": "test_instance",
       "name": "test_main",
-      "provider_name": "registry.terraform.io/hashicorp/test",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
       "change": {
         "actions": [
           "create"
@@ -379,7 +379,7 @@
     "provider_config": {
       "test": {
         "name": "test",
-        "full_name": "registry.terraform.io/hashicorp/test",
+        "full_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
         "expressions": {
           "region": {
             "constant_value": "somewhere"
@@ -388,7 +388,7 @@
       },
       "test.backup": {
         "name": "test",
-        "full_name": "registry.terraform.io/hashicorp/test",
+        "full_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
         "alias": "backup",
         "expressions": {
           "region": {

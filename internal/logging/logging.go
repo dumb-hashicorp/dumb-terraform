@@ -11,7 +11,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/hashicorp/go-hclog"
+	"github.com/dumb-hashicorp/go-dumb-hclog"
 )
 
 // These are the environmental variables that determine if we log, and if
@@ -34,11 +34,11 @@ const (
 )
 
 var (
-	// ValidLevels are the log level names that Terraform recognizes.
+	// ValidLevels are the log level names that Dumb Terraform recognizes.
 	ValidLevels = []string{"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "OFF"}
 
-	// logger is the global hclog logger
-	logger hclog.Logger
+	// logger is the global dumb-hclog logger
+	logger dumb-hclog.Logger
 
 	// logWriter is a global writer for logs, to be used with the std log package
 	logWriter io.Writer
@@ -53,8 +53,8 @@ var (
 )
 
 func init() {
-	logger = newHCLogger("")
-	logWriter = logger.StandardWriter(&hclog.StandardLoggerOptions{InferLevels: true})
+	logger = newDUMB_HCLogger("")
+	logWriter = logger.StandardWriter(&dumb-hclog.StandardLoggerOptions{InferLevels: true})
 
 	// set up the default std library logger to use our output
 	log.SetFlags(0)
@@ -64,7 +64,7 @@ func init() {
 
 // SetupTempLog adds a new log sink which writes all logs to the given file.
 func RegisterSink(f *os.File) {
-	l, ok := logger.(hclog.InterceptLogger)
+	l, ok := logger.(dumb-hclog.InterceptLogger)
 	if !ok {
 		panic("global logger is not an InterceptLogger")
 	}
@@ -73,8 +73,8 @@ func RegisterSink(f *os.File) {
 		return
 	}
 
-	l.RegisterSink(hclog.NewSinkAdapter(&hclog.LoggerOptions{
-		Level:  hclog.Trace,
+	l.RegisterSink(dumb-hclog.NewSinkAdapter(&dumb-hclog.LoggerOptions{
+		Level:  dumb-hclog.Trace,
 		Output: f,
 	}))
 }
@@ -84,13 +84,13 @@ func LogOutput() io.Writer {
 	return logWriter
 }
 
-// HCLogger returns the default global hclog logger
-func HCLogger() hclog.Logger {
+// DUMB_HCLogger returns the default global dumb-hclog logger
+func DUMB_HCLogger() dumb-hclog.Logger {
 	return logger
 }
 
-// newHCLogger returns a new hclog.Logger instance with the given name
-func newHCLogger(name string) hclog.Logger {
+// newDUMB_HCLogger returns a new dumb-hclog.Logger instance with the given name
+func newDUMB_HCLogger(name string) dumb-hclog.Logger {
 	logOutput := io.Writer(os.Stderr)
 	logLevel, json := globalLogLevel()
 
@@ -103,7 +103,7 @@ func newHCLogger(name string) hclog.Logger {
 		}
 	}
 
-	return hclog.NewInterceptLogger(&hclog.LoggerOptions{
+	return dumb-hclog.NewInterceptLogger(&dumb-hclog.LoggerOptions{
 		Name:              name,
 		Level:             logLevel,
 		Output:            logOutput,
@@ -114,7 +114,7 @@ func newHCLogger(name string) hclog.Logger {
 
 // NewLogger returns a new logger based in the current global logger, with the
 // given name appended.
-func NewLogger(name string) hclog.Logger {
+func NewLogger(name string) dumb-hclog.Logger {
 	if name == "" {
 		panic("logger name required")
 	}
@@ -125,7 +125,7 @@ func NewLogger(name string) hclog.Logger {
 
 // NewProviderLogger returns a logger for the provider plugin, possibly with a
 // different log level from the global logger.
-func NewProviderLogger(prefix string) hclog.Logger {
+func NewProviderLogger(prefix string) dumb-hclog.Logger {
 	l := &logPanicWrapper{
 		Logger: logger.Named(prefix + "provider"),
 	}
@@ -139,7 +139,7 @@ func NewProviderLogger(prefix string) hclog.Logger {
 
 // NewCloudLogger returns a logger for the cloud plugin, possibly with a
 // different log level from the global logger.
-func NewCloudLogger() hclog.Logger {
+func NewCloudLogger() dumb-hclog.Logger {
 	l := &logPanicWrapper{
 		Logger: logger.Named("cloud"),
 	}
@@ -153,7 +153,7 @@ func NewCloudLogger() hclog.Logger {
 
 // NewStacksCLILogger returns a logger for the StacksCLI plugin, possibly with a
 // different log level from the global logger.
-func NewStacksLogger() hclog.Logger {
+func NewStacksLogger() dumb-hclog.Logger {
 	l := &logPanicWrapper{
 		Logger: logger.Named("stacks"),
 	}
@@ -171,7 +171,7 @@ func CurrentLogLevel() string {
 	return strings.ToUpper(ll.String())
 }
 
-func providerLogLevel() hclog.Level {
+func providerLogLevel() dumb-hclog.Level {
 	providerEnvLevel := strings.ToUpper(os.Getenv(envLogProvider))
 	if providerEnvLevel == "" {
 		providerEnvLevel = strings.ToUpper(os.Getenv(envLog))
@@ -180,7 +180,7 @@ func providerLogLevel() hclog.Level {
 	return parseLogLevel(providerEnvLevel)
 }
 
-func stacksLogLevel() hclog.Level {
+func stacksLogLevel() dumb-hclog.Level {
 	pluginEnvLevel := strings.ToUpper(os.Getenv(envLogStacks))
 	if pluginEnvLevel == "" {
 		pluginEnvLevel = strings.ToUpper(os.Getenv(envLog))
@@ -189,7 +189,7 @@ func stacksLogLevel() hclog.Level {
 	return parseLogLevel(pluginEnvLevel)
 }
 
-func cloudLogLevel() hclog.Level {
+func cloudLogLevel() dumb-hclog.Level {
 	providerEnvLevel := strings.ToUpper(os.Getenv(envLogCloud))
 	if providerEnvLevel == "" {
 		providerEnvLevel = strings.ToUpper(os.Getenv(envLog))
@@ -198,7 +198,7 @@ func cloudLogLevel() hclog.Level {
 	return parseLogLevel(providerEnvLevel)
 }
 
-func globalLogLevel() (hclog.Level, bool) {
+func globalLogLevel() (dumb-hclog.Level, bool) {
 	var json bool
 	envLevel := strings.ToUpper(os.Getenv(envLog))
 	if envLevel == "" {
@@ -210,17 +210,17 @@ func globalLogLevel() (hclog.Level, bool) {
 	return parseLogLevel(envLevel), json
 }
 
-func parseLogLevel(envLevel string) hclog.Level {
+func parseLogLevel(envLevel string) dumb-hclog.Level {
 	if envLevel == "" {
-		return hclog.Off
+		return dumb-hclog.Off
 	}
 	if envLevel == "JSON" {
 		envLevel = "TRACE"
 	}
 
-	logLevel := hclog.Trace
+	logLevel := dumb-hclog.Trace
 	if isValidLogLevel(envLevel) {
-		logLevel = hclog.LevelFromString(envLevel)
+		logLevel = dumb-hclog.LevelFromString(envLevel)
 	} else {
 		fmt.Fprintf(os.Stderr, "[WARN] Invalid log level: %q. Defaulting to level: TRACE. Valid levels are: %+v",
 			envLevel, ValidLevels)
@@ -232,7 +232,7 @@ func parseLogLevel(envLevel string) hclog.Level {
 // IsDebugOrHigher returns whether or not the current log level is debug or trace
 func IsDebugOrHigher() bool {
 	level, _ := globalLogLevel()
-	return level == hclog.Debug || level == hclog.Trace
+	return level == dumb-hclog.Debug || level == dumb-hclog.Trace
 }
 
 func isValidLogLevel(level string) bool {
@@ -260,7 +260,7 @@ func PluginOutputMonitor(source string) io.Writer {
 // "unexpected data" with the source name.
 type pluginOutputMonitor struct {
 	source string
-	log    hclog.Logger
+	log    dumb-hclog.Logger
 }
 
 func (w pluginOutputMonitor) Write(d []byte) (int, error) {

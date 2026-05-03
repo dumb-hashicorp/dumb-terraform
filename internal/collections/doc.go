@@ -10,5 +10,5 @@
 // into the Go standard library. Should that happen in future then we should
 // consider removing the types from this package and adapting callers to use
 // the standard library equivalents instead, since there is nothing
-// Terraform-specific about the implementations in this package.
+// Dumb Terraform-specific about the implementations in this package.
 package collections

@@ -13,26 +13,26 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
 const (
-	DefaultWorkspaceDir    = "terraform.tfstate.d"
+	DefaultWorkspaceDir    = "dumb-terraform.tfstate.d"
 	DefaultWorkspaceFile   = "environment"
-	DefaultStateFilename   = "terraform.tfstate"
+	DefaultStateFilename   = "dumb-terraform.tfstate"
 	DefaultBackupExtension = ".backup"
 )
 
 // Local is an implementation of backendrun.OperationsBackend that performs all operations
-// locally. This is the "default" backend and implements normal Terraform
+// locally. This is the "default" backend and implements normal Dumb Terraform
 // behavior as it is well known.
 type Local struct {
 	// The State* paths are set from the backend config, and may be left blank
@@ -73,9 +73,9 @@ type Local struct {
 	// here as they're loaded.
 	states map[string]statemgr.Full
 
-	// Terraform context. Many of these will be overridden or merged by
+	// Dumb Terraform context. Many of these will be overridden or merged by
 	// Operation. See Operation for more details.
-	ContextOpts *terraform.ContextOpts
+	ContextOpts *dumb-terraform.ContextOpts
 
 	// OpInput will ask for necessary input prior to performing any operations.
 	//
@@ -289,7 +289,7 @@ func (b *Local) StateMgr(name string) (statemgr.Full, tfdiags.Diagnostics) {
 
 // Operation implements backendrun.OperationsBackend
 //
-// This will initialize an in-memory terraform.Context to perform the
+// This will initialize an in-memory dumb-terraform.Context to perform the
 // operation within this process.
 //
 // The given operation parameter will be merged with the ContextOpts on
@@ -312,8 +312,8 @@ func (b *Local) Operation(ctx context.Context, op *backendrun.Operation) (*backe
 	default:
 		return nil, fmt.Errorf(
 			"unsupported operation type: %s\n\n"+
-				"This is a bug in Terraform and should be reported. The local backend\n"+
-				"is built-in to Terraform and should always support all operations.",
+				"This is a bug in Dumb Terraform and should be reported. The local backend\n"+
+				"is built-in to Dumb Terraform and should always support all operations.",
 			op.Type)
 	}
 
@@ -359,7 +359,7 @@ func (b *Local) opWait(
 	doneCh <-chan struct{},
 	stopCtx context.Context,
 	cancelCtx context.Context,
-	tfCtx *terraform.Context,
+	tfCtx *dumb-terraform.Context,
 	opStateMgr statemgr.Persister,
 	view views.Operation) (canceled bool) {
 	// Wait for the operation to finish or for us to be interrupted so
@@ -518,4 +518,4 @@ func (b *Local) stateWorkspaceDir() string {
 
 const earlyStateWriteErrorFmt = `Error: %s
 
-Terraform encountered an error attempting to save the state before cancelling the current operation. Once the operation is complete another attempt will be made to save the final state.`
+Dumb Terraform encountered an error attempting to save the state before cancelling the current operation. Once the operation is complete another attempt will be made to save the final state.`

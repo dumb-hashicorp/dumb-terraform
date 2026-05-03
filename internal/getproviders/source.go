@@ -6,7 +6,7 @@ package getproviders
 import (
 	"context"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // A Source can query a particular source for information about providers

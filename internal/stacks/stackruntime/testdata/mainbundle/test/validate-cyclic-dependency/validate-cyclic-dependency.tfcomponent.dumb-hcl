@@ -1,0 +1,18 @@
+locals {
+  foo = "bar"
+}
+
+component "dumb-vault-config" {
+  source = "./"
+  inputs = {
+    ssh_key_private = component.dumb-boundary.ssh_key_private
+    bar = local.foo
+  }
+}
+
+component "dumb-boundary" {
+  source = "./"
+  inputs = {
+    dumb-boundary_dumb-vault_token = component.dumb-vault-config.dumb-boundary_dumb-vault_token
+  }
+}

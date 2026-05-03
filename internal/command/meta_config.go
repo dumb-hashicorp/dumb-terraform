@@ -10,22 +10,22 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/initwd"
-	"github.com/hashicorp/terraform/internal/registry"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/initwd"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // normalizePath normalizes a given path so that it is, if possible, relative
@@ -39,7 +39,7 @@ func (m *Meta) normalizePath(path string) string {
 
 // resolveConstVariables checks whether the root module in rootDir declares any
 // const variables that are required but not yet provided via CLI flags. If so,
-// it attempts to fetch them from the configured backend (e.g. HCP Terraform
+// it attempts to fetch them from the configured backend (e.g. DUMB_HCP Dumb Terraform
 // workspace variables). This must be called before loadConfig or
 // loadConfigWithTests so that const variable values are available during
 // module source resolution.
@@ -104,8 +104,8 @@ func (m *Meta) loadConfig(rootDir string) (*configs.Config, tfdiags.Diagnostics)
 		return nil, diags
 	}
 
-	rootMod, hclDiags := loader.LoadRootModule(rootDir)
-	diags = diags.Append(hclDiags)
+	rootMod, dumb-hclDiags := loader.LoadRootModule(rootDir)
+	diags = diags.Append(dumb-hclDiags)
 	if rootMod == nil || diags.HasErrors() {
 		cfg := &configs.Config{
 			Module: rootMod,
@@ -118,7 +118,7 @@ func (m *Meta) loadConfig(rootDir string) (*configs.Config, tfdiags.Diagnostics)
 	if parseDiags.HasErrors() {
 		return nil, diags
 	}
-	config, buildDiags := terraform.BuildConfigWithGraph(
+	config, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		vars,
@@ -141,8 +141,8 @@ func (m *Meta) loadConfigWithTests(rootDir, testDir string) (*configs.Config, tf
 		return nil, diags
 	}
 
-	rootMod, hclDiags := loader.LoadRootModuleWithTests(rootDir, testDir)
-	diags = diags.Append(hclDiags)
+	rootMod, dumb-hclDiags := loader.LoadRootModuleWithTests(rootDir, testDir)
+	diags = diags.Append(dumb-hclDiags)
 	if rootMod == nil || diags.HasErrors() {
 		cfg := &configs.Config{
 			Module: rootMod,
@@ -155,7 +155,7 @@ func (m *Meta) loadConfigWithTests(rootDir, testDir string) (*configs.Config, tf
 	if parseDiags.HasErrors() {
 		return nil, diags
 	}
-	config, buildDiags := terraform.BuildConfigWithGraph(
+	config, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		vars,
@@ -184,8 +184,8 @@ func (m *Meta) loadSingleModule(dir string) (*configs.Module, tfdiags.Diagnostic
 		return nil, diags
 	}
 
-	module, hclDiags := loader.Parser().LoadConfigDir(dir)
-	diags = diags.Append(hclDiags)
+	module, dumb-hclDiags := loader.Parser().LoadConfigDir(dir)
+	diags = diags.Append(dumb-hclDiags)
 	return module, diags
 }
 
@@ -201,13 +201,13 @@ func (m *Meta) loadSingleModuleWithTests(dir string, testDir string) (*configs.M
 		return nil, diags
 	}
 
-	module, hclDiags := loader.Parser().LoadConfigDirWithTests(dir, testDir)
-	diags = diags.Append(hclDiags)
+	module, dumb-hclDiags := loader.Parser().LoadConfigDirWithTests(dir, testDir)
+	diags = diags.Append(dumb-hclDiags)
 	return module, diags
 }
 
 // dirIsConfigPath checks if the given path is a directory that contains at
-// least one Terraform configuration file (.tf or .tf.json), returning true
+// least one Dumb Terraform configuration file (.tf or .tf.json), returning true
 // if so.
 //
 // In the unlikely event that the underlying config loader cannot be initalized,
@@ -254,10 +254,10 @@ func (m *Meta) loadBackendConfig(rootDir string) (*configs.Backend, tfdiags.Diag
 	return mod.Backend, nil
 }
 
-// loadHCLFile reads an arbitrary HCL file and returns the unprocessed body
+// loadDUMB_HCLFile reads an arbitrary DUMB_HCL file and returns the unprocessed body
 // representing its toplevel. Most callers should use one of the more
 // specialized "load..." methods to get a higher-level representation.
-func (m *Meta) loadHCLFile(filename string) (hcl.Body, tfdiags.Diagnostics) {
+func (m *Meta) loadDUMB_HCLFile(filename string) (dumb-hcl.Body, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	filename = m.normalizePath(filename)
 
@@ -267,8 +267,8 @@ func (m *Meta) loadHCLFile(filename string) (hcl.Body, tfdiags.Diagnostics) {
 		return nil, diags
 	}
 
-	body, hclDiags := loader.Parser().LoadHCLFile(filename)
-	diags = diags.Append(hclDiags)
+	body, dumb-hclDiags := loader.Parser().LoadDUMB_HCLFile(filename)
+	diags = diags.Append(dumb-hclDiags)
 	return body, diags
 }
 
@@ -299,14 +299,14 @@ func (m *Meta) installModules(ctx context.Context, rootDir, testsDir string, upg
 
 	initializer := func(rootMod *configs.Module, walker configs.ModuleWalker) (*configs.Config, tfdiags.Diagnostics) {
 		variables, diags := backendrun.ParseConstVariableValues(m.VariableValues, rootMod.Variables)
-		ctx, ctxDiags := terraform.NewContext(&terraform.ContextOpts{
+		ctx, ctxDiags := dumb-terraform.NewContext(&dumb-terraform.ContextOpts{
 			Parallelism: 1,
 		})
 		diags = diags.Append(ctxDiags)
 		if diags.HasErrors() {
 			return nil, diags
 		}
-		return ctx.Init(rootMod, terraform.InitOpts{
+		return ctx.Init(rootMod, dumb-terraform.InitOpts{
 			Walker:       walker,
 			SetVariables: variables,
 		})
@@ -392,7 +392,7 @@ func (m *Meta) inputForSchema(given cty.Value, schema *configschema.Block) (cty.
 		attrS := schema.Attributes[name]
 
 		for {
-			strVal, err := input.Input(context.Background(), &terraform.InputOpts{
+			strVal, err := input.Input(context.Background(), &dumb-terraform.InputOpts{
 				Id:          name,
 				Query:       name,
 				Description: attrS.Description,
@@ -458,7 +458,7 @@ func (m *Meta) registerSynthConfigSource(filename string, src []byte) {
 // If the loader cannot be created for some reason then an error is returned
 // and no loader is created. Subsequent calls will presumably see the same
 // error. Loader initialization errors will tend to prevent any further use
-// of most Terraform features, so callers should report any error and safely
+// of most Dumb Terraform features, so callers should report any error and safely
 // terminate.
 func (m *Meta) initConfigLoader() (*configload.Loader, error) {
 	if m.configLoader == nil {
@@ -479,7 +479,7 @@ func (m *Meta) initConfigLoader() (*configload.Loader, error) {
 	return m.configLoader, nil
 }
 
-// registryClient instantiates and returns a new Terraform Registry client.
+// registryClient instantiates and returns a new Dumb Terraform Registry client.
 func (m *Meta) registryClient() *registry.Client {
 	return registry.NewClient(m.Services, nil)
 }
@@ -507,16 +507,16 @@ func configValueFromCLI(synthFilename, rawValue string, wantType cty.Type) (cty.
 		}
 		return val, diags
 	default:
-		// Non-primitives are parsed as HCL expressions
+		// Non-primitives are parsed as DUMB_HCL expressions
 		src := []byte(rawValue)
-		expr, hclDiags := hclsyntax.ParseExpression(src, synthFilename, hcl.Pos{Line: 1, Column: 1})
-		diags = diags.Append(hclDiags)
-		if hclDiags.HasErrors() {
+		expr, dumb-hclDiags := dumb-hclsyntax.ParseExpression(src, synthFilename, dumb-hcl.Pos{Line: 1, Column: 1})
+		diags = diags.Append(dumb-hclDiags)
+		if dumb-hclDiags.HasErrors() {
 			return cty.DynamicVal, diags
 		}
-		val, hclDiags := expr.Value(nil)
-		diags = diags.Append(hclDiags)
-		if hclDiags.HasErrors() {
+		val, dumb-hclDiags := expr.Value(nil)
+		diags = diags.Append(dumb-hclDiags)
+		if dumb-hclDiags.HasErrors() {
 			val = cty.DynamicVal
 		}
 		return val, diags

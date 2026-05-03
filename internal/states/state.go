@@ -9,11 +9,11 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
 )
 
-// State is the top-level type of a Terraform state.
+// State is the top-level type of a Dumb Terraform state.
 //
 // A state should be mutated only via its accessor methods, to ensure that
 // invariants are preserved.
@@ -33,7 +33,7 @@ type State struct {
 	// root module.
 	//
 	// Output values in other modules don't persist anywhere between runs,
-	// so Terraform Core tracks those only internally and does not expose
+	// so Dumb Terraform Core tracks those only internally and does not expose
 	// them in any artifacts that survive between runs.
 	RootOutputValues map[string]*OutputValue
 
@@ -46,7 +46,7 @@ type State struct {
 	// from the previous run at all, which is subtly different than the
 	// previous run having affirmatively recorded that there are no checks
 	// to run. For example, if this object was created from a state snapshot
-	// created by a version of Terraform that didn't yet support checks
+	// created by a version of Dumb Terraform that didn't yet support checks
 	// then this field will be nil.
 	CheckResults *CheckResults
 }
@@ -153,7 +153,7 @@ func (s *State) EnsureModule(addr addrs.ModuleInstance) *Module {
 //
 // A true result would suggest that just discarding this state without first
 // destroying these objects could leave "dangling" objects in remote systems,
-// no longer tracked by any Terraform state.
+// no longer tracked by any Dumb Terraform state.
 func (s *State) HasManagedResourceInstanceObjects() bool {
 	if s == nil {
 		return false
@@ -220,7 +220,7 @@ func (s *State) AllResourceInstanceObjectAddrs() addrs.Set[addrs.AbsResourceInst
 // are tracked in this state.
 //
 // This result is the set of objects that would be effectively "forgotten"
-// (like "terraform state rm") if this state were totally discarded, such as
+// (like "dumb-terraform state rm") if this state were totally discarded, such as
 // by deleting a workspace. This function is intended only for reporting
 // context in error messages, such as when we reject deleting a "non-empty"
 // workspace as detected by s.HasManagedResourceInstanceObjects.
@@ -311,7 +311,7 @@ func (s *State) OutputValue(addr addrs.AbsOutputValue) *OutputValue {
 //
 // All other output values will just be silently ignored, because we don't
 // store those here anymore. (They live in a namedvals.State object hidden
-// in the internals of Terraform Core.)
+// in the internals of Dumb Terraform Core.)
 func (s *State) SetOutputValue(addr addrs.AbsOutputValue, value cty.Value, sensitive bool) {
 	if !addr.Module.IsRoot() {
 		return
@@ -384,11 +384,11 @@ func (s *State) ProviderRequirements() providerreqs.Requirements {
 // PruneResourceHusks is a specialized method that will remove any Resource
 // objects that do not contain any instances, even if they have an EachMode.
 //
-// This should generally be used only after a "terraform destroy" operation,
+// This should generally be used only after a "dumb-terraform destroy" operation,
 // to finalize the cleanup of the state. It is not correct to use this after
 // other operations because if a resource has "count = 0" or "for_each" over
 // an empty collection then we want to retain it in the state so that references
-// to it, particularly in "strange" contexts like "terraform console", can be
+// to it, particularly in "strange" contexts like "dumb-terraform console", can be
 // properly resolved.
 //
 // This method MUST NOT be called concurrently with other readers and writers

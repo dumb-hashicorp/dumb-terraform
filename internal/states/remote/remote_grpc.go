@@ -4,13 +4,13 @@
 package remote
 
 import (
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // NewRemoteGRPC returns a remote state manager (remote.State) containing
-// an implementation of remote.Client that allows Terraform to interact with
+// an implementation of remote.Client that allows Dumb Terraform to interact with
 // a provider implementing pluggable state storage.
 //
 // The remote.Client implementation's methods invoke the provider's RPC
@@ -84,7 +84,7 @@ func (g *grpcClient) Put(state []byte) tfdiags.Diagnostics {
 		return diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Refusing to write empty remote state snapshot",
-			"Terraform produced an empty state file and will not upload it to remote storage. This indicates a bug in Terraform; please report it.",
+			"Dumb Terraform produced an empty state file and will not upload it to remote storage. This indicates a bug in Dumb Terraform; please report it.",
 		))
 	}
 

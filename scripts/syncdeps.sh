@@ -23,6 +23,6 @@ go mod tidy
 # Each of the modules starting at our root gets its go.mod and go.sum
 # synchronized, so that we can see which components are affected by an
 # update and therefore which codeowners might be interested in the change.
-for dir in $(go list -m -f '{{.Dir}}' github.com/hashicorp/terraform/...); do
+for dir in $(go list -m -f '{{.Dir}}' github.com/dumb-hashicorp/dumb-terraform/...); do
     (cd $dir && go mod tidy)
 done

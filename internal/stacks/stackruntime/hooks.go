@@ -6,7 +6,7 @@ package stackruntime
 import (
 	"context"
 
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval"
 )
 
 // This file exposes a small part of the API surface of "stackeval" to external

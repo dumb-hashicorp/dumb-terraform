@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 // StateIdentitiesCommand is a Command implementation that lists the resource identities
@@ -37,7 +37,7 @@ func (c *StateIdentitiesCommand) Run(args []string) int {
 
 	if !jsonOutput {
 		c.Ui.Error(
-			"The `terraform state identities` command requires the `-json` flag.\n")
+			"The `dumb-terraform state identities` command requires the `-json` flag.\n")
 		cmdFlags.Usage()
 		return 1
 	}
@@ -119,11 +119,11 @@ func (c *StateIdentitiesCommand) Run(args []string) int {
 
 func (c *StateIdentitiesCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] state identities [options] -json [address...]
+Usage: dumb-terraform [global options] state identities [options] -json [address...]
 
-  List the json format of the identities of resources in the Terraform state.
+  List the json format of the identities of resources in the Dumb Terraform state.
 
-  This command lists the identities of resource instances in the Terraform state in json format.
+  This command lists the identities of resource instances in the Dumb Terraform state in json format.
   The address argument can be used to filter the instances by resource or module. If
   no pattern is given, identities for all resource instances are listed.
 
@@ -139,9 +139,9 @@ Usage: terraform [global options] state identities [options] -json [address...]
 
 Options:
 
-  -state=statefile    Path to a Terraform state file to use to look
-                      up Terraform-managed resources. By default, Terraform
-                      will consult the state of the currently-selected
+  -state=statefile    Path to a Dumb Terraform state file to use to look
+                      up Dumb Terraform-managed resources. By default, Dumb Terraform
+                      will dumb-consult the state of the currently-selected
                       workspace.
 
   -id=ID              Filters the results to include only instances whose

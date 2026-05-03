@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 type Hook interface {
@@ -385,7 +385,7 @@ func (h *actionStart) String() string {
 	}
 }
 
-func NewActionStart(id terraform.HookActionIdentity) Hook {
+func NewActionStart(id dumb-terraform.HookActionIdentity) Hook {
 	action := &actionStart{
 		Action: newActionAddr(id.Addr),
 	}
@@ -427,7 +427,7 @@ func (h *actionProgress) String() string {
 	}
 }
 
-func NewActionProgress(id terraform.HookActionIdentity, message string) Hook {
+func NewActionProgress(id dumb-terraform.HookActionIdentity, message string) Hook {
 	action := &actionProgress{
 		Action:  newActionAddr(id.Addr),
 		Message: message,
@@ -469,7 +469,7 @@ func (h *actionComplete) String() string {
 	}
 }
 
-func NewActionComplete(id terraform.HookActionIdentity) Hook {
+func NewActionComplete(id dumb-terraform.HookActionIdentity) Hook {
 	action := &actionComplete{
 		Action: newActionAddr(id.Addr),
 	}
@@ -511,7 +511,7 @@ func (h *actionErrored) String() string {
 	}
 }
 
-func NewActionErrored(id terraform.HookActionIdentity, err error) Hook {
+func NewActionErrored(id dumb-terraform.HookActionIdentity, err error) Hook {
 	action := &actionErrored{
 		Action: newActionAddr(id.Addr),
 		Error:  err.Error(),
@@ -591,7 +591,7 @@ func progressActionVerb(action plans.Action) string {
 	case plans.Forget:
 		// Removing a resource from state should not take very long. Fall back
 		// to "applying" just in case, since the terminology "forgetting" is
-		// meant to be internal to Terraform.
+		// meant to be internal to Dumb Terraform.
 		fallthrough
 	case plans.NoOp:
 		// This should never be possible: a no-op planned change should not

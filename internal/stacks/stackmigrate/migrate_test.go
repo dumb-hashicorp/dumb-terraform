@@ -13,23 +13,23 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	stacks_testing_provider "github.com/hashicorp/terraform/internal/stacks/stackruntime/testing"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	stacks_testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestMigrate(t *testing.T) {
@@ -791,8 +791,8 @@ func TestMigrate(t *testing.T) {
 					Schema:             stacks_testing_provider.TestingResourceSchema,
 				},
 			},
-			expectedDiags: tfdiags.Diagnostics{}.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			expectedDiags: tfdiags.Diagnostics{}.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Resource mapped to non-existent target",
 				Detail:   "Could not migrate resource \"testing_resource.for_child\". Target resource \"testing_resource.for_child\" not found in component \"component.child\".",
 			}),
@@ -921,8 +921,8 @@ func TestMigrate(t *testing.T) {
 					Schema:             stacks_testing_provider.TestingResourceSchema,
 				},
 			},
-			expectedDiags: tfdiags.Diagnostics{}.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			expectedDiags: tfdiags.Diagnostics{}.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Resource not found",
 				Detail:   "Resource \"testing_resource.for_child\" exists in state, but was not included in any provided mapping.",
 			}),
@@ -1148,8 +1148,8 @@ func TestMigrate(t *testing.T) {
 					Schema:             stacks_testing_provider.TestingResourceSchema,
 				},
 			},
-			expectedDiags: tfdiags.Diagnostics{}.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			expectedDiags: tfdiags.Diagnostics{}.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid component instance",
 				Detail:   "Only root component instances are allowed, got \"stack.embedded.component.self\"",
 			}),

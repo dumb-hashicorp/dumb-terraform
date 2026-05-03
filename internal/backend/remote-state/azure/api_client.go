@@ -11,13 +11,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hashicorp/go-azure-helpers/resourcemanager/commonids"
-	"github.com/hashicorp/go-azure-sdk/resource-manager/storage/2023-01-01/storageaccounts"
-	"github.com/hashicorp/go-azure-sdk/sdk/auth"
-	"github.com/hashicorp/go-azure-sdk/sdk/client"
-	"github.com/hashicorp/go-azure-sdk/sdk/environments"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/go-azure-helpers/resourcemanager/commonids"
+	"github.com/dumb-hashicorp/go-azure-sdk/resource-manager/storage/2023-01-01/storageaccounts"
+	"github.com/dumb-hashicorp/go-azure-sdk/sdk/auth"
+	"github.com/dumb-hashicorp/go-azure-sdk/sdk/client"
+	"github.com/dumb-hashicorp/go-azure-sdk/sdk/environments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 	"github.com/jackofallops/giovanni/storage/2023-11-03/blob/blobs"
 	"github.com/jackofallops/giovanni/storage/2023-11-03/blob/containers"
 )
@@ -273,7 +273,7 @@ func (c *Client) configureClient(client client.BaseClient, authorizer auth.Autho
 }
 
 func buildUserAgent(userAgent string) string {
-	userAgent = strings.TrimSpace(fmt.Sprintf("%s %s", userAgent, httpclient.TerraformUserAgent(version.Version)))
+	userAgent = strings.TrimSpace(fmt.Sprintf("%s %s", userAgent, httpclient.Dumb TerraformUserAgent(version.Version)))
 
 	// append the CloudShell version to the user agent if it exists
 	if azureAgent := os.Getenv("AZURE_HTTP_USER_AGENT"); azureAgent != "" {

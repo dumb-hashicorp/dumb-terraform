@@ -14,16 +14,16 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
 const fsStoreName = "simple6_fs"
-const defaultStatesDir = "terraform.tfstate.d"
+const defaultStatesDir = "dumb-terraform.tfstate.d"
 
 // FsStore allows storing state in the local filesystem.
 //
@@ -48,7 +48,7 @@ func stateStoreFsGetSchema() providers.Schema {
 				"workspace_dir": {
 					Type:        cty.String,
 					Optional:    true,
-					Description: "The directory where state files will be created. When unset the value will default to terraform.tfstate.d",
+					Description: "The directory where state files will be created. When unset the value will default to dumb-terraform.tfstate.d",
 				},
 			},
 		},
@@ -159,7 +159,7 @@ func (f *FsStore) DeleteState(req providers.DeleteStateRequest) providers.Delete
 }
 
 func (f *FsStore) getStatePath(stateId string) string {
-	return path.Join(f.statesDir, stateId, "terraform.tfstate")
+	return path.Join(f.statesDir, stateId, "dumb-terraform.tfstate")
 }
 
 func (f *FsStore) getStateDir(stateId string) string {
@@ -170,7 +170,7 @@ func (f *FsStore) ReadStateBytes(req providers.ReadStateBytesRequest) providers.
 	log.Printf("[DEBUG] ReadStateBytes: reading data from the %q state", req.StateId)
 	resp := providers.ReadStateBytesResponse{}
 
-	// E.g. terraform.tfstate.d/foobar/terraform.tfstate
+	// E.g. dumb-terraform.tfstate.d/foobar/dumb-terraform.tfstate
 	path := f.getStatePath(req.StateId)
 	file, err := os.Open(path)
 
@@ -222,7 +222,7 @@ func (f *FsStore) WriteStateBytes(req providers.WriteStateBytesRequest) provider
 	log.Printf("[DEBUG] WriteStateBytes: writing data to the %q state", req.StateId)
 	resp := providers.WriteStateBytesResponse{}
 
-	// E.g. terraform.tfstate.d/foobar/terraform.tfstate
+	// E.g. dumb-terraform.tfstate.d/foobar/dumb-terraform.tfstate
 	path := f.getStatePath(req.StateId)
 
 	// Create or open state file
@@ -240,7 +240,7 @@ func (f *FsStore) WriteStateBytes(req providers.WriteStateBytesRequest) provider
 	buf := bytes.NewBuffer(req.Bytes)
 	var processedBytes int
 	if f.chunkSize == 0 {
-		panic("WriteStateBytes: chunk size zero. This is an error in Terraform and should be reported")
+		panic("WriteStateBytes: chunk size zero. This is an error in Dumb Terraform and should be reported")
 	}
 	for {
 		data := buf.Next(int(f.chunkSize))

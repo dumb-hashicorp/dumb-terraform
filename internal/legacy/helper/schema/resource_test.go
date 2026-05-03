@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	"github.com/hashicorp/terraform/internal/legacy/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/legacy/dumb-terraform"
 
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
@@ -37,11 +37,11 @@ func TestResourceApply_create(t *testing.T) {
 		return nil
 	}
 
-	var s *terraform.InstanceState = nil
+	var s *dumb-terraform.InstanceState = nil
 
-	d := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	d := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				New: "42",
 			},
 		},
@@ -56,7 +56,7 @@ func TestResourceApply_create(t *testing.T) {
 		t.Fatal("not called")
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":  "foo",
@@ -95,11 +95,11 @@ func TestResourceApply_Timeout_state(t *testing.T) {
 		return nil
 	}
 
-	var s *terraform.InstanceState = nil
+	var s *dumb-terraform.InstanceState = nil
 
-	d := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	d := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				New: "42",
 			},
 		},
@@ -124,7 +124,7 @@ func TestResourceApply_Timeout_state(t *testing.T) {
 		t.Fatal("not called")
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":  "foo",
@@ -169,7 +169,7 @@ func TestResourceApply_Timeout_destroy(t *testing.T) {
 		return nil
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 	}
 
@@ -177,7 +177,7 @@ func TestResourceApply_Timeout_destroy(t *testing.T) {
 		t.Fatalf("Error encoding to state: %s", err)
 	}
 
-	d := &terraform.InstanceDiff{
+	d := &dumb-terraform.InstanceDiff{
 		Destroy: true,
 	}
 
@@ -219,7 +219,7 @@ func TestResourceDiff_Timeout_diff(t *testing.T) {
 		return nil
 	}
 
-	conf := terraform.NewResourceConfigRaw(
+	conf := dumb-terraform.NewResourceConfigRaw(
 		map[string]interface{}{
 			"foo": 42,
 			TimeoutsConfigKey: map[string]interface{}{
@@ -227,16 +227,16 @@ func TestResourceDiff_Timeout_diff(t *testing.T) {
 			},
 		},
 	)
-	var s *terraform.InstanceState
+	var s *dumb-terraform.InstanceState
 
 	actual, err := r.Diff(s, conf, nil)
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
 
-	expected := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	expected := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				New: "42",
 			},
 		},
@@ -274,13 +274,13 @@ func TestResourceDiff_CustomizeFunc(t *testing.T) {
 		return nil
 	}
 
-	conf := terraform.NewResourceConfigRaw(
+	conf := dumb-terraform.NewResourceConfigRaw(
 		map[string]interface{}{
 			"foo": 42,
 		},
 	)
 
-	var s *terraform.InstanceState
+	var s *dumb-terraform.InstanceState
 
 	_, err := r.Diff(s, conf, nil)
 	if err != nil {
@@ -308,11 +308,11 @@ func TestResourceApply_destroy(t *testing.T) {
 		return nil
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 	}
 
-	d := &terraform.InstanceDiff{
+	d := &dumb-terraform.InstanceDiff{
 		Destroy: true,
 	}
 
@@ -356,7 +356,7 @@ func TestResourceApply_destroyCreate(t *testing.T) {
 		return nil
 	}
 
-	var s *terraform.InstanceState = &terraform.InstanceState{
+	var s *dumb-terraform.InstanceState = &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"foo":       "bar",
@@ -364,13 +364,13 @@ func TestResourceApply_destroyCreate(t *testing.T) {
 		},
 	}
 
-	d := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	d := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				New:         "42",
 				RequiresNew: true,
 			},
-			"tags.Name": &terraform.ResourceAttrDiff{
+			"tags.Name": &dumb-terraform.ResourceAttrDiff{
 				Old:         "foo",
 				New:         "foo",
 				RequiresNew: true,
@@ -387,7 +387,7 @@ func TestResourceApply_destroyCreate(t *testing.T) {
 		t.Fatal("should have change")
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":        "foo",
@@ -418,14 +418,14 @@ func TestResourceApply_destroyPartial(t *testing.T) {
 		return fmt.Errorf("some error")
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"foo": "12",
 		},
 	}
 
-	d := &terraform.InstanceDiff{
+	d := &dumb-terraform.InstanceDiff{
 		Destroy: true,
 	}
 
@@ -434,7 +434,7 @@ func TestResourceApply_destroyPartial(t *testing.T) {
 		t.Fatal("should error")
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"id":  "bar",
@@ -465,16 +465,16 @@ func TestResourceApply_update(t *testing.T) {
 		return nil
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"foo": "12",
 		},
 	}
 
-	d := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	d := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				New: "13",
 			},
 		},
@@ -485,7 +485,7 @@ func TestResourceApply_update(t *testing.T) {
 		t.Fatalf("err: %s", err)
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":  "foo",
@@ -510,16 +510,16 @@ func TestResourceApply_updateNoCallback(t *testing.T) {
 
 	r.Update = nil
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"foo": "12",
 		},
 	}
 
-	d := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	d := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				New: "13",
 			},
 		},
@@ -530,7 +530,7 @@ func TestResourceApply_updateNoCallback(t *testing.T) {
 		t.Fatal("should error")
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"foo": "12",
@@ -566,23 +566,23 @@ func TestResourceApply_isNewResource(t *testing.T) {
 	}
 	r.Update = updateFunc
 
-	d := &terraform.InstanceDiff{
-		Attributes: map[string]*terraform.ResourceAttrDiff{
-			"foo": &terraform.ResourceAttrDiff{
+	d := &dumb-terraform.InstanceDiff{
+		Attributes: map[string]*dumb-terraform.ResourceAttrDiff{
+			"foo": &dumb-terraform.ResourceAttrDiff{
 				New: "bla-blah",
 			},
 		},
 	}
 
 	// positive test
-	var s *terraform.InstanceState = nil
+	var s *dumb-terraform.InstanceState = nil
 
 	actual, err := r.Apply(s, d, nil)
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":  "foo",
@@ -596,7 +596,7 @@ func TestResourceApply_isNewResource(t *testing.T) {
 	}
 
 	// negative test
-	s = &terraform.InstanceState{
+	s = &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":  "foo",
@@ -609,7 +609,7 @@ func TestResourceApply_isNewResource(t *testing.T) {
 		t.Fatalf("err: %s", err)
 	}
 
-	expected = &terraform.InstanceState{
+	expected = &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":  "foo",
@@ -903,14 +903,14 @@ func TestResourceRefresh(t *testing.T) {
 		return d.Set("foo", d.Get("foo").(int)+1)
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"foo": "12",
 		},
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"id":  "bar",
@@ -946,7 +946,7 @@ func TestResourceRefresh_blankId(t *testing.T) {
 		return nil
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID:         "",
 		Attributes: map[string]string{},
 	}
@@ -975,7 +975,7 @@ func TestResourceRefresh_delete(t *testing.T) {
 		return nil
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"foo": "12",
@@ -1010,7 +1010,7 @@ func TestResourceRefresh_existsError(t *testing.T) {
 		panic("shouldn't be called")
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"foo": "12",
@@ -1044,7 +1044,7 @@ func TestResourceRefresh_noExists(t *testing.T) {
 		panic("shouldn't be called")
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"foo": "12",
@@ -1078,8 +1078,8 @@ func TestResourceRefresh_needsMigration(t *testing.T) {
 
 	r.MigrateState = func(
 		v int,
-		s *terraform.InstanceState,
-		meta interface{}) (*terraform.InstanceState, error) {
+		s *dumb-terraform.InstanceState,
+		meta interface{}) (*dumb-terraform.InstanceState, error) {
 		// Real state migration functions will probably switch on this value,
 		// but we'll just assert on it for now.
 		if v != 1 {
@@ -1102,7 +1102,7 @@ func TestResourceRefresh_needsMigration(t *testing.T) {
 
 	// State is v1 and deals in oldfoo, which tracked foo as a float at 1/10th
 	// the scale of newfoo
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"oldfoo": "1.2",
@@ -1117,7 +1117,7 @@ func TestResourceRefresh_needsMigration(t *testing.T) {
 		t.Fatalf("err: %s", err)
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"id":     "bar",
@@ -1150,13 +1150,13 @@ func TestResourceRefresh_noMigrationNeeded(t *testing.T) {
 
 	r.MigrateState = func(
 		v int,
-		s *terraform.InstanceState,
-		meta interface{}) (*terraform.InstanceState, error) {
+		s *dumb-terraform.InstanceState,
+		meta interface{}) (*dumb-terraform.InstanceState, error) {
 		t.Fatal("Migrate function shouldn't be called!")
 		return nil, nil
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"newfoo": "12",
@@ -1171,7 +1171,7 @@ func TestResourceRefresh_noMigrationNeeded(t *testing.T) {
 		t.Fatalf("err: %s", err)
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"id":     "bar",
@@ -1205,13 +1205,13 @@ func TestResourceRefresh_stateSchemaVersionUnset(t *testing.T) {
 
 	r.MigrateState = func(
 		v int,
-		s *terraform.InstanceState,
-		meta interface{}) (*terraform.InstanceState, error) {
+		s *dumb-terraform.InstanceState,
+		meta interface{}) (*dumb-terraform.InstanceState, error) {
 		s.Attributes["newfoo"] = s.Attributes["oldfoo"]
 		return s, nil
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"oldfoo": "12",
@@ -1223,7 +1223,7 @@ func TestResourceRefresh_stateSchemaVersionUnset(t *testing.T) {
 		t.Fatalf("err: %s", err)
 	}
 
-	expected := &terraform.InstanceState{
+	expected := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"id":     "bar",
@@ -1257,12 +1257,12 @@ func TestResourceRefresh_migrateStateErr(t *testing.T) {
 
 	r.MigrateState = func(
 		v int,
-		s *terraform.InstanceState,
-		meta interface{}) (*terraform.InstanceState, error) {
+		s *dumb-terraform.InstanceState,
+		meta interface{}) (*dumb-terraform.InstanceState, error) {
 		return s, fmt.Errorf("triggering an error")
 	}
 
-	s := &terraform.InstanceState{
+	s := &dumb-terraform.InstanceState{
 		ID: "bar",
 		Attributes: map[string]string{
 			"oldfoo": "12",
@@ -1286,7 +1286,7 @@ func TestResourceData(t *testing.T) {
 		},
 	}
 
-	state := &terraform.InstanceState{
+	state := &dumb-terraform.InstanceState{
 		ID: "foo",
 		Attributes: map[string]string{
 			"id":  "foo",
@@ -1411,7 +1411,7 @@ func TestResource_UpgradeState(t *testing.T) {
 
 	// convert the legacy flatmap state to the json equivalent
 	ty := r.StateUpgraders[0].Type
-	val, err := hcl2shim.HCL2ValueFromFlatmap(oldStateAttrs, ty)
+	val, err := dumb-hcl2shim.DUMB_HCL2ValueFromFlatmap(oldStateAttrs, ty)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1548,7 +1548,7 @@ func TestResource_migrateAndUpgrade(t *testing.T) {
 			},
 		},
 		// this MigrateState will take the state to version 2
-		MigrateState: func(v int, is *terraform.InstanceState, _ interface{}) (*terraform.InstanceState, error) {
+		MigrateState: func(v int, is *dumb-terraform.InstanceState, _ interface{}) (*dumb-terraform.InstanceState, error) {
 			switch v {
 			case 0:
 				_, ok := is.Attributes["zero"]
@@ -1611,7 +1611,7 @@ func TestResource_migrateAndUpgrade(t *testing.T) {
 		},
 	}
 
-	testStates := []*terraform.InstanceState{
+	testStates := []*dumb-terraform.InstanceState{
 		{
 			ID: "bar",
 			Attributes: map[string]string{
@@ -1671,7 +1671,7 @@ func TestResource_migrateAndUpgrade(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			expected := &terraform.InstanceState{
+			expected := &dumb-terraform.InstanceState{
 				ID: "bar",
 				Attributes: map[string]string{
 					"id":   "bar",

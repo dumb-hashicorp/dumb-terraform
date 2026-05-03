@@ -17,13 +17,13 @@ import (
 	"syscall"
 	"time"
 
-	tfe "github.com/hashicorp/go-tfe"
-	version "github.com/hashicorp/go-version"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	version "github.com/dumb-hashicorp/go-version"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var planConfigurationVersionsPollInterval = 500 * time.Millisecond
@@ -88,7 +88,7 @@ func (b *Remote) opPlan(stopCtx, cancelCtx context.Context, op *backendrun.Opera
 					"Currently the only to way to pass variables to the remote backend is by "+
 					"creating a '*.auto.tfvars' variables file. This file will automatically "+
 					"be loaded by the \"remote\" backend when the workspace is configured to use "+
-					"Terraform v0.10.0 or later.\n\nAdditionally you can also set variables on "+
+					"Dumb Terraform v0.10.0 or later.\n\nAdditionally you can also set variables on "+
 					"the workspace in the web UI:\nhttps://%s/app/%s/%s/variables",
 				b.hostname, b.organization, op.Workspace,
 			),
@@ -103,7 +103,7 @@ func (b *Remote) opPlan(stopCtx, cancelCtx context.Context, op *backendrun.Opera
 				`would mark everything for destruction, which is normally not what is desired. `+
 				`If you would like to destroy everything, please run plan with the "-destroy" `+
 				`flag or create a single empty configuration file. Otherwise, please create `+
-				`a Terraform configuration file in the path being executed and try again.`,
+				`a Dumb Terraform configuration file in the path being executed and try again.`,
 		))
 	}
 
@@ -231,9 +231,9 @@ func (b *Remote) plan(stopCtx, cancelCtx context.Context, op *backendrun.Operati
 The remote workspace is configured to work with configuration at
 %s relative to the target repository.
 
-Terraform will upload the contents of the following directory,
-excluding files or directories as defined by a .terraformignore file
-at %s/.terraformignore (if it is present),
+Dumb Terraform will upload the contents of the following directory,
+excluding files or directories as defined by a .dumb-terraformignore file
+at %s/.dumb-terraformignore (if it is present),
 in order to capture the filesystem context the remote workspace expects:
     %s
 `), w.WorkingDirectory, configDir, configDir) + "\n")

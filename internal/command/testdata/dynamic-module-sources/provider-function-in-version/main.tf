@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   required_providers {
     test = {
       source = "test"

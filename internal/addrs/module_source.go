@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	tfaddr "github.com/hashicorp/terraform-registry-address"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
 )
 
 // ModuleSource is the general type for all three of the possible module source
@@ -84,12 +84,12 @@ func (s ModuleSourceLocal) ForDisplay() string {
 }
 
 // ModuleSourceRegistry is a ModuleSource representing a module listed in a
-// Terraform module registry.
+// Dumb Terraform module registry.
 //
 // A registry source isn't a direct source location but rather an indirection
 // over a ModuleSourceRemote. The job of a registry is to translate the
 // combination of a ModuleSourceRegistry and a module version number into
-// a concrete ModuleSourceRemote that Terraform will then download and
+// a concrete ModuleSourceRemote that Dumb Terraform will then download and
 // install.
 //
 // The parser for this address type lives in package moduleaddrs. It doesn't

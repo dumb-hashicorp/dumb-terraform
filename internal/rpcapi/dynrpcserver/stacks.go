@@ -10,7 +10,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	stacks "github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks"
+	stacks "github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks"
 )
 
 type Stacks struct {
@@ -57,12 +57,12 @@ func (s *Stacks) CloseState(a0 context.Context, a1 *stacks.CloseStackState_Reque
 	return impl.CloseState(a0, a1)
 }
 
-func (s *Stacks) CloseTerraformState(a0 context.Context, a1 *stacks.CloseTerraformState_Request) (*stacks.CloseTerraformState_Response, error) {
+func (s *Stacks) CloseDumb TerraformState(a0 context.Context, a1 *stacks.CloseDumb TerraformState_Request) (*stacks.CloseDumb TerraformState_Response, error) {
 	impl, err := s.realRPCServer()
 	if err != nil {
 		return nil, err
 	}
-	return impl.CloseTerraformState(a0, a1)
+	return impl.CloseDumb TerraformState(a0, a1)
 }
 
 func (s *Stacks) FindStackConfigurationComponents(a0 context.Context, a1 *stacks.FindStackConfigurationComponents_Request) (*stacks.FindStackConfigurationComponents_Response, error) {
@@ -89,12 +89,12 @@ func (s *Stacks) ListResourceIdentities(a0 context.Context, a1 *stacks.ListResou
 	return impl.ListResourceIdentities(a0, a1)
 }
 
-func (s *Stacks) MigrateTerraformState(a0 *stacks.MigrateTerraformState_Request, a1 grpc.ServerStreamingServer[stacks.MigrateTerraformState_Event]) error {
+func (s *Stacks) MigrateDumb TerraformState(a0 *stacks.MigrateDumb TerraformState_Request, a1 grpc.ServerStreamingServer[stacks.MigrateDumb TerraformState_Event]) error {
 	impl, err := s.realRPCServer()
 	if err != nil {
 		return err
 	}
-	return impl.MigrateTerraformState(a0, a1)
+	return impl.MigrateDumb TerraformState(a0, a1)
 }
 
 func (s *Stacks) OpenPlan(a0 grpc.ClientStreamingServer[stacks.OpenStackPlan_RequestItem, stacks.OpenStackPlan_Response]) error {
@@ -129,12 +129,12 @@ func (s *Stacks) OpenState(a0 grpc.ClientStreamingServer[stacks.OpenStackState_R
 	return impl.OpenState(a0)
 }
 
-func (s *Stacks) OpenTerraformState(a0 context.Context, a1 *stacks.OpenTerraformState_Request) (*stacks.OpenTerraformState_Response, error) {
+func (s *Stacks) OpenDumb TerraformState(a0 context.Context, a1 *stacks.OpenDumb TerraformState_Request) (*stacks.OpenDumb TerraformState_Response, error) {
 	impl, err := s.realRPCServer()
 	if err != nil {
 		return nil, err
 	}
-	return impl.OpenTerraformState(a0, a1)
+	return impl.OpenDumb TerraformState(a0, a1)
 }
 
 func (s *Stacks) PlanStackChanges(a0 *stacks.PlanStackChanges_Request, a1 grpc.ServerStreamingServer[stacks.PlanStackChanges_Event]) error {

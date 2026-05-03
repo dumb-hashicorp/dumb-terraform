@@ -14,12 +14,12 @@ import (
 
 	"github.com/apparentlymart/go-versions/versions"
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/packages"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/packages"
 )
 
 func TestPackagesServer_ProviderPackageVersions(t *testing.T) {
@@ -30,12 +30,12 @@ func TestPackagesServer_ProviderPackageVersions(t *testing.T) {
 		sourceFn         providerSourceFn
 	}{
 		"single_version": {
-			source:           "hashicorp/foo",
+			source:           "dumb-hashicorp/foo",
 			expectedVersions: []string{"0.1.0"},
 			sourceFn: func(_ *disco.Disco) getproviders.Source {
 				packages := []getproviders.PackageMeta{
 					{
-						Provider: addrs.MustParseProviderSourceString("hashicorp/foo"),
+						Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/foo"),
 						Version:  versions.MustParseVersion("0.1.0"),
 					},
 				}
@@ -43,16 +43,16 @@ func TestPackagesServer_ProviderPackageVersions(t *testing.T) {
 			},
 		},
 		"multiple_versions": {
-			source:           "hashicorp/foo",
+			source:           "dumb-hashicorp/foo",
 			expectedVersions: []string{"0.1.0", "0.2.0"},
 			sourceFn: func(_ *disco.Disco) getproviders.Source {
 				packages := []getproviders.PackageMeta{
 					{
-						Provider: addrs.MustParseProviderSourceString("hashicorp/foo"),
+						Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/foo"),
 						Version:  versions.MustParseVersion("0.1.0"),
 					},
 					{
-						Provider: addrs.MustParseProviderSourceString("hashicorp/foo"),
+						Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/foo"),
 						Version:  versions.MustParseVersion("0.2.0"),
 					},
 				}
@@ -60,18 +60,18 @@ func TestPackagesServer_ProviderPackageVersions(t *testing.T) {
 			},
 		},
 		"with_warnings": {
-			source:           "hashicorp/foo",
+			source:           "dumb-hashicorp/foo",
 			expectedVersions: []string{"0.1.0"},
 			expectedWarnings: []string{"- warning one", "- warning two"},
 			sourceFn: func(_ *disco.Disco) getproviders.Source {
 				packages := []getproviders.PackageMeta{
 					{
-						Provider: addrs.MustParseProviderSourceString("hashicorp/foo"),
+						Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/foo"),
 						Version:  versions.MustParseVersion("0.1.0"),
 					},
 				}
 				warnings := map[addrs.Provider]getproviders.Warnings{
-					addrs.MustParseProviderSourceString("hashicorp/foo"): {
+					addrs.MustParseProviderSourceString("dumb-hashicorp/foo"): {
 						"warning one",
 						"warning two",
 					},
@@ -95,7 +95,7 @@ func TestPackagesServer_ProviderPackageVersions(t *testing.T) {
 
 			if len(tc.expectedWarnings) > 0 {
 				for _, diag := range response.Diagnostics {
-					if diag.Severity == terraform1.Diagnostic_WARNING && diag.Summary == "Additional provider information from registry" {
+					if diag.Severity == dumb-terraform1.Diagnostic_WARNING && diag.Summary == "Additional provider information from registry" {
 						expected := fmt.Sprintf("The remote registry returned warnings for %s:\n%s", tc.source, strings.Join(tc.expectedWarnings, "\n"))
 						if diff := cmp.Diff(expected, diag.Detail); len(diff) > 0 {
 							t.Error(diff)
@@ -147,28 +147,28 @@ func TestPackagesServer_FetchProviderPackage(t *testing.T) {
 		diagnostics map[string][]string
 	}{
 		"single_version_and_platform": {
-			source:    "hashicorp/foo",
+			source:    "dumb-hashicorp/foo",
 			version:   "0.1.0",
 			platforms: []string{"linux_amd64"},
 			platformLocations: map[string]string{
-				"linux_amd64": "terraform_provider_foo",
+				"linux_amd64": "dumb-terraform_provider_foo",
 			},
 		},
 		"single_version_multiple_platforms": {
-			source:    "hashicorp/foo",
+			source:    "dumb-hashicorp/foo",
 			version:   "0.1.0",
 			platforms: []string{"linux_amd64", "darwin_arm64"},
 			platformLocations: map[string]string{
-				"linux_amd64":  "terraform_provider_foo",
-				"darwin_arm64": "terraform_provider_bar",
+				"linux_amd64":  "dumb-terraform_provider_foo",
+				"darwin_arm64": "dumb-terraform_provider_bar",
 			},
 		},
 		"single_version_and_platform_with_hashes": {
-			source:    "hashicorp/foo",
+			source:    "dumb-hashicorp/foo",
 			version:   "0.1.0",
 			platforms: []string{"linux_amd64"},
 			platformLocations: map[string]string{
-				"linux_amd64": "terraform_provider_foo",
+				"linux_amd64": "dumb-terraform_provider_foo",
 			},
 			platformHashes: map[string][]string{
 				"linux_amd64": {
@@ -177,12 +177,12 @@ func TestPackagesServer_FetchProviderPackage(t *testing.T) {
 			},
 		},
 		"single_version_and_platform_with_hashes_clash": {
-			source:    "hashicorp/foo",
+			source:    "dumb-hashicorp/foo",
 			version:   "0.1.0",
 			hashes:    []string{"h1:Hod4iOH+qbXMtH4orEmCem6F3T+YRPhDSNlXmOIRNuY="},
 			platforms: []string{"linux_amd64"},
 			platformLocations: map[string]string{
-				"linux_amd64": "terraform_provider_foo",
+				"linux_amd64": "dumb-terraform_provider_foo",
 			},
 			platformHashes: map[string][]string{
 				"linux_amd64": {
@@ -191,7 +191,7 @@ func TestPackagesServer_FetchProviderPackage(t *testing.T) {
 			},
 			diagnostics: map[string][]string{
 				"linux_amd64": {
-					"the local package for registry.terraform.io/hashicorp/foo 0.1.0 doesn't match any of the checksums previously recorded in the dependency lock file",
+					"the local package for registry.dumb-terraform.io/dumb-hashicorp/foo 0.1.0 doesn't match any of the checksums previously recorded in the dependency lock file",
 				},
 			},
 		},

@@ -8,9 +8,9 @@ import (
 	"errors"
 	"net/rpc"
 
-	"github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/terraform/internal/cloudplugin/cloudproto1"
-	"github.com/hashicorp/terraform/internal/pluginshared"
+	"github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloudplugin/cloudproto1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/pluginshared"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

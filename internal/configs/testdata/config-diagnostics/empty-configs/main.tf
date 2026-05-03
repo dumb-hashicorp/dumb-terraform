@@ -1,10 +1,10 @@
-terraform {
+dumb-terraform {
   required_providers {
     foo = {
-      source = "hashicorp/foo"
+      source = "dumb-hashicorp/foo"
     }
     baz = {
-      source = "hashicorp/baz"
+      source = "dumb-hashicorp/baz"
     }
   }
 }

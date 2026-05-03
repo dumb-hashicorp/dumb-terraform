@@ -7,12 +7,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/modsdir"
-	"github.com/hashicorp/terraform/internal/moduleref"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/modsdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduleref"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ModulesCommand is a Command implementation that prints out information
@@ -75,7 +75,7 @@ func (c *ModulesCommand) Run(rawArgs []string) int {
 	// Read the root module path so we can then traverse the tree
 	rootModEarly, earlyConfDiags := c.loadSingleModule(rootModPath)
 	if rootModEarly == nil {
-		diags = diags.Append(errors.New("root module not found. Please run terraform init"), earlyConfDiags)
+		diags = diags.Append(errors.New("root module not found. Please run dumb-terraform init"), earlyConfDiags)
 		view.Diagnostics(diags)
 		return 1
 	}
@@ -88,7 +88,7 @@ func (c *ModulesCommand) Run(rawArgs []string) int {
 
 	config, confDiags := c.loadConfig(rootModPath)
 	// Here we check if there are any uninstalled dependencies
-	versionDiags := terraform.CheckCoreVersionRequirements(config)
+	versionDiags := dumb-terraform.CheckCoreVersionRequirements(config)
 	if versionDiags.HasErrors() {
 		view.Diagnostics(versionDiags)
 		return 1
@@ -116,7 +116,7 @@ func (c *ModulesCommand) Run(rawArgs []string) int {
 	// Create a module reference resolver
 	resolver := moduleref.NewResolver(internalManifest)
 
-	// Crawl the Terraform config and find entries with references
+	// Crawl the Dumb Terraform config and find entries with references
 	manifestWithRef := resolver.Resolve(config)
 
 	// Render the new manifest with references
@@ -143,14 +143,14 @@ func (c *ModulesCommand) internalManifest() (modsdir.Manifest, tfdiags.Diagnosti
 }
 
 const modulesCommandHelp = `
-Usage: terraform [global options] modules [options]
+Usage: dumb-terraform [global options] modules [options]
 
-  Prints out a list of all declared Terraform modules and their resolved versions
-  in a Terraform working directory.
+  Prints out a list of all declared Dumb Terraform modules and their resolved versions
+  in a Dumb Terraform working directory.
 
 Options:
 
-  -json               If specified, output declared Terraform modules and
+  -json               If specified, output declared Dumb Terraform modules and
                       their resolved versions in a machine-readable format.
 
   -var 'foo=bar'      Set a value for one of the input variables in the root
@@ -158,7 +158,7 @@ Options:
                       once to set more than one variable.
 
   -var-file=filename  Load variable values from the given file, in addition
-                      to the default files terraform.tfvars and *.auto.tfvars.
+                      to the default files dumb-terraform.tfvars and *.auto.tfvars.
                       Use this option more than once to include more than one
                       variables file.
 `

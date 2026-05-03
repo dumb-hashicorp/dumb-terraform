@@ -10,16 +10,16 @@ import (
 	"io"
 	"os"
 
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const tfstateFilename = "tfstate"
 const tfstatePreviousFilename = "tfstate-prev"
-const dependencyLocksFilename = ".terraform.lock.hcl" // matches the conventional name in an input configuration
+const dependencyLocksFilename = ".dumb-terraform.lock.dumb-hcl" // matches the conventional name in an input configuration
 
 // ErrUnusableLocalPlan is an error wrapper to indicate that we *think* the
 // input represents plan file data, but can't use it for some reason (as
@@ -61,7 +61,7 @@ func Open(filename string) (*Reader, error) {
 		// like our old plan format from versions prior to 0.12.
 		if b, sErr := os.ReadFile(filename); sErr == nil {
 			if bytes.HasPrefix(b, []byte("tfplan")) {
-				return nil, errUnusable(fmt.Errorf("the given plan file was created by an earlier version of Terraform; plan files cannot be shared between different Terraform versions"))
+				return nil, errUnusable(fmt.Errorf("the given plan file was created by an earlier version of Dumb Terraform; plan files cannot be shared between different Dumb Terraform versions"))
 			}
 		}
 		return nil, err
@@ -93,7 +93,7 @@ func Open(filename string) (*Reader, error) {
 //
 // Errors can be returned for various reasons, including if the plan file
 // is not of an appropriate format version, if it was created by a different
-// version of Terraform, if it is invalid, etc.
+// version of Dumb Terraform, if it is invalid, etc.
 func (r *Reader) ReadPlan() (*plans.Plan, error) {
 	var planFile *zip.File
 	for _, file := range r.zip.File {
@@ -229,7 +229,7 @@ func (r *Reader) ReadDependencyLocks() (*depsfile.Locks, tfdiags.Diagnostics) {
 	diags = diags.Append(tfdiags.Sourceless(
 		tfdiags.Error,
 		"Saved plan has no dependency lock information",
-		"The specified saved plan file does not include any dependency lock information. This is a bug in the previous run of Terraform that created this file.",
+		"The specified saved plan file does not include any dependency lock information. This is a bug in the previous run of Dumb Terraform that created this file.",
 	))
 	return nil, diags
 }

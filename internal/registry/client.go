@@ -17,19 +17,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-retryablehttp"
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/registry/regsrc"
-	"github.com/hashicorp/terraform/internal/registry/response"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/go-retryablehttp"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry/regsrc"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry/response"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 const (
-	xTerraformGet      = "X-Terraform-Get"
-	xTerraformVersion  = "X-Terraform-Version"
+	xDumb TerraformGet      = "X-Dumb Terraform-Get"
+	xDumb TerraformVersion  = "X-Dumb Terraform-Version"
 	modulesServiceID   = "modules.v1"
 	providersServiceID = "providers.v1"
 
@@ -61,7 +61,7 @@ func init() {
 	configureRequestTimeout()
 }
 
-// Client provides methods to query Terraform Registries.
+// Client provides methods to query Dumb Terraform Registries.
 type Client struct {
 	// this is the client to be used for all requests.
 	client *retryablehttp.Client
@@ -92,7 +92,7 @@ func NewClient(services *disco.Disco, client *http.Client) *Client {
 
 	services.Transport = retryableClient.HTTPClient.Transport
 
-	services.SetUserAgent(httpclient.TerraformUserAgent(version.String()))
+	services.SetUserAgent(httpclient.Dumb TerraformUserAgent(version.String()))
 
 	return &Client{
 		client:   retryableClient,
@@ -140,7 +140,7 @@ func (c *Client) ModuleVersions(ctx context.Context, module *regsrc.Module) (*re
 	req = req.WithContext(ctx)
 
 	c.addRequestCreds(host, req.Request)
-	req.Header.Set(xTerraformVersion, tfVersion)
+	req.Header.Set(xDumb TerraformVersion, tfVersion)
 
 	resp, err := c.client.Do(req)
 	if err != nil {
@@ -219,7 +219,7 @@ func (c *Client) ModuleLocation(ctx context.Context, module *regsrc.Module, vers
 	req = req.WithContext(ctx)
 
 	c.addRequestCreds(host, req.Request)
-	req.Header.Set(xTerraformVersion, tfVersion)
+	req.Header.Set(xDumb TerraformVersion, tfVersion)
 
 	resp, err := c.client.Do(req)
 	if err != nil {
@@ -243,8 +243,8 @@ func (c *Client) ModuleLocation(ctx context.Context, module *regsrc.Module, vers
 		return "", fmt.Errorf("error getting download location for %q: %s resp:%s", module, resp.Status, body)
 	}
 
-	// the download location is in the X-Terraform-Get header
-	location := resp.Header.Get(xTerraformGet)
+	// the download location is in the X-Dumb Terraform-Get header
+	location := resp.Header.Get(xDumb TerraformGet)
 	if location == "" {
 		return "", fmt.Errorf("failed to get download URL for %q: %s resp:%s", module, resp.Status, body)
 	}
@@ -252,7 +252,7 @@ func (c *Client) ModuleLocation(ctx context.Context, module *regsrc.Module, vers
 	// If location looks like it's trying to be a relative URL, treat it as
 	// one.
 	//
-	// We don't do this for just _any_ location, since the X-Terraform-Get
+	// We don't do this for just _any_ location, since the X-Dumb Terraform-Get
 	// header is a go-getter location rather than a URL, and so not all
 	// possible values will parse reasonably as URLs.)
 	//

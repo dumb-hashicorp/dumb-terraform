@@ -6,12 +6,12 @@ package graph
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/dag"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dag"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 // TestProvidersTransformer is a GraphTransformer that gathers all the providers
@@ -23,7 +23,7 @@ type TestProvidersTransformer struct {
 	Providers map[addrs.Provider]providers.Factory
 }
 
-func (t *TestProvidersTransformer) Transform(g *terraform.Graph) error {
+func (t *TestProvidersTransformer) Transform(g *dumb-terraform.Graph) error {
 
 	type tuple struct {
 		configure *NodeProviderConfigure

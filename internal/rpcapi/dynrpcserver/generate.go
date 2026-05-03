@@ -3,4 +3,4 @@
 
 package dynrpcserver
 
-//go:generate go run github.com/hashicorp/terraform/internal/rpcapi/dynrpcserver/generator
+//go:generate go run github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dynrpcserver/generator

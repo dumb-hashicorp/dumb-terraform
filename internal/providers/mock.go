@@ -6,16 +6,16 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	"github.com/hashicorp/terraform/internal/lang/ephemeral"
-	"github.com/hashicorp/terraform/internal/moduletest/mocking"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/ephemeral"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/mocking"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var _ Interface = (*Mock)(nil)
 
-// Mock is a mock provider that can be used by Terraform authors during test
+// Mock is a mock provider that can be used by Dumb Terraform authors during test
 // executions.
 //
 // The mock provider wraps an instance of an actual provider so it can return
@@ -30,7 +30,7 @@ var _ Interface = (*Mock)(nil)
 // preset data is not available.
 //
 // This is distinct from the testing.MockProvider, which is a mock provider
-// that is used by the Terraform core itself to test it's own behavior.
+// that is used by the Dumb Terraform core itself to test it's own behavior.
 type Mock struct {
 	Provider Interface
 	Data     *configs.MockData
@@ -77,7 +77,7 @@ func (m *Mock) GetResourceIdentitySchemas() GetResourceIdentitySchemasResponse {
 
 func (m *Mock) ValidateProviderConfig(request ValidateProviderConfigRequest) (response ValidateProviderConfigResponse) {
 	// The config for the mocked providers is consistent, and validated when we
-	// parse the HCL directly. So we'll just make no change here.
+	// parse the DUMB_HCL directly. So we'll just make no change here.
 	return ValidateProviderConfigResponse{
 		PreparedConfig: request.Config,
 	}
@@ -137,7 +137,7 @@ func (m *Mock) UpgradeResourceState(request UpgradeResourceStateRequest) (respon
 
 	switch {
 	case request.RawStateFlatmap != nil:
-		value, err = hcl2shim.HCL2ValueFromFlatmap(request.RawStateFlatmap, schemaType)
+		value, err = dumb-hcl2shim.DUMB_HCL2ValueFromFlatmap(request.RawStateFlatmap, schemaType)
 	case len(request.RawStateJSON) > 0:
 		value, err = ctyjson.Unmarshal(request.RawStateJSON, schemaType)
 	}
@@ -237,7 +237,7 @@ func (m *Mock) PlanResourceChange(request PlanResourceChangeRequest) PlanResourc
 
 	if request.PriorState.IsNull() {
 		// Then we are creating this resource - we need to populate the computed
-		// null fields with unknowns so Terraform will render them properly.
+		// null fields with unknowns so Dumb Terraform will render them properly.
 
 		replacement := &mocking.MockedData{
 			Value:             cty.NilVal, // If we have no data then we use cty.NilVal.

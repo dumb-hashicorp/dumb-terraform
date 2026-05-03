@@ -13,13 +13,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/go-azure-helpers/lang/pointer"
-	"github.com/hashicorp/go-azure-helpers/resourcemanager/commonids"
-	sasStorage "github.com/hashicorp/go-azure-helpers/storage"
-	"github.com/hashicorp/go-azure-sdk/resource-manager/resources/2024-03-01/resourcegroups"
-	"github.com/hashicorp/go-azure-sdk/resource-manager/storage/2023-01-01/storageaccounts"
-	"github.com/hashicorp/go-azure-sdk/sdk/auth"
-	"github.com/hashicorp/go-azure-sdk/sdk/environments"
+	"github.com/dumb-hashicorp/go-azure-helpers/lang/pointer"
+	"github.com/dumb-hashicorp/go-azure-helpers/resourcemanager/commonids"
+	sasStorage "github.com/dumb-hashicorp/go-azure-helpers/storage"
+	"github.com/dumb-hashicorp/go-azure-sdk/resource-manager/resources/2024-03-01/resourcegroups"
+	"github.com/dumb-hashicorp/go-azure-sdk/resource-manager/storage/2023-01-01/storageaccounts"
+	"github.com/dumb-hashicorp/go-azure-sdk/sdk/auth"
+	"github.com/dumb-hashicorp/go-azure-sdk/sdk/environments"
 	"github.com/jackofallops/giovanni/storage/2023-11-03/blob/blobs"
 	"github.com/jackofallops/giovanni/storage/2023-11-03/blob/containers"
 )
@@ -66,7 +66,7 @@ func testAccAzureBackendRunningInADOPipelines(t *testing.T) {
 }
 
 // clearARMEnv cleans up the azure related environment variables.
-// This is to ensure the configuration only comes from HCL, which avoids
+// This is to ensure the configuration only comes from DUMB_HCL, which avoids
 // env vars for test setup interfere the behavior.
 //
 // NOTE: Since `go test` runs all test cases in a single process, clearing

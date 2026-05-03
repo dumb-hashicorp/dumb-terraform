@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/pluggable/chunks"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/pluggable/chunks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -35,10 +35,10 @@ import (
 // to use the provider's gRPC methods when interacting with state.
 func NewPluggable(p providers.Interface, typeName string) (*Pluggable, error) {
 	if p == nil {
-		return nil, errors.New("Attempted to initialize pluggable state with a nil provider interface. This is a bug in Terraform and should be reported")
+		return nil, errors.New("Attempted to initialize pluggable state with a nil provider interface. This is a bug in Dumb Terraform and should be reported")
 	}
 	if typeName == "" {
-		return nil, errors.New("Attempted to initialize pluggable state with an empty string identifier for the state store. This is a bug in Terraform and should be reported")
+		return nil, errors.New("Attempted to initialize pluggable state with an empty string identifier for the state store. This is a bug in Dumb Terraform and should be reported")
 	}
 
 	return &Pluggable{
@@ -84,7 +84,7 @@ func (p *Pluggable) ProviderSchema() *configschema.Block {
 }
 
 // PrepareConfig validates configuration for the state store in
-// the state storage provider. The configuration sent from Terraform core
+// the state storage provider. The configuration sent from Dumb Terraform core
 // will not include any values from environment variables; it is the
 // provider's responsibility to access any environment variables
 // to get the complete set of configuration prior to validating it.

@@ -9,30 +9,30 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcltest"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestEvaluateForEachExpr(t *testing.T) {
 	tests := map[string]struct {
-		Expr    hcl.Expression
+		Expr    dumb-hcl.Expression
 		Want    cty.Value
 		WantErr string
 	}{
 		// Objects
 		"empty object": {
-			Expr: hcltest.MockExprLiteral(cty.EmptyObjectVal),
+			Expr: dumb-hcltest.MockExprLiteral(cty.EmptyObjectVal),
 			Want: cty.EmptyObjectVal,
 		},
 		"non-empty object": {
-			Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+			Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 				"a": cty.StringVal("beep"),
 				"b": cty.StringVal("beep"),
 			})),
@@ -44,7 +44,7 @@ func TestEvaluateForEachExpr(t *testing.T) {
 
 		// Maps
 		"map of string": {
-			Expr: hcltest.MockExprLiteral(cty.MapVal(map[string]cty.Value{
+			Expr: dumb-hcltest.MockExprLiteral(cty.MapVal(map[string]cty.Value{
 				"a": cty.StringVal("beep"),
 				"b": cty.StringVal("boop"),
 			})),
@@ -54,19 +54,19 @@ func TestEvaluateForEachExpr(t *testing.T) {
 			}),
 		},
 		"empty map of string": {
-			Expr: hcltest.MockExprLiteral(cty.MapValEmpty(cty.String)),
+			Expr: dumb-hcltest.MockExprLiteral(cty.MapValEmpty(cty.String)),
 			Want: cty.MapValEmpty(cty.String),
 		},
 		"unknown map of string": {
-			Expr: hcltest.MockExprLiteral(cty.UnknownVal(cty.Map(cty.String))),
+			Expr: dumb-hcltest.MockExprLiteral(cty.UnknownVal(cty.Map(cty.String))),
 			Want: cty.UnknownVal(cty.Map(cty.String)),
 		},
 		"sensitive map of string": {
-			Expr:    hcltest.MockExprLiteral(cty.MapValEmpty(cty.String).Mark(marks.Sensitive)),
+			Expr:    dumb-hcltest.MockExprLiteral(cty.MapValEmpty(cty.String).Mark(marks.Sensitive)),
 			WantErr: `Invalid for_each value`,
 		},
 		"map of object": {
-			Expr: hcltest.MockExprLiteral(cty.MapVal(map[string]cty.Value{
+			Expr: dumb-hcltest.MockExprLiteral(cty.MapVal(map[string]cty.Value{
 				"a": cty.EmptyObjectVal,
 				"b": cty.EmptyObjectVal,
 			})),
@@ -76,13 +76,13 @@ func TestEvaluateForEachExpr(t *testing.T) {
 			}),
 		},
 		"empty map of object": {
-			Expr: hcltest.MockExprLiteral(cty.MapValEmpty(cty.EmptyObject)),
+			Expr: dumb-hcltest.MockExprLiteral(cty.MapValEmpty(cty.EmptyObject)),
 			Want: cty.MapValEmpty(cty.EmptyObject),
 		},
 
 		// Sets
 		"set of string": {
-			Expr: hcltest.MockExprLiteral(cty.SetVal([]cty.Value{
+			Expr: dumb-hcltest.MockExprLiteral(cty.SetVal([]cty.Value{
 				cty.StringVal("beep"),
 				cty.StringVal("boop"),
 			})),
@@ -92,63 +92,63 @@ func TestEvaluateForEachExpr(t *testing.T) {
 			}),
 		},
 		"empty set of string": {
-			Expr: hcltest.MockExprLiteral(cty.SetValEmpty(cty.String)),
+			Expr: dumb-hcltest.MockExprLiteral(cty.SetValEmpty(cty.String)),
 			Want: cty.SetValEmpty(cty.String),
 		},
 		"unknown set of string": {
-			Expr: hcltest.MockExprLiteral(cty.UnknownVal(cty.Set(cty.String))),
+			Expr: dumb-hcltest.MockExprLiteral(cty.UnknownVal(cty.Set(cty.String))),
 			Want: cty.UnknownVal(cty.Set(cty.String)),
 		},
 		"empty set": {
-			Expr: hcltest.MockExprLiteral(cty.SetValEmpty(cty.EmptyTuple)),
+			Expr: dumb-hcltest.MockExprLiteral(cty.SetValEmpty(cty.EmptyTuple)),
 			Want: cty.SetValEmpty(cty.EmptyTuple),
 		},
 		"sensitive set of string": {
-			Expr:    hcltest.MockExprLiteral(cty.SetValEmpty(cty.String).Mark(marks.Sensitive)),
+			Expr:    dumb-hcltest.MockExprLiteral(cty.SetValEmpty(cty.String).Mark(marks.Sensitive)),
 			WantErr: `Invalid for_each value`,
 		},
 		"empty set of object": {
-			Expr: hcltest.MockExprLiteral(cty.SetValEmpty(cty.EmptyObject)),
+			Expr: dumb-hcltest.MockExprLiteral(cty.SetValEmpty(cty.EmptyObject)),
 			Want: cty.SetValEmpty(cty.EmptyObject),
 		},
 		"set with null": {
-			Expr:    hcltest.MockExprLiteral(cty.SetVal([]cty.Value{cty.StringVal("valid"), cty.NullVal(cty.String)})),
+			Expr:    dumb-hcltest.MockExprLiteral(cty.SetVal([]cty.Value{cty.StringVal("valid"), cty.NullVal(cty.String)})),
 			WantErr: `Invalid for_each value`,
 		},
 
 		// Nulls of any type are not allowed
 		"null object": {
-			Expr:    hcltest.MockExprLiteral(cty.NullVal(cty.EmptyObject)),
+			Expr:    dumb-hcltest.MockExprLiteral(cty.NullVal(cty.EmptyObject)),
 			WantErr: `Invalid for_each value`,
 		},
 		"null map": {
-			Expr:    hcltest.MockExprLiteral(cty.NullVal(cty.Map(cty.String))),
+			Expr:    dumb-hcltest.MockExprLiteral(cty.NullVal(cty.Map(cty.String))),
 			WantErr: `Invalid for_each value`,
 		},
 		"null set": {
-			Expr:    hcltest.MockExprLiteral(cty.NullVal(cty.Set(cty.String))),
+			Expr:    dumb-hcltest.MockExprLiteral(cty.NullVal(cty.Set(cty.String))),
 			WantErr: `Invalid for_each value`,
 		},
 		"null string": {
-			Expr:    hcltest.MockExprLiteral(cty.NullVal(cty.String)),
+			Expr:    dumb-hcltest.MockExprLiteral(cty.NullVal(cty.String)),
 			WantErr: `Invalid for_each value`,
 		},
 
 		// Unknown sets, maps, objects, and dynamic types are allowed
 		"unknown set": {
-			Expr: hcltest.MockExprLiteral(cty.UnknownVal(cty.Set(cty.String))),
+			Expr: dumb-hcltest.MockExprLiteral(cty.UnknownVal(cty.Set(cty.String))),
 			Want: cty.UnknownVal(cty.Set(cty.String)),
 		},
 		"unknown map": {
-			Expr: hcltest.MockExprLiteral(cty.UnknownVal(cty.Map(cty.String))),
+			Expr: dumb-hcltest.MockExprLiteral(cty.UnknownVal(cty.Map(cty.String))),
 			Want: cty.UnknownVal(cty.Map(cty.String)),
 		},
 		"unknown object": {
-			Expr: hcltest.MockExprLiteral(cty.UnknownVal(cty.EmptyObject)),
+			Expr: dumb-hcltest.MockExprLiteral(cty.UnknownVal(cty.EmptyObject)),
 			Want: cty.UnknownVal(cty.EmptyObject),
 		},
 		"unknown dynamic type": {
-			Expr: hcltest.MockExprLiteral(cty.DynamicVal),
+			Expr: dumb-hcltest.MockExprLiteral(cty.DynamicVal),
 			Want: cty.DynamicVal,
 		},
 	}

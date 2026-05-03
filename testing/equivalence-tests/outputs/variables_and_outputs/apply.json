@@ -2,7 +2,7 @@
   {
     "@level": "info",
     "@message": "Apply complete! Resources: 0 added, 0 changed, 0 destroyed.",
-    "@module": "terraform.ui",
+    "@module": "dumb-terraform.ui",
     "changes": {
       "action_invocation": 0,
       "add": 0,
@@ -16,7 +16,7 @@
   {
     "@level": "info",
     "@message": "Outputs: 5",
-    "@module": "terraform.ui",
+    "@module": "dumb-terraform.ui",
     "outputs": {
       "list_empty_default": {
         "sensitive": false,

@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Action is an address for an action block within configuration, which
@@ -357,7 +357,7 @@ type configActionKey string
 func (k configActionKey) uniqueKeySigil() {}
 
 // ParseAbsActionInstanceStr is a helper wrapper around
-// ParseAbsActionInstance that takes a string and parses it with the HCL
+// ParseAbsActionInstance that takes a string and parses it with the DUMB_HCL
 // native syntax traversal parser before interpreting it.
 //
 // Error diagnostics are returned if either the parsing fails or the analysis
@@ -371,7 +371,7 @@ func (k configActionKey) uniqueKeySigil() {}
 func ParseAbsActionInstanceStr(str string) (AbsActionInstance, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return AbsActionInstance{}, diags
@@ -391,7 +391,7 @@ func ParseAbsActionInstanceStr(str string) (AbsActionInstance, tfdiags.Diagnosti
 //
 // If error diagnostics are returned then the AbsResource value is invalid and
 // must not be used.
-func ParseAbsActionInstance(traversal hcl.Traversal) (AbsActionInstance, tfdiags.Diagnostics) {
+func ParseAbsActionInstance(traversal dumb-hcl.Traversal) (AbsActionInstance, tfdiags.Diagnostics) {
 	moduleAddr, remain, diags := parseModuleInstancePrefix(traversal, false)
 	if diags.HasErrors() {
 		return AbsActionInstance{}, diags
@@ -399,8 +399,8 @@ func ParseAbsActionInstance(traversal hcl.Traversal) (AbsActionInstance, tfdiags
 
 	if remain.IsRelative() {
 		// (relative means that there's either nothing left or what's next isn't an identifier)
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid action address",
 			Detail:   "Module path must be followed by an action instance address.",
 			Subject:  remain.SourceRange().Ptr(),
@@ -409,8 +409,8 @@ func ParseAbsActionInstance(traversal hcl.Traversal) (AbsActionInstance, tfdiags
 	}
 
 	if remain.RootName() != "action" {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Action address must start with \"action.\".",
 			Subject:  remain[0].SourceRange().Ptr(),
@@ -420,8 +420,8 @@ func ParseAbsActionInstance(traversal hcl.Traversal) (AbsActionInstance, tfdiags
 	remain = remain[1:]
 
 	if len(remain) < 2 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Action specification must include an action type and name.",
 			Subject:  remain.SourceRange().Ptr(),
@@ -431,13 +431,13 @@ func ParseAbsActionInstance(traversal hcl.Traversal) (AbsActionInstance, tfdiags
 
 	var actionType, name string
 	switch tt := remain[0].(type) {
-	case hcl.TraverseRoot:
+	case dumb-hcl.TraverseRoot:
 		actionType = tt.Name
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		actionType = tt.Name
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid action address",
 			Detail:   "An action name is required.",
 			Subject:  remain[0].SourceRange().Ptr(),
@@ -446,11 +446,11 @@ func ParseAbsActionInstance(traversal hcl.Traversal) (AbsActionInstance, tfdiags
 	}
 
 	switch tt := remain[1].(type) {
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		name = tt.Name
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "An action name is required.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -464,11 +464,11 @@ func ParseAbsActionInstance(traversal hcl.Traversal) (AbsActionInstance, tfdiags
 		return moduleAddr.ActionInstance(actionType, name, NoKey), diags
 	case 1:
 		switch tt := remain[0].(type) {
-		case hcl.TraverseIndex:
+		case dumb-hcl.TraverseIndex:
 			key, err := ParseInstanceKey(tt.Key)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid address",
 					Detail:   fmt.Sprintf("Invalid resource instance key: %s.", err),
 					Subject:  remain[0].SourceRange().Ptr(),
@@ -476,18 +476,18 @@ func ParseAbsActionInstance(traversal hcl.Traversal) (AbsActionInstance, tfdiags
 				return AbsActionInstance{}, diags
 			}
 			return moduleAddr.ActionInstance(actionType, name, key), diags
-		case hcl.TraverseSplat:
+		case dumb-hcl.TraverseSplat:
 			// Not yet supported!
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "Action instance key must be given in square brackets.",
 				Subject:  remain[0].SourceRange().Ptr(),
 			})
 			return AbsActionInstance{}, diags
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "Action instance key must be given in square brackets.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -495,8 +495,8 @@ func ParseAbsActionInstance(traversal hcl.Traversal) (AbsActionInstance, tfdiags
 			return AbsActionInstance{}, diags
 		}
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Unexpected extra operators after address.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -513,7 +513,7 @@ func ParseAbsActionInstance(traversal hcl.Traversal) (AbsActionInstance, tfdiags
 //
 // If error diagnostics are returned then the AbsAction value is invalid and
 // must not be used.
-func ParseAbsAction(traversal hcl.Traversal) (AbsAction, tfdiags.Diagnostics) {
+func ParseAbsAction(traversal dumb-hcl.Traversal) (AbsAction, tfdiags.Diagnostics) {
 	addr, diags := ParseTargetAction(traversal)
 	if diags.HasErrors() {
 		return AbsAction{}, diags
@@ -528,8 +528,8 @@ func ParseAbsAction(traversal hcl.Traversal) (AbsAction, tfdiags.Diagnostics) {
 		// Assume that the last element of the traversal must be the index,
 		// since that's required for a valid resource instance address.
 		indexStep := traversal[len(traversal)-1]
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "An action address is required. This instance key identifies a specific action instance, which is not expected here.",
 			Subject:  indexStep.SourceRange().Ptr(),
@@ -537,8 +537,8 @@ func ParseAbsAction(traversal hcl.Traversal) (AbsAction, tfdiags.Diagnostics) {
 		return AbsAction{}, diags
 
 	case ModuleInstance: // Catch likely user error with specialized message
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "An action address is required here. The module path must be followed by an action specification.",
 			Subject:  traversal.SourceRange().Ptr(),
@@ -546,8 +546,8 @@ func ParseAbsAction(traversal hcl.Traversal) (AbsAction, tfdiags.Diagnostics) {
 		return AbsAction{}, diags
 
 	default: // Generic message for other address types
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "An action address is required here.",
 			Subject:  traversal.SourceRange().Ptr(),
@@ -558,7 +558,7 @@ func ParseAbsAction(traversal hcl.Traversal) (AbsAction, tfdiags.Diagnostics) {
 }
 
 // ParseAbsActionStr is a helper wrapper around ParseAbsAction that takes a
-// string and parses it with the HCL native syntax traversal parser before
+// string and parses it with the DUMB_HCL native syntax traversal parser before
 // interpreting it.
 //
 // Error diagnostics are returned if either the parsing fails or the analysis
@@ -572,7 +572,7 @@ func ParseAbsAction(traversal hcl.Traversal) (AbsAction, tfdiags.Diagnostics) {
 func ParseAbsActionStr(str string) (AbsAction, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return AbsAction{}, diags

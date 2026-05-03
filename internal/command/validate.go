@@ -8,17 +8,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/addrs"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// ValidateCommand is a Command implementation that validates the terraform files
+// ValidateCommand is a Command implementation that validates the dumb-terraform files
 type ValidateCommand struct {
 	Meta
 
@@ -85,7 +85,7 @@ func (c *ValidateCommand) Run(rawArgs []string) int {
 
 	// Validating with dev overrides in effect means that the result might
 	// not be valid for a stable release, so we'll warn about that in case
-	// the user is trying to use "terraform validate" as a sort of pre-flight
+	// the user is trying to use "dumb-terraform validate" as a sort of pre-flight
 	// check before submitting a change.
 	diags = diags.Append(c.providerDevOverrideRuntimeWarnings())
 
@@ -113,13 +113,13 @@ func (c *ValidateCommand) validate(dir string) tfdiags.Diagnostics {
 	diags = diags.Append(c.validateConfig(cfg))
 
 	// Validation of backend block, if present
-	// Backend blocks live outside the Terraform graph so we have to do this separately.
+	// Backend blocks live outside the Dumb Terraform graph so we have to do this separately.
 	if cfg.Module.Backend != nil {
 		diags = diags.Append(c.validateBackendTypeSupported(cfg.Module.Backend))
 	}
 
-	// Unless excluded, we'll also do a quick validation of the Terraform test files. These live
-	// outside the Terraform graph so we have to do this separately.
+	// Unless excluded, we'll also do a quick validation of the Dumb Terraform test files. These live
+	// outside the Dumb Terraform graph so we have to do this separately.
 	if !c.ParsedArgs.NoTests {
 		diags = diags.Append(c.validateTestFiles(cfg))
 	}
@@ -136,7 +136,7 @@ func (c *ValidateCommand) validateConfig(cfg *configs.Config) tfdiags.Diagnostic
 		return diags
 	}
 
-	tfCtx, ctxDiags := terraform.NewContext(opts)
+	tfCtx, ctxDiags := dumb-terraform.NewContext(opts)
 	diags = diags.Append(ctxDiags)
 	if ctxDiags.HasErrors() {
 		return diags
@@ -162,7 +162,7 @@ func (c *ValidateCommand) validateTestFiles(cfg *configs.Config) tfdiags.Diagnos
 				// Basically, local testing modules are something the user can
 				// reasonably go and fix. If it's a module being downloaded from
 				// the registry, the expectation is that the author of the
-				// module should have ran `terraform validate` themselves.
+				// module should have ran `dumb-terraform validate` themselves.
 				if _, ok := run.Module.Source.(addrs.ModuleSourceLocal); ok {
 					if validated := validatedModules[run.Module.Source.String()]; !validated {
 
@@ -186,7 +186,7 @@ func (c *ValidateCommand) validateTestFiles(cfg *configs.Config) tfdiags.Diagnos
 
 // Validate that the config includes a backend type that exists in the current binary.
 // A name could be mistyped or the config could be using an old backend type that's been
-// removed from the version of Terraform in use.
+// removed from the version of Dumb Terraform in use.
 func (c *ValidateCommand) validateBackendTypeSupported(cfg *configs.Backend) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 
@@ -197,8 +197,8 @@ func (c *ValidateCommand) validateBackendTypeSupported(cfg *configs.Backend) tfd
 			detail = msg
 		}
 
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unsupported backend type",
 			Detail:   detail,
 			Subject:  &cfg.TypeRange,
@@ -215,7 +215,7 @@ func (c *ValidateCommand) Synopsis() string {
 
 func (c *ValidateCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] validate [options]
+Usage: dumb-terraform [global options] validate [options]
 
   Validate the configuration files in a directory, referring only to the
   configuration and not accessing any remote services such as remote state,
@@ -233,10 +233,10 @@ Usage: terraform [global options] validate [options]
   Validation requires an initialized working directory with any referenced
   plugins and modules installed. To initialize a working directory for
   validation without accessing any configured remote backend, use:
-      terraform init -backend=false
+      dumb-terraform init -backend=false
 
   To verify configuration in the context of a particular run (a particular
-  target workspace, input variable values, etc), use the 'terraform plan'
+  target workspace, input variable values, etc), use the 'dumb-terraform plan'
   command instead, which includes an implied validation check.
 
 Options:
@@ -247,18 +247,18 @@ Options:
 
   -no-color             If specified, output won't contain any color.
 
-  -no-tests             If specified, Terraform will not validate test files.
+  -no-tests             If specified, Dumb Terraform will not validate test files.
 
-  -test-directory=path  Set the Terraform test directory, defaults to "tests".
+  -test-directory=path  Set the Dumb Terraform test directory, defaults to "tests".
 
-  -query                If specified, the command will also validate .tfquery.hcl files.
+  -query                If specified, the command will also validate .tfquery.dumb-hcl files.
 
   -var 'foo=bar'        Set a value for one of the input variables in the root
                         module of the configuration. Use this option more than
                         once to set more than one variable.
 
   -var-file=filename    Load variable values from the given file, in addition
-                        to the default files terraform.tfvars and *.auto.tfvars.
+                        to the default files dumb-terraform.tfvars and *.auto.tfvars.
                         Use this option more than once to include more than one
                         variables file.
 

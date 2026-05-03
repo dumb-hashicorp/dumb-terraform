@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   required_version = ">200.0.0"
 
   bad {

@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   required_providers {
     null = "~> 2.0.0"
     random = {

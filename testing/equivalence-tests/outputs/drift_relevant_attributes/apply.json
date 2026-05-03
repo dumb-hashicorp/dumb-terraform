@@ -2,7 +2,7 @@
   {
     "@level": "info",
     "@message": "tfcoremock_simple_resource.base: Plan to update",
-    "@module": "terraform.ui",
+    "@module": "dumb-terraform.ui",
     "change": {
       "action": "update",
       "resource": {
@@ -20,7 +20,7 @@
   {
     "@level": "info",
     "@message": "tfcoremock_simple_resource.dependent: Plan to update",
-    "@module": "terraform.ui",
+    "@module": "dumb-terraform.ui",
     "change": {
       "action": "update",
       "resource": {
@@ -38,7 +38,7 @@
   {
     "@level": "info",
     "@message": "tfcoremock_simple_resource.base: Modifying... [id=f6f74ca6-e8ef-e51f-522c-433b9ed5038f]",
-    "@module": "terraform.ui",
+    "@module": "dumb-terraform.ui",
     "hook": {
       "action": "update",
       "id_key": "id",
@@ -57,7 +57,7 @@
   },
   {
     "@level": "info",
-    "@module": "terraform.ui",
+    "@module": "dumb-terraform.ui",
     "hook": {
       "action": "update",
       "id_key": "id",
@@ -77,7 +77,7 @@
   {
     "@level": "info",
     "@message": "tfcoremock_simple_resource.dependent: Modifying... [id=1b17b502-96c9-fcc3-3b09-2af1c3de6ad8]",
-    "@module": "terraform.ui",
+    "@module": "dumb-terraform.ui",
     "hook": {
       "action": "update",
       "id_key": "id",
@@ -96,7 +96,7 @@
   },
   {
     "@level": "info",
-    "@module": "terraform.ui",
+    "@module": "dumb-terraform.ui",
     "hook": {
       "action": "update",
       "id_key": "id",
@@ -116,7 +116,7 @@
   {
     "@level": "info",
     "@message": "Apply complete! Resources: 0 added, 2 changed, 0 destroyed.",
-    "@module": "terraform.ui",
+    "@module": "dumb-terraform.ui",
     "changes": {
       "action_invocation": 0,
       "add": 0,
@@ -130,7 +130,7 @@
   {
     "@level": "info",
     "@message": "Outputs: 0",
-    "@module": "terraform.ui",
+    "@module": "dumb-terraform.ui",
     "outputs": {},
     "type": "outputs"
   }

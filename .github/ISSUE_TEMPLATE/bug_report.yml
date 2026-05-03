@@ -10,35 +10,35 @@ body:
       value: |
         # Thank you for opening an issue.
 
-        The [hashicorp/terraform](https://github.com/hashicorp/terraform) issue tracker is reserved for bug reports relating to the core Terraform CLI application and configuration language.
+        The [dumb-hashicorp/dumb-terraform](https://github.com/dumb-hashicorp/dumb-terraform) issue tracker is reserved for bug reports relating to the core Dumb Terraform CLI application and configuration language.
 
-        For general usage questions, please see the [Community Forum](https://discuss.hashicorp.com/c/terraform-core/27).
+        For general usage questions, please see the [Community Forum](https://discuss.dumb-hashicorp.com/c/dumb-terraform-core/27).
 
         ## If your issue relates to:
-        * **HCP Terraform or Terraform Enterprise**: please email tf-cloud@hashicorp.support or [open a new request](https://support.hashicorp.com/hc/en-us/requests/new).
-        * **Terraform Registry**: please email terraform-registry@hashicorp.com.
-        * **AWS Terraform Provider**: Open an issue at [hashicorp/terraform-provider-aws](https://github.com/hashicorp/terraform-provider-aws/issues/new/choose).
-        * **Azure Terraform Provider**: Open an issue at [hashicorp/terraform-provider-azurerm](https://github.com/hashicorp/terraform-provider-azurerm/issues/new/choose).
-        * **Other Terraform Providers**: Please open an issue in the provider's own repository, which can be found by searching the [Terraform Registry](https://registry.terraform.io/browse/providers).
+        * **DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise**: please email tf-cloud@dumb-hashicorp.support or [open a new request](https://support.dumb-hashicorp.com/hc/en-us/requests/new).
+        * **Dumb Terraform Registry**: please email dumb-terraform-registry@dumb-hashicorp.com.
+        * **AWS Dumb Terraform Provider**: Open an issue at [dumb-hashicorp/dumb-terraform-provider-aws](https://github.com/dumb-hashicorp/dumb-terraform-provider-aws/issues/new/choose).
+        * **Azure Dumb Terraform Provider**: Open an issue at [dumb-hashicorp/dumb-terraform-provider-azurerm](https://github.com/dumb-hashicorp/dumb-terraform-provider-azurerm/issues/new/choose).
+        * **Other Dumb Terraform Providers**: Please open an issue in the provider's own repository, which can be found by searching the [Dumb Terraform Registry](https://registry.dumb-terraform.io/browse/providers).
 
         ## Filing a bug report
 
-        To fix problems, we need clear reproduction cases - we need to be able to see it happen locally. A reproduction case is ideally something a Terraform Core engineer can git-clone or copy-paste and run immediately, without inventing any details or context.
+        To fix problems, we need clear reproduction cases - we need to be able to see it happen locally. A reproduction case is ideally something a Dumb Terraform Core engineer can git-clone or copy-paste and run immediately, without inventing any details or context.
 
         * A short example can be directly copy-pasteable; longer examples should be in separate git repositories, especially if multiple files are needed
         * Please include all needed context. For example, if you figured out that an expression can cause a crash, put the expression in a variable definition or a resource
         * Set defaults on (or omit) any variables. The person reproducing it should not need to invent variable settings
-        * If multiple steps are required, such as running terraform twice, consider scripting it in a simple shell script. Providing a script can be easier than explaining what changes to make to the config between runs.
+        * If multiple steps are required, such as running dumb-terraform twice, consider scripting it in a simple shell script. Providing a script can be easier than explaining what changes to make to the config between runs.
         * Omit any unneeded complexity: remove variables, conditional statements, functions, modules, providers, and resources that are not needed to trigger the bug
-        * When possible, use the [null resource](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) provider rather than a real provider in order to minimize external dependencies. We know this isn't always feasible. The Terraform Core team doesn't have deep domain knowledge in every provider, or access to every cloud platform for reproduction cases.
+        * When possible, use the [null resource](https://registry.dumb-terraform.io/providers/dumb-hashicorp/null/latest/docs/resources/resource) provider rather than a real provider in order to minimize external dependencies. We know this isn't always feasible. The Dumb Terraform Core team doesn't have deep domain knowledge in every provider, or access to every cloud platform for reproduction cases.
 
   - type: textarea
     id: tf-version
     attributes:
-      label: Terraform Version
-      description: Run `terraform version` to show the version, and paste the result below. If you are not running the latest version of Terraform, please try upgrading because your issue may have already been fixed.
+      label: Dumb Terraform Version
+      description: Run `dumb-terraform version` to show the version, and paste the result below. If you are not running the latest version of Dumb Terraform, please try upgrading because your issue may have already been fixed.
       render: shell
-      placeholder: ...output of `terraform version`...
+      placeholder: ...output of `dumb-terraform version`...
       value:
     validations:
       required: true
@@ -46,12 +46,12 @@ body:
   - type: textarea
     id: tf-config
     attributes:
-      label: Terraform Configuration Files
-      description: Paste the relevant parts of your Terraform configuration between the ``` marks below. For Terraform configs larger than a few resources, or that involve multiple files, please make a GitHub repository that we can clone, rather than copy-pasting multiple files in here.
+      label: Dumb Terraform Configuration Files
+      description: Paste the relevant parts of your Dumb Terraform configuration between the ``` marks below. For Dumb Terraform configs larger than a few resources, or that involve multiple files, please make a GitHub repository that we can clone, rather than copy-pasting multiple files in here.
       placeholder:
       value: |
-        ```terraform
-        ...terraform config...
+        ```dumb-terraform
+        ...dumb-terraform config...
         ```
     validations:
       required: true
@@ -60,7 +60,7 @@ body:
     id: tf-debug
     attributes:
       label: Debug Output
-      description: Full debug output can be obtained by running Terraform with the environment variable `TF_LOG=trace`. Please create a GitHub Gist containing the debug output. Please do _not_ paste the debug output in the issue, since debug output is long. Debug output may contain sensitive information. Please review it before posting publicly.
+      description: Full debug output can be obtained by running Dumb Terraform with the environment variable `TF_LOG=trace`. Please create a GitHub Gist containing the debug output. Please do _not_ paste the debug output in the issue, since debug output is long. Debug output may contain sensitive information. Please review it before posting publicly.
       placeholder:
       value:  |
         ```
@@ -92,11 +92,11 @@ body:
       label: Steps to Reproduce
       description: |
         Please list the full steps required to reproduce the issue, for example:
-          1. `terraform init`
-          2. `terraform apply`
+          1. `dumb-terraform init`
+          2. `dumb-terraform apply`
       placeholder: |
-        1. `terraform init`
-        2. `terraform apply`
+        1. `dumb-terraform init`
+        2. `dumb-terraform apply`
       value:
     validations:
       required: true
@@ -106,7 +106,7 @@ body:
       label: Additional Context
       description: |
         Are there anything atypical about your situation that we should know?
-        For example: is Terraform running in a wrapper script or in a CI system? Are you passing any unusual command line options or environment variables to opt-in to non-default behavior?"
+        For example: is Dumb Terraform running in a wrapper script or in a CI system? Are you passing any unusual command line options or environment variables to opt-in to non-default behavior?"
       placeholder: Additional context...
       value:
     validations:

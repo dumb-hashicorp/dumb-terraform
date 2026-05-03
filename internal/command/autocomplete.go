@@ -4,7 +4,7 @@
 package command
 
 import (
-	"github.com/hashicorp/terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
 	"github.com/posener/complete"
 )
 

@@ -7,13 +7,13 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/internal/logging"
+	"github.com/dumb-hashicorp/go-retryablehttp"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
 )
 
 // NewCloudPluginClient creates a new client for downloading and verifying
-// terraform-cloudplugin archives
+// dumb-terraform-cloudplugin archives
 func NewCloudPluginClient(ctx context.Context, serviceURL *url.URL) (*BasePluginClient, error) {
 	httpClient := httpclient.New()
 	httpClient.Timeout = defaultRequestTimeout
@@ -22,7 +22,7 @@ func NewCloudPluginClient(ctx context.Context, serviceURL *url.URL) (*BasePlugin
 	retryableClient.HTTPClient = httpClient
 	retryableClient.RetryMax = 3
 	retryableClient.RequestLogHook = requestLogHook
-	retryableClient.Logger = logging.HCLogger()
+	retryableClient.Logger = logging.DUMB_HCLogger()
 
 	client := BasePluginClient{
 		ctx:        ctx,

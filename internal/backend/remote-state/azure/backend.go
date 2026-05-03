@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/go-azure-sdk/sdk/auth"
-	"github.com/hashicorp/go-azure-sdk/sdk/environments"
+	"github.com/dumb-hashicorp/go-azure-sdk/sdk/auth"
+	"github.com/dumb-hashicorp/go-azure-sdk/sdk/environments"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendbase"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendbase"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // New creates a new backend for Azure remote state.
@@ -99,7 +99,7 @@ func New() backend.Backend {
 						Type:        cty.String,
 						Optional:    true,
 						Deprecated:  true,
-						Description: "`endpoint` is deprecated in favor of `msi_endpoint`, it will be removed in a future version of Terraform",
+						Description: "`endpoint` is deprecated in favor of `msi_endpoint`, it will be removed in a future version of Dumb Terraform",
 					},
 
 					// Client Certificate specific fields

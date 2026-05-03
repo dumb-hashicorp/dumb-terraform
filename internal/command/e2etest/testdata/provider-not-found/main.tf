@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
     nonexist = {
-      source = "registry.terraform.io/hashicorp/nonexist"
+      source = "registry.dumb-terraform.io/dumb-hashicorp/nonexist"
     }
   }
 }

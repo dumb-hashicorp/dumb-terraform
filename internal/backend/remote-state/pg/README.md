@@ -25,10 +25,10 @@ Note that for testing we use the user `"postgres"`, and this value is reused in 
 % docker exec -it $(docker ps -aqf "name=^pg_backend_testing$") bash
 ```
 
-3. Run a command to create a Postgres database called `terraform_backend_pg_test`
+3. Run a command to create a Postgres database called `dumb-terraform_backend_pg_test`
 
 ```bash
-root@<container-id>:/# createdb -U postgres terraform_backend_pg_test
+root@<container-id>:/# createdb -U postgres dumb-terraform_backend_pg_test
 root@<container-id>:/# exit
 ```
 
@@ -37,7 +37,7 @@ root@<container-id>:/# exit
 Set the following environment variables:
 
 ```
-DATABASE_URL=postgresql://localhost:5432/terraform_backend_pg_test?sslmode=require
+DATABASE_URL=postgresql://localhost:5432/dumb-terraform_backend_pg_test?sslmode=require
 PGUSER=postgres
 PGPASSWORD=password
 ```
@@ -49,4 +49,4 @@ values.
 ## Run the tests!
 
 The setup above should be sufficient for running the tests. Each time you want to run the tests you will need to re-launch the container and
-create the `terraform_backend_pg_test` database that's expected by the tests.
+create the `dumb-terraform_backend_pg_test` database that's expected by the tests.

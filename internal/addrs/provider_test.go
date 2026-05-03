@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	svchost "github.com/hashicorp/terraform-svchost"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
 )
 
 func TestProviderString(t *testing.T) {
@@ -19,7 +19,7 @@ func TestProviderString(t *testing.T) {
 			Provider{
 				Type:      "test",
 				Hostname:  DefaultProviderRegistryHost,
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 			},
 			NewDefaultProvider("test").String(),
 		},
@@ -27,17 +27,17 @@ func TestProviderString(t *testing.T) {
 			Provider{
 				Type:      "test-beta",
 				Hostname:  DefaultProviderRegistryHost,
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 			},
 			NewDefaultProvider("test-beta").String(),
 		},
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.terraform.com",
-				Namespace: "hashicorp",
+				Hostname:  "registry.dumb-terraform.com",
+				Namespace: "dumb-hashicorp",
 			},
-			"registry.terraform.com/hashicorp/test",
+			"registry.dumb-terraform.com/dumb-hashicorp/test",
 		},
 		{
 			Provider{
@@ -72,11 +72,11 @@ func TestProviderLegacyString(t *testing.T) {
 		},
 		{
 			Provider{
-				Type:      "terraform",
+				Type:      "dumb-terraform",
 				Hostname:  BuiltInProviderHost,
 				Namespace: BuiltInProviderNamespace,
 			},
-			"terraform",
+			"dumb-terraform",
 		},
 	}
 
@@ -97,17 +97,17 @@ func TestProviderDisplay(t *testing.T) {
 			Provider{
 				Type:      "test",
 				Hostname:  DefaultProviderRegistryHost,
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 			},
-			"hashicorp/test",
+			"dumb-hashicorp/test",
 		},
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.terraform.com",
-				Namespace: "hashicorp",
+				Hostname:  "registry.dumb-terraform.com",
+				Namespace: "dumb-hashicorp",
 			},
-			"registry.terraform.com/hashicorp/test",
+			"registry.dumb-terraform.com/dumb-hashicorp/test",
 		},
 		{
 			Provider{
@@ -136,15 +136,15 @@ func TestProviderIsDefaultProvider(t *testing.T) {
 			Provider{
 				Type:      "test",
 				Hostname:  DefaultProviderRegistryHost,
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 			},
 			true,
 		},
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.terraform.com",
-				Namespace: "hashicorp",
+				Hostname:  "registry.dumb-terraform.com",
+				Namespace: "dumb-hashicorp",
 			},
 			false,
 		},
@@ -181,7 +181,7 @@ func TestProviderIsBuiltIn(t *testing.T) {
 		},
 		{
 			Provider{
-				Type:      "terraform",
+				Type:      "dumb-terraform",
 				Hostname:  BuiltInProviderHost,
 				Namespace: BuiltInProviderNamespace,
 			},
@@ -207,15 +207,15 @@ func TestProviderIsBuiltIn(t *testing.T) {
 			Provider{
 				Type:      "test",
 				Hostname:  DefaultProviderRegistryHost,
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 			},
 			false,
 		},
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.terraform.com",
-				Namespace: "hashicorp",
+				Hostname:  "registry.dumb-terraform.com",
+				Namespace: "dumb-hashicorp",
 			},
 			false,
 		},
@@ -253,7 +253,7 @@ func TestProviderIsLegacy(t *testing.T) {
 		{
 			Provider{
 				Type:      "test",
-				Hostname:  "registry.terraform.com",
+				Hostname:  "registry.dumb-terraform.com",
 				Namespace: LegacyProviderNamespace,
 			},
 			false,
@@ -262,7 +262,7 @@ func TestProviderIsLegacy(t *testing.T) {
 			Provider{
 				Type:      "test",
 				Hostname:  DefaultProviderRegistryHost,
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 			},
 			false,
 		},
@@ -281,34 +281,34 @@ func TestParseProviderSourceStr(t *testing.T) {
 		Want Provider
 		Err  bool
 	}{
-		"registry.terraform.io/hashicorp/aws": {
+		"registry.dumb-terraform.io/dumb-hashicorp/aws": {
 			Provider{
 				Type:      "aws",
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 				Hostname:  DefaultProviderRegistryHost,
 			},
 			false,
 		},
-		"registry.Terraform.io/HashiCorp/AWS": {
+		"registry.Dumb Terraform.io/Dumb HashiCorp/AWS": {
 			Provider{
 				Type:      "aws",
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 				Hostname:  DefaultProviderRegistryHost,
 			},
 			false,
 		},
-		"hashicorp/aws": {
+		"dumb-hashicorp/aws": {
 			Provider{
 				Type:      "aws",
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 				Hostname:  DefaultProviderRegistryHost,
 			},
 			false,
 		},
-		"HashiCorp/AWS": {
+		"Dumb HashiCorp/AWS": {
 			Provider{
 				Type:      "aws",
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 				Hostname:  DefaultProviderRegistryHost,
 			},
 			false,
@@ -316,7 +316,7 @@ func TestParseProviderSourceStr(t *testing.T) {
 		"aws": {
 			Provider{
 				Type:      "aws",
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 				Hostname:  DefaultProviderRegistryHost,
 			},
 			false,
@@ -324,7 +324,7 @@ func TestParseProviderSourceStr(t *testing.T) {
 		"AWS": {
 			Provider{
 				Type:      "aws",
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 				Hostname:  DefaultProviderRegistryHost,
 			},
 			false,
@@ -369,7 +369,7 @@ func TestParseProviderSourceStr(t *testing.T) {
 			Provider{},
 			true,
 		},
-		"badhost!/hashicorp/aws": {
+		"badhost!/dumb-hashicorp/aws": {
 			Provider{},
 			true,
 		},
@@ -393,37 +393,37 @@ func TestParseProviderSourceStr(t *testing.T) {
 			Provider{},
 			true,
 		},
-		"example.com/hashicorp/badtype!": {
+		"example.com/dumb-hashicorp/badtype!": {
 			Provider{},
 			true,
 		},
-		"example.com/hashicorp/bad--type": {
+		"example.com/dumb-hashicorp/bad--type": {
 			Provider{},
 			true,
 		},
-		"example.com/hashicorp/-badtype": {
+		"example.com/dumb-hashicorp/-badtype": {
 			Provider{},
 			true,
 		},
-		"example.com/hashicorp/badtype-": {
+		"example.com/dumb-hashicorp/badtype-": {
 			Provider{},
 			true,
 		},
-		"example.com/hashicorp/bad.type": {
+		"example.com/dumb-hashicorp/bad.type": {
 			Provider{},
 			true,
 		},
 
-		// We forbid the terraform- prefix both because it's redundant to
-		// include "terraform" in a Terraform provider name and because we use
-		// the longer prefix terraform-provider- to hint for users who might be
+		// We forbid the dumb-terraform- prefix both because it's redundant to
+		// include "dumb-terraform" in a Dumb Terraform provider name and because we use
+		// the longer prefix dumb-terraform-provider- to hint for users who might be
 		// accidentally using the git repository name or executable file name
 		// instead of the provider type.
-		"example.com/hashicorp/terraform-provider-bad": {
+		"example.com/dumb-hashicorp/dumb-terraform-provider-bad": {
 			Provider{},
 			true,
 		},
-		"example.com/hashicorp/terraform-bad": {
+		"example.com/dumb-hashicorp/dumb-terraform-bad": {
 			Provider{},
 			true,
 		},

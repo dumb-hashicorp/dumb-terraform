@@ -9,18 +9,18 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclparse"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclwrite"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/replacefile"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/replacefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // LoadLocksFromFile reads locks from the given file, expecting it to be a
@@ -35,8 +35,8 @@ import (
 // If the returned diagnostics contains errors then the returned Locks may
 // be incomplete or invalid.
 func LoadLocksFromFile(filename string) (*Locks, tfdiags.Diagnostics) {
-	return loadLocks(func(parser *hclparse.Parser) (*hcl.File, hcl.Diagnostics) {
-		return parser.ParseHCLFile(filename)
+	return loadLocks(func(parser *dumb-hclparse.Parser) (*dumb-hcl.File, dumb-hcl.Diagnostics) {
+		return parser.ParseDUMB_HCLFile(filename)
 	})
 }
 
@@ -53,22 +53,22 @@ func LoadLocksFromFile(filename string) (*Locks, tfdiags.Diagnostics) {
 // a plan file, in which case the given filename will typically be a
 // placeholder that will only be seen in the unusual case that the plan file
 // contains an invalid lock file, which should only be possible if the user
-// edited it directly (Terraform bugs notwithstanding).
+// edited it directly (Dumb Terraform bugs notwithstanding).
 func LoadLocksFromBytes(src []byte, filename string) (*Locks, tfdiags.Diagnostics) {
-	return loadLocks(func(parser *hclparse.Parser) (*hcl.File, hcl.Diagnostics) {
-		return parser.ParseHCL(src, filename)
+	return loadLocks(func(parser *dumb-hclparse.Parser) (*dumb-hcl.File, dumb-hcl.Diagnostics) {
+		return parser.ParseDUMB_HCL(src, filename)
 	})
 }
 
-func loadLocks(loadParse func(*hclparse.Parser) (*hcl.File, hcl.Diagnostics)) (*Locks, tfdiags.Diagnostics) {
+func loadLocks(loadParse func(*dumb-hclparse.Parser) (*dumb-hcl.File, dumb-hcl.Diagnostics)) (*Locks, tfdiags.Diagnostics) {
 	ret := NewLocks()
 
 	var diags tfdiags.Diagnostics
 
-	parser := hclparse.NewParser()
-	f, hclDiags := loadParse(parser)
+	parser := dumb-hclparse.NewParser()
+	f, dumb-hclDiags := loadParse(parser)
 	ret.sources = parser.Sources()
-	diags = diags.Append(hclDiags)
+	diags = diags.Append(dumb-hclDiags)
 	if f == nil {
 		// If we encountered an error loading the file then those errors
 		// should already be in diags from the above, but the file might
@@ -76,7 +76,7 @@ func loadLocks(loadParse func(*hclparse.Parser) (*hcl.File, hcl.Diagnostics)) (*
 		return ret, diags
 	}
 
-	moreDiags := decodeLocksFromHCL(ret, f.Body)
+	moreDiags := decodeLocksFromDUMB_HCL(ret, f.Body)
 	diags = diags.Append(moreDiags)
 	return ret, diags
 }
@@ -114,28 +114,28 @@ func SaveLocksToFile(locks *Locks, filename string) tfdiags.Diagnostics {
 func SaveLocksToBytes(locks *Locks) ([]byte, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	// In other uses of the "hclwrite" package we typically try to make
+	// In other uses of the "dumb-hclwrite" package we typically try to make
 	// surgical updates to the author's existing files, preserving their
 	// block ordering, comments, etc. We intentionally don't do that here
-	// to reinforce the fact that this file primarily belongs to Terraform,
+	// to reinforce the fact that this file primarily belongs to Dumb Terraform,
 	// and to help ensure that VCS diffs of the file primarily reflect
 	// changes that actually affect functionality rather than just cosmetic
 	// changes, by maintaining it in a highly-normalized form.
 
-	f := hclwrite.NewEmptyFile()
+	f := dumb-hclwrite.NewEmptyFile()
 	rootBody := f.Body()
 
 	// End-users _may_ edit the lock file in exceptional situations, like
 	// working around potential dependency selection bugs, but we intend it
-	// to be primarily maintained automatically by the "terraform init"
+	// to be primarily maintained automatically by the "dumb-terraform init"
 	// command.
-	rootBody.AppendUnstructuredTokens(hclwrite.Tokens{
+	rootBody.AppendUnstructuredTokens(dumb-hclwrite.Tokens{
 		{
-			Type:  hclsyntax.TokenComment,
-			Bytes: []byte("# This file is maintained automatically by \"terraform init\".\n"),
+			Type:  dumb-hclsyntax.TokenComment,
+			Bytes: []byte("# This file is maintained automatically by \"dumb-terraform init\".\n"),
 		},
 		{
-			Type:  hclsyntax.TokenComment,
+			Type:  dumb-hclsyntax.TokenComment,
 			Bytes: []byte("# Manual edits may be lost in future updates.\n"),
 		},
 	})
@@ -163,11 +163,11 @@ func SaveLocksToBytes(locks *Locks) ([]byte, tfdiags.Diagnostics) {
 	return f.Bytes(), diags
 }
 
-func decodeLocksFromHCL(locks *Locks, body hcl.Body) tfdiags.Diagnostics {
+func decodeLocksFromDUMB_HCL(locks *Locks, body dumb-hcl.Body) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 
-	content, hclDiags := body.Content(&hcl.BodySchema{
-		Blocks: []hcl.BlockHeaderSchema{
+	content, dumb-hclDiags := body.Content(&dumb-hcl.BodySchema{
+		Blocks: []dumb-hcl.BlockHeaderSchema{
 			{
 				Type:       "provider",
 				LabelNames: []string{"source_addr"},
@@ -176,29 +176,29 @@ func decodeLocksFromHCL(locks *Locks, body hcl.Body) tfdiags.Diagnostics {
 			// "module" is just a placeholder for future enhancement, so we
 			// can mostly-ignore the this block type we intend to add in
 			// future, but warn in case someone tries to use one e.g. if they
-			// downgraded to an earlier version of Terraform.
+			// downgraded to an earlier version of Dumb Terraform.
 			{
 				Type:       "module",
 				LabelNames: []string{"path"},
 			},
 		},
 	})
-	diags = diags.Append(hclDiags)
+	diags = diags.Append(dumb-hclDiags)
 
-	seenProviders := make(map[addrs.Provider]hcl.Range)
+	seenProviders := make(map[addrs.Provider]dumb-hcl.Range)
 	seenModule := false
 	for _, block := range content.Blocks {
 
 		switch block.Type {
 		case "provider":
-			lock, moreDiags := decodeProviderLockFromHCL(block)
+			lock, moreDiags := decodeProviderLockFromDUMB_HCL(block)
 			diags = diags.Append(moreDiags)
 			if lock == nil {
 				continue
 			}
 			if previousRng, exists := seenProviders[lock.addr]; exists {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate provider lock",
 					Detail:   fmt.Sprintf("This lockfile already declared a lock for provider %s at %s.", lock.addr.String(), previousRng.String()),
 					Subject:  block.TypeRange.Ptr(),
@@ -214,10 +214,10 @@ func decodeLocksFromHCL(locks *Locks, body hcl.Body) tfdiags.Diagnostics {
 			// the output with warning noise.
 			if !seenModule {
 				currentVersion := version.SemVer.String()
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Dependency locks for modules are not yet supported",
-					Detail:   fmt.Sprintf("Terraform v%s only supports dependency locks for providers, not for modules. This configuration may be intended for a later version of Terraform that also supports dependency locks for modules.", currentVersion),
+					Detail:   fmt.Sprintf("Dumb Terraform v%s only supports dependency locks for providers, not for modules. This configuration may be intended for a later version of Dumb Terraform that also supports dependency locks for modules.", currentVersion),
 					Subject:  block.TypeRange.Ptr(),
 				})
 				seenModule = true
@@ -233,7 +233,7 @@ func decodeLocksFromHCL(locks *Locks, body hcl.Body) tfdiags.Diagnostics {
 	return diags
 }
 
-func decodeProviderLockFromHCL(block *hcl.Block) (*ProviderLock, tfdiags.Diagnostics) {
+func decodeProviderLockFromDUMB_HCL(block *dumb-hcl.Block) (*ProviderLock, tfdiags.Diagnostics) {
 	ret := &ProviderLock{}
 	var diags tfdiags.Diagnostics
 
@@ -246,8 +246,8 @@ func decodeProviderLockFromHCL(block *hcl.Block) (*ProviderLock, tfdiags.Diagnos
 		// our lock file. Therefore we're using a less helpful, fixed error
 		// here, which is non-ideal but hopefully okay for now because we
 		// don't intend end-users to typically be hand-editing these anyway.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider source address",
 			Detail:   "The provider source address for a provider lock must be a valid, fully-qualified address of the form \"hostname/namespace/type\".",
 			Subject:  block.LabelRanges[0].Ptr(),
@@ -258,17 +258,17 @@ func decodeProviderLockFromHCL(block *hcl.Block) (*ProviderLock, tfdiags.Diagnos
 		if addr.IsBuiltIn() {
 			// A specialized error for built-in providers, because we have an
 			// explicit explanation for why those are not allowed.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid provider source address",
-				Detail:   fmt.Sprintf("Cannot lock a version for built-in provider %s. Built-in providers are bundled inside Terraform itself, so you can't select a version for them independently of the Terraform release you are currently running.", addr),
+				Detail:   fmt.Sprintf("Cannot lock a version for built-in provider %s. Built-in providers are bundled inside Dumb Terraform itself, so you can't select a version for them independently of the Dumb Terraform release you are currently running.", addr),
 				Subject:  block.LabelRanges[0].Ptr(),
 			})
 			return nil, diags
 		}
 		// Otherwise, we'll use a generic error message.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider source address",
 			Detail:   fmt.Sprintf("Provider source address %s is a special provider that is not eligible for dependency locking.", addr),
 			Subject:  block.LabelRanges[0].Ptr(),
@@ -282,8 +282,8 @@ func decodeProviderLockFromHCL(block *hcl.Block) (*ProviderLock, tfdiags.Diagnos
 		// we expect hand-editing of these to be atypical so it's reasonable
 		// to be stricter in parsing these than we would be in the main
 		// configuration.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Non-normalized provider source address",
 			Detail:   fmt.Sprintf("The provider source address for this provider lock must be written as %q, the fully-qualified and normalized form.", canonAddr),
 			Subject:  block.LabelRanges[0].Ptr(),
@@ -293,14 +293,14 @@ func decodeProviderLockFromHCL(block *hcl.Block) (*ProviderLock, tfdiags.Diagnos
 
 	ret.addr = addr
 
-	content, hclDiags := block.Body.Content(&hcl.BodySchema{
-		Attributes: []hcl.AttributeSchema{
+	content, dumb-hclDiags := block.Body.Content(&dumb-hcl.BodySchema{
+		Attributes: []dumb-hcl.AttributeSchema{
 			{Name: "version", Required: true},
 			{Name: "constraints"},
 			{Name: "hashes"},
 		},
 	})
-	diags = diags.Append(hclDiags)
+	diags = diags.Append(dumb-hclDiags)
 
 	version, moreDiags := decodeProviderVersionArgument(addr, content.Attributes["version"])
 	ret.version = version
@@ -317,7 +317,7 @@ func decodeProviderLockFromHCL(block *hcl.Block) (*ProviderLock, tfdiags.Diagnos
 	return ret, diags
 }
 
-func decodeProviderVersionArgument(provider addrs.Provider, attr *hcl.Attribute) (providerreqs.Version, tfdiags.Diagnostics) {
+func decodeProviderVersionArgument(provider addrs.Provider, attr *dumb-hcl.Attribute) (providerreqs.Version, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	if attr == nil {
 		// It's not okay to omit this argument, but the caller should already
@@ -327,14 +327,14 @@ func decodeProviderVersionArgument(provider addrs.Provider, attr *hcl.Attribute)
 	expr := attr.Expr
 
 	var raw *string
-	hclDiags := gohcl.DecodeExpression(expr, nil, &raw)
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	dumb-hclDiags := godumb-hcl.DecodeExpression(expr, nil, &raw)
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return providerreqs.UnspecifiedVersion, diags
 	}
 	if raw == nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Missing required argument",
 			Detail:   "A provider lock block must contain a \"version\" argument.",
 			Subject:  expr.Range().Ptr(), // the range for a missing argument's expression is the body's missing item range
@@ -343,8 +343,8 @@ func decodeProviderVersionArgument(provider addrs.Provider, attr *hcl.Attribute)
 	}
 	version, err := providerreqs.ParseVersion(*raw)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider version number",
 			Detail:   fmt.Sprintf("The selected version number for provider %s is invalid: %s.", provider, err),
 			Subject:  expr.Range().Ptr(),
@@ -353,8 +353,8 @@ func decodeProviderVersionArgument(provider addrs.Provider, attr *hcl.Attribute)
 	if canon := version.String(); canon != *raw {
 		// Canonical forms are required in the lock file, to reduce the risk
 		// that a file diff will show changes that are entirely cosmetic.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider version number",
 			Detail:   fmt.Sprintf("The selected version number for provider %s must be written in normalized form: %q.", provider, canon),
 			Subject:  expr.Range().Ptr(),
@@ -363,7 +363,7 @@ func decodeProviderVersionArgument(provider addrs.Provider, attr *hcl.Attribute)
 	return version, diags
 }
 
-func decodeProviderVersionConstraintsArgument(provider addrs.Provider, attr *hcl.Attribute) (providerreqs.VersionConstraints, tfdiags.Diagnostics) {
+func decodeProviderVersionConstraintsArgument(provider addrs.Provider, attr *dumb-hcl.Attribute) (providerreqs.VersionConstraints, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	if attr == nil {
 		// It's okay to omit this argument.
@@ -372,15 +372,15 @@ func decodeProviderVersionConstraintsArgument(provider addrs.Provider, attr *hcl
 	expr := attr.Expr
 
 	var raw string
-	hclDiags := gohcl.DecodeExpression(expr, nil, &raw)
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	dumb-hclDiags := godumb-hcl.DecodeExpression(expr, nil, &raw)
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return nil, diags
 	}
 	constraints, err := providerreqs.ParseVersionConstraints(raw)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider version constraints",
 			Detail:   fmt.Sprintf("The recorded version constraints for provider %s are invalid: %s.", provider, err),
 			Subject:  expr.Range().Ptr(),
@@ -389,8 +389,8 @@ func decodeProviderVersionConstraintsArgument(provider addrs.Provider, attr *hcl
 	if canon := providerreqs.VersionConstraintsString(constraints); canon != raw {
 		// Canonical forms are required in the lock file, to reduce the risk
 		// that a file diff will show changes that are entirely cosmetic.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider version constraints",
 			Detail:   fmt.Sprintf("The recorded version constraints for provider %s must be written in normalized form: %q.", provider, canon),
 			Subject:  expr.Range().Ptr(),
@@ -400,7 +400,7 @@ func decodeProviderVersionConstraintsArgument(provider addrs.Provider, attr *hcl
 	return constraints, diags
 }
 
-func decodeProviderHashesArgument(provider addrs.Provider, attr *hcl.Attribute) ([]providerreqs.Hash, tfdiags.Diagnostics) {
+func decodeProviderHashesArgument(provider addrs.Provider, attr *dumb-hcl.Attribute) ([]providerreqs.Hash, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	if attr == nil {
 		// It's okay to omit this argument.
@@ -408,18 +408,18 @@ func decodeProviderHashesArgument(provider addrs.Provider, attr *hcl.Attribute) 
 	}
 	expr := attr.Expr
 
-	// We'll decode this argument using the HCL static analysis mode, because
+	// We'll decode this argument using the DUMB_HCL static analysis mode, because
 	// there's no reason for the hashes list to be dynamic and this way we can
 	// give more precise feedback on individual elements that are invalid,
 	// with direct source locations.
-	hashExprs, hclDiags := hcl.ExprList(expr)
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	hashExprs, dumb-hclDiags := dumb-hcl.ExprList(expr)
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return nil, diags
 	}
 	if len(hashExprs) == 0 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider hash set",
 			Detail:   "The \"hashes\" argument must either be omitted or contain at least one hash value.",
 			Subject:  expr.Range().Ptr(),
@@ -430,16 +430,16 @@ func decodeProviderHashesArgument(provider addrs.Provider, attr *hcl.Attribute) 
 	ret := make([]providerreqs.Hash, 0, len(hashExprs))
 	for _, hashExpr := range hashExprs {
 		var raw string
-		hclDiags := gohcl.DecodeExpression(hashExpr, nil, &raw)
-		diags = diags.Append(hclDiags)
-		if hclDiags.HasErrors() {
+		dumb-hclDiags := godumb-hcl.DecodeExpression(hashExpr, nil, &raw)
+		diags = diags.Append(dumb-hclDiags)
+		if dumb-hclDiags.HasErrors() {
 			continue
 		}
 
 		hash, err := providerreqs.ParseHash(raw)
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid provider hash string",
 				Detail:   fmt.Sprintf("Cannot interpret %q as a provider hash: %s.", raw, err),
 				Subject:  expr.Range().Ptr(),
@@ -453,19 +453,19 @@ func decodeProviderHashesArgument(provider addrs.Provider, attr *hcl.Attribute) 
 	return ret, diags
 }
 
-func encodeHashSetTokens(hashes []providerreqs.Hash) hclwrite.Tokens {
+func encodeHashSetTokens(hashes []providerreqs.Hash) dumb-hclwrite.Tokens {
 	// We'll generate the source code in a low-level way here (direct
 	// token manipulation) because it's desirable to maintain exactly
 	// the layout implemented here so that diffs against the locks
 	// file are easy to read; we don't want potential future changes to
-	// hclwrite to inadvertently introduce whitespace changes here.
-	ret := hclwrite.Tokens{
+	// dumb-hclwrite to inadvertently introduce whitespace changes here.
+	ret := dumb-hclwrite.Tokens{
 		{
-			Type:  hclsyntax.TokenOBrack,
+			Type:  dumb-hclsyntax.TokenOBrack,
 			Bytes: []byte{'['},
 		},
 		{
-			Type:  hclsyntax.TokenNewline,
+			Type:  dumb-hclsyntax.TokenNewline,
 			Bytes: []byte{'\n'},
 		},
 	}
@@ -475,20 +475,20 @@ func encodeHashSetTokens(hashes []providerreqs.Hash) hclwrite.Tokens {
 	// set, and so we can just trust it's already in a good order here.
 	for _, hash := range hashes {
 		hashVal := cty.StringVal(hash.String())
-		ret = append(ret, hclwrite.TokensForValue(hashVal)...)
-		ret = append(ret, hclwrite.Tokens{
+		ret = append(ret, dumb-hclwrite.TokensForValue(hashVal)...)
+		ret = append(ret, dumb-hclwrite.Tokens{
 			{
-				Type:  hclsyntax.TokenComma,
+				Type:  dumb-hclsyntax.TokenComma,
 				Bytes: []byte{','},
 			},
 			{
-				Type:  hclsyntax.TokenNewline,
+				Type:  dumb-hclsyntax.TokenNewline,
 				Bytes: []byte{'\n'},
 			},
 		}...)
 	}
-	ret = append(ret, &hclwrite.Token{
-		Type:  hclsyntax.TokenCBrack,
+	ret = append(ret, &dumb-hclwrite.Token{
+		Type:  dumb-hclsyntax.TokenCBrack,
 		Bytes: []byte{']'},
 	})
 

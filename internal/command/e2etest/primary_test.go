@@ -16,38 +16,38 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/terraform/internal/command"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/e2e"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/grpcwrap"
-	"github.com/hashicorp/terraform/internal/plans"
-	tfplugin "github.com/hashicorp/terraform/internal/plugin6"
-	simple "github.com/hashicorp/terraform/internal/provider-simple-v6"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	proto "github.com/hashicorp/terraform/internal/tfplugin6"
+	"github.com/dumb-hashicorp/go-dumb-hclog"
+	"github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/e2e"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/grpcwrap"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	tfplugin "github.com/dumb-hashicorp/dumb-terraform/internal/plugin6"
+	simple "github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	proto "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin6"
 	"github.com/zclconf/go-cty/cty"
 )
 
 // The tests in this file are for the "primary workflow", which includes
 // variants of the following sequence, with different details:
-// terraform init
-// terraform plan
-// terraform apply
-// terraform destroy
+// dumb-terraform init
+// dumb-terraform plan
+// dumb-terraform apply
+// dumb-terraform destroy
 
 func TestPrimarySeparatePlan(t *testing.T) {
 	t.Parallel()
 
-	// This test reaches out to releases.hashicorp.com to download the
+	// This test reaches out to releases.dumb-hashicorp.com to download the
 	// template and null providers, so it can only run if network access is
 	// allowed.
 	skipIfCannotAccessNetwork(t)
 
 	fixturePath := filepath.Join("testdata", "full-workflow-null")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	//// INIT
 	stdout, stderr, err := tf.Run("init")
@@ -57,11 +57,11 @@ func TestPrimarySeparatePlan(t *testing.T) {
 
 	// Make sure we actually downloaded the plugins, rather than picking up
 	// copies that might be already installed globally on the system.
-	if !strings.Contains(stdout, "Installing hashicorp/template v") {
+	if !strings.Contains(stdout, "Installing dumb-hashicorp/template v") {
 		t.Errorf("template provider download message is missing from init output:\n%s", stdout)
 		t.Logf("(this can happen if you have a copy of the plugin in one of the global plugin search dirs)")
 	}
-	if !strings.Contains(stdout, "Installing hashicorp/null v") {
+	if !strings.Contains(stdout, "Installing dumb-hashicorp/null v") {
 		t.Errorf("null provider download message is missing from init output:\n%s", stdout)
 		t.Logf("(this can happen if you have a copy of the plugin in one of the global plugin search dirs)")
 	}
@@ -79,7 +79,7 @@ func TestPrimarySeparatePlan(t *testing.T) {
 	if !strings.Contains(stdout, "Saved the plan to: tfplan") {
 		t.Errorf("missing \"Saved the plan to...\" message in plan output\n%s", stdout)
 	}
-	if !strings.Contains(stdout, "terraform apply \"tfplan\"") {
+	if !strings.Contains(stdout, "dumb-terraform apply \"tfplan\"") {
 		t.Errorf("missing next-step instruction in plan output\n%s", stdout)
 	}
 
@@ -166,7 +166,7 @@ func TestPrimaryChdirOption(t *testing.T) {
 	// safe to run it even when network access is disallowed.
 
 	fixturePath := filepath.Join("testdata", "chdir-option")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	//// INIT
 	_, stderr, err := tf.Run("-chdir=subdir", "init")
@@ -187,7 +187,7 @@ func TestPrimaryChdirOption(t *testing.T) {
 	if !strings.Contains(stdout, "Saved the plan to: tfplan") {
 		t.Errorf("missing \"Saved the plan to...\" message in plan output\n%s", stdout)
 	}
-	if !strings.Contains(stdout, "terraform apply \"tfplan\"") {
+	if !strings.Contains(stdout, "dumb-terraform apply \"tfplan\"") {
 		t.Errorf("missing next-step instruction in plan output\n%s", stdout)
 	}
 
@@ -213,7 +213,7 @@ func TestPrimaryChdirOption(t *testing.T) {
 	}
 
 	// The state file is in subdir because -chdir changed the current working directory.
-	state, err := tf.StateFromFile("subdir/terraform.tfstate")
+	state, err := tf.StateFromFile("subdir/dumb-terraform.tfstate")
 	if err != nil {
 		t.Fatalf("failed to read state file: %s", err)
 	}
@@ -256,25 +256,25 @@ func TestPrimary_stateStore(t *testing.T) {
 	}
 
 	t.Setenv(e2e.TestExperimentFlag, "true")
-	terraformBin := e2e.GoBuild("github.com/hashicorp/terraform", "terraform")
+	dumb-terraformBin := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform", "dumb-terraform")
 
 	fixturePath := filepath.Join("testdata", "full-workflow-with-state-store-fs")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 	workspaceDirName := "states" // See workspace_dir value in the configuration
 
 	// In order to test integration with PSS we need a provider plugin implementing a state store.
 	// Here will build the simple6 (built with protocol v6) provider, which implements PSS.
-	simple6Provider := filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-	simple6ProviderExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+	simple6Provider := filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+	simple6ProviderExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 
-	// Move the provider binaries into a directory that we will point terraform
+	// Move the provider binaries into a directory that we will point dumb-terraform
 	// to using the -plugin-dir cli flag.
 	platform := getproviders.CurrentPlatform.String()
-	hashiDir := "cache/registry.terraform.io/hashicorp/"
+	hashiDir := "cache/registry.dumb-terraform.io/dumb-hashicorp/"
 	if err := os.MkdirAll(tf.Path(hashiDir, "simple6/0.0.1/", platform), os.ModePerm); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "terraform-provider-simple6")); err != nil {
+	if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "dumb-terraform-provider-simple6")); err != nil {
 		t.Fatal(err)
 	}
 
@@ -298,7 +298,7 @@ func TestPrimary_stateStore(t *testing.T) {
 	}
 
 	// Check the statefile saved by the fs state store.
-	path := fmt.Sprintf("%s/default/terraform.tfstate", workspaceDirName)
+	path := fmt.Sprintf("%s/default/dumb-terraform.tfstate", workspaceDirName)
 	f, err := tf.OpenFile(path)
 	if err != nil {
 		t.Fatalf("unexpected error opening state file %s: %s\nstderr:\n%s", path, err, stderr)
@@ -314,8 +314,8 @@ func TestPrimary_stateStore(t *testing.T) {
 	if len(r) != 1 {
 		t.Fatalf("expected state to include one resource, but got %d", len(r))
 	}
-	if _, ok := r["terraform_data.my-data"]; !ok {
-		t.Fatalf("expected state to include terraform_data.my-data but it's missing")
+	if _, ok := r["dumb-terraform_data.my-data"]; !ok {
+		t.Fatalf("expected state to include dumb-terraform_data.my-data but it's missing")
 	}
 }
 
@@ -330,24 +330,24 @@ func TestPrimary_stateStore_planFile(t *testing.T) {
 	}
 
 	t.Setenv(e2e.TestExperimentFlag, "true")
-	terraformBin := e2e.GoBuild("github.com/hashicorp/terraform", "terraform")
+	dumb-terraformBin := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform", "dumb-terraform")
 
 	fixturePath := filepath.Join("testdata", "full-workflow-with-state-store-fs")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	// In order to test integration with PSS we need a provider plugin implementing a state store.
 	// Here will build the simple6 (built with protocol v6) provider, which implements PSS.
-	simple6Provider := filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-	simple6ProviderExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+	simple6Provider := filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+	simple6ProviderExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 
-	// Move the provider binaries into a directory that we will point terraform
+	// Move the provider binaries into a directory that we will point dumb-terraform
 	// to using the -plugin-dir cli flag.
 	platform := getproviders.CurrentPlatform.String()
-	hashiDir := "cache/registry.terraform.io/hashicorp/"
+	hashiDir := "cache/registry.dumb-terraform.io/dumb-hashicorp/"
 	if err := os.MkdirAll(tf.Path(hashiDir, "simple6/0.0.1/", platform), os.ModePerm); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "terraform-provider-simple6")); err != nil {
+	if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "dumb-terraform-provider-simple6")); err != nil {
 		t.Fatal(err)
 	}
 
@@ -375,7 +375,7 @@ func TestPrimary_stateStore_planFile(t *testing.T) {
 	}
 
 	// Check the statefile saved by the fs state store.
-	path := "states/default/terraform.tfstate"
+	path := "states/default/dumb-terraform.tfstate"
 	f, err := tf.OpenFile(path)
 	if err != nil {
 		t.Fatalf("unexpected error opening state file %s: %s\nstderr:\n%s", path, err, stderr)
@@ -391,8 +391,8 @@ func TestPrimary_stateStore_planFile(t *testing.T) {
 	if len(r) != 1 {
 		t.Fatalf("expected state to include one resource, but got %d", len(r))
 	}
-	if _, ok := r["terraform_data.my-data"]; !ok {
-		t.Fatalf("expected state to include terraform_data.my-data but it's missing")
+	if _, ok := r["dumb-terraform_data.my-data"]; !ok {
+		t.Fatalf("expected state to include dumb-terraform_data.my-data but it's missing")
 	}
 }
 
@@ -419,8 +419,8 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		fixturePath := filepath.Join("testdata", "full-workflow-with-state-store-fs")
 
 		t.Setenv(e2e.TestExperimentFlag, "true")
-		terraformBin := e2e.GoBuild("github.com/hashicorp/terraform", "terraform")
-		tf := e2e.NewBinary(t, terraformBin, fixturePath)
+		dumb-terraformBin := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform", "dumb-terraform")
+		tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 		reattachCh := make(chan *plugin.ReattachConfig)
 		closeCh := make(chan struct{})
@@ -431,9 +431,9 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		t.Cleanup(cancel)
 
 		go plugin.Serve(&plugin.ServeConfig{
-			Logger: hclog.New(&hclog.LoggerOptions{
+			Logger: dumb-hclog.New(&dumb-hclog.LoggerOptions{
 				Name:   "plugintest",
-				Level:  hclog.Trace,
+				Level:  dumb-hclog.Trace,
 				Output: io.Discard,
 			}),
 			Test: &plugin.ServeTestConfig{
@@ -457,7 +457,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 			t.Fatalf("no reattach config received")
 		}
 		reattachStr, err := json.Marshal(map[string]reattachConfig{
-			"hashicorp/simple6": {
+			"dumb-hashicorp/simple6": {
 				Protocol:        string(config.Protocol),
 				ProtocolVersion: 6,
 				Pid:             config.Pid,
@@ -481,7 +481,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		}
 
 		// Assert backend state file says the provider is a reattached
-		statePath := filepath.Join(tf.WorkDir(), ".terraform", command.DefaultStateFilename)
+		statePath := filepath.Join(tf.WorkDir(), ".dumb-terraform", command.DefaultStateFilename)
 		sMgr := &clistate.LocalState{Path: statePath}
 		if err := sMgr.RefreshState(); err != nil {
 			t.Fatal("Failed to load state:", err)
@@ -499,20 +499,20 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		// No longer using reattached providers.
 		tf.RemoveEnv("TF_REATTACH_PROVIDERS")
 
-		// Build the provider binary and direct Terraform to use it via dev_override, which should cause Terraform to treat it as a dev_override in a CLI configuration file.
-		simple6Provider := filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-		simple6ProviderExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+		// Build the provider binary and direct Dumb Terraform to use it via dev_override, which should cause Dumb Terraform to treat it as a dev_override in a CLI configuration file.
+		simple6Provider := filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+		simple6ProviderExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 		if err := os.Rename(simple6ProviderExe, simple6Provider); err != nil {
 			t.Fatal(err)
 		}
 		cliCfg := fmt.Sprintf(`provider_installation {
 
   dev_overrides {
-    "hashicorp/simple6" = "%s"
+    "dumb-hashicorp/simple6" = "%s"
   }
 
   # For all other providers, install them directly from their origin provider
-  # registries as normal. If you omit this, Terraform will _only_ use
+  # registries as normal. If you omit this, Dumb Terraform will _only_ use
   # the dev_overrides block, and so no other providers will be available.
   direct {}
 }
@@ -551,21 +551,21 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		fixturePath := filepath.Join("testdata", "full-workflow-with-state-store-fs")
 
 		t.Setenv(e2e.TestExperimentFlag, "true")
-		terraformBin := e2e.GoBuild("github.com/hashicorp/terraform", "terraform")
-		tf := e2e.NewBinary(t, terraformBin, fixturePath)
+		dumb-terraformBin := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform", "dumb-terraform")
+		tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 		// Build provider binaries that will be used via a filesystem mirror/-plugin-dir flag.
-		simple6Provider := filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-		simple6ProviderExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+		simple6Provider := filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+		simple6ProviderExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 
-		// Move the provider binaries into a directory that we will point terraform
+		// Move the provider binaries into a directory that we will point dumb-terraform
 		// to using the -plugin-dir cli flag.
 		platform := getproviders.CurrentPlatform.String()
-		hashiDir := "cache/registry.terraform.io/hashicorp/"
+		hashiDir := "cache/registry.dumb-terraform.io/dumb-hashicorp/"
 		if err := os.MkdirAll(tf.Path(hashiDir, "simple6/0.0.1/", platform), os.ModePerm); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "terraform-provider-simple6")); err != nil {
+		if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "dumb-terraform-provider-simple6")); err != nil {
 			t.Fatal(err)
 		}
 
@@ -576,7 +576,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		}
 
 		// Assert backend state file says the provider is a managed provider
-		statePath := filepath.Join(tf.WorkDir(), ".terraform", command.DefaultStateFilename)
+		statePath := filepath.Join(tf.WorkDir(), ".dumb-terraform", command.DefaultStateFilename)
 		sMgr := &clistate.LocalState{Path: statePath}
 		if err := sMgr.RefreshState(); err != nil {
 			t.Fatal("Failed to load state:", err)
@@ -585,8 +585,8 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		if s == nil || s.StateStore == nil {
 			t.Fatal("expected backend state file to be created and include state store details, but it was missing.")
 		}
-		if s.StateStore.ProviderSupplyMode != getproviders.ManagedByTerraform {
-			t.Fatalf("expected state store provider supply mode to be 'managed_by_terraform', got '%s'", s.StateStore.ProviderSupplyMode)
+		if s.StateStore.ProviderSupplyMode != getproviders.ManagedByDumb Terraform {
+			t.Fatalf("expected state store provider supply mode to be 'managed_by_dumb-terraform', got '%s'", s.StateStore.ProviderSupplyMode)
 		}
 
 		//// PLAN - using same provider but dev_overrides now.
@@ -596,20 +596,20 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 			t.Fatal(err)
 		}
 
-		// Build a new provider binary and direct Terraform to use it via CLI configuration file.
-		simple6Provider = filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-		simple6ProviderExe = e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+		// Build a new provider binary and direct Dumb Terraform to use it via CLI configuration file.
+		simple6Provider = filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+		simple6ProviderExe = e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 		if err := os.Rename(simple6ProviderExe, simple6Provider); err != nil {
 			t.Fatal(err)
 		}
 		cliCfg := fmt.Sprintf(`provider_installation {
 
   dev_overrides {
-    "hashicorp/simple6" = "%s"
+    "dumb-hashicorp/simple6" = "%s"
   }
 
   # For all other providers, install them directly from their origin provider
-  # registries as normal. If you omit this, Terraform will _only_ use
+  # registries as normal. If you omit this, Dumb Terraform will _only_ use
   # the dev_overrides block, and so no other providers will be available.
   direct {}
 }
@@ -628,7 +628,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		if !strings.Contains(stdout, devOverrideMsg) {
 			t.Fatalf("expected output to include %q, but it was missing from output:\n%s", devOverrideMsg, stdout)
 		}
-		initErrorMsg := "Error: State store initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\""
+		initErrorMsg := "Error: State store initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\""
 		if !strings.Contains(stderr, initErrorMsg) {
 			t.Fatalf("expected error output to include %q, but it was missing from output:\n%s", initErrorMsg, stderr)
 		}
@@ -647,23 +647,23 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		fixturePath := filepath.Join("testdata", "full-workflow-with-state-store-fs")
 
 		t.Setenv(e2e.TestExperimentFlag, "true")
-		terraformBin := e2e.GoBuild("github.com/hashicorp/terraform", "terraform")
-		tf := e2e.NewBinary(t, terraformBin, fixturePath)
+		dumb-terraformBin := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform", "dumb-terraform")
+		tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
-		// Build a new provider binary and direct Terraform to use it via CLI configuration file.
-		simple6Provider := filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-		simple6ProviderExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+		// Build a new provider binary and direct Dumb Terraform to use it via CLI configuration file.
+		simple6Provider := filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+		simple6ProviderExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 		if err := os.Rename(simple6ProviderExe, simple6Provider); err != nil {
 			t.Fatal(err)
 		}
 		cliCfg := fmt.Sprintf(`provider_installation {
 
   dev_overrides {
-    "hashicorp/simple6" = "%s"
+    "dumb-hashicorp/simple6" = "%s"
   }
 
   # For all other providers, install them directly from their origin provider
-  # registries as normal. If you omit this, Terraform will _only_ use
+  # registries as normal. If you omit this, Dumb Terraform will _only_ use
   # the dev_overrides block, and so no other providers will be available.
   direct {}
 }
@@ -684,7 +684,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		}
 
 		// Assert backend state file says the provider is a dev_override provider
-		statePath := filepath.Join(tf.WorkDir(), ".terraform", command.DefaultStateFilename)
+		statePath := filepath.Join(tf.WorkDir(), ".dumb-terraform", command.DefaultStateFilename)
 		sMgr := &clistate.LocalState{Path: statePath}
 		if err := sMgr.RefreshState(); err != nil {
 			t.Fatal("Failed to load state:", err)
@@ -697,7 +697,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 			t.Fatalf("expected state store provider supply mode to be 'dev_override', got '%s'", s.StateStore.ProviderSupplyMode)
 		}
 
-		// PLAN - using same provider but now it's managed by Terraform.
+		// PLAN - using same provider but now it's managed by Dumb Terraform.
 
 		// Delete the old binary and CLI configuration file, to ensure that's no longer in use.
 		if err := os.RemoveAll(simple6Provider); err != nil {
@@ -709,17 +709,17 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenInitAndPlanApply(t *te
 		tf.RemoveEnv("TF_CLI_CONFIG_FILE")
 
 		// Build provider binaries that will be used via a filesystem mirror/-plugin-dir flag.
-		simple6Provider = filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-		simple6ProviderExe = e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+		simple6Provider = filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+		simple6ProviderExe = e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 
-		// Move the provider binaries into a directory that we will point terraform
+		// Move the provider binaries into a directory that we will point dumb-terraform
 		// to using the -plugin-dir cli flag.
 		platform := getproviders.CurrentPlatform.String()
-		hashiDir := "cache/registry.terraform.io/hashicorp/"
+		hashiDir := "cache/registry.dumb-terraform.io/dumb-hashicorp/"
 		if err := os.MkdirAll(tf.Path(hashiDir, "simple6/0.0.1/", platform), os.ModePerm); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "terraform-provider-simple6")); err != nil {
+		if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "dumb-terraform-provider-simple6")); err != nil {
 			t.Fatal(err)
 		}
 
@@ -755,8 +755,8 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		fixturePath := filepath.Join("testdata", "full-workflow-with-state-store-fs")
 
 		t.Setenv(e2e.TestExperimentFlag, "true")
-		terraformBin := e2e.GoBuild("github.com/hashicorp/terraform", "terraform")
-		tf := e2e.NewBinary(t, terraformBin, fixturePath)
+		dumb-terraformBin := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform", "dumb-terraform")
+		tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 		reattachCh := make(chan *plugin.ReattachConfig)
 		closeCh := make(chan struct{})
@@ -767,9 +767,9 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		t.Cleanup(cancel)
 
 		go plugin.Serve(&plugin.ServeConfig{
-			Logger: hclog.New(&hclog.LoggerOptions{
+			Logger: dumb-hclog.New(&dumb-hclog.LoggerOptions{
 				Name:   "plugintest",
-				Level:  hclog.Trace,
+				Level:  dumb-hclog.Trace,
 				Output: io.Discard,
 			}),
 			Test: &plugin.ServeTestConfig{
@@ -793,7 +793,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 			t.Fatalf("no reattach config received")
 		}
 		reattachStr, err := json.Marshal(map[string]reattachConfig{
-			"hashicorp/simple6": {
+			"dumb-hashicorp/simple6": {
 				Protocol:        string(config.Protocol),
 				ProtocolVersion: 6,
 				Pid:             config.Pid,
@@ -817,7 +817,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		}
 
 		// Assert backend state file says the provider is a reattached
-		statePath := filepath.Join(tf.WorkDir(), ".terraform", command.DefaultStateFilename)
+		statePath := filepath.Join(tf.WorkDir(), ".dumb-terraform", command.DefaultStateFilename)
 		sMgr := &clistate.LocalState{Path: statePath}
 		if err := sMgr.RefreshState(); err != nil {
 			t.Fatal("Failed to load state:", err)
@@ -835,20 +835,20 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		// No longer using reattached providers.
 		tf.RemoveEnv("TF_REATTACH_PROVIDERS")
 
-		// Build the provider binary and direct Terraform to use it via dev_override, which should cause Terraform to treat it as a dev_override in a CLI configuration file.
-		simple6Provider := filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-		simple6ProviderExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+		// Build the provider binary and direct Dumb Terraform to use it via dev_override, which should cause Dumb Terraform to treat it as a dev_override in a CLI configuration file.
+		simple6Provider := filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+		simple6ProviderExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 		if err := os.Rename(simple6ProviderExe, simple6Provider); err != nil {
 			t.Fatal(err)
 		}
 		cliCfg := fmt.Sprintf(`provider_installation {
 
   dev_overrides {
-    "hashicorp/simple6" = "%s"
+    "dumb-hashicorp/simple6" = "%s"
   }
 
   # For all other providers, install them directly from their origin provider
-  # registries as normal. If you omit this, Terraform will _only_ use
+  # registries as normal. If you omit this, Dumb Terraform will _only_ use
   # the dev_overrides block, and so no other providers will be available.
   direct {}
 }
@@ -862,7 +862,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		if err != nil {
 			t.Fatalf("unexpected error: %s\nstderr:\n%s", err, stderr)
 		}
-		expectedMessage := "Terraform has been successfully initialized!"
+		expectedMessage := "Dumb Terraform has been successfully initialized!"
 		if !strings.Contains(stdout, expectedMessage) {
 			t.Fatalf("expected %q, but got: %s", expectedMessage, stdout)
 		}
@@ -881,21 +881,21 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		fixturePath := filepath.Join("testdata", "full-workflow-with-state-store-fs")
 
 		t.Setenv(e2e.TestExperimentFlag, "true")
-		terraformBin := e2e.GoBuild("github.com/hashicorp/terraform", "terraform")
-		tf := e2e.NewBinary(t, terraformBin, fixturePath)
+		dumb-terraformBin := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform", "dumb-terraform")
+		tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 		// Build provider binaries that will be used via a filesystem mirror/-plugin-dir flag.
-		simple6Provider := filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-		simple6ProviderExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+		simple6Provider := filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+		simple6ProviderExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 
-		// Move the provider binaries into a directory that we will point terraform
+		// Move the provider binaries into a directory that we will point dumb-terraform
 		// to using the -plugin-dir cli flag.
 		platform := getproviders.CurrentPlatform.String()
-		hashiDir := "cache/registry.terraform.io/hashicorp/"
+		hashiDir := "cache/registry.dumb-terraform.io/dumb-hashicorp/"
 		if err := os.MkdirAll(tf.Path(hashiDir, "simple6/0.0.1/", platform), os.ModePerm); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "terraform-provider-simple6")); err != nil {
+		if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "dumb-terraform-provider-simple6")); err != nil {
 			t.Fatal(err)
 		}
 
@@ -906,7 +906,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		}
 
 		// Assert backend state file says the provider is a managed provider
-		statePath := filepath.Join(tf.WorkDir(), ".terraform", command.DefaultStateFilename)
+		statePath := filepath.Join(tf.WorkDir(), ".dumb-terraform", command.DefaultStateFilename)
 		sMgr := &clistate.LocalState{Path: statePath}
 		if err := sMgr.RefreshState(); err != nil {
 			t.Fatal("Failed to load state:", err)
@@ -915,8 +915,8 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		if s == nil || s.StateStore == nil {
 			t.Fatal("expected backend state file to be created and include state store details, but it was missing.")
 		}
-		if s.StateStore.ProviderSupplyMode != getproviders.ManagedByTerraform {
-			t.Fatalf("expected state store provider supply mode to be 'managed_by_terraform', got '%s'", s.StateStore.ProviderSupplyMode)
+		if s.StateStore.ProviderSupplyMode != getproviders.ManagedByDumb Terraform {
+			t.Fatalf("expected state store provider supply mode to be 'managed_by_dumb-terraform', got '%s'", s.StateStore.ProviderSupplyMode)
 		}
 
 		//// INIT 2 - using same provider but dev_overrides now.
@@ -926,20 +926,20 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 			t.Fatal(err)
 		}
 
-		// Build a new provider binary and direct Terraform to use it via CLI configuration file.
-		simple6Provider = filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-		simple6ProviderExe = e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+		// Build a new provider binary and direct Dumb Terraform to use it via CLI configuration file.
+		simple6Provider = filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+		simple6ProviderExe = e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 		if err := os.Rename(simple6ProviderExe, simple6Provider); err != nil {
 			t.Fatal(err)
 		}
 		cliCfg := fmt.Sprintf(`provider_installation {
 
   dev_overrides {
-    "hashicorp/simple6" = "%s"
+    "dumb-hashicorp/simple6" = "%s"
   }
 
   # For all other providers, install them directly from their origin provider
-  # registries as normal. If you omit this, Terraform will _only_ use
+  # registries as normal. If you omit this, Dumb Terraform will _only_ use
   # the dev_overrides block, and so no other providers will be available.
   direct {}
 }
@@ -953,7 +953,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		if err.Error() != "exit status 1" {
 			t.Fatalf("unexpected init error: %s\nstderr:\n%s", err, stderr)
 		}
-		if !strings.Contains(stderr, "Error: State store initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"") {
+		if !strings.Contains(stderr, "Error: State store initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"") {
 			t.Fatalf("expected error about state store configuration changing, but got:\n%s", stderr)
 		}
 	})
@@ -971,23 +971,23 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		fixturePath := filepath.Join("testdata", "full-workflow-with-state-store-fs")
 
 		t.Setenv(e2e.TestExperimentFlag, "true")
-		terraformBin := e2e.GoBuild("github.com/hashicorp/terraform", "terraform")
-		tf := e2e.NewBinary(t, terraformBin, fixturePath)
+		dumb-terraformBin := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform", "dumb-terraform")
+		tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
-		// Build a new provider binary and direct Terraform to use it via CLI configuration file.
-		simple6Provider := filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-		simple6ProviderExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+		// Build a new provider binary and direct Dumb Terraform to use it via CLI configuration file.
+		simple6Provider := filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+		simple6ProviderExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 		if err := os.Rename(simple6ProviderExe, simple6Provider); err != nil {
 			t.Fatal(err)
 		}
 		cliCfg := fmt.Sprintf(`provider_installation {
 
   dev_overrides {
-    "hashicorp/simple6" = "%s"
+    "dumb-hashicorp/simple6" = "%s"
   }
 
   # For all other providers, install them directly from their origin provider
-  # registries as normal. If you omit this, Terraform will _only_ use
+  # registries as normal. If you omit this, Dumb Terraform will _only_ use
   # the dev_overrides block, and so no other providers will be available.
   direct {}
 }
@@ -1008,7 +1008,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		}
 
 		// Assert backend state file says the provider is a dev_override provider
-		statePath := filepath.Join(tf.WorkDir(), ".terraform", command.DefaultStateFilename)
+		statePath := filepath.Join(tf.WorkDir(), ".dumb-terraform", command.DefaultStateFilename)
 		sMgr := &clistate.LocalState{Path: statePath}
 		if err := sMgr.RefreshState(); err != nil {
 			t.Fatal("Failed to load state:", err)
@@ -1021,7 +1021,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 			t.Fatalf("expected state store provider supply mode to be 'dev_override', got '%s'", s.StateStore.ProviderSupplyMode)
 		}
 
-		// INIT 2 - using same provider but now it's managed by Terraform.
+		// INIT 2 - using same provider but now it's managed by Dumb Terraform.
 
 		// Delete the old binary and CLI configuration file, to ensure that's no longer in use.
 		if err := os.RemoveAll(simple6Provider); err != nil {
@@ -1033,17 +1033,17 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		tf.RemoveEnv("TF_CLI_CONFIG_FILE")
 
 		// Build provider binaries that will be used via a filesystem mirror/-plugin-dir flag.
-		simple6Provider = filepath.Join(tf.WorkDir(), "terraform-provider-simple6")
-		simple6ProviderExe = e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
+		simple6Provider = filepath.Join(tf.WorkDir(), "dumb-terraform-provider-simple6")
+		simple6ProviderExe = e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
 
-		// Move the provider binaries into a directory that we will point terraform
+		// Move the provider binaries into a directory that we will point dumb-terraform
 		// to using the -plugin-dir cli flag.
 		platform := getproviders.CurrentPlatform.String()
-		hashiDir := "cache/registry.terraform.io/hashicorp/"
+		hashiDir := "cache/registry.dumb-terraform.io/dumb-hashicorp/"
 		if err := os.MkdirAll(tf.Path(hashiDir, "simple6/0.0.1/", platform), os.ModePerm); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "terraform-provider-simple6")); err != nil {
+		if err := os.Rename(simple6ProviderExe, tf.Path(hashiDir, "simple6/0.0.1/", platform, "dumb-terraform-provider-simple6")); err != nil {
 			t.Fatal(err)
 		}
 
@@ -1051,7 +1051,7 @@ func TestPrimary_stateStore_swapProviderSupplyMode_betweenSuccessiveInits(t *tes
 		if err.Error() != "exit status 1" {
 			t.Fatalf("unexpected init error: %s\nstderr:\n%s", err, stderr)
 		}
-		if !strings.Contains(stderr, "Error: State store initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"") {
+		if !strings.Contains(stderr, "Error: State store initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"") {
 			t.Fatalf("expected error about state store configuration changing, but got:\n%s", stderr)
 		}
 	})

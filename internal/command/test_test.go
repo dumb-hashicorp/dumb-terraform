@@ -22,23 +22,23 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	testing_command "github.com/hashicorp/terraform/internal/command/testing"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/initwd"
-	teststates "github.com/hashicorp/terraform/internal/moduletest/states"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/registry"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	testing_command "github.com/dumb-hashicorp/dumb-terraform/internal/command/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/initwd"
+	teststates "github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestTest_Runs(t *testing.T) {
@@ -175,7 +175,7 @@ func TestTest_Runs(t *testing.T) {
 		},
 		"multiple_files_with_filter": {
 			override:    "multiple_files",
-			args:        []string{"-filter=one.tftest.hcl"},
+			args:        []string{"-filter=one.tftest.dumb-hcl"},
 			expectedOut: []string{"1 passed, 0 failed"},
 			code:        0,
 		},
@@ -266,7 +266,7 @@ func TestTest_Runs(t *testing.T) {
 		},
 		"destroy_fail": {
 			expectedOut:           []string{"3 passed, 0 failed."},
-			expectedErr:           []string{`Terraform left the following resources in state`},
+			expectedErr:           []string{`Dumb Terraform left the following resources in state`},
 			code:                  1,
 			expectedResourceCount: 4,
 		},
@@ -305,9 +305,9 @@ func TestTest_Runs(t *testing.T) {
 		"mocking-error": {
 			expectedErr: []string{
 				"Unknown condition value",
-				"plan_mocked_overridden.tftest.hcl",
+				"plan_mocked_overridden.tftest.dumb-hcl",
 				"test_resource.primary[0].id",
-				"plan_mocked_provider.tftest.hcl",
+				"plan_mocked_provider.tftest.dumb-hcl",
 				"test_resource.secondary[0].id",
 			},
 			code: 1,
@@ -536,8 +536,8 @@ func TestTest_Runs(t *testing.T) {
 					t.Errorf("unexpected stderr output\n%s", stderr)
 				}
 
-				// If `terraform init` failed, then we don't expect that
-				// `terraform test` will have run at all, so we can just return
+				// If `dumb-terraform init` failed, then we don't expect that
+				// `dumb-terraform test` will have run at all, so we can just return
 				// here.
 				return
 			}
@@ -661,18 +661,18 @@ func TestTest_DestroyFail(t *testing.T) {
 	output := done(t)
 	err := output.Stderr()
 
-	cleanupMessage := `main.tftest.hcl... in progress
+	cleanupMessage := `main.tftest.dumb-hcl... in progress
   run "setup"... pass
   run "single"... pass
   run "double"... pass
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 3 passed, 0 failed.
 `
 
-	cleanupErr := `Terraform encountered an error destroying resources created while executing
-main.tftest.hcl/double.
+	cleanupErr := `Dumb Terraform encountered an error destroying resources created while executing
+main.tftest.dumb-hcl/double.
 
 Error: Failed to destroy resource
 
@@ -682,12 +682,12 @@ Error: Failed to destroy resource
 
 destroy_fail is set to true
 
-Terraform left the following resources in state after executing
-main.tftest.hcl/double, and they need to be cleaned up manually:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl/double, and they need to be cleaned up manually:
   - test_resource.another
   - test_resource.resource
-Terraform encountered an error destroying resources created while executing
-main.tftest.hcl/single.
+Dumb Terraform encountered an error destroying resources created while executing
+main.tftest.dumb-hcl/single.
 
 Error: Failed to destroy resource
 
@@ -697,8 +697,8 @@ Error: Failed to destroy resource
 
 destroy_fail is set to true
 
-Terraform left the following resources in state after executing
-main.tftest.hcl/single, and they need to be cleaned up manually:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl/single, and they need to be cleaned up manually:
   - test_resource.another
   - test_resource.resource
 `
@@ -752,9 +752,9 @@ main.tftest.hcl/single, and they need to be cleaned up manually:
 		output := done(t)
 
 		actualCleanup := output.Stdout()
-		expectedCleanup := `main.tftest.hcl... in progress
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+		expectedCleanup := `main.tftest.dumb-hcl... in progress
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success!
 `
@@ -807,30 +807,30 @@ func TestTest_Cleanup(t *testing.T) {
 		c.Run([]string{"-no-color"})
 		output := done(t)
 
-		message := `main.tftest.hcl... in progress
+		message := `main.tftest.dumb-hcl... in progress
   run "test"... pass
   run "test_two"... pass
   run "test_three"... pass
   run "test_four"... pass
-main.tftest.hcl... tearing down
+main.tftest.dumb-hcl... tearing down
 
-Terraform left the following resources in state after executing
-main.tftest.hcl/test_two because the skip_cleanup attribute was set:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl/test_two because the skip_cleanup attribute was set:
   - test_resource.resource
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... fail
 
 Failure! 4 passed, 0 failed.
 `
 
-		outputErr := `Terraform encountered an error destroying resources created while executing
-main.tftest.hcl/test_three.
+		outputErr := `Dumb Terraform encountered an error destroying resources created while executing
+main.tftest.dumb-hcl/test_three.
 
 Error: Failed to destroy resource
 
 destroy_fail is set to true
 
-Terraform left the following resources in state after executing
-main.tftest.hcl/test_three, and they need to be cleaned up manually:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl/test_three, and they need to be cleaned up manually:
   - test_resource.resource
 `
 		if diff := cmp.Diff(outputErr, output.Stderr()); diff != "" {
@@ -897,9 +897,9 @@ main.tftest.hcl/test_three, and they need to be cleaned up manually:
 		c.Run([]string{"-no-color"})
 		output := done(t)
 
-		expectedCleanup := `main.tftest.hcl... in progress
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+		expectedCleanup := `main.tftest.dumb-hcl... in progress
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success!
 `
@@ -950,13 +950,13 @@ Success!
 		c.Run([]string{"-no-color", "-repair"})
 		output := done(t)
 
-		expectedCleanup := `main.tftest.hcl... in progress
-main.tftest.hcl... tearing down
+		expectedCleanup := `main.tftest.dumb-hcl... in progress
+main.tftest.dumb-hcl... tearing down
 
-Terraform left the following resources in state after executing
-main.tftest.hcl/test_two because the skip_cleanup attribute was set:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl/test_two because the skip_cleanup attribute was set:
   - test_resource.resource
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... pass
 
 Success!
 `
@@ -1131,8 +1131,8 @@ func TestTest_SkipCleanup_ConsecutiveTestsFail(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expectedOut := "main.tftest.hcl... in progress\nmain.tftest.hcl... tearing down\nmain.tftest.hcl... fail\n\nFailure! 0 passed, 0 failed.\n"
-	expectedErr := "\nError: State manifest not empty\n\nThe state manifest for main.tftest.hcl should be empty before running tests.\nThis could be due to a previous test run not cleaning up after itself. Please\nensure that all state files are cleaned up before running tests.\n"
+	expectedOut := "main.tftest.dumb-hcl... in progress\nmain.tftest.dumb-hcl... tearing down\nmain.tftest.dumb-hcl... fail\n\nFailure! 0 passed, 0 failed.\n"
+	expectedErr := "\nError: State manifest not empty\n\nThe state manifest for main.tftest.dumb-hcl should be empty before running tests.\nThis could be due to a previous test run not cleaning up after itself. Please\nensure that all state files are cleaned up before running tests.\n"
 
 	if diff := cmp.Diff(expectedOut, output.Stdout()); len(diff) > 0 {
 		t.Error(diff)
@@ -1193,11 +1193,11 @@ func TestTest_SharedState_Order(t *testing.T) {
 	// Ensure the order of the tests is correct. Even though they share no state,
 	// the order should be sequential.
 	expectedOrder := []string{
-		// main.tftest.hcl
+		// main.tftest.dumb-hcl
 		"run \"setup\"",
 		"run \"test\"",
 
-		// no-shared-state.tftest.hcl
+		// no-shared-state.tftest.dumb-hcl
 		"run \"setup\"",
 		"run \"test_a\"",
 		"run \"test_b\"",
@@ -1384,7 +1384,7 @@ func TestTest_ParallelTeardown(t *testing.T) {
 					value = test_resource.foo.value
 					}
 					`,
-				"parallel.tftest.hcl": `
+				"parallel.tftest.dumb-hcl": `
 					test {
 					parallel = true
 					}
@@ -1438,7 +1438,7 @@ func TestTest_ParallelTeardown(t *testing.T) {
 				}
 				// Each teardown sleeps for 3 seconds, so we expect the total duration to be less than 6 seconds.
 				if dur >= 6*time.Second {
-					t.Fatalf("parallel.tftest.hcl duration took too long: %0.2f seconds", dur.Seconds())
+					t.Fatalf("parallel.tftest.dumb-hcl duration took too long: %0.2f seconds", dur.Seconds())
 				}
 			},
 		},
@@ -1459,7 +1459,7 @@ func TestTest_ParallelTeardown(t *testing.T) {
 						value = test_resource.foo.value
 					}
 					`,
-				"parallel.tftest.hcl": `
+				"parallel.tftest.dumb-hcl": `
 					test {
 						parallel = true
 					}
@@ -1513,7 +1513,7 @@ func TestTest_ParallelTeardown(t *testing.T) {
 				}
 				// Each teardown sleeps for 5 seconds, so we expect the total duration to be at least 10 seconds.
 				if dur < 10*time.Second {
-					t.Fatalf("parallel.tftest.hcl duration took too short: %0.2f seconds", dur.Seconds())
+					t.Fatalf("parallel.tftest.dumb-hcl duration took too short: %0.2f seconds", dur.Seconds())
 				}
 			},
 		},
@@ -1535,7 +1535,7 @@ func TestTest_ParallelTeardown(t *testing.T) {
 					}
 					`,
 				// c2 => a1, b1 => a1, a2 => b1, b2 => c1
-				"parallel.tftest.hcl": `
+				"parallel.tftest.dumb-hcl": `
 					test {
 						parallel = true
 					}
@@ -1688,14 +1688,14 @@ func TestTest_ParallelTeardown(t *testing.T) {
 			// Find the start of the teardown and complete timestamps
 			var startTimestamp, completeTimestamp string
 			for _, line := range lines {
-				if strings.Contains(line, `{"path":"parallel.tftest.hcl","progress":"teardown"`) {
+				if strings.Contains(line, `{"path":"parallel.tftest.dumb-hcl","progress":"teardown"`) {
 					var obj map[string]interface{}
 					if err := json.Unmarshal([]byte(line), &obj); err == nil {
 						if ts, ok := obj["@timestamp"].(string); ok {
 							startTimestamp = ts
 						}
 					}
-				} else if strings.Contains(line, `{"path":"parallel.tftest.hcl","progress":"complete"`) {
+				} else if strings.Contains(line, `{"path":"parallel.tftest.dumb-hcl","progress":"complete"`) {
 					var obj map[string]interface{}
 					if err := json.Unmarshal([]byte(line), &obj); err == nil {
 						if ts, ok := obj["@timestamp"].(string); ok {
@@ -1747,7 +1747,7 @@ func TestTest_InterruptSkipsRemaining(t *testing.T) {
 	c.Run([]string{"-no-color"})
 	output := done(t).All()
 
-	if !strings.Contains(output, "skip_me.tftest.hcl... skip") {
+	if !strings.Contains(output, "skip_me.tftest.dumb-hcl... skip") {
 		t.Errorf("output didn't produce the right output:\n\n%s", output)
 	}
 
@@ -1783,10 +1783,10 @@ func TestTest_DoubleInterrupt(t *testing.T) {
 		t.Errorf("output didn't produce the right output:\n\n%s", output)
 	}
 
-	cleanupMessage := `Terraform was interrupted while executing main.tftest.hcl, and may not have
+	cleanupMessage := `Dumb Terraform was interrupted while executing main.tftest.dumb-hcl, and may not have
 performed the expected cleanup operations.
 
-Terraform has already created the following resources from the module under
+Dumb Terraform has already created the following resources from the module under
 test:
   - test_resource.primary
   - test_resource.secondary
@@ -1925,14 +1925,14 @@ func TestTest_ComplexCondition(t *testing.T) {
 		t.Errorf("expected status code 1 but got %d: %s", code, output.All())
 	}
 
-	expectedOut := `main.tftest.hcl... in progress
+	expectedOut := `main.tftest.dumb-hcl... in progress
   run "validate_diff_types"... fail
   run "validate_output"... fail
   run "validate_complex_output"... fail
   run "validate_complex_output_sensitive"... fail
   run "validate_complex_output_pass"... pass
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 1 passed, 4 failed.
 `
@@ -1940,7 +1940,7 @@ Failure! 1 passed, 4 failed.
 	expectedErr := `
 Error: Test assertion failed
 
-  on main.tftest.hcl line 37, in run "validate_diff_types":
+  on main.tftest.dumb-hcl line 37, in run "validate_diff_types":
   37:     condition = var.tr1 == var.tr2 
     ├────────────────
     │ Warning: LHS and RHS values are of different types
@@ -1950,7 +1950,7 @@ expected to fail
 
 Error: Test assertion failed
 
-  on main.tftest.hcl line 44, in run "validate_output":
+  on main.tftest.dumb-hcl line 44, in run "validate_output":
   44:     condition = output.foo == var.foo
     ├────────────────
     │ Diff:
@@ -1971,7 +1971,7 @@ expected to fail due to different values
 
 Error: Test assertion failed
 
-  on main.tftest.hcl line 52, in run "validate_complex_output":
+  on main.tftest.dumb-hcl line 52, in run "validate_complex_output":
   52:     condition = output.complex == var.bar
     ├────────────────
     │ Warning: LHS and RHS values are of different types
@@ -2001,7 +2001,7 @@ expected to fail
 
 Error: Test assertion failed
 
-  on main.tftest.hcl line 60, in run "validate_complex_output_sensitive":
+  on main.tftest.dumb-hcl line 60, in run "validate_complex_output_sensitive":
   60:     condition = output.complex == output.complex_sensitive
     ├────────────────
     │ Diff:
@@ -2097,7 +2097,7 @@ func TestTest_ComplexConditionVerbose(t *testing.T) {
 	expectedErr := `
 Error: Test assertion failed
 
-  on main.tftest.hcl line 37, in run "validate_diff_types":
+  on main.tftest.dumb-hcl line 37, in run "validate_diff_types":
   37:     condition = var.tr1 == var.tr2 
     ├────────────────
     │ LHS:
@@ -2125,7 +2125,7 @@ expected to fail
 
 Error: Test assertion failed
 
-  on main.tftest.hcl line 44, in run "validate_output":
+  on main.tftest.dumb-hcl line 44, in run "validate_output":
   44:     condition = output.foo == var.foo
     ├────────────────
     │ LHS:
@@ -2172,7 +2172,7 @@ expected to fail due to different values
 
 Error: Test assertion failed
 
-  on main.tftest.hcl line 52, in run "validate_complex_output":
+  on main.tftest.dumb-hcl line 52, in run "validate_complex_output":
   52:     condition = output.complex == var.bar
     ├────────────────
     │ LHS:
@@ -2268,7 +2268,7 @@ expected to fail
 
 Error: Test assertion failed
 
-  on main.tftest.hcl line 60, in run "validate_complex_output_sensitive":
+  on main.tftest.dumb-hcl line 60, in run "validate_complex_output_sensitive":
   60:     condition = output.complex == output.complex_sensitive
     ├────────────────
     │ LHS:
@@ -2332,14 +2332,14 @@ Error: Test assertion failed
 expected to fail
 `
 	outputs := []string{
-		"main.tftest.hcl... in progress",
+		"main.tftest.dumb-hcl... in progress",
 		"  run \"validate_diff_types\"... fail",
 		"  run \"validate_output\"... fail",
 		"  run \"validate_complex_output\"... fail",
 		"  run \"validate_complex_output_sensitive\"... fail",
 		"  run \"validate_complex_output_pass\"... pass",
-		"main.tftest.hcl... tearing down",
-		"main.tftest.hcl... fail",
+		"main.tftest.dumb-hcl... tearing down",
+		"main.tftest.dumb-hcl... fail",
 		"Failure! 1 passed, 4 failed.",
 	}
 	stdout := output.Stdout()
@@ -2731,10 +2731,10 @@ func TestTest_CatchesErrorsBeforeDestroy(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expectedOut := `main.tftest.hcl... in progress
+	expectedOut := `main.tftest.dumb-hcl... in progress
   run "test"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 0 passed, 1 failed.
 `
@@ -2788,14 +2788,14 @@ func TestTest_Verbose(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   run "validate_test_resource"... pass
 
-Terraform used the selected providers to generate the following execution
+Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   + create
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.foo will be created
   + resource "test_resource" "foo" {
@@ -2817,8 +2817,8 @@ resource "test_resource" "foo" {
     write_only   = (write-only attribute)
 }
 
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 2 passed, 0 failed.
 `
@@ -2840,17 +2840,17 @@ func TestTest_ValidatesBeforeExecution(t *testing.T) {
 		expectedErr string
 	}{
 		"invalid": {
-			expectedOut: `main.tftest.hcl... in progress
+			expectedOut: `main.tftest.dumb-hcl... in progress
   run "invalid"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 0 passed, 1 failed.
 `,
 			expectedErr: `
 Error: Invalid ` + "`expect_failures`" + ` reference
 
-  on main.tftest.hcl line 5, in run "invalid":
+  on main.tftest.dumb-hcl line 5, in run "invalid":
    5:         local.my_value,
 
 You cannot expect failures from local.my_value. You can only expect failures
@@ -2859,11 +2859,11 @@ managed resources and data sources.
 `,
 		},
 		"invalid-module": {
-			expectedOut: `main.tftest.hcl... in progress
+			expectedOut: `main.tftest.dumb-hcl... in progress
   run "invalid"... fail
   run "test"... skip
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 0 passed, 1 failed, 1 skipped.
 `,
@@ -2878,10 +2878,10 @@ variable can be declared with a variable "not_real" {} block.
 `,
 		},
 		"missing-provider": {
-			expectedOut: `main.tftest.hcl... in progress
+			expectedOut: `main.tftest.dumb-hcl... in progress
   run "passes_validation"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 0 passed, 1 failed.
 `,
@@ -2889,7 +2889,7 @@ Failure! 0 passed, 1 failed.
 Error: Provider configuration not present
 
 To work with test_resource.secondary its original provider configuration at
-provider["registry.terraform.io/hashicorp/test"].secondary is required, but
+provider["registry.dumb-terraform.io/dumb-hashicorp/test"].secondary is required, but
 it has been removed. This occurs when a provider configuration is removed
 while objects created by that provider still exist in the state. Re-add the
 provider configuration to destroy test_resource.secondary, after which you
@@ -2897,10 +2897,10 @@ can remove the provider configuration again.
 `,
 		},
 		"missing-provider-in-run-block": {
-			expectedOut: `main.tftest.hcl... in progress
+			expectedOut: `main.tftest.dumb-hcl... in progress
   run "passes_validation"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 0 passed, 1 failed.
 `,
@@ -2908,7 +2908,7 @@ Failure! 0 passed, 1 failed.
 Error: Provider configuration not present
 
 To work with test_resource.secondary its original provider configuration at
-provider["registry.terraform.io/hashicorp/test"].secondary is required, but
+provider["registry.dumb-terraform.io/dumb-hashicorp/test"].secondary is required, but
 it has been removed. This occurs when a provider configuration is removed
 while objects created by that provider still exist in the state. Re-add the
 provider configuration to destroy test_resource.secondary, after which you
@@ -2916,28 +2916,28 @@ can remove the provider configuration again.
 `,
 		},
 		"missing-provider-definition-in-file": {
-			expectedOut: `main.tftest.hcl... in progress
+			expectedOut: `main.tftest.dumb-hcl... in progress
   run "passes_validation"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 0 passed, 1 failed.
 `,
 			expectedErr: `
 Error: Missing provider definition for test
 
-  on main.tftest.hcl line 12, in run "passes_validation":
+  on main.tftest.dumb-hcl line 12, in run "passes_validation":
   12:     test = test
 
 This provider block references a provider definition that does not exist.
 `,
 		},
 		"missing-provider-in-test-module": {
-			expectedOut: `main.tftest.hcl... in progress
+			expectedOut: `main.tftest.dumb-hcl... in progress
   run "passes_validation_primary"... pass
   run "passes_validation_secondary"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 1 passed, 1 failed.
 `,
@@ -2945,7 +2945,7 @@ Failure! 1 passed, 1 failed.
 Error: Provider configuration not present
 
 To work with test_resource.secondary its original provider configuration at
-provider["registry.terraform.io/hashicorp/test"].secondary is required, but
+provider["registry.dumb-terraform.io/dumb-hashicorp/test"].secondary is required, but
 it has been removed. This occurs when a provider configuration is removed
 while objects created by that provider still exist in the state. Re-add the
 provider configuration to destroy test_resource.secondary, after which you
@@ -3124,7 +3124,7 @@ func TestTest_StatePropagation(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   run "initial_apply_example"... pass
 
 # test_resource.module_resource:
@@ -3147,11 +3147,11 @@ resource "test_resource" "resource" {
 
   run "plan_second_example"... pass
 
-Terraform used the selected providers to generate the following execution
+Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   + create
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.second_module_resource will be created
   + resource "test_resource" "second_module_resource" {
@@ -3165,11 +3165,11 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 
   run "plan_update"... pass
 
-Terraform used the selected providers to generate the following execution
+Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   ~ update in-place
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.resource will be updated in-place
   ~ resource "test_resource" "resource" {
@@ -3182,11 +3182,11 @@ Plan: 0 to add, 1 to change, 0 to destroy.
 
   run "plan_update_example"... pass
 
-Terraform used the selected providers to generate the following execution
+Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   ~ update in-place
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.module_resource will be updated in-place
   ~ resource "test_resource" "module_resource" {
@@ -3197,8 +3197,8 @@ Terraform will perform the following actions:
 
 Plan: 0 to add, 1 to change, 0 to destroy.
 
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 5 passed, 0 failed.
 `
@@ -3268,24 +3268,24 @@ func TestTest_SkipCleanup(t *testing.T) {
 		expected := `
 Warning: Duplicate "skip_cleanup" block
 
-  on main.tftest.hcl line 15, in run "test_three":
+  on main.tftest.dumb-hcl line 15, in run "test_three":
   15:   skip_cleanup = true
 
 The run "test_three" has a skip_cleanup attribute set, but shares state with
 an earlier run "test_two" that also has skip_cleanup set. The later run takes
 precedence, and this attribute is ignored for the earlier run.
-main.tftest.hcl... in progress
+main.tftest.dumb-hcl... in progress
   run "test"... pass
   run "test_two"... pass
   run "test_three"... pass
   run "test_four"... pass
   run "test_five"... pass
-main.tftest.hcl... tearing down
+main.tftest.dumb-hcl... tearing down
 
-Terraform left the following resources in state after executing
-main.tftest.hcl/test_three because the skip_cleanup attribute was set:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl/test_three because the skip_cleanup attribute was set:
   - test_resource.resource
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... pass
 
 Success! 5 passed, 0 failed.
 `
@@ -3369,16 +3369,16 @@ func TestTest_SkipCleanupWithRunDependencies(t *testing.T) {
 
 	t.Run("skipped resources should not be deleted", func(t *testing.T) {
 
-		expected := `main.tftest.hcl... in progress
+		expected := `main.tftest.dumb-hcl... in progress
   run "test"... pass
   run "test_two"... pass
   run "test_three"... pass
-main.tftest.hcl... tearing down
+main.tftest.dumb-hcl... tearing down
 
-Terraform left the following resources in state after executing
-main.tftest.hcl/test_two because the skip_cleanup attribute was set:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl/test_two because the skip_cleanup attribute was set:
   - test_resource.resource
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... pass
 
 Success! 3 passed, 0 failed.
 `
@@ -3429,9 +3429,9 @@ Success! 3 passed, 0 failed.
 		c.Run([]string{"-no-color"})
 		output := done(t)
 
-		expectedCleanup := `main.tftest.hcl... in progress
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+		expectedCleanup := `main.tftest.dumb-hcl... in progress
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success!
 `
@@ -3544,24 +3544,24 @@ func TestTest_SkipCleanup_JSON(t *testing.T) {
 	t.Run("skipped resources should not be deleted", func(t *testing.T) {
 
 		expected := []string{
-			`{"@level":"warn","@message":"Warning: Duplicate \"skip_cleanup\" block","@module":"terraform.ui","diagnostic":{"detail":"The run \"test_three\" has a skip_cleanup attribute set, but shares state with an earlier run \"test_two\" that also has skip_cleanup set. The later run takes precedence, and this attribute is ignored for the earlier run.","range":{"end":{"byte":163,"column":15,"line":15},"filename":"main.tftest.hcl","start":{"byte":151,"column":3,"line":15}},"severity":"warning","snippet":{"code":"  skip_cleanup = true","context":"run \"test_three\"","highlight_end_offset":14,"highlight_start_offset":2,"start_line":15,"values":[]},"summary":"Duplicate \"skip_cleanup\" block"},"type":"diagnostic"}`,
-			`{"@level":"info","@message":"Found 1 file and 5 run blocks","@module":"terraform.ui","test_abstract":{"main.tftest.hcl":["test","test_two","test_three","test_four","test_five"]},"type":"test_abstract"}`,
-			`{"@level":"info","@message":"main.tftest.hcl... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","test_file":{"path":"main.tftest.hcl","progress":"starting"},"type":"test_file"}`,
-			`{"@level":"info","@message":"  \"test\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test","test_run":{"path":"main.tftest.hcl","progress":"starting","run":"test"},"type":"test_run"}`,
-			`{"@level":"info","@message":"  \"test\"... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test","test_run":{"path":"main.tftest.hcl","progress":"complete","run":"test","status":"pass"},"type":"test_run"}`,
-			`{"@level":"info","@message":"  \"test_two\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test_two","test_run":{"path":"main.tftest.hcl","progress":"starting","run":"test_two"},"type":"test_run"}`,
-			`{"@level":"info","@message":"  \"test_two\"... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test_two","test_run":{"path":"main.tftest.hcl","progress":"complete","run":"test_two","status":"pass"},"type":"test_run"}`,
-			`{"@level":"info","@message":"  \"test_three\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test_three","test_run":{"path":"main.tftest.hcl","progress":"starting","run":"test_three"},"type":"test_run"}`,
-			`{"@level":"info","@message":"  \"test_three\"... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test_three","test_run":{"path":"main.tftest.hcl","progress":"complete","run":"test_three","status":"pass"},"type":"test_run"}`,
-			`{"@level":"info","@message":"  \"test_four\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test_four","test_run":{"path":"main.tftest.hcl","progress":"starting","run":"test_four"},"type":"test_run"}`,
-			`{"@level":"info","@message":"  \"test_four\"... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test_four","test_run":{"path":"main.tftest.hcl","progress":"complete","run":"test_four","status":"pass"},"type":"test_run"}`,
-			`{"@level":"info","@message":"  \"test_five\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test_five","test_run":{"path":"main.tftest.hcl","progress":"starting","run":"test_five"},"type":"test_run"}`,
-			`{"@level":"info","@message":"  \"test_five\"... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test_five","test_run":{"path":"main.tftest.hcl","progress":"complete","run":"test_five","status":"pass"},"type":"test_run"}`,
-			`{"@level":"info","@message":"main.tftest.hcl... tearing down","@module":"terraform.ui","@testfile":"main.tftest.hcl","test_file":{"path":"main.tftest.hcl","progress":"teardown"},"type":"test_file"}`,
-			`{"@level":"info","@message":"  \"test_three\"... tearing down","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test_three","test_run":{"path":"main.tftest.hcl","progress":"teardown","run":"test_three"},"type":"test_run"}`,
-			`{"@level":"info","@message":"Terraform left some resources in state after executing main.tftest.hcl/test_three because the skip_cleanup attribute was set.","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test_three","test_cleanup":{"skipped_resources":[{"instance":"test_resource.resource"}]},"type":"test_cleanup"}`,
-			`{"@level":"info","@message":"main.tftest.hcl... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","test_file":{"path":"main.tftest.hcl","progress":"complete","status":"pass"},"type":"test_file"}`,
-			`{"@level":"info","@message":"Success! 5 passed, 0 failed.","@module":"terraform.ui","test_summary":{"errored":0,"failed":0,"passed":5,"skipped":0,"status":"pass"},"type":"test_summary"}`,
+			`{"@level":"warn","@message":"Warning: Duplicate \"skip_cleanup\" block","@module":"dumb-terraform.ui","diagnostic":{"detail":"The run \"test_three\" has a skip_cleanup attribute set, but shares state with an earlier run \"test_two\" that also has skip_cleanup set. The later run takes precedence, and this attribute is ignored for the earlier run.","range":{"end":{"byte":163,"column":15,"line":15},"filename":"main.tftest.dumb-hcl","start":{"byte":151,"column":3,"line":15}},"severity":"warning","snippet":{"code":"  skip_cleanup = true","context":"run \"test_three\"","highlight_end_offset":14,"highlight_start_offset":2,"start_line":15,"values":[]},"summary":"Duplicate \"skip_cleanup\" block"},"type":"diagnostic"}`,
+			`{"@level":"info","@message":"Found 1 file and 5 run blocks","@module":"dumb-terraform.ui","test_abstract":{"main.tftest.dumb-hcl":["test","test_two","test_three","test_four","test_five"]},"type":"test_abstract"}`,
+			`{"@level":"info","@message":"main.tftest.dumb-hcl... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","test_file":{"path":"main.tftest.dumb-hcl","progress":"starting"},"type":"test_file"}`,
+			`{"@level":"info","@message":"  \"test\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test","test_run":{"path":"main.tftest.dumb-hcl","progress":"starting","run":"test"},"type":"test_run"}`,
+			`{"@level":"info","@message":"  \"test\"... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test","test_run":{"path":"main.tftest.dumb-hcl","progress":"complete","run":"test","status":"pass"},"type":"test_run"}`,
+			`{"@level":"info","@message":"  \"test_two\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test_two","test_run":{"path":"main.tftest.dumb-hcl","progress":"starting","run":"test_two"},"type":"test_run"}`,
+			`{"@level":"info","@message":"  \"test_two\"... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test_two","test_run":{"path":"main.tftest.dumb-hcl","progress":"complete","run":"test_two","status":"pass"},"type":"test_run"}`,
+			`{"@level":"info","@message":"  \"test_three\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test_three","test_run":{"path":"main.tftest.dumb-hcl","progress":"starting","run":"test_three"},"type":"test_run"}`,
+			`{"@level":"info","@message":"  \"test_three\"... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test_three","test_run":{"path":"main.tftest.dumb-hcl","progress":"complete","run":"test_three","status":"pass"},"type":"test_run"}`,
+			`{"@level":"info","@message":"  \"test_four\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test_four","test_run":{"path":"main.tftest.dumb-hcl","progress":"starting","run":"test_four"},"type":"test_run"}`,
+			`{"@level":"info","@message":"  \"test_four\"... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test_four","test_run":{"path":"main.tftest.dumb-hcl","progress":"complete","run":"test_four","status":"pass"},"type":"test_run"}`,
+			`{"@level":"info","@message":"  \"test_five\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test_five","test_run":{"path":"main.tftest.dumb-hcl","progress":"starting","run":"test_five"},"type":"test_run"}`,
+			`{"@level":"info","@message":"  \"test_five\"... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test_five","test_run":{"path":"main.tftest.dumb-hcl","progress":"complete","run":"test_five","status":"pass"},"type":"test_run"}`,
+			`{"@level":"info","@message":"main.tftest.dumb-hcl... tearing down","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","test_file":{"path":"main.tftest.dumb-hcl","progress":"teardown"},"type":"test_file"}`,
+			`{"@level":"info","@message":"  \"test_three\"... tearing down","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test_three","test_run":{"path":"main.tftest.dumb-hcl","progress":"teardown","run":"test_three"},"type":"test_run"}`,
+			`{"@level":"info","@message":"Dumb Terraform left some resources in state after executing main.tftest.dumb-hcl/test_three because the skip_cleanup attribute was set.","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test_three","test_cleanup":{"skipped_resources":[{"instance":"test_resource.resource"}]},"type":"test_cleanup"}`,
+			`{"@level":"info","@message":"main.tftest.dumb-hcl... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","test_file":{"path":"main.tftest.dumb-hcl","progress":"complete","status":"pass"},"type":"test_file"}`,
+			`{"@level":"info","@message":"Success! 5 passed, 0 failed.","@module":"dumb-terraform.ui","test_summary":{"errored":0,"failed":0,"passed":5,"skipped":0,"status":"pass"},"type":"test_summary"}`,
 		}
 
 		trimmedActual := strings.Join(messages, "\n")
@@ -3633,18 +3633,18 @@ func TestTest_SkipCleanup_FileLevelFlag(t *testing.T) {
 
 	t.Run("skipped resources should not be deleted", func(t *testing.T) {
 
-		expected := `main.tftest.hcl... in progress
+		expected := `main.tftest.dumb-hcl... in progress
   run "test"... pass
   run "test_two"... pass
   run "test_three"... pass
   run "test_four"... pass
   run "test_five"... pass
-main.tftest.hcl... tearing down
+main.tftest.dumb-hcl... tearing down
 
-Terraform left the following resources in state after executing
-main.tftest.hcl/test_four because the skip_cleanup attribute was set:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl/test_four because the skip_cleanup attribute was set:
   - test_resource.resource
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... pass
 
 Success! 5 passed, 0 failed.
 `
@@ -3699,7 +3699,7 @@ Success! 5 passed, 0 failed.
 					}
 				}
 				sort.Strings(resources)
-				actualStates[strings.TrimSuffix(fileName, ".tftest.hcl")+"."+name] = resources
+				actualStates[strings.TrimSuffix(fileName, ".tftest.dumb-hcl")+"."+name] = resources
 			}
 		}
 
@@ -3760,11 +3760,11 @@ func TestTest_OnlyExternalModules(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   run "first"... pass
   run "second"... pass
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 2 passed, 0 failed.
 `
@@ -3802,7 +3802,7 @@ func TestTest_PartialUpdates(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   run "first"... pass
 
 Warning: Resource targeting is in effect
@@ -3813,7 +3813,7 @@ configuration.
 
 The -target option is not for routine use, and is provided only for
 exceptional situations such as recovering from errors or mistakes, or when
-Terraform specifically suggests to use it as part of an error message.
+Dumb Terraform specifically suggests to use it as part of an error message.
 
 Warning: Applied changes may be incomplete
 
@@ -3821,16 +3821,16 @@ The plan was created with the -target option in effect, so some changes
 requested in the configuration may have been ignored and the output values
 may not be fully updated. Run the following command to verify that no other
 changes are pending:
-    terraform plan
+    dumb-terraform plan
 
 Note that the -target option is not suitable for routine use, and is provided
 only for exceptional situations such as recovering from errors or mistakes,
-or when Terraform specifically suggests to use it as part of an error
+or when Dumb Terraform specifically suggests to use it as part of an error
 message.
 
   run "second"... pass
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 2 passed, 0 failed.
 `
@@ -3894,19 +3894,19 @@ func TestTest_InvalidWarningsInCleanup(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   run "test"... pass
 
 Warning: Value for undeclared variable
 
-  on main.tftest.hcl line 6, in run "test":
+  on main.tftest.dumb-hcl line 6, in run "test":
    6:     validation = "Hello, world!"
 
 The module under test does not declare a variable named "validation", but it
 is declared in run block "test".
 
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 1 passed, 0 failed.
 `
@@ -3944,16 +3944,16 @@ func TestTest_BadReferences(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expectedOut := `main.tftest.hcl... in progress
+	expectedOut := `main.tftest.dumb-hcl... in progress
   run "setup"... pass
   run "test"... fail
   run "finalise"... skip
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
-providers.tftest.hcl... in progress
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
+providers.tftest.dumb-hcl... in progress
   run "test"... skip
-providers.tftest.hcl... tearing down
-providers.tftest.hcl... fail
+providers.tftest.dumb-hcl... tearing down
+providers.tftest.dumb-hcl... fail
 
 Failure! 1 passed, 1 failed, 2 skipped.
 `
@@ -3965,21 +3965,21 @@ Failure! 1 passed, 1 failed, 2 skipped.
 	expectedErr := `
 Error: Reference to unavailable variable
 
-  on main.tftest.hcl line 15, in run "test":
+  on main.tftest.dumb-hcl line 15, in run "test":
   15:     input_one = var.notreal
 
 The input variable "notreal" does not exist within this test file.
 
 Error: Reference to unknown run block
 
-  on main.tftest.hcl line 16, in run "test":
+  on main.tftest.dumb-hcl line 16, in run "test":
   16:     input_two = run.madeup.response
 
 The run block "madeup" does not exist within this test file.
 
 Error: Reference to unavailable variable
 
-  on providers.tftest.hcl line 3, in provider "test":
+  on providers.tftest.dumb-hcl line 3, in provider "test":
    3:   resource_prefix = var.default
 
 The input variable "default" does not exist within this test file.
@@ -4016,10 +4016,10 @@ func TestTest_UndefinedVariables(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expectedOut := `main.tftest.hcl... in progress
+	expectedOut := `main.tftest.dumb-hcl... in progress
   run "test"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 0 passed, 1 failed.
 `
@@ -4069,10 +4069,10 @@ func TestTest_VariablesInProviders(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   run "test"... pass
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 1 passed, 0 failed.
 `
@@ -4108,11 +4108,11 @@ func TestTest_ExpectedFailuresDuringPlanning(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expectedOut := `check.tftest.hcl... in progress
+	expectedOut := `check.tftest.dumb-hcl... in progress
   run "check_passes"... pass
-check.tftest.hcl... tearing down
-check.tftest.hcl... pass
-input.tftest.hcl... in progress
+check.tftest.dumb-hcl... tearing down
+check.tftest.dumb-hcl... pass
+input.tftest.dumb-hcl... in progress
   run "input_failure"... fail
 
 Warning: Expected failure while planning
@@ -4124,14 +4124,14 @@ be marked as a failure and the original diagnostic included in the test
 report.
 
   run "no_run"... skip
-input.tftest.hcl... tearing down
-input.tftest.hcl... fail
-output.tftest.hcl... in progress
+input.tftest.dumb-hcl... tearing down
+input.tftest.dumb-hcl... fail
+output.tftest.dumb-hcl... in progress
   run "output_failure"... fail
 
 Warning: Expected failure while planning
 
-  on output.tftest.hcl line 13, in run "output_failure":
+  on output.tftest.dumb-hcl line 13, in run "output_failure":
   13:     output.output,
 
 A custom condition within output.output failed during the planning stage and
@@ -4140,9 +4140,9 @@ the apply operation could not be executed and so the overall test case will
 be marked as a failure and the original diagnostic included in the test
 report.
 
-output.tftest.hcl... tearing down
-output.tftest.hcl... fail
-resource.tftest.hcl... in progress
+output.tftest.dumb-hcl... tearing down
+output.tftest.dumb-hcl... fail
+resource.tftest.dumb-hcl... in progress
   run "resource_failure"... fail
 
 Warning: Expected failure while planning
@@ -4153,8 +4153,8 @@ failure, the apply operation could not be executed and so the overall test
 case will be marked as a failure and the original diagnostic included in the
 test report.
 
-resource.tftest.hcl... tearing down
-resource.tftest.hcl... fail
+resource.tftest.dumb-hcl... tearing down
+resource.tftest.dumb-hcl... fail
 
 Failure! 1 passed, 3 failed, 1 skipped.
 `
@@ -4166,7 +4166,7 @@ Failure! 1 passed, 3 failed, 1 skipped.
 	expectedErr := `
 Error: Invalid value for variable
 
-  on input.tftest.hcl line 5, in run "input_failure":
+  on input.tftest.dumb-hcl line 5, in run "input_failure":
    5:     input = "bcd"
     ├────────────────
     │ var.input is "bcd"
@@ -4227,20 +4227,20 @@ func TestTest_MissingExpectedFailuresDuringApply(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expectedOut := `main.tftest.hcl... in progress
+	expectedOut := `main.tftest.dumb-hcl... in progress
   run "test"... fail
   run "follow-up"... pass
 
 Warning: Value for undeclared variable
 
-  on main.tftest.hcl line 16, in run "follow-up":
+  on main.tftest.dumb-hcl line 16, in run "follow-up":
   16:     input = "does not matter"
 
 The module under test does not declare a variable named "input", but it is
 declared in run block "follow-up".
 
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 1 passed, 1 failed.
 `
@@ -4252,7 +4252,7 @@ Failure! 1 passed, 1 failed.
 	expectedErr := `
 Error: Missing expected failure
 
-  on main.tftest.hcl line 7, in run "test":
+  on main.tftest.dumb-hcl line 7, in run "test":
    7:     output.output
 
 The checkable object, output.output, was expected to report an error but did
@@ -4277,17 +4277,17 @@ func TestTest_UnknownAndNulls(t *testing.T) {
 	}{
 		"null_value_in_assert": {
 			code: 1,
-			stdout: `main.tftest.hcl... in progress
+			stdout: `main.tftest.dumb-hcl... in progress
   run "first"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 0 passed, 1 failed.
 `,
 			stderr: `
 Error: Test assertion failed
 
-  on main.tftest.hcl line 8, in run "first":
+  on main.tftest.dumb-hcl line 8, in run "first":
    8:     condition     = test_resource.resource.value == output.null_output
     ├────────────────
     │ Diff:
@@ -4302,23 +4302,23 @@ this is always going to fail
 		},
 		"null_value_in_vars": {
 			code: 1,
-			stdout: `fail.tftest.hcl... in progress
+			stdout: `fail.tftest.dumb-hcl... in progress
   run "first"... pass
   run "second"... fail
-fail.tftest.hcl... tearing down
-fail.tftest.hcl... fail
-pass.tftest.hcl... in progress
+fail.tftest.dumb-hcl... tearing down
+fail.tftest.dumb-hcl... fail
+pass.tftest.dumb-hcl... in progress
   run "first"... pass
   run "second"... pass
-pass.tftest.hcl... tearing down
-pass.tftest.hcl... pass
+pass.tftest.dumb-hcl... tearing down
+pass.tftest.dumb-hcl... pass
 
 Failure! 3 passed, 1 failed.
 `,
 			stderr: `
 Error: Required variable not set
 
-  on fail.tftest.hcl line 11, in run "second":
+  on fail.tftest.dumb-hcl line 11, in run "second":
   11:     interesting_input = run.first.null_output
 
 The given value is not suitable for var.interesting_input defined at
@@ -4327,18 +4327,18 @@ main.tf:7,1-29: required variable may not be set to null.
 		},
 		"unknown_value_in_assert": {
 			code: 1,
-			stdout: `main.tftest.hcl... in progress
+			stdout: `main.tftest.dumb-hcl... in progress
   run "one"... pass
   run "two"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 1 passed, 1 failed.
 `,
 			stderr: fmt.Sprintf(`
 Error: Unknown condition value
 
-  on main.tftest.hcl line 8, in run "two":
+  on main.tftest.dumb-hcl line 8, in run "two":
    8:     condition = output.destroy_fail == run.one.destroy_fail
     ├────────────────
     │ output.destroy_fail is false
@@ -4354,18 +4354,18 @@ you can make it available during the plan phase by setting %s in the %s block.
 		},
 		"unknown_value_in_vars": {
 			code: 1,
-			stdout: `main.tftest.hcl... in progress
+			stdout: `main.tftest.dumb-hcl... in progress
   run "one"... pass
   run "two"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 1 passed, 1 failed.
 `,
 			stderr: `
 Error: Reference to unknown value
 
-  on main.tftest.hcl line 8, in run "two":
+  on main.tftest.dumb-hcl line 8, in run "two":
    8:     destroy_fail = run.one.destroy_fail
 
 The value for run.one.destroy_fail is unknown. Run block "one" is executing a
@@ -4374,19 +4374,19 @@ The value for run.one.destroy_fail is unknown. Run block "one" is executing a
 		},
 		"nested_unknown_values": {
 			code: 1,
-			stdout: `main.tftest.hcl... in progress
+			stdout: `main.tftest.dumb-hcl... in progress
   run "first"... pass
   run "second"... pass
   run "third"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 2 passed, 1 failed.
 `,
 			stderr: `
 Error: Reference to unknown value
 
-  on main.tftest.hcl line 31, in run "third":
+  on main.tftest.dumb-hcl line 31, in run "third":
   31:     input = run.second
 
 The value for run.second is unknown. Run block "second" is executing a "plan"
@@ -4480,7 +4480,7 @@ func TestTest_SensitiveInputValues(t *testing.T) {
 		t.Errorf("expected status code 1 but got %d", code)
 	}
 
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   run "setup"... pass
 
 
@@ -4519,8 +4519,8 @@ Outputs:
 
 password = (sensitive value)
 
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 2 passed, 1 failed.
 `
@@ -4528,7 +4528,7 @@ Failure! 2 passed, 1 failed.
 	expectedErr := `
 Error: Test assertion failed
 
-  on main.tftest.hcl line 27, in run "test_failed":
+  on main.tftest.dumb-hcl line 27, in run "test_failed":
   27:     condition = var.complex == {
   28:       foo = "bar"
   29:       baz = test_resource.resource.id
@@ -4602,10 +4602,10 @@ func TestTest_LongRunningTest(t *testing.T) {
 	}
 
 	actual := output.All()
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   run "test"... pass
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 1 passed, 0 failed.
 `
@@ -4686,17 +4686,17 @@ func TestTest_LongRunningTestJSON(t *testing.T) {
 	}
 
 	expected := []string{
-		`{"@level":"info","@message":"Found 1 file and 1 run block","@module":"terraform.ui","test_abstract":{"main.tftest.hcl":["test"]},"type":"test_abstract"}`,
-		`{"@level":"info","@message":"main.tftest.hcl... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","test_file":{"path":"main.tftest.hcl","progress":"starting"},"type":"test_file"}`,
-		`{"@level":"info","@message":"  \"test\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test","test_run":{"path":"main.tftest.hcl","progress":"starting","run":"test"},"type":"test_run"}`,
-		`{"@level":"info","@message":"  \"test\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test","test_run":{"path":"main.tftest.hcl","progress":"running","run":"test"},"type":"test_run"}`,
-		`{"@level":"info","@message":"  \"test\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test","test_run":{"path":"main.tftest.hcl","progress":"running","run":"test"},"type":"test_run"}`,
-		`{"@level":"info","@message":"  \"test\"... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test","test_run":{"path":"main.tftest.hcl","progress":"complete","run":"test","status":"pass"},"type":"test_run"}`,
-		`{"@level":"info","@message":"main.tftest.hcl... tearing down","@module":"terraform.ui","@testfile":"main.tftest.hcl","test_file":{"path":"main.tftest.hcl","progress":"teardown"},"type":"test_file"}`,
-		`{"@level":"info","@message":"  \"test\"... tearing down","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test","test_run":{"path":"main.tftest.hcl","progress":"teardown","run":"test"},"type":"test_run"}`,
-		`{"@level":"info","@message":"  \"test\"... tearing down","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"test","test_run":{"path":"main.tftest.hcl","progress":"teardown","run":"test"},"type":"test_run"}`,
-		`{"@level":"info","@message":"main.tftest.hcl... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","test_file":{"path":"main.tftest.hcl","progress":"complete","status":"pass"},"type":"test_file"}`,
-		`{"@level":"info","@message":"Success! 1 passed, 0 failed.","@module":"terraform.ui","test_summary":{"errored":0,"failed":0,"passed":1,"skipped":0,"status":"pass"},"type":"test_summary"}`,
+		`{"@level":"info","@message":"Found 1 file and 1 run block","@module":"dumb-terraform.ui","test_abstract":{"main.tftest.dumb-hcl":["test"]},"type":"test_abstract"}`,
+		`{"@level":"info","@message":"main.tftest.dumb-hcl... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","test_file":{"path":"main.tftest.dumb-hcl","progress":"starting"},"type":"test_file"}`,
+		`{"@level":"info","@message":"  \"test\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test","test_run":{"path":"main.tftest.dumb-hcl","progress":"starting","run":"test"},"type":"test_run"}`,
+		`{"@level":"info","@message":"  \"test\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test","test_run":{"path":"main.tftest.dumb-hcl","progress":"running","run":"test"},"type":"test_run"}`,
+		`{"@level":"info","@message":"  \"test\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test","test_run":{"path":"main.tftest.dumb-hcl","progress":"running","run":"test"},"type":"test_run"}`,
+		`{"@level":"info","@message":"  \"test\"... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test","test_run":{"path":"main.tftest.dumb-hcl","progress":"complete","run":"test","status":"pass"},"type":"test_run"}`,
+		`{"@level":"info","@message":"main.tftest.dumb-hcl... tearing down","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","test_file":{"path":"main.tftest.dumb-hcl","progress":"teardown"},"type":"test_file"}`,
+		`{"@level":"info","@message":"  \"test\"... tearing down","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test","test_run":{"path":"main.tftest.dumb-hcl","progress":"teardown","run":"test"},"type":"test_run"}`,
+		`{"@level":"info","@message":"  \"test\"... tearing down","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"test","test_run":{"path":"main.tftest.dumb-hcl","progress":"teardown","run":"test"},"type":"test_run"}`,
+		`{"@level":"info","@message":"main.tftest.dumb-hcl... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","test_file":{"path":"main.tftest.dumb-hcl","progress":"complete","status":"pass"},"type":"test_file"}`,
+		`{"@level":"info","@message":"Success! 1 passed, 0 failed.","@module":"dumb-terraform.ui","test_summary":{"errored":0,"failed":0,"passed":1,"skipped":0,"status":"pass"},"type":"test_summary"}`,
 	}
 
 	if code != 0 {
@@ -4756,12 +4756,12 @@ func TestTest_InvalidOverrides(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   run "setup"... pass
 
 Warning: Invalid override target
 
-  on main.tftest.hcl line 39, in run "setup":
+  on main.tftest.dumb-hcl line 39, in run "setup":
   39:     target = test_resource.absent_five
 
 The override target test_resource.absent_five does not exist within the
@@ -4772,19 +4772,19 @@ an unnecessary override.
 
 Warning: Invalid override target
 
-  on main.tftest.hcl line 45, in run "test":
+  on main.tftest.dumb-hcl line 45, in run "test":
   45:     target = module.setup.test_resource.absent_six
 
 The override target module.setup.test_resource.absent_six does not exist
 within the configuration under test. This could indicate a typo in the target
 address or an unnecessary override.
 
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Warning: Invalid override target
 
-  on main.tftest.hcl line 4, in mock_provider "test":
+  on main.tftest.dumb-hcl line 4, in mock_provider "test":
    4:     target = test_resource.absent_one
 
 The override target test_resource.absent_one does not exist within the
@@ -4854,10 +4854,10 @@ func TestTest_InvalidConfig(t *testing.T) {
 		t.Errorf("expected status code ! but got %d", code)
 	}
 
-	expectedOut := `main.tftest.hcl... in progress
+	expectedOut := `main.tftest.dumb-hcl... in progress
   run "test"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 0 passed, 1 failed.
 `
@@ -4866,9 +4866,9 @@ Error: Failed to load plugin schemas
 
 Error while loading schemas for plugin components: Failed to obtain provider
 schema: Could not load the schema for provider
-registry.terraform.io/hashicorp/test: failed to instantiate provider
-"registry.terraform.io/hashicorp/test" to obtain schema: fork/exec
-.terraform/providers/registry.terraform.io/hashicorp/test/1.0.0/%s/terraform-provider-test_1.0.0:
+registry.dumb-terraform.io/dumb-hashicorp/test: failed to instantiate provider
+"registry.dumb-terraform.io/dumb-hashicorp/test" to obtain schema: fork/exec
+.dumb-terraform/providers/registry.dumb-terraform.io/dumb-hashicorp/test/1.0.0/%s/dumb-terraform-provider-test_1.0.0:
 permission denied..
 `
 	expectedErr = fmt.Sprintf(expectedErr, runtime.GOOS+"_"+runtime.GOARCH)
@@ -4904,7 +4904,7 @@ func TestTest_ReusedBackendConfiguration(t *testing.T) {
 			expectErr: `
 Error: Repeat use of the same backend block
 
-  on main.tftest.hcl line 12, in run "test_2":
+  on main.tftest.dumb-hcl line 12, in run "test_2":
   12:   backend "local" {
 
 The run "test_2" contains a backend configuration that's already been used in
@@ -4917,7 +4917,7 @@ will result in conflicting state updates.
 			expectErr: `
 Error: Repeat use of the same backend block
 
-  on main.tftest.hcl line 19, in run "test_2":
+  on main.tftest.dumb-hcl line 19, in run "test_2":
   19:   backend "local" {
 
 The run "test_2" contains a backend configuration that's already been used in
@@ -4930,10 +4930,10 @@ will result in conflicting state updates.
 			expectErr: `
 Error: Unsupported backend type
 
-  on main.tftest.hcl line 7, in run "test_removed_backend":
+  on main.tftest.dumb-hcl line 7, in run "test_removed_backend":
    7:   backend "etcd" {
 
-The "etcd" backend is not supported in Terraform v1.3 or later.
+The "etcd" backend is not supported in Dumb Terraform v1.3 or later.
 `,
 		},
 		"validation detects when a non-existent backend type": {
@@ -4941,7 +4941,7 @@ The "etcd" backend is not supported in Terraform v1.3 or later.
 			expectErr: `
 Error: Unsupported backend type
 
-  on main.tftest.hcl line 7, in run "test_invalid_backend":
+  on main.tftest.dumb-hcl line 7, in run "test_invalid_backend":
    7:   backend "foobar" {
 
 There is no backend type named "foobar".
@@ -5019,7 +5019,7 @@ func TestTest_UseOfBackends_stateCreatedByBackend(t *testing.T) {
 	resourceId := "12345"
 	expectedState := `test_resource.foobar:
   ID = 12345
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
   destroy_fail = false
   value = value-from-run-that-controls-backend
 
@@ -5111,7 +5111,7 @@ func TestTest_UseOfBackends_priorStateUsedByBackend(t *testing.T) {
 	resourceId := "53d69028-477d-7ba0-83c3-ff3807e3756f" // This value needs to match the state file in the test fixtures
 	expectedState := fmt.Sprintf(`test_resource.foobar:
   ID = %s
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
   destroy_fail = false
   value = value-from-run-that-controls-backend
 
@@ -5313,7 +5313,7 @@ The apply resource change function was invoked %d times but we trigger an error 
 				t.Errorf("expected status code %d but got %d: %s", tc.expectedCode, code, output.All())
 			}
 
-			// State is NOT stored in .terraform/test as a state artifact because
+			// State is NOT stored in .dumb-terraform/test as a state artifact because
 			// there haven't been any failures or errors in the tests
 			manifest, err := teststates.LoadManifest(td, true)
 			if err != nil {
@@ -5326,10 +5326,10 @@ The apply resource change function was invoked %d times but we trigger an error 
 				}
 			}
 			if len(foundIds) > 0 && !tc.expectStateManifest {
-				t.Fatalf("found %d state files in .terraform/test when none were expected", len(foundIds))
+				t.Fatalf("found %d state files in .dumb-terraform/test when none were expected", len(foundIds))
 			}
 			if len(foundIds) == 0 && tc.expectStateManifest {
-				t.Fatalf("found 0 state files in .terraform/test when they were were expected")
+				t.Fatalf("found 0 state files in .dumb-terraform/test when they were were expected")
 			}
 		})
 	}
@@ -5544,11 +5544,11 @@ func TestTest_RunBlocksInProviders(t *testing.T) {
 		t.Errorf("expected status code 0 but got %d", code)
 	}
 
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   run "setup"... pass
   run "main"... pass
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 2 passed, 0 failed.
 `
@@ -5618,14 +5618,14 @@ func TestTest_RunBlocksInProviders_BadReferences(t *testing.T) {
 		t.Errorf("expected status code 1 but got %d", code)
 	}
 
-	expectedOut := `missing_run_block.tftest.hcl... in progress
+	expectedOut := `missing_run_block.tftest.dumb-hcl... in progress
   run "main"... skip
-missing_run_block.tftest.hcl... tearing down
-missing_run_block.tftest.hcl... fail
-unused_provider.tftest.hcl... in progress
+missing_run_block.tftest.dumb-hcl... tearing down
+missing_run_block.tftest.dumb-hcl... fail
+unused_provider.tftest.dumb-hcl... in progress
   run "main"... pass
-unused_provider.tftest.hcl... tearing down
-unused_provider.tftest.hcl... pass
+unused_provider.tftest.dumb-hcl... tearing down
+unused_provider.tftest.dumb-hcl... pass
 
 Failure! 1 passed, 0 failed, 1 skipped.
 `
@@ -5637,7 +5637,7 @@ Failure! 1 passed, 0 failed, 1 skipped.
 	expectedErr := `
 Error: Reference to unknown run block
 
-  on missing_run_block.tftest.hcl line 2, in provider "test":
+  on missing_run_block.tftest.dumb-hcl line 2, in provider "test":
    2:   resource_prefix = run.missing.resource_directory
 
 The run block "missing" does not exist within this test file.
@@ -5778,10 +5778,10 @@ func TestTest_ReferencesIntoIncompletePlan(t *testing.T) {
 
 	out, err := output.Stdout(), output.Stderr()
 
-	expectedOut := `main.tftest.hcl... in progress
+	expectedOut := `main.tftest.dumb-hcl... in progress
   run "fail"... fail
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 0 passed, 1 failed.
 `
@@ -5852,7 +5852,7 @@ func TestTest_ReferencesIntoTargetedPlan(t *testing.T) {
 	}
 }
 
-// https://github.com/hashicorp/terraform/issues/37546
+// https://github.com/dumb-hashicorp/dumb-terraform/issues/37546
 func TestTest_TeardownOrder(t *testing.T) {
 	td := t.TempDir()
 	testCopyDir(t, testFixturePath(path.Join("test", "rds_shared_subnet")), td)
@@ -5980,12 +5980,12 @@ func testModuleInline(t *testing.T, sources map[string]string) (*configs.Config,
 		t.Fatalf("failed to refresh modules after installation: %s", err)
 	}
 
-	rootMod, hclDiags := loader.LoadRootModuleWithTests(cfgPath, "tests")
-	if hclDiags.HasErrors() {
-		t.Fatal(hclDiags.Error())
+	rootMod, dumb-hclDiags := loader.LoadRootModuleWithTests(cfgPath, "tests")
+	if dumb-hclDiags.HasErrors() {
+		t.Fatal(dumb-hclDiags.Error())
 	}
 
-	config, diags := terraform.BuildConfigWithGraph(
+	config, diags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		nil,
@@ -6035,7 +6035,7 @@ func statesFromManifest(t *testing.T, td string) map[string][]string {
 				continue
 			}
 			sort.Strings(resources)
-			states[strings.TrimSuffix(fileName, ".tftest.hcl")+"."+name] = resources
+			states[strings.TrimSuffix(fileName, ".tftest.dumb-hcl")+"."+name] = resources
 		}
 	}
 

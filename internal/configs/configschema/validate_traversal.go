@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/didyoumean"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/didyoumean"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StaticValidateTraversal checks whether the given traversal (which must be
@@ -22,7 +22,7 @@ import (
 // This method is "optimistic" in that it will not return errors for possible
 // problems that cannot be detected statically. It is possible that a
 // traversal which passed static validation will still fail when evaluated.
-func (b *Block) StaticValidateTraversal(traversal hcl.Traversal) tfdiags.Diagnostics {
+func (b *Block) StaticValidateTraversal(traversal dumb-hcl.Traversal) tfdiags.Diagnostics {
 	if !traversal.IsRelative() {
 		panic("StaticValidateTraversal on absolute traversal")
 	}
@@ -37,18 +37,18 @@ func (b *Block) StaticValidateTraversal(traversal hcl.Traversal) tfdiags.Diagnos
 
 	var name string
 	switch step := next.(type) {
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		name = step.Name
-	case hcl.TraverseIndex:
+	case dumb-hcl.TraverseIndex:
 		// No other traversal step types are allowed directly at a block.
 		// If it looks like the user was trying to use index syntax to
 		// access an attribute then we'll produce a specialized message.
 		key := step.Key
 		if key.Type() == cty.String && key.IsKnown() && !key.IsNull() {
 			maybeName := key.AsString()
-			if hclsyntax.ValidIdentifier(maybeName) {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+			if dumb-hclsyntax.ValidIdentifier(maybeName) {
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  `Invalid index operation`,
 					Detail:   fmt.Sprintf(`Only attribute access is allowed here. Did you mean to access attribute %q using the dot operator?`, maybeName),
 					Subject:  &step.SrcRange,
@@ -57,8 +57,8 @@ func (b *Block) StaticValidateTraversal(traversal hcl.Traversal) tfdiags.Diagnos
 			}
 		}
 		// If it looks like some other kind of index then we'll use a generic error.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  `Invalid index operation`,
 			Detail:   `Only attribute access is allowed here, using the dot operator.`,
 			Subject:  &step.SrcRange,
@@ -67,8 +67,8 @@ func (b *Block) StaticValidateTraversal(traversal hcl.Traversal) tfdiags.Diagnos
 	default:
 		// No other traversal types should appear in a normal valid traversal,
 		// but we'll handle this with a generic error anyway to be robust.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  `Invalid operation`,
 			Detail:   `Only attribute access is allowed here, using the dot operator.`,
 			Subject:  next.SourceRange().Ptr(),
@@ -79,11 +79,11 @@ func (b *Block) StaticValidateTraversal(traversal hcl.Traversal) tfdiags.Diagnos
 	if attrS, exists := b.Attributes[name]; exists {
 		// For attribute validation we will just apply the rest of the
 		// traversal to an unknown value of the attribute type and pass
-		// through HCL's own errors, since we don't want to replicate all
-		// of HCL's type checking rules here.
+		// through DUMB_HCL's own errors, since we don't want to replicate all
+		// of DUMB_HCL's type checking rules here.
 		val := cty.UnknownVal(attrS.ImpliedType())
-		_, hclDiags := after.TraverseRel(val)
-		return diags.Append(hclDiags)
+		_, dumb-hclDiags := after.TraverseRel(val)
+		return diags.Append(dumb-hclDiags)
 	}
 
 	if blockS, exists := b.BlockTypes[name]; exists {
@@ -106,8 +106,8 @@ func (b *Block) StaticValidateTraversal(traversal hcl.Traversal) tfdiags.Diagnos
 	if suggestion != "" {
 		suggestion = fmt.Sprintf(" Did you mean %q?", suggestion)
 	}
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  `Unsupported attribute`,
 		Detail:   fmt.Sprintf(`This object has no argument, nested block, or exported attribute named %q.%s`, name, suggestion),
 		Subject:  next.SourceRange().Ptr(),
@@ -116,7 +116,7 @@ func (b *Block) StaticValidateTraversal(traversal hcl.Traversal) tfdiags.Diagnos
 	return diags
 }
 
-func (b *NestedBlock) staticValidateTraversal(typeName string, traversal hcl.Traversal) tfdiags.Diagnostics {
+func (b *NestedBlock) staticValidateTraversal(typeName string, traversal dumb-hcl.Traversal) tfdiags.Diagnostics {
 	if b.Nesting == NestingSingle || b.Nesting == NestingGroup {
 		// Single blocks are easy: just pass right through.
 		return b.Block.StaticValidateTraversal(traversal)
@@ -136,8 +136,8 @@ func (b *NestedBlock) staticValidateTraversal(typeName string, traversal hcl.Tra
 	case NestingSet:
 		// Can't traverse into a set at all, since it does not have any keys
 		// to index with.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  `Cannot index a set value`,
 			Detail:   fmt.Sprintf(`Block type %q is represented by a set of objects, and set elements do not have addressable keys. To find elements matching specific criteria, use a "for" expression with an "if" clause.`, typeName),
 			Subject:  next.SourceRange().Ptr(),
@@ -145,12 +145,12 @@ func (b *NestedBlock) staticValidateTraversal(typeName string, traversal hcl.Tra
 		return diags
 
 	case NestingList:
-		if _, ok := next.(hcl.TraverseIndex); ok {
+		if _, ok := next.(dumb-hcl.TraverseIndex); ok {
 			moreDiags := b.Block.StaticValidateTraversal(after)
 			diags = diags.Append(moreDiags)
 		} else {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  `Invalid operation`,
 				Detail:   fmt.Sprintf(`Block type %q is represented by a list of objects, so it must be indexed using a numeric key, like .%s[0].`, typeName, typeName),
 				Subject:  next.SourceRange().Ptr(),

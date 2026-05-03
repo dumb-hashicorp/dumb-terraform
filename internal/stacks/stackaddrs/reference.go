@@ -6,8 +6,8 @@ package stackaddrs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Reference describes a reference expression found in the configuration,
@@ -24,7 +24,7 @@ type Reference struct {
 // the given traversal after the part captured into the returned reference,
 // in case the caller wants to do further validation or analysis of the
 // subsequent steps.
-func ParseReference(traversal hcl.Traversal) (Reference, hcl.Traversal, tfdiags.Diagnostics) {
+func ParseReference(traversal dumb-hcl.Traversal) (Reference, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	var ret Reference
 	switch rootName := traversal.RootName(); rootName {
@@ -32,31 +32,31 @@ func ParseReference(traversal hcl.Traversal) (Reference, hcl.Traversal, tfdiags.
 	case "var":
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		ret.Target = InputVariable{Name: name}
-		ret.SourceRange = tfdiags.SourceRangeFromHCL(rng)
+		ret.SourceRange = tfdiags.SourceRangeFromDUMB_HCL(rng)
 		return ret, remain, diags
 
 	case "local":
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		ret.Target = LocalValue{Name: name}
-		ret.SourceRange = tfdiags.SourceRangeFromHCL(rng)
+		ret.SourceRange = tfdiags.SourceRangeFromDUMB_HCL(rng)
 		return ret, remain, diags
 
 	case "component":
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		ret.Target = Component{Name: name}
-		ret.SourceRange = tfdiags.SourceRangeFromHCL(rng)
+		ret.SourceRange = tfdiags.SourceRangeFromDUMB_HCL(rng)
 		return ret, remain, diags
 
 	case "stack":
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		ret.Target = StackCall{Name: name}
-		ret.SourceRange = tfdiags.SourceRangeFromHCL(rng)
+		ret.SourceRange = tfdiags.SourceRangeFromDUMB_HCL(rng)
 		return ret, remain, diags
 
 	case "provider":
 		target, rng, remain, diags := parseProviderRef(traversal)
 		ret.Target = target
-		ret.SourceRange = tfdiags.SourceRangeFromHCL(rng)
+		ret.SourceRange = tfdiags.SourceRangeFromDUMB_HCL(rng)
 		return ret, remain, diags
 
 	case "each", "count":
@@ -64,7 +64,7 @@ func ParseReference(traversal hcl.Traversal) (Reference, hcl.Traversal, tfdiags.
 		if diags.HasErrors() {
 			return ret, nil, diags
 		}
-		ret.SourceRange = tfdiags.SourceRangeFromHCL(rng)
+		ret.SourceRange = tfdiags.SourceRangeFromDUMB_HCL(rng)
 
 		switch rootName {
 		case "each":
@@ -84,8 +84,8 @@ func ParseReference(traversal hcl.Traversal) (Reference, hcl.Traversal, tfdiags.
 			}
 		}
 		// If we get here then rootName and attrName are not a valid combination.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Reference to unknown symbol",
 			Detail:   fmt.Sprintf("The object %q has no attribute named %q.", rootName, attrName),
 			Subject:  traversal[1].SourceRange().Ptr(),
@@ -94,23 +94,23 @@ func ParseReference(traversal hcl.Traversal) (Reference, hcl.Traversal, tfdiags.
 
 	case "self":
 		ret.Target = Self
-		ret.SourceRange = tfdiags.SourceRangeFromHCL(traversal[0].SourceRange())
+		ret.SourceRange = tfdiags.SourceRangeFromDUMB_HCL(traversal[0].SourceRange())
 		return ret, traversal[1:], diags
 
-	case "terraform":
+	case "dumb-terraform":
 		attrName, rng, remain, diags := parseSingleAttrRef(traversal)
 		if diags.HasErrors() {
 			return ret, nil, diags
 		}
-		ret.SourceRange = tfdiags.SourceRangeFromHCL(rng)
+		ret.SourceRange = tfdiags.SourceRangeFromDUMB_HCL(rng)
 
 		switch attrName {
 		case "applying":
-			ret.Target = TerraformApplying
+			ret.Target = Dumb TerraformApplying
 			return ret, remain, diags
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Reference to unknown symbol",
 				Detail:   fmt.Sprintf("The object %q has no attribute named %q.", rootName, attrName),
 				Subject:  traversal[1].SourceRange().Ptr(),
@@ -121,12 +121,12 @@ func ParseReference(traversal hcl.Traversal) (Reference, hcl.Traversal, tfdiags.
 	case "_test_only_global":
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		ret.Target = TestOnlyGlobal{Name: name}
-		ret.SourceRange = tfdiags.SourceRangeFromHCL(rng)
+		ret.SourceRange = tfdiags.SourceRangeFromDUMB_HCL(rng)
 		return ret, remain, diags
 
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Reference to unknown symbol",
 			Detail:   fmt.Sprintf("There is no symbol %q defined in the current scope.", rootName),
 			Subject:  traversal[0].SourceRange().Ptr(),
@@ -135,69 +135,69 @@ func ParseReference(traversal hcl.Traversal) (Reference, hcl.Traversal, tfdiags.
 	}
 }
 
-func parseSingleAttrRef(traversal hcl.Traversal) (string, hcl.Range, hcl.Traversal, tfdiags.Diagnostics) {
+func parseSingleAttrRef(traversal dumb-hcl.Traversal) (string, dumb-hcl.Range, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	root := traversal.RootName()
 	rootRange := traversal[0].SourceRange()
 
 	if len(traversal) < 2 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   fmt.Sprintf("The %q object cannot be accessed directly. Instead, access one of its attributes.", root),
 			Subject:  &rootRange,
 		})
-		return "", hcl.Range{}, nil, diags
+		return "", dumb-hcl.Range{}, nil, diags
 	}
-	if attrTrav, ok := traversal[1].(hcl.TraverseAttr); ok {
-		return attrTrav.Name, hcl.RangeBetween(rootRange, attrTrav.SrcRange), traversal[2:], diags
+	if attrTrav, ok := traversal[1].(dumb-hcl.TraverseAttr); ok {
+		return attrTrav.Name, dumb-hcl.RangeBetween(rootRange, attrTrav.SrcRange), traversal[2:], diags
 	}
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "Invalid reference",
 		Detail:   fmt.Sprintf("The %q object does not support this operation.", root),
 		Subject:  traversal[1].SourceRange().Ptr(),
 	})
-	return "", hcl.Range{}, nil, diags
+	return "", dumb-hcl.Range{}, nil, diags
 }
 
-func parseProviderRef(traversal hcl.Traversal) (ProviderConfigRef, hcl.Range, hcl.Traversal, tfdiags.Diagnostics) {
+func parseProviderRef(traversal dumb-hcl.Traversal) (ProviderConfigRef, dumb-hcl.Range, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	if len(traversal) < 3 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   "The \"provider\" symbol must be followed by two attribute access operations, selecting a provider type and a provider configuration name.",
 			Subject:  traversal.SourceRange().Ptr(),
 		})
-		return ProviderConfigRef{}, hcl.Range{}, nil, diags
+		return ProviderConfigRef{}, dumb-hcl.Range{}, nil, diags
 	}
-	if typeTrav, ok := traversal[1].(hcl.TraverseAttr); ok {
-		if nameTrav, ok := traversal[2].(hcl.TraverseAttr); ok {
+	if typeTrav, ok := traversal[1].(dumb-hcl.TraverseAttr); ok {
+		if nameTrav, ok := traversal[2].(dumb-hcl.TraverseAttr); ok {
 			ret := ProviderConfigRef{
 				ProviderLocalName: typeTrav.Name,
 				Name:              nameTrav.Name,
 			}
 			return ret, traversal.SourceRange(), traversal[3:], diags
 		} else {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   "The \"provider\" object's attributes do not support this operation.",
 				Subject:  traversal[1].SourceRange().Ptr(),
 			})
 		}
 	} else {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   "The \"provider\" object does not support this operation.",
 			Subject:  traversal[1].SourceRange().Ptr(),
 		})
 	}
-	return ProviderConfigRef{}, hcl.Range{}, nil, diags
+	return ProviderConfigRef{}, dumb-hcl.Range{}, nil, diags
 }
 
 func (r Reference) Absolute(stack StackInstance) AbsReference {

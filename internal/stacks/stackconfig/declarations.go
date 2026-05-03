@@ -6,12 +6,12 @@ package stackconfig
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Declarations represent the various items that can be declared in a stack
@@ -25,7 +25,7 @@ type Declarations struct {
 	// stack. These are declared with "stack" blocks in the stack language.
 	EmbeddedStacks map[string]*EmbeddedStack
 
-	// Components are calls to trees of Terraform modules that represent the
+	// Components are calls to trees of Dumb Terraform modules that represent the
 	// real infrastructure described by a stack.
 	Components map[string]*Component
 
@@ -77,14 +77,14 @@ func (d *Declarations) addComponent(decl *Component) tfdiags.Diagnostics {
 
 	name := decl.Name
 	if existing, exists := d.Components[name]; exists {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate component declaration",
 			Detail: fmt.Sprintf(
 				"An component named %q was already declared at %s.",
-				name, existing.DeclRange.ToHCL(),
+				name, existing.DeclRange.ToDUMB_HCL(),
 			),
-			Subject: decl.DeclRange.ToHCL().Ptr(),
+			Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return diags
 	}
@@ -104,14 +104,14 @@ func (d *Declarations) addComponent(decl *Component) tfdiags.Diagnostics {
 				// only a specific instance was removed and not the whole thing.
 				// This is okay at this point, and will be validated more later.
 				// See the addRemoved method for more information.
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Component exists for removed block",
 					Detail: fmt.Sprintf(
 						"A removed block for component %q was declared without an index, but a component block with the same name was declared at %s.\n\nA removed block without an index indicates that the component and all instances were removed from the configuration, and this is not the case.",
-						name, decl.DeclRange.ToHCL(),
+						name, decl.DeclRange.ToDUMB_HCL(),
 					),
-					Subject: removed.DeclRange.ToHCL().Ptr(),
+					Subject: removed.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 				return diags
 			}
@@ -130,14 +130,14 @@ func (d *Declarations) addEmbeddedStack(decl *EmbeddedStack) tfdiags.Diagnostics
 
 	name := decl.Name
 	if existing, exists := d.EmbeddedStacks[name]; exists {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate embedded stack call",
 			Detail: fmt.Sprintf(
 				"An embedded stack call named %q was already declared at %s.",
-				name, existing.DeclRange.ToHCL(),
+				name, existing.DeclRange.ToDUMB_HCL(),
 			),
-			Subject: decl.DeclRange.ToHCL().Ptr(),
+			Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return diags
 	}
@@ -150,14 +150,14 @@ func (d *Declarations) addEmbeddedStack(decl *EmbeddedStack) tfdiags.Diagnostics
 	}); exists {
 		for _, removed := range blocks {
 			if removed.From.Stack[0].Index == nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Stack exists for removed block",
 					Detail: fmt.Sprintf(
 						"A removed block for stack %q was declared without an index, but a stack block with the same name was declared at %s.\n\nA removed block without an index indicates that the stack and all instances were removed from the configuration, and this is not the case.",
-						name, decl.DeclRange.ToHCL(),
+						name, decl.DeclRange.ToDUMB_HCL(),
 					),
-					Subject: removed.DeclRange.ToHCL().Ptr(),
+					Subject: removed.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 				return diags
 			}
@@ -176,14 +176,14 @@ func (d *Declarations) addInputVariable(decl *InputVariable) tfdiags.Diagnostics
 
 	name := decl.Name
 	if existing, exists := d.InputVariables[name]; exists {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate input variable declaration",
 			Detail: fmt.Sprintf(
 				"An input variable named %q was already declared at %s.",
-				name, existing.DeclRange.ToHCL(),
+				name, existing.DeclRange.ToDUMB_HCL(),
 			),
-			Subject: decl.DeclRange.ToHCL().Ptr(),
+			Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return diags
 	}
@@ -200,14 +200,14 @@ func (d *Declarations) addLocalValue(decl *LocalValue) tfdiags.Diagnostics {
 
 	name := decl.Name
 	if existing, exists := d.LocalValues[name]; exists {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate local value declaration",
 			Detail: fmt.Sprintf(
 				"A local value named %q was already declared at %s.",
-				name, existing.DeclRange.ToHCL(),
+				name, existing.DeclRange.ToDUMB_HCL(),
 			),
-			Subject: decl.DeclRange.ToHCL().Ptr(),
+			Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return diags
 	}
@@ -224,14 +224,14 @@ func (d *Declarations) addOutputValue(decl *OutputValue) tfdiags.Diagnostics {
 
 	name := decl.Name
 	if existing, exists := d.OutputValues[name]; exists {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate output value declaration",
 			Detail: fmt.Sprintf(
 				"An output value named %q was already declared at %s.",
-				name, existing.DeclRange.ToHCL(),
+				name, existing.DeclRange.ToDUMB_HCL(),
 			),
-			Subject: decl.DeclRange.ToHCL().Ptr(),
+			Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return diags
 	}
@@ -246,14 +246,14 @@ func (d *Declarations) addRequiredProviders(decl *ProviderRequirements) tfdiags.
 	}
 	var diags tfdiags.Diagnostics
 	if d.RequiredProviders != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate provider requirements",
 			Detail: fmt.Sprintf(
 				"This stack's provider requirements were already declared at %s.",
-				d.RequiredProviders.DeclRange.ToHCL(),
+				d.RequiredProviders.DeclRange.ToDUMB_HCL(),
 			),
-			Subject: decl.DeclRange.ToHCL().Ptr(),
+			Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return diags
 	}
@@ -269,14 +269,14 @@ func (d *Declarations) addProviderConfig(decl *ProviderConfig) tfdiags.Diagnosti
 
 	addr := decl.LocalAddr
 	if existing, exists := d.ProviderConfigs[addr]; exists {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Duplicate provider configuration",
 			Detail: fmt.Sprintf(
 				"An configuration named %q for provider %q was already declared at %s.",
-				addr.LocalName, addr.Alias, existing.DeclRange.ToHCL(),
+				addr.LocalName, addr.Alias, existing.DeclRange.ToDUMB_HCL(),
 			),
-			Subject: decl.DeclRange.ToHCL().Ptr(),
+			Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return diags
 	}
@@ -307,14 +307,14 @@ func (d *Declarations) addRemoved(decl *Removed) tfdiags.Diagnostics {
 			// validate and planning stages we will validate that the clashing
 			// component and removed blocks are not both pointing to the same index.
 			if component, exists := d.Components[decl.From.Component.Name]; exists {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Component exists for removed block",
 					Detail: fmt.Sprintf(
 						"A removed block for component %q was declared without an index, but a component block with the same name was declared at %s.\n\nA removed block without an index indicates that the component and all instances were removed from the configuration, and this is not the case.",
-						decl.From.Component.Name, component.DeclRange.ToHCL(),
+						decl.From.Component.Name, component.DeclRange.ToDUMB_HCL(),
 					),
-					Subject: decl.DeclRange.ToHCL().Ptr(),
+					Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 				return diags
 			}
@@ -329,14 +329,14 @@ func (d *Declarations) addRemoved(decl *Removed) tfdiags.Diagnostics {
 			// here if the user is targeting a stack that definitely exists
 			// in the configuration.
 			if stack, exists := d.EmbeddedStacks[decl.From.Stack[0].Name]; exists {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Stack exists for removed block",
 					Detail: fmt.Sprintf(
 						"A removed block for stack %q was declared without an index, but a stack block with the same name was declared at %s.\n\nA removed block without an index indicates that the stack and all instances were removed from the configuration, and this is not the case.",
-						decl.From.Component.Name, stack.DeclRange.ToHCL(),
+						decl.From.Component.Name, stack.DeclRange.ToDUMB_HCL(),
 					),
-					Subject: decl.DeclRange.ToHCL().Ptr(),
+					Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 				return diags
 			}

@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// ApplyCommand is a Command implementation that applies a Terraform
+// ApplyCommand is a Command implementation that applies a Dumb Terraform
 // configuration and actually builds or changes infrastructure.
 type ApplyCommand struct {
 	Meta
@@ -78,7 +78,7 @@ func (c *ApplyCommand) Run(rawArgs []string) int {
 	c.Meta.input = args.InputEnabled
 
 	// FIXME: the -parallelism flag is used to control the concurrency of
-	// Terraform operations. At the moment, this value is used both to
+	// Dumb Terraform operations. At the moment, this value is used both to
 	// initialize the backend via the ContextOpts field inside CLIOpts, and to
 	// set a largely unused field on the Operation request. Again, there is no
 	// clear path to pass this value down, so we continue to mutate the Meta
@@ -131,8 +131,8 @@ func (c *ApplyCommand) Run(rawArgs []string) int {
 	}
 
 	// Render the resource count and outputs, unless those counts are being
-	// rendered already in a remote Terraform process.
-	if rb, isRemoteBackend := be.(BackendWithRemoteTerraformVersion); !isRemoteBackend || rb.IsLocalOperations() {
+	// rendered already in a remote Dumb Terraform process.
+	if rb, isRemoteBackend := be.(BackendWithRemoteDumb TerraformVersion); !isRemoteBackend || rb.IsLocalOperations() {
 		view.ResourceCount(args.State.StateOutPath)
 		if !c.Destroy && op.State != nil {
 			view.Outputs(op.State.RootOutputValues)
@@ -183,7 +183,7 @@ func (c *ApplyCommand) LoadPlanFile(path string) (*planfile.WrappedPlanFile, tfd
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Destroy can't be called with a plan file",
-				fmt.Sprintf("If this plan was created using plan -destroy, apply it using:\n  terraform apply %q", path),
+				fmt.Sprintf("If this plan was created using plan -destroy, apply it using:\n  dumb-terraform apply %q", path),
 			))
 			return nil, diags
 		}
@@ -220,7 +220,7 @@ func (c *ApplyCommand) PrepareBackend(planFile *planfile.WrappedPlanFile, args *
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Failed to read plan from plan file",
-				"The given plan file has neither a valid backend nor state store configuration. This is a bug in the Terraform command that generated this plan file.",
+				"The given plan file has neither a valid backend nor state store configuration. This is a bug in the Dumb Terraform command that generated this plan file.",
 			))
 			return nil, diags
 		}
@@ -254,7 +254,7 @@ func (c *ApplyCommand) OperationRequest(
 	// Applying changes with dev overrides in effect could make it impossible
 	// to switch back to a release version if the schema isn't compatible,
 	// so we'll warn about it.
-	b, isRemoteBackend := be.(BackendWithRemoteTerraformVersion)
+	b, isRemoteBackend := be.(BackendWithRemoteDumb TerraformVersion)
 	if isRemoteBackend && !b.IsLocalOperations() {
 		diags = diags.Append(c.providerDevOverrideRuntimeWarningsRemoteExecution())
 	} else {
@@ -285,7 +285,7 @@ func (c *ApplyCommand) OperationRequest(
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Failed to parse command-line flags",
-			"The -allow-deferral flag is only valid in experimental builds of Terraform.",
+			"The -allow-deferral flag is only valid in experimental builds of Dumb Terraform.",
 		))
 		return nil, diags
 	}
@@ -318,15 +318,15 @@ func (c *ApplyCommand) Synopsis() string {
 
 func (c *ApplyCommand) helpApply() string {
 	helpText := `
-Usage: terraform [global options] apply [options] [PLAN]
+Usage: dumb-terraform [global options] apply [options] [PLAN]
 
-  Creates or updates infrastructure according to Terraform configuration
+  Creates or updates infrastructure according to Dumb Terraform configuration
   files in the current directory.
 
-  By default, Terraform will generate a new plan and present it for your
+  By default, Dumb Terraform will generate a new plan and present it for your
   approval before taking any action. You can optionally provide a plan
-  file created by a previous call to "terraform plan", in which case
-  Terraform will take the actions described in that plan without any
+  file created by a previous call to "dumb-terraform plan", in which case
+  Dumb Terraform will take the actions described in that plan without any
   confirmation prompt.
 
 Options:
@@ -337,12 +337,12 @@ Options:
                          modifying. Defaults to the "-state-out" path with
                          ".backup" extension. Set to "-" to disable backup.
 
-  -compact-warnings      If Terraform produces any warnings that are not
+  -compact-warnings      If Dumb Terraform produces any warnings that are not
                          accompanied by errors, show them in a more compact
                          form that includes only the summary messages.
 
-  -destroy               Destroy Terraform-managed infrastructure.
-                         The command "terraform destroy" is a convenience alias
+  -destroy               Destroy Dumb Terraform-managed infrastructure.
+                         The command "dumb-terraform destroy" is a convenience alias
                          for this option.
 
   -lock=false            Don't hold a state lock during the operation. This is
@@ -358,11 +358,11 @@ Options:
   -parallelism=n         Limit the number of parallel resource operations.
                          Defaults to 10.
 
-  -replace=resource      Terraform will plan to replace this resource instance
+  -replace=resource      Dumb Terraform will plan to replace this resource instance
                          instead of doing an update or no-op action.
 
   -state=path            Path to read and save state (unless state-out
-                         is specified). Defaults to "terraform.tfstate".
+                         is specified). Defaults to "dumb-terraform.tfstate".
                          Legacy option for the local backend only. See the local
                          backend's documentation for more information.
 
@@ -378,30 +378,30 @@ Options:
                          once to set more than one variable.
 
   -var-file=filename     Load variable values from the given file, in addition
-                         to the default files terraform.tfvars and *.auto.tfvars.
+                         to the default files dumb-terraform.tfvars and *.auto.tfvars.
                          Use this option more than once to include more than one
                          variables file.
 
   If you don't provide a saved plan file then this command will also accept
-  all of the plan-customization options accepted by the terraform plan command.
+  all of the plan-customization options accepted by the dumb-terraform plan command.
   For more information on those options, run:
-      terraform plan -help
+      dumb-terraform plan -help
 `
 	return strings.TrimSpace(helpText)
 }
 
 func (c *ApplyCommand) helpDestroy() string {
 	helpText := `
-Usage: terraform [global options] destroy [options]
+Usage: dumb-terraform [global options] destroy [options]
 
-  Destroy Terraform-managed infrastructure.
+  Destroy Dumb Terraform-managed infrastructure.
 
   This command is a convenience alias for:
-      terraform apply -destroy
+      dumb-terraform apply -destroy
 
   This command also accepts many of the plan-customization options accepted by
-  the terraform plan command. For more information on those options, run:
-      terraform plan -help
+  the dumb-terraform plan command. For more information on those options, run:
+      dumb-terraform plan -help
 `
 	return strings.TrimSpace(helpText)
 }

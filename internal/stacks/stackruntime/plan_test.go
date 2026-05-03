@@ -15,35 +15,35 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/msgpack"
 
-	"github.com/hashicorp/terraform/internal/checks"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/hooks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/checks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/hooks"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 
-	"github.com/hashicorp/terraform/internal/builtin/providers/terraform"
-	terraformProvider "github.com/hashicorp/terraform/internal/builtin/providers/terraform"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	default_testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval"
-	stacks_testing_provider "github.com/hashicorp/terraform/internal/stacks/stackruntime/testing"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/builtin/providers/dumb-terraform"
+	dumb-terraformProvider "github.com/dumb-hashicorp/dumb-terraform/internal/builtin/providers/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	default_testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval"
+	stacks_testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // TestPlan_valid runs the same set of configurations as TestValidate_valid.
@@ -85,8 +85,8 @@ func TestPlan_valid(t *testing.T) {
 			testContext := TestContext{
 				config: loadMainBundleConfigForTest(t, name),
 				providers: map[addrs.Provider]providers.Factory{
-					// We support both hashicorp/testing and
-					// terraform.io/builtin/testing as providers. This lets us
+					// We support both dumb-hashicorp/testing and
+					// dumb-terraform.io/builtin/testing as providers. This lets us
 					// test the provider aliasing feature. Both providers
 					// support the same set of resources and data sources.
 					addrs.NewDefaultProvider("testing"): func() (providers.Interface, error) {
@@ -152,8 +152,8 @@ func TestPlan_invalid(t *testing.T) {
 			testContext := TestContext{
 				config: loadMainBundleConfigForTest(t, name),
 				providers: map[addrs.Provider]providers.Factory{
-					// We support both hashicorp/testing and
-					// terraform.io/builtin/testing as providers. This lets us
+					// We support both dumb-hashicorp/testing and
+					// dumb-terraform.io/builtin/testing as providers. This lets us
 					// test the provider aliasing feature. Both providers
 					// support the same set of resources and data sources.
 					addrs.NewDefaultProvider("testing"): func() (providers.Interface, error) {
@@ -230,7 +230,7 @@ func TestPlan(t *testing.T) {
 						PlanTimestamp: fakePlanTimestamp,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -325,7 +325,7 @@ func TestPlan(t *testing.T) {
 						DeferredReason: providers.DeferredReasonProviderConfigUnknown,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -492,7 +492,7 @@ func TestPlan(t *testing.T) {
 						DeferredReason: providers.DeferredReasonProviderConfigUnknown,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -524,24 +524,24 @@ func TestPlan(t *testing.T) {
 					}),
 				},
 				wantPlannedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Cannot remove component instance",
-						Detail:   "The component instance stack.for_each.component.self[\"foo\"] is targeted by a component block and cannot be removed. The relevant component is defined at git::https://example.com/test.git//with-single-input/for-each-component/for-each-component.tfcomponent.hcl:15,1-17.",
-						Subject: &hcl.Range{
-							Filename: "git::https://example.com/test.git//with-single-input/removed-component-from-stack-dynamic/removed-component-from-stack-dynamic.tfcomponent.hcl",
-							Start:    hcl.Pos{Line: 38, Column: 1, Byte: 505},
-							End:      hcl.Pos{Line: 38, Column: 8, Byte: 512},
+						Detail:   "The component instance stack.for_each.component.self[\"foo\"] is targeted by a component block and cannot be removed. The relevant component is defined at git::https://example.com/test.git//with-single-input/for-each-component/for-each-component.tfcomponent.dumb-hcl:15,1-17.",
+						Subject: &dumb-hcl.Range{
+							Filename: "git::https://example.com/test.git//with-single-input/removed-component-from-stack-dynamic/removed-component-from-stack-dynamic.tfcomponent.dumb-hcl",
+							Start:    dumb-hcl.Pos{Line: 38, Column: 1, Byte: 505},
+							End:      dumb-hcl.Pos{Line: 38, Column: 8, Byte: 512},
 						},
 					})
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Cannot remove component instance",
-						Detail:   "The component instance stack.simple[\"foo\"].component.self is targeted by a component block and cannot be removed. The relevant component is defined at git::https://example.com/test.git//with-single-input/valid/valid.tfcomponent.hcl:19,1-17.",
-						Subject: &hcl.Range{
-							Filename: "git::https://example.com/test.git//with-single-input/removed-component-from-stack-dynamic/removed-component-from-stack-dynamic.tfcomponent.hcl",
-							Start:    hcl.Pos{Line: 60, Column: 1, Byte: 811},
-							End:      hcl.Pos{Line: 60, Column: 8, Byte: 818},
+						Detail:   "The component instance stack.simple[\"foo\"].component.self is targeted by a component block and cannot be removed. The relevant component is defined at git::https://example.com/test.git//with-single-input/valid/valid.tfcomponent.dumb-hcl:19,1-17.",
+						Subject: &dumb-hcl.Range{
+							Filename: "git::https://example.com/test.git//with-single-input/removed-component-from-stack-dynamic/removed-component-from-stack-dynamic.tfcomponent.dumb-hcl",
+							Start:    dumb-hcl.Pos{Line: 60, Column: 1, Byte: 811},
+							End:      dumb-hcl.Pos{Line: 60, Column: 8, Byte: 818},
 						},
 					})
 					return diags
@@ -583,7 +583,7 @@ func TestPlan(t *testing.T) {
 						Applyable: true,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -630,7 +630,7 @@ func TestPlan(t *testing.T) {
 							},
 							ProviderConfigAddr: addrs.AbsProviderConfig{
 								Module:   addrs.RootModule,
-								Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+								Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 							},
 							ChangeSrc: &plans.ResourceInstanceChangeSrc{
 								Addr: addrs.Resource{
@@ -645,7 +645,7 @@ func TestPlan(t *testing.T) {
 								}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 								ProviderAddr: addrs.AbsProviderConfig{
 									Module:   addrs.RootModule,
-									Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+									Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 								},
 								ChangeSrc: plans.ChangeSrc{
 									Action: plans.Update,
@@ -693,7 +693,7 @@ func TestPlan(t *testing.T) {
 						Applyable: true,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -740,7 +740,7 @@ func TestPlan(t *testing.T) {
 							},
 							ProviderConfigAddr: addrs.AbsProviderConfig{
 								Module:   addrs.RootModule,
-								Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+								Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 							},
 							ChangeSrc: &plans.ResourceInstanceChangeSrc{
 								Addr: addrs.Resource{
@@ -755,7 +755,7 @@ func TestPlan(t *testing.T) {
 								}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 								ProviderAddr: addrs.AbsProviderConfig{
 									Module:   addrs.RootModule,
-									Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+									Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 								},
 								ChangeSrc: plans.ChangeSrc{
 									Action: plans.Create,
@@ -790,7 +790,7 @@ func TestPlan(t *testing.T) {
 						Applyable: true,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -839,7 +839,7 @@ func TestPlan(t *testing.T) {
 							},
 							ProviderConfigAddr: addrs.AbsProviderConfig{
 								Module:   addrs.RootModule,
-								Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+								Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 							},
 							ChangeSrc: &plans.ResourceInstanceChangeSrc{
 								Addr: addrs.Resource{
@@ -854,7 +854,7 @@ func TestPlan(t *testing.T) {
 								}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 								ProviderAddr: addrs.AbsProviderConfig{
 									Module:   addrs.RootModule,
-									Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+									Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 								},
 								ChangeSrc: plans.ChangeSrc{
 									Action: plans.Create,
@@ -892,7 +892,7 @@ func TestPlan(t *testing.T) {
 						Applyable: true,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -946,8 +946,8 @@ func TestPlan(t *testing.T) {
 					"input": cty.StringVal("input"),
 				},
 				wantPlannedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-					return diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					return diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Unclaimed component instance",
 						Detail:   "The component instance stack.child.component.self is not claimed by any component or removed block in the configuration. Make sure it is instantiated by a component block, or targeted for removal by a removed block.",
 					})
@@ -966,14 +966,14 @@ func TestPlan(t *testing.T) {
 					}),
 				},
 				wantPlannedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-					return diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					return diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Cannot remove stack instance",
-						Detail:   "The stack instance stack.simple[\"component\"] is targeted by an embedded stack block and cannot be removed. The relevant embedded stack is defined at git::https://example.com/test.git//with-single-input/removed-stack-instance-dynamic/removed-stack-instance-dynamic.tfcomponent.hcl:25,1-15.",
-						Subject: &hcl.Range{
-							Filename: "git::https://example.com/test.git//with-single-input/removed-stack-instance-dynamic/removed-stack-instance-dynamic.tfcomponent.hcl",
-							Start:    hcl.Pos{Line: 36, Column: 1, Byte: 441},
-							End:      hcl.Pos{Line: 36, Column: 8, Byte: 448},
+						Detail:   "The stack instance stack.simple[\"component\"] is targeted by an embedded stack block and cannot be removed. The relevant embedded stack is defined at git::https://example.com/test.git//with-single-input/removed-stack-instance-dynamic/removed-stack-instance-dynamic.tfcomponent.dumb-hcl:25,1-15.",
+						Subject: &dumb-hcl.Range{
+							Filename: "git::https://example.com/test.git//with-single-input/removed-stack-instance-dynamic/removed-stack-instance-dynamic.tfcomponent.dumb-hcl",
+							Start:    dumb-hcl.Pos{Line: 36, Column: 1, Byte: 441},
+							End:      dumb-hcl.Pos{Line: 36, Column: 8, Byte: 448},
 						},
 					})
 				}),
@@ -996,14 +996,14 @@ func TestPlan(t *testing.T) {
 					}),
 				},
 				wantPlannedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-					return diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					return diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Cannot remove stack instance",
-						Detail:   "The stack instance stack.embedded[\"component\"].stack.simple[\"component\"] is targeted by an embedded stack block and cannot be removed. The relevant embedded stack is defined at git::https://example.com/test.git//with-single-input/removed-stack-instance-dynamic/removed-stack-instance-dynamic.tfcomponent.hcl:25,1-15.",
-						Subject: &hcl.Range{
-							Filename: "git::https://example.com/test.git//with-single-input/removed-stack-from-embedded-stack/removed-stack-from-embedded-stack.tfcomponent.hcl",
-							Start:    hcl.Pos{Line: 28, Column: 1, Byte: 360},
-							End:      hcl.Pos{Line: 28, Column: 8, Byte: 367},
+						Detail:   "The stack instance stack.embedded[\"component\"].stack.simple[\"component\"] is targeted by an embedded stack block and cannot be removed. The relevant embedded stack is defined at git::https://example.com/test.git//with-single-input/removed-stack-instance-dynamic/removed-stack-instance-dynamic.tfcomponent.dumb-hcl:25,1-15.",
+						Subject: &dumb-hcl.Range{
+							Filename: "git::https://example.com/test.git//with-single-input/removed-stack-from-embedded-stack/removed-stack-from-embedded-stack.tfcomponent.dumb-hcl",
+							Start:    dumb-hcl.Pos{Line: 28, Column: 1, Byte: 360},
+							End:      dumb-hcl.Pos{Line: 28, Column: 8, Byte: 367},
 						},
 					})
 				}),
@@ -1042,14 +1042,14 @@ func TestPlan(t *testing.T) {
 					}),
 				},
 				wantPlannedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-					return diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					return diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Cannot remove component instance",
-						Detail:   "The component instance stack.simple[\"component\"].component.self is targeted by a component block and cannot be removed. The relevant component is defined at git::https://example.com/test.git//with-single-input/valid/valid.tfcomponent.hcl:19,1-17.",
-						Subject: &hcl.Range{
-							Filename: "git::https://example.com/test.git//with-single-input/removed-stack-instance-dynamic/removed-stack-instance-dynamic.tfcomponent.hcl",
-							Start:    hcl.Pos{Line: 51, Column: 1, Byte: 708},
-							End:      hcl.Pos{Line: 51, Column: 8, Byte: 715},
+						Detail:   "The component instance stack.simple[\"component\"].component.self is targeted by a component block and cannot be removed. The relevant component is defined at git::https://example.com/test.git//with-single-input/valid/valid.tfcomponent.dumb-hcl:19,1-17.",
+						Subject: &dumb-hcl.Range{
+							Filename: "git::https://example.com/test.git//with-single-input/removed-stack-instance-dynamic/removed-stack-instance-dynamic.tfcomponent.dumb-hcl",
+							Start:    dumb-hcl.Pos{Line: 51, Column: 1, Byte: 708},
+							End:      dumb-hcl.Pos{Line: 51, Column: 8, Byte: 715},
 						},
 					})
 				}),
@@ -1086,14 +1086,14 @@ func TestPlan(t *testing.T) {
 					}),
 				},
 				wantPlannedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-					return diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					return diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid removed block",
 						Detail:   "The component instance stack.simple[\"component\"].component.self could not be removed. The linked removed block was not executed because the `from` attribute of the removed block targets a component or embedded stack within an orphaned embedded stack.\n\nIn order to remove an entire stack, update your removed block to target the entire removed stack itself instead of the specific elements within it.",
-						Subject: &hcl.Range{
-							Filename: "git::https://example.com/test.git//with-single-input/removed-component-from-stack-dynamic/removed-component-from-stack-dynamic.tfcomponent.hcl",
-							Start:    hcl.Pos{Line: 60, Column: 1, Byte: 811},
-							End:      hcl.Pos{Line: 60, Column: 8, Byte: 818},
+						Subject: &dumb-hcl.Range{
+							Filename: "git::https://example.com/test.git//with-single-input/removed-component-from-stack-dynamic/removed-component-from-stack-dynamic.tfcomponent.dumb-hcl",
+							Start:    dumb-hcl.Pos{Line: 60, Column: 1, Byte: 811},
+							End:      dumb-hcl.Pos{Line: 60, Column: 8, Byte: 818},
 						},
 					})
 				}),
@@ -1102,7 +1102,7 @@ func TestPlan(t *testing.T) {
 						Applyable: false,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -1170,14 +1170,14 @@ func TestPlan(t *testing.T) {
 					}),
 				},
 				wantPlannedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-					return diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					return diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid removed block",
 						Detail:   "The component instance stack.embedded[\"component\"].stack.simple[\"component\"].component.self could not be removed. The linked removed block was not executed because the `from` attribute of the removed block targets a component or embedded stack within an orphaned embedded stack.\n\nIn order to remove an entire stack, update your removed block to target the entire removed stack itself instead of the specific elements within it.",
-						Subject: &hcl.Range{
-							Filename: "git::https://example.com/test.git//with-single-input/removed-stack-from-embedded-stack/removed-stack-from-embedded-stack.tfcomponent.hcl",
-							Start:    hcl.Pos{Line: 28, Column: 1, Byte: 360},
-							End:      hcl.Pos{Line: 28, Column: 8, Byte: 367},
+						Subject: &dumb-hcl.Range{
+							Filename: "git::https://example.com/test.git//with-single-input/removed-stack-from-embedded-stack/removed-stack-from-embedded-stack.tfcomponent.dumb-hcl",
+							Start:    dumb-hcl.Pos{Line: 28, Column: 1, Byte: 360},
+							End:      dumb-hcl.Pos{Line: 28, Column: 8, Byte: 367},
 						},
 					})
 				}),
@@ -1208,14 +1208,14 @@ func TestPlan(t *testing.T) {
 				Build(),
 			cycle: TestCycle{
 				wantPlannedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-					return diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					return diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid removed block",
 						Detail:   "The component instance stack.embedded.component.self could not be removed. The linked removed block was not executed because the `from` attribute of the removed block targets a component or embedded stack within an orphaned embedded stack.\n\nIn order to remove an entire stack, update your removed block to target the entire removed stack itself instead of the specific elements within it.",
-						Subject: &hcl.Range{
-							Filename: "git::https://example.com/test.git//with-single-input/orphaned-component/orphaned-component.tfcomponent.hcl",
-							Start:    hcl.Pos{Line: 10, Column: 1, Byte: 131},
-							End:      hcl.Pos{Line: 10, Column: 8, Byte: 138},
+						Subject: &dumb-hcl.Range{
+							Filename: "git::https://example.com/test.git//with-single-input/orphaned-component/orphaned-component.tfcomponent.dumb-hcl",
+							Start:    dumb-hcl.Pos{Line: 10, Column: 1, Byte: 131},
+							End:      dumb-hcl.Pos{Line: 10, Column: 8, Byte: 138},
 						},
 					})
 				}),
@@ -1253,7 +1253,7 @@ func TestPlan(t *testing.T) {
 						Applyable: true,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -1356,7 +1356,7 @@ func TestPlan(t *testing.T) {
 						Applyable: true,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -1468,8 +1468,8 @@ func TestPlanWithMissingInputVariable(t *testing.T) {
 	req := PlanRequest{
 		Config: cfg,
 		ProviderFactories: map[addrs.Provider]providers.Factory{
-			addrs.NewBuiltInProvider("terraform"): func() (providers.Interface, error) {
-				return terraformProvider.NewProvider(), nil
+			addrs.NewBuiltInProvider("dumb-terraform"): func() (providers.Interface, error) {
+				return dumb-terraformProvider.NewProvider(), nil
 			},
 		},
 
@@ -1488,14 +1488,14 @@ func TestPlanWithMissingInputVariable(t *testing.T) {
 	// about which underlying implementation is in use.
 	gotDiags = gotDiags.ForRPC()
 	var wantDiags tfdiags.Diagnostics
-	wantDiags = wantDiags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	wantDiags = wantDiags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "Reference to undeclared input variable",
 		Detail:   `There is no variable "input" block declared in this stack.`,
-		Subject: &hcl.Range{
-			Filename: mainBundleSourceAddrStr("plan-undeclared-variable-in-component/undeclared-variable.tfcomponent.hcl"),
-			Start:    hcl.Pos{Line: 17, Column: 13, Byte: 250},
-			End:      hcl.Pos{Line: 17, Column: 22, Byte: 259},
+		Subject: &dumb-hcl.Range{
+			Filename: mainBundleSourceAddrStr("plan-undeclared-variable-in-component/undeclared-variable.tfcomponent.dumb-hcl"),
+			Start:    dumb-hcl.Pos{Line: 17, Column: 13, Byte: 250},
+			End:      dumb-hcl.Pos{Line: 17, Column: 22, Byte: 259},
 		},
 	})
 	wantDiags = wantDiags.ForRPC()
@@ -1519,8 +1519,8 @@ func TestPlanWithNoValueForRequiredVariable(t *testing.T) {
 	req := PlanRequest{
 		Config: cfg,
 		ProviderFactories: map[addrs.Provider]providers.Factory{
-			addrs.NewBuiltInProvider("terraform"): func() (providers.Interface, error) {
-				return terraformProvider.NewProvider(), nil
+			addrs.NewBuiltInProvider("dumb-terraform"): func() (providers.Interface, error) {
+				return dumb-terraformProvider.NewProvider(), nil
 			},
 		},
 
@@ -1539,14 +1539,14 @@ func TestPlanWithNoValueForRequiredVariable(t *testing.T) {
 	// about which underlying implementation is in use.
 	gotDiags = gotDiags.ForRPC()
 	var wantDiags tfdiags.Diagnostics
-	wantDiags = wantDiags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	wantDiags = wantDiags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "No value for required variable",
 		Detail:   `The root input variable "var.beep" is not set, and has no default value.`,
-		Subject: &hcl.Range{
-			Filename: mainBundleSourceAddrStr("plan-no-value-for-required-variable/unset-variable.tfcomponent.hcl"),
-			Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-			End:      hcl.Pos{Line: 1, Column: 16, Byte: 15},
+		Subject: &dumb-hcl.Range{
+			Filename: mainBundleSourceAddrStr("plan-no-value-for-required-variable/unset-variable.tfcomponent.dumb-hcl"),
+			Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			End:      dumb-hcl.Pos{Line: 1, Column: 16, Byte: 15},
 		},
 	})
 	wantDiags = wantDiags.ForRPC()
@@ -1569,7 +1569,7 @@ func TestPlanWithVariableDefaults(t *testing.T) {
 			inputs: map[stackaddrs.InputVariable]ExternalInputValue{
 				{Name: "beep"}: {
 					Value:    cty.NullVal(cty.DynamicPseudoType),
-					DefRange: tfdiags.SourceRange{Filename: "fake.tfcomponent.hcl"},
+					DefRange: tfdiags.SourceRange{Filename: "fake.tfcomponent.dumb-hcl"},
 				},
 			},
 		},
@@ -1609,7 +1609,7 @@ func TestPlanWithVariableDefaults(t *testing.T) {
 					Applyable: true,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangeOutputValue{
 					Addr:   stackaddrs.OutputValue{Name: "beep"},
@@ -1748,12 +1748,12 @@ func TestPlanWithComplexVariableDefaults(t *testing.T) {
 				},
 				ProviderAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Module:   addrs.RootModule,
-				Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+				Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 			},
 			Schema: stacks_testing_provider.TestingResourceSchema,
 		},
@@ -1772,12 +1772,12 @@ func TestPlanWithComplexVariableDefaults(t *testing.T) {
 				},
 				ProviderAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Module:   addrs.RootModule,
-				Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+				Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 			},
 			Schema: stacks_testing_provider.TestingResourceSchema,
 		},
@@ -1796,17 +1796,17 @@ func TestPlanWithComplexVariableDefaults(t *testing.T) {
 				},
 				ProviderAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Module:   addrs.RootModule,
-				Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+				Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 			},
 			Schema: stacks_testing_provider.TestingResourceSchema,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -1855,12 +1855,12 @@ func TestPlanWithComplexVariableDefaults(t *testing.T) {
 				},
 				ProviderAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Module:   addrs.RootModule,
-				Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+				Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 			},
 			Schema: stacks_testing_provider.TestingResourceSchema,
 		},
@@ -1879,12 +1879,12 @@ func TestPlanWithComplexVariableDefaults(t *testing.T) {
 				},
 				ProviderAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Module:   addrs.RootModule,
-				Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+				Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 			},
 			Schema: stacks_testing_provider.TestingResourceSchema,
 		},
@@ -1903,12 +1903,12 @@ func TestPlanWithComplexVariableDefaults(t *testing.T) {
 				},
 				ProviderAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Module:   addrs.RootModule,
-				Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+				Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 			},
 			Schema: stacks_testing_provider.TestingResourceSchema,
 		},
@@ -1960,8 +1960,8 @@ func TestPlanWithSingleResource(t *testing.T) {
 	req := PlanRequest{
 		Config: cfg,
 		ProviderFactories: map[addrs.Provider]providers.Factory{
-			addrs.NewBuiltInProvider("terraform"): func() (providers.Interface, error) {
-				return terraformProvider.NewProvider(), nil
+			addrs.NewBuiltInProvider("dumb-terraform"): func() (providers.Interface, error) {
+				return dumb-terraformProvider.NewProvider(), nil
 			},
 		},
 
@@ -1991,7 +1991,7 @@ func TestPlanWithSingleResource(t *testing.T) {
 
 	// extract the schema from the builtin provider so we can generate correctly
 	// shaped plan objects.
-	schema := terraform.NewProvider().GetProviderSchema().ResourceTypes["terraform_data"]
+	schema := dumb-terraform.NewProvider().GetProviderSchema().ResourceTypes["dumb-terraform_data"]
 	wantMap := schema.Body.EmptyValue().AsValueMap()
 	wantMap["id"] = cty.UnknownVal(cty.String).RefineNotNull()
 	wantMap["input"] = cty.StringVal("hello")
@@ -2026,7 +2026,7 @@ func TestPlanWithSingleResource(t *testing.T) {
 			PlanTimestamp: fakePlanTimestamp,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangeOutputValue{
 			Addr:   stackaddrs.OutputValue{Name: "obj"},
@@ -2051,29 +2051,29 @@ func TestPlanWithSingleResource(t *testing.T) {
 				Item: addrs.AbsResourceInstanceObject{
 					ResourceInstance: addrs.Resource{
 						Mode: addrs.ManagedResourceMode,
-						Type: "terraform_data",
+						Type: "dumb-terraform_data",
 						Name: "main",
 					}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 				},
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Module:   addrs.RootModule,
-				Provider: addrs.MustParseProviderSourceString("terraform.io/builtin/terraform"),
+				Provider: addrs.MustParseProviderSourceString("dumb-terraform.io/builtin/dumb-terraform"),
 			},
 			ChangeSrc: &plans.ResourceInstanceChangeSrc{
 				Addr: addrs.Resource{
 					Mode: addrs.ManagedResourceMode,
-					Type: "terraform_data",
+					Type: "dumb-terraform_data",
 					Name: "main",
 				}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 				PrevRunAddr: addrs.Resource{
 					Mode: addrs.ManagedResourceMode,
-					Type: "terraform_data",
+					Type: "dumb-terraform_data",
 					Name: "main",
 				}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 				ProviderAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.NewBuiltInProvider("terraform"),
+					Provider: addrs.NewBuiltInProvider("dumb-terraform"),
 				},
 				ChangeSrc: plans.ChangeSrc{
 					Action: plans.Create,
@@ -2082,8 +2082,8 @@ func TestPlanWithSingleResource(t *testing.T) {
 				},
 			},
 
-			// The following is schema for the real terraform_data resource
-			// type from the real terraform.io/builtin/terraform provider
+			// The following is schema for the real dumb-terraform_data resource
+			// type from the real dumb-terraform.io/builtin/dumb-terraform provider
 			// maintained elsewhere in this codebase. If that schema changes
 			// in future then this should change to match it.
 			Schema: schema,
@@ -2132,7 +2132,7 @@ func TestPlanWithEphemeralInputVariables(t *testing.T) {
 				Applyable: true,
 			},
 			&stackplan.PlannedChangeHeader{
-				TerraformVersion: version.SemVer,
+				Dumb TerraformVersion: version.SemVer,
 			},
 			&stackplan.PlannedChangePlannedTimestamp{
 				PlannedTimestamp: fakePlanTimestamp,
@@ -2195,7 +2195,7 @@ func TestPlanWithEphemeralInputVariables(t *testing.T) {
 				Applyable: true,
 			},
 			&stackplan.PlannedChangeHeader{
-				TerraformVersion: version.SemVer,
+				Dumb TerraformVersion: version.SemVer,
 			},
 			&stackplan.PlannedChangePlannedTimestamp{
 				PlannedTimestamp: fakePlanTimestamp,
@@ -2259,7 +2259,7 @@ func TestPlanVariableOutputRoundtripNested(t *testing.T) {
 			Applyable: true,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangeOutputValue{
 			Addr:   stackaddrs.OutputValue{Name: "msg"},
@@ -2337,7 +2337,7 @@ func TestPlanSensitiveOutput(t *testing.T) {
 			PlanTimestamp: fakePlanTimestamp,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangeOutputValue{
 			Addr:   stackaddrs.OutputValue{Name: "result"},
@@ -2390,7 +2390,7 @@ func TestPlanSensitiveOutputNested(t *testing.T) {
 			Applyable: true,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangeOutputValue{
 			Addr:   stackaddrs.OutputValue{Name: "result"},
@@ -2489,7 +2489,7 @@ func TestPlanSensitiveOutputAsInput(t *testing.T) {
 			PlanTimestamp: fakePlanTimestamp,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangeOutputValue{
 			Addr:   stackaddrs.OutputValue{Name: "result"},
@@ -2651,8 +2651,8 @@ func TestPlanWithRemovedResource(t *testing.T) {
 			req := PlanRequest{
 				Config: cfg,
 				ProviderFactories: map[addrs.Provider]providers.Factory{
-					addrs.NewBuiltInProvider("terraform"): func() (providers.Interface, error) {
-						return terraformProvider.NewProvider(), nil
+					addrs.NewBuiltInProvider("dumb-terraform"): func() (providers.Interface, error) {
+						return dumb-terraformProvider.NewProvider(), nil
 					},
 				},
 
@@ -2679,7 +2679,7 @@ func TestPlanWithRemovedResource(t *testing.T) {
 									Resource: addrs.ResourceInstance{
 										Resource: addrs.Resource{
 											Mode: addrs.ManagedResourceMode,
-											Type: "terraform_data",
+											Type: "dumb-terraform_data",
 											Name: "main",
 										},
 										Key: addrs.NoKey,
@@ -2695,7 +2695,7 @@ func TestPlanWithRemovedResource(t *testing.T) {
 						}).
 						SetProviderAddr(addrs.AbsProviderConfig{
 							Module:   addrs.RootModule,
-							Provider: addrs.MustParseProviderSourceString("terraform.io/builtin/terraform"),
+							Provider: addrs.MustParseProviderSourceString("dumb-terraform.io/builtin/dumb-terraform"),
 						})).
 					Build(),
 			}
@@ -2818,7 +2818,7 @@ func TestPlanWithSensitivePropagation(t *testing.T) {
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Module:   addrs.RootModule,
-				Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+				Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 			},
 			ChangeSrc: &plans.ResourceInstanceChangeSrc{
 				Addr: addrs.Resource{
@@ -2867,7 +2867,7 @@ func TestPlanWithSensitivePropagation(t *testing.T) {
 			PlanTimestamp: fakePlanTimestamp,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -2981,7 +2981,7 @@ func TestPlanWithSensitivePropagationNested(t *testing.T) {
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Module:   addrs.RootModule,
-				Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+				Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 			},
 			ChangeSrc: &plans.ResourceInstanceChangeSrc{
 				Addr: addrs.Resource{
@@ -3013,7 +3013,7 @@ func TestPlanWithSensitivePropagationNested(t *testing.T) {
 			Schema: stacks_testing_provider.TestingResourceSchema,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -3142,15 +3142,15 @@ func TestPlanWithCheckableObjects(t *testing.T) {
 		Diagnostics:    diagsCh,
 	}
 	var wantDiags tfdiags.Diagnostics
-	wantDiags = wantDiags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	wantDiags = wantDiags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 
 		Summary: "Check block assertion failed",
 		Detail:  `value must be 'baz'`,
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: mainBundleSourceAddrStr("checkable-objects/checkable-objects.tf"),
-			Start:    hcl.Pos{Line: 41, Column: 21, Byte: 716},
-			End:      hcl.Pos{Line: 41, Column: 57, Byte: 752},
+			Start:    dumb-hcl.Pos{Line: 41, Column: 21, Byte: 716},
+			End:      dumb-hcl.Pos{Line: 41, Column: 57, Byte: 752},
 		},
 	})
 
@@ -3276,7 +3276,7 @@ func TestPlanWithCheckableObjects(t *testing.T) {
 			PlanTimestamp: fakePlanTimestamp,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -3432,7 +3432,7 @@ func TestPlanWithDeferredResource(t *testing.T) {
 				},
 				ProviderConfigAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 				ChangeSrc: &plans.ResourceInstanceChangeSrc{
 					Addr: addrs.Resource{
@@ -3447,7 +3447,7 @@ func TestPlanWithDeferredResource(t *testing.T) {
 					}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 					ProviderAddr: addrs.AbsProviderConfig{
 						Module:   addrs.RootModule,
-						Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+						Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 					},
 					ChangeSrc: plans.ChangeSrc{
 						Action: plans.Create,
@@ -3465,7 +3465,7 @@ func TestPlanWithDeferredResource(t *testing.T) {
 			DeferredReason: providers.DeferredReasonResourceConfigUnknown,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -3613,7 +3613,7 @@ func TestPlanWithDeferredComponentForEach(t *testing.T) {
 					}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 					ProviderAddr: addrs.AbsProviderConfig{
 						Module:   addrs.RootModule,
-						Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+						Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 					},
 					ChangeSrc: plans.ChangeSrc{
 						Action: plans.Create,
@@ -3627,7 +3627,7 @@ func TestPlanWithDeferredComponentForEach(t *testing.T) {
 				},
 				ProviderConfigAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 				Schema: stacks_testing_provider.TestingResourceSchema,
 			},
@@ -3679,7 +3679,7 @@ func TestPlanWithDeferredComponentForEach(t *testing.T) {
 				},
 				ProviderConfigAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 				ChangeSrc: &plans.ResourceInstanceChangeSrc{
 					Addr: addrs.Resource{
@@ -3694,7 +3694,7 @@ func TestPlanWithDeferredComponentForEach(t *testing.T) {
 					}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 					ProviderAddr: addrs.AbsProviderConfig{
 						Module:   addrs.RootModule,
-						Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+						Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 					},
 					ChangeSrc: plans.ChangeSrc{
 						Action: plans.Create,
@@ -3710,7 +3710,7 @@ func TestPlanWithDeferredComponentForEach(t *testing.T) {
 			},
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -3840,7 +3840,7 @@ func TestPlanWithDeferredComponentReferences(t *testing.T) {
 				},
 				ProviderConfigAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 				ChangeSrc: &plans.ResourceInstanceChangeSrc{
 					Addr: addrs.Resource{
@@ -3855,7 +3855,7 @@ func TestPlanWithDeferredComponentReferences(t *testing.T) {
 					}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 					ProviderAddr: addrs.AbsProviderConfig{
 						Module:   addrs.RootModule,
-						Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+						Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 					},
 					ChangeSrc: plans.ChangeSrc{
 						Action: plans.Create,
@@ -3952,17 +3952,17 @@ func TestPlanWithDeferredComponentReferences(t *testing.T) {
 				},
 				ProviderAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Module:   addrs.RootModule,
-				Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+				Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 			},
 			Schema: stacks_testing_provider.TestingResourceSchema,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -4142,7 +4142,7 @@ func TestPlanWithDeferredProviderForEach(t *testing.T) {
 				},
 				ProviderConfigAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 				ChangeSrc: &plans.ResourceInstanceChangeSrc{
 					Addr: addrs.Resource{
@@ -4157,7 +4157,7 @@ func TestPlanWithDeferredProviderForEach(t *testing.T) {
 					}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 					ProviderAddr: addrs.AbsProviderConfig{
 						Module:   addrs.RootModule,
-						Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+						Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 					},
 					ChangeSrc: plans.ChangeSrc{
 						Action: plans.Create,
@@ -4214,7 +4214,7 @@ func TestPlanWithDeferredProviderForEach(t *testing.T) {
 				},
 				ProviderConfigAddr: addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				},
 				ChangeSrc: &plans.ResourceInstanceChangeSrc{
 					Addr: addrs.Resource{
@@ -4229,7 +4229,7 @@ func TestPlanWithDeferredProviderForEach(t *testing.T) {
 					}.Instance(addrs.NoKey).Absolute(addrs.RootModuleInstance),
 					ProviderAddr: addrs.AbsProviderConfig{
 						Module:   addrs.RootModule,
-						Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+						Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 					},
 					ChangeSrc: plans.ChangeSrc{
 						Action: plans.Create,
@@ -4245,7 +4245,7 @@ func TestPlanWithDeferredProviderForEach(t *testing.T) {
 			DeferredReason: providers.DeferredReasonProviderConfigUnknown,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -4323,7 +4323,7 @@ func TestPlanInvalidProvidersFailGracefully(t *testing.T) {
 			PlannedCheckResults: &states.CheckResults{},
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -4420,7 +4420,7 @@ func TestPlanWithStateManipulation(t *testing.T) {
 					Schema:             stacks_testing_provider.TestingResourceSchema,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -4502,7 +4502,7 @@ func TestPlanWithStateManipulation(t *testing.T) {
 					Schema:             stacks_testing_provider.DeferredResourceSchema,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -4584,7 +4584,7 @@ func TestPlanWithStateManipulation(t *testing.T) {
 					Schema:             stacks_testing_provider.TestingResourceSchema,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -4673,7 +4673,7 @@ func TestPlanWithStateManipulation(t *testing.T) {
 					Schema:             stacks_testing_provider.TestingResourceSchema,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -4687,7 +4687,7 @@ func TestPlanWithStateManipulation(t *testing.T) {
 						Forget: 1,
 					},
 				}),
-			expectedWarnings: []string{"Some objects will no longer be managed by Terraform"},
+			expectedWarnings: []string{"Some objects will no longer be managed by Dumb Terraform"},
 		},
 	}
 
@@ -4790,8 +4790,8 @@ func TestPlan_plantimestamp_force_timestamp(t *testing.T) {
 	req := PlanRequest{
 		Config: cfg,
 		ProviderFactories: map[addrs.Provider]providers.Factory{
-			// We support both hashicorp/testing and
-			// terraform.io/builtin/testing as providers. This lets us
+			// We support both dumb-hashicorp/testing and
+			// dumb-terraform.io/builtin/testing as providers. This lets us
 			// test the provider aliasing feature. Both providers
 			// support the same set of resources and data sources.
 			addrs.NewDefaultProvider("testing"): func() (providers.Interface, error) {
@@ -4881,7 +4881,7 @@ func TestPlan_plantimestamp_force_timestamp(t *testing.T) {
 			PlanTimestamp: fakePlanTimestamp,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangeOutputValue{
 			Addr:   stackaddrs.OutputValue{Name: "plantimestamp"},
@@ -4912,8 +4912,8 @@ func TestPlan_plantimestamp_later_than_when_writing_this_test(t *testing.T) {
 	req := PlanRequest{
 		Config: cfg,
 		ProviderFactories: map[addrs.Provider]providers.Factory{
-			// We support both hashicorp/testing and
-			// terraform.io/builtin/testing as providers. This lets us
+			// We support both dumb-hashicorp/testing and
+			// dumb-terraform.io/builtin/testing as providers. This lets us
 			// test the provider aliasing feature. Both providers
 			// support the same set of resources and data sources.
 			addrs.NewDefaultProvider("testing"): func() (providers.Interface, error) {
@@ -5098,7 +5098,7 @@ func TestPlan_DependsOnUpdatesRequirements(t *testing.T) {
 			Schema:             stacks_testing_provider.TestingResourceSchema,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -5309,7 +5309,7 @@ func TestPlan_RemovedBlocks(t *testing.T) {
 					Schema:             stacks_testing_provider.TestingResourceSchema,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -5413,7 +5413,7 @@ func TestPlan_RemovedBlocks(t *testing.T) {
 					DeferredReason: providers.DeferredReasonDeferredPrereq,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -5577,7 +5577,7 @@ func TestPlan_RemovedBlocks(t *testing.T) {
 					Schema:             stacks_testing_provider.TestingResourceSchema,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -5677,7 +5677,7 @@ func TestPlan_RemovedBlocks(t *testing.T) {
 					DeferredReason: providers.DeferredReasonDeferredPrereq,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -5703,7 +5703,7 @@ func TestPlan_RemovedBlocks(t *testing.T) {
 					Applyable: true,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -5796,7 +5796,7 @@ func TestPlan_RemovedBlocks(t *testing.T) {
 					Addr: mustAbsComponentInstance("component.self[\"removed\"]"),
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -5958,7 +5958,7 @@ func TestPlan_RemovedBlocks(t *testing.T) {
 					Schema:             stacks_testing_provider.TestingResourceSchema,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -6070,7 +6070,7 @@ func TestPlan_RemovedBlocks(t *testing.T) {
 					Schema:             stacks_testing_provider.TestingResourceSchema,
 				},
 				&stackplan.PlannedChangeHeader{
-					TerraformVersion: version.SemVer,
+					Dumb TerraformVersion: version.SemVer,
 				},
 				&stackplan.PlannedChangePlannedTimestamp{
 					PlannedTimestamp: fakePlanTimestamp,
@@ -6096,7 +6096,7 @@ func TestPlan_RemovedBlocks(t *testing.T) {
 				{
 					severity: tfdiags.Error,
 					summary:  "Cannot remove component instance",
-					detail:   "The component instance component.self[\"a\"] is targeted by a component block and cannot be removed. The relevant component is defined at git::https://example.com/test.git//with-single-input/removed-component-instance/removed-component-instance.tfcomponent.hcl:18,1-17.",
+					detail:   "The component instance component.self[\"a\"] is targeted by a component block and cannot be removed. The relevant component is defined at git::https://example.com/test.git//with-single-input/removed-component-instance/removed-component-instance.tfcomponent.dumb-hcl:18,1-17.",
 				},
 			},
 		},
@@ -6235,7 +6235,7 @@ func TestPlanWithResourceIdentities(t *testing.T) {
 			Schema:             stacks_testing_provider.TestingResourceWithIdentitySchema,
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangePlannedTimestamp{
 			PlannedTimestamp: fakePlanTimestamp,
@@ -6292,19 +6292,19 @@ func TestPlanInvalidLocalValue(t *testing.T) {
 	go Plan(ctx, &req, &resp)
 	gotChanges, diags := collectPlanOutput(changesCh, diagsCh)
 
-	tfdiags.AssertDiagnosticsMatch(t, diags, tfdiags.Diagnostics{}.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	tfdiags.AssertDiagnosticsMatch(t, diags, tfdiags.Diagnostics{}.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "Invalid operand",
 		Detail:   "Unsuitable value for left operand: a number is required.",
-		Subject: &hcl.Range{
-			Filename: "git::https://example.com/test.git//invalid-local/invalid-local.tfcomponent.hcl",
-			Start:    hcl.Pos{Line: 19, Column: 49, Byte: 377},
-			End:      hcl.Pos{Line: 19, Column: 50, Byte: 378},
+		Subject: &dumb-hcl.Range{
+			Filename: "git::https://example.com/test.git//invalid-local/invalid-local.tfcomponent.dumb-hcl",
+			Start:    dumb-hcl.Pos{Line: 19, Column: 49, Byte: 377},
+			End:      dumb-hcl.Pos{Line: 19, Column: 50, Byte: 378},
 		},
-		Context: &hcl.Range{
-			Filename: "git::https://example.com/test.git//invalid-local/invalid-local.tfcomponent.hcl",
-			Start:    hcl.Pos{Line: 19, Column: 49, Byte: 377},
-			End:      hcl.Pos{Line: 19, Column: 54, Byte: 382},
+		Context: &dumb-hcl.Range{
+			Filename: "git::https://example.com/test.git//invalid-local/invalid-local.tfcomponent.dumb-hcl",
+			Start:    dumb-hcl.Pos{Line: 19, Column: 49, Byte: 377},
+			End:      dumb-hcl.Pos{Line: 19, Column: 54, Byte: 382},
 		},
 	}))
 

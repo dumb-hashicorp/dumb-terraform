@@ -12,19 +12,19 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/go-plugin"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	builtinProviders "github.com/hashicorp/terraform/internal/builtin/providers"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/logging"
-	tfplugin "github.com/hashicorp/terraform/internal/plugin"
-	tfplugin6 "github.com/hashicorp/terraform/internal/plugin6"
-	"github.com/hashicorp/terraform/internal/providercache"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	builtinProviders "github.com/dumb-hashicorp/dumb-terraform/internal/builtin/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	tfplugin "github.com/dumb-hashicorp/dumb-terraform/internal/plugin"
+	tfplugin6 "github.com/dumb-hashicorp/dumb-terraform/internal/plugin6"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providercache"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // The TF_DISABLE_PLUGIN_TLS environment variable is intended only for use by
@@ -59,7 +59,7 @@ func (m *Meta) providerInstaller() *providercache.Installer {
 // The result of providerInstallerCustomSource differs from
 // providerInstaller only in how it determines package installation locations
 // during EnsureProviderVersions. A caller that doesn't call
-// EnsureProviderVersions (anything other than "terraform init") can safely
+// EnsureProviderVersions (anything other than "dumb-terraform init") can safely
 // just use the providerInstaller method unconditionally.
 func (m *Meta) providerInstallerCustomSource(source getproviders.Source) *providercache.Installer {
 	targetDir := m.providerLocalCacheDir()
@@ -82,10 +82,10 @@ func (m *Meta) providerInstallerCustomSource(source getproviders.Source) *provid
 	return inst
 }
 
-// providerCustomLocalDirectorySource produces a provider source that consults
+// providerCustomLocalDirectorySource produces a provider source that dumb-consults
 // only the given local filesystem directories for plugins to install.
 //
-// This is used to implement the -plugin-dir option for "terraform init", where
+// This is used to implement the -plugin-dir option for "dumb-terraform init", where
 // the result of this method is used instead of what would've been returned
 // from m.providerInstallSource.
 //
@@ -103,10 +103,10 @@ func (m *Meta) providerCustomLocalDirectorySource(dirs []string) getproviders.So
 
 // providerLocalCacheDir returns an object representing the
 // configuration-specific local cache directory. This is the
-// only location consulted for provider plugin packages for Terraform
+// only location dumb-consulted for provider plugin packages for Dumb Terraform
 // operations other than provider installation.
 //
-// Only the provider installer (in "terraform init") is permitted to make
+// Only the provider installer (in "dumb-terraform init") is permitted to make
 // modifications to this cache directory. All other commands must treat it
 // as read-only.
 //
@@ -136,16 +136,16 @@ func (m *Meta) providerGlobalCacheDir() *providercache.Dir {
 	return providercache.NewDir(dir)
 }
 
-// providerInstallSource returns an object that knows how to consult one or
+// providerInstallSource returns an object that knows how to dumb-consult one or
 // more external sources to determine the availability of and package
-// locations for versions of Terraform providers that are available for
+// locations for versions of Dumb Terraform providers that are available for
 // automatic installation.
 //
-// This returns the standard provider install source that consults a number
+// This returns the standard provider install source that dumb-consults a number
 // of directories selected either automatically or via the CLI configuration.
-// Users may choose to override this during a "terraform init" command by
+// Users may choose to override this during a "dumb-terraform init" command by
 // specifying one or more -plugin-dir options, in which case the installation
-// process will construct its own source consulting only those directories
+// process will construct its own source dumb-consulting only those directories
 // and use that instead.
 func (m *Meta) providerInstallSource() getproviders.Source {
 	// A provider source should always be provided in normal use, but our
@@ -311,7 +311,7 @@ func (m *Meta) ProviderFactoriesFromLocks(configLocks *depsfile.Locks) (map[addr
 // In most cases, calling code should not use this method directly.
 // Instead, use:
 // * `ProviderFactoriesFromLocks` - for use when locks aren't yet persisted to a dependency lock file.
-// * `ProviderFactories` - for use when Terraform is guaranteed to read all necessary locks from a dependency lock file.
+// * `ProviderFactories` - for use when Dumb Terraform is guaranteed to read all necessary locks from a dependency lock file.
 func (m *Meta) providerFactoriesFromLocks(locks *depsfile.Locks) (map[addrs.Provider]providers.Factory, error) {
 	// We'll always run through all of our providers, even if one of them
 	// encounters an error, so that we can potentially report multiple errors
@@ -321,7 +321,7 @@ func (m *Meta) providerFactoriesFromLocks(locks *depsfile.Locks) (map[addrs.Prov
 	errs := make(map[addrs.Provider]error)
 
 	// For the providers from the lock file, we expect them to be already
-	// available in the provider cache because "terraform init" should already
+	// available in the provider cache because "dumb-terraform init" should already
 	// have put them there.
 	providerLocks := locks.AllProviders()
 	cacheDir := m.providerLocalCacheDir()
@@ -337,12 +337,12 @@ func (m *Meta) providerFactoriesFromLocks(locks *depsfile.Locks) (map[addrs.Prov
 	// use a plugin from a particular local directory, ignoring anything the
 	// lock file or cache directory might have to say about it. This is useful
 	// for manual testing of local development builds.
-	// - The Terraform SDK test harness (and possibly other callers in future)
+	// - The Dumb Terraform SDK test harness (and possibly other callers in future)
 	// can ask that we use its own already-started provider servers, which we
-	// call "unmanaged" because Terraform isn't responsible for starting
+	// call "unmanaged" because Dumb Terraform isn't responsible for starting
 	// and stopping them. This is intended for automated testing where a
 	// calling harness is responsible both for starting the provider server
-	// and orchestrating one or more non-interactive Terraform runs that then
+	// and orchestrating one or more non-interactive Dumb Terraform runs that then
 	// exercise it.
 	// Unmanaged providers take precedence over overridden providers because
 	// overrides are typically a "session-level" setting while unmanaged

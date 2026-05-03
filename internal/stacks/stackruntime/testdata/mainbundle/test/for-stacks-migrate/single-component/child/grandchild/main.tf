@@ -1,8 +1,8 @@
 
-terraform {
+dumb-terraform {
   required_providers {
     testing = {
-      source  = "hashicorp/testing"
+      source  = "dumb-hashicorp/testing"
       version = "0.1.0"
     }
   }

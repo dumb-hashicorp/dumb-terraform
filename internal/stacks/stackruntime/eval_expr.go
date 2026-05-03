@@ -6,24 +6,24 @@ package stackruntime
 import (
 	"context"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
 // EvalExpr evaluates the given expression in a specified evaluation
 // environment and scope.
 //
-// This is intended for situations like the "terraform console" command which
+// This is intended for situations like the "dumb-terraform console" command which
 // need to evaluate arbitrary expressions against a configuration and
 // previously-established state snapshot.
-func EvalExpr(ctx context.Context, expr hcl.Expression, req *EvalExprRequest) (cty.Value, tfdiags.Diagnostics) {
+func EvalExpr(ctx context.Context, expr dumb-hcl.Expression, req *EvalExprRequest) (cty.Value, tfdiags.Diagnostics) {
 	main := stackeval.NewForInspecting(req.Config, req.State, stackeval.InspectOpts{
 		InputVariableValues: req.InputValues,
 		ProviderFactories:   req.ProviderFactories,

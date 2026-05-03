@@ -9,11 +9,11 @@ import (
 	"io"
 	"log"
 
-	"github.com/hashicorp/terraform/internal/cloudplugin/cloudproto1"
-	"github.com/hashicorp/terraform/internal/pluginshared"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloudplugin/cloudproto1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/pluginshared"
 )
 
-// GRPCCloudClient is the client interface for interacting with terraform-cloudplugin
+// GRPCCloudClient is the client interface for interacting with dumb-terraform-cloudplugin
 type GRPCCloudClient struct {
 	client  cloudproto1.CommandServiceClient
 	context context.Context

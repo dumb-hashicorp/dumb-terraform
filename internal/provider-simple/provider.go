@@ -11,8 +11,8 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
 )
 
 type simple struct {
@@ -48,7 +48,7 @@ func Provider() providers.Interface {
 		schema: providers.GetProviderSchemaResponse{
 			Provider: providers.Schema{
 				Body: &configschema.Block{
-					Description: "This is terraform-provider-simple v5",
+					Description: "This is dumb-terraform-provider-simple v5",
 				},
 			},
 			ResourceTypes: map[string]providers.Schema{

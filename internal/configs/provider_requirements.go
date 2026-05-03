@@ -6,9 +6,9 @@ package configs
 import (
 	"fmt"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/addrs"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -21,16 +21,16 @@ type RequiredProvider struct {
 	Source      string
 	Type        addrs.Provider
 	Requirement VersionConstraint
-	DeclRange   hcl.Range
+	DeclRange   dumb-hcl.Range
 	Aliases     []addrs.LocalProviderConfig
 }
 
 type RequiredProviders struct {
 	RequiredProviders map[string]*RequiredProvider
-	DeclRange         hcl.Range
+	DeclRange         dumb-hcl.Range
 }
 
-func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Diagnostics) {
+func decodeRequiredProvidersBlock(block *dumb-hcl.Block) (*RequiredProviders, dumb-hcl.Diagnostics) {
 	attrs, diags := block.Body.JustAttributes()
 	if diags.HasErrors() {
 		return nil, diags
@@ -55,8 +55,8 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 
 			pType, err := addrs.ParseProviderPart(rp.Name)
 			if err != nil {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid provider name",
 					Detail:   err.Error(),
 					Subject:  attr.Expr.Range().Ptr(),
@@ -78,10 +78,10 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 			continue
 		}
 
-		kvs, mapDiags := hcl.ExprMap(attr.Expr)
+		kvs, mapDiags := dumb-hcl.ExprMap(attr.Expr)
 		if mapDiags.HasErrors() {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid required_providers object",
 				Detail:   "required_providers entries must be strings or objects.",
 				Subject:  attr.Expr.Range().Ptr(),
@@ -98,8 +98,8 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 			}
 
 			if key.Type() != cty.String {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid Attribute",
 					Detail:   fmt.Sprintf("Invalid attribute value for provider requirement: %#v", key),
 					Subject:  kv.Key.Range().Ptr(),
@@ -115,8 +115,8 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 
 				constraint, valDiags := kv.Value.Value(nil)
 				if valDiags.HasErrors() || !constraint.Type().Equals(cty.String) {
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid version constraint",
 						Detail:   "Version must be specified as a string.",
 						Subject:  kv.Value.Range().Ptr(),
@@ -129,8 +129,8 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 				if err != nil {
 					// NewConstraint doesn't return user-friendly errors, so we'll just
 					// ignore the provided error and produce our own generic one.
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid version constraint",
 						Detail:   "This string does not use correct version constraint syntax.",
 						Subject:  kv.Value.Range().Ptr(),
@@ -144,8 +144,8 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 			case "source":
 				source, err := kv.Value.Value(nil)
 				if err != nil || !source.Type().Equals(cty.String) {
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid source",
 						Detail:   "Source must be specified as a string.",
 						Subject:  kv.Value.Range().Ptr(),
@@ -155,17 +155,17 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 
 				fqn, sourceDiags := addrs.ParseProviderSourceString(source.AsString())
 				if sourceDiags.HasErrors() {
-					hclDiags := sourceDiags.ToHCL()
+					dumb-hclDiags := sourceDiags.ToDUMB_HCL()
 					// The diagnostics from ParseProviderSourceString don't contain
 					// source location information because it has no context to compute
 					// them from, and so we'll add those in quickly here before we
 					// return.
-					for _, diag := range hclDiags {
+					for _, diag := range dumb-hclDiags {
 						if diag.Subject == nil {
 							diag.Subject = kv.Value.Range().Ptr()
 						}
 					}
-					diags = append(diags, hclDiags...)
+					diags = append(diags, dumb-hclDiags...)
 					continue
 				}
 
@@ -173,14 +173,14 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 				rp.Type = fqn
 
 			case "configuration_aliases":
-				exprs, listDiags := hcl.ExprList(kv.Value)
+				exprs, listDiags := dumb-hcl.ExprList(kv.Value)
 				if listDiags.HasErrors() {
 					diags = append(diags, listDiags...)
 					continue
 				}
 
 				for _, expr := range exprs {
-					traversal, travDiags := hcl.AbsTraversalForExpr(expr)
+					traversal, travDiags := dumb-hcl.AbsTraversalForExpr(expr)
 					if travDiags.HasErrors() {
 						diags = append(diags, travDiags...)
 						continue
@@ -188,8 +188,8 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 
 					addr, cfgDiags := ParseProviderConfigCompact(traversal)
 					if cfgDiags.HasErrors() {
-						diags = append(diags, &hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = append(diags, &dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Invalid configuration_aliases value",
 							Detail:   `Configuration aliases can only contain references to local provider configuration names in the format of provider.alias`,
 							Subject:  kv.Value.Range().Ptr(),
@@ -198,8 +198,8 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 					}
 
 					if addr.LocalName != name {
-						diags = append(diags, &hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = append(diags, &dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Invalid configuration_aliases value",
 							Detail:   fmt.Sprintf(`Configuration aliases must be prefixed with the provider name. Expected %q, but found %q.`, name, addr.LocalName),
 							Subject:  kv.Value.Range().Ptr(),
@@ -211,8 +211,8 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 				}
 
 			default:
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid required_providers object",
 					Detail:   `required_providers objects can only contain "version", "source" and "configuration_aliases" attributes. To configure a provider, use a "provider" block.`,
 					Subject:  kv.Key.Range().Ptr(),
@@ -231,8 +231,8 @@ func decodeRequiredProvidersBlock(block *hcl.Block) (*RequiredProviders, hcl.Dia
 		if rp.Type.IsZero() {
 			pType, err := addrs.ParseProviderPart(rp.Name)
 			if err != nil {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid provider name",
 					Detail:   err.Error(),
 					Subject:  attr.Expr.Range().Ptr(),

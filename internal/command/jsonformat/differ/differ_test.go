@@ -11,11 +11,11 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/command/jsonformat/computed/renderers"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/structured"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/structured/attribute_path"
-	"github.com/hashicorp/terraform/internal/command/jsonprovider"
-	"github.com/hashicorp/terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/computed/renderers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/structured"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/structured/attribute_path"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonprovider"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
 )
 
 type SetDiff struct {
@@ -2801,7 +2801,7 @@ func TestSpecificCases(t *testing.T) {
 			}, nil, nil, nil, nil, plans.Create, false),
 		},
 
-		// The following tests are from issue 33472. Basically Terraform allows
+		// The following tests are from issue 33472. Basically Dumb Terraform allows
 		// callers to treat numbers as strings in references and expects us
 		// to coerce the strings into numbers. For example the following are
 		// equivalent.

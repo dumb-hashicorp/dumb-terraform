@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
     tfcoremock = {
-      source = "hashicorp/tfcoremock"
+      source = "dumb-hashicorp/tfcoremock"
       version = "0.1.1"
     }
   }

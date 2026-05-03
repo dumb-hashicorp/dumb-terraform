@@ -10,16 +10,16 @@ import (
 
 	"github.com/apparentlymart/go-versions/versions"
 	"github.com/apparentlymart/go-versions/versions/constraints"
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig/stackconfigtypes"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig/typeexpr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/stackconfigtypes"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/typeexpr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // maxEmbeddedStackNesting is an arbitrary, hopefully-reasonable limit on
@@ -37,7 +37,7 @@ type Config struct {
 
 	// Sources is the source bundle that the configuration was loaded from.
 	//
-	// This is also the source bundle that any Terraform modules used by
+	// This is also the source bundle that any Dumb Terraform modules used by
 	// components should be loaded from.
 	Sources *sourcebundle.Bundle
 
@@ -161,14 +161,14 @@ func loadConfigDir(sourceAddr sourceaddrs.FinalSource, sources *sourcebundle.Bun
 	for _, call := range stack.EmbeddedStacks {
 		effectiveSourceAddr, err := resolveFinalSourceAddr(sourceAddr, call.SourceAddr, call.VersionConstraints, sources)
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid source address",
 				Detail: fmt.Sprintf(
 					"Cannot use %q as a source address here: %s.",
 					call.SourceAddr, err,
 				),
-				Subject: call.SourceAddrRange.ToHCL().Ptr(),
+				Subject: call.SourceAddrRange.ToDUMB_HCL().Ptr(),
 			})
 			continue
 		}
@@ -179,14 +179,14 @@ func loadConfigDir(sourceAddr sourceaddrs.FinalSource, sources *sourcebundle.Bun
 			for i, addr := range callers {
 				fmt.Fprintf(&callersBuf, "\n  %2d: %s", i+1, addr)
 			}
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Too much embedded stack nesting",
 				Detail: fmt.Sprintf(
-					"This embedded stack call is nested %d levels deep, which is greater than Terraform's nesting safety limit.\n\nWe recommend keeping stack configuration trees relatively flat, ideally using composition of a flat set of nested calls at the root.\n\nEmbedded stacks leading to this point:%s",
+					"This embedded stack call is nested %d levels deep, which is greater than Dumb Terraform's nesting safety limit.\n\nWe recommend keeping stack configuration trees relatively flat, ideally using composition of a flat set of nested calls at the root.\n\nEmbedded stacks leading to this point:%s",
 					len(callers), callersBuf.String(),
 				),
-				Subject: call.DeclRange.ToHCL().Ptr(),
+				Subject: call.DeclRange.ToDUMB_HCL().Ptr(),
 			})
 			continue
 		}
@@ -219,14 +219,14 @@ func loadConfigDir(sourceAddr sourceaddrs.FinalSource, sources *sourcebundle.Bun
 		for _, block := range stack.RemovedEmbeddedStacks.Get(target) {
 			effectiveSourceAddr, err := resolveFinalSourceAddr(sourceAddr, block.SourceAddr, block.VersionConstraints, sources)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid source address",
 					Detail: fmt.Sprintf(
 						"Cannot use %q as a source address here: %s.",
 						block.SourceAddr, err,
 					),
-					Subject: block.SourceAddrRange.ToHCL().Ptr(),
+					Subject: block.SourceAddrRange.ToDUMB_HCL().Ptr(),
 				})
 				continue
 			}
@@ -238,11 +238,11 @@ func loadConfigDir(sourceAddr sourceaddrs.FinalSource, sources *sourcebundle.Bun
 				if current == nil {
 					// this is invalid, we can't have orphaned removed blocks
 					// so we'll just return an error and skip this block.
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid removed block",
 						Detail:   "The linked removed block was not executed because the `from` attribute of the removed block targets a component or embedded stack within an orphaned embedded stack.\n\nIn order to remove an entire stack, update your removed block to target the entire removed stack itself instead of the specific elements within it.",
-						Subject:  block.DeclRange.ToHCL().Ptr(),
+						Subject:  block.DeclRange.ToDUMB_HCL().Ptr(),
 					})
 					break
 				}
@@ -258,11 +258,11 @@ func loadConfigDir(sourceAddr sourceaddrs.FinalSource, sources *sourcebundle.Bun
 					if childNode.Source != block.FinalSourceAddr {
 						// but apparently the blocks don't agree on what the
 						// source should be here, so that is an error
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Invalid source address",
 							Detail:   fmt.Sprintf("Cannot use %q as a source address here: the target stack is already initialised with another source %q.", block.FinalSourceAddr, childNode.Source),
-							Subject:  block.SourceAddrRange.ToHCL().Ptr(),
+							Subject:  block.SourceAddrRange.ToDUMB_HCL().Ptr(),
 						})
 					}
 					continue
@@ -284,14 +284,14 @@ func loadConfigDir(sourceAddr sourceaddrs.FinalSource, sources *sourcebundle.Bun
 	for _, cmpn := range stack.Components {
 		effectiveSourceAddr, err := resolveFinalSourceAddr(sourceAddr, cmpn.SourceAddr, cmpn.VersionConstraints, sources)
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid source address",
 				Detail: fmt.Sprintf(
 					"Cannot use %q as a source address here: %s.",
 					cmpn.SourceAddr, err,
 				),
-				Subject: cmpn.SourceAddrRange.ToHCL().Ptr(),
+				Subject: cmpn.SourceAddrRange.ToDUMB_HCL().Ptr(),
 			})
 			continue
 		}
@@ -311,14 +311,14 @@ func loadConfigDir(sourceAddr sourceaddrs.FinalSource, sources *sourcebundle.Bun
 		for _, rmvd := range blocks {
 			effectiveSourceAddr, err := resolveFinalSourceAddr(sourceAddr, rmvd.SourceAddr, rmvd.VersionConstraints, sources)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid source address",
 					Detail: fmt.Sprintf(
 						"Cannot use %q as a source address here: %s.",
 						rmvd.SourceAddr, err,
 					),
-					Subject: rmvd.SourceAddrRange.ToHCL().Ptr(),
+					Subject: rmvd.SourceAddrRange.ToDUMB_HCL().Ptr(),
 				})
 				continue
 			}
@@ -326,11 +326,11 @@ func loadConfigDir(sourceAddr sourceaddrs.FinalSource, sources *sourcebundle.Bun
 			if source == nil {
 				source = effectiveSourceAddr
 			} else if source != effectiveSourceAddr {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid source address",
 					Detail:   fmt.Sprintf("Cannot use %q as a source address here: the target stack is already initialised with another source %q.", effectiveSourceAddr, source),
-					Subject:  rmvd.SourceAddrRange.ToHCL().Ptr(),
+					Subject:  rmvd.SourceAddrRange.ToDUMB_HCL().Ptr(),
 				})
 			}
 
@@ -421,7 +421,7 @@ func resolveFinalSourceAddr(base sourceaddrs.FinalSource, rel sourceaddrs.Source
 	default:
 		// Should not get here because the above cases should be exhaustive
 		// for all implementations of sourceaddrs.Source.
-		return nil, fmt.Errorf("cannot resolve final source address for %T (this is a bug in Terraform)", rel)
+		return nil, fmt.Errorf("cannot resolve final source address for %T (this is a bug in Dumb Terraform)", rel)
 	}
 }
 
@@ -512,10 +512,10 @@ func decodeTypeConstraintsSingle(node *ConfigNode, types map[addrs.Provider]cty.
 
 func decodeTypeConstraint(c *TypeConstraint, typeInfo *decodeTypeConstraintsTypeInfo) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
-	ty, defaults, hclDiags := typeexpr.TypeConstraint(c.Expression, typeInfo)
+	ty, defaults, dumb-hclDiags := typeexpr.TypeConstraint(c.Expression, typeInfo)
 	c.Constraint = ty
 	c.Defaults = defaults
-	diags = diags.Append(hclDiags)
+	diags = diags.Append(dumb-hclDiags)
 	return diags
 }
 

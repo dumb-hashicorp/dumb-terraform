@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	backendCloud "github.com/hashicorp/terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	backendCloud "github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
 )
 
 // More thorough tests for providers mirror can be found in the e2etest
@@ -68,7 +68,7 @@ func TestProvidersMirror_constVariable(t *testing.T) {
 	})
 
 	t.Run("value via cli", func(t *testing.T) {
-		// We'll reuse our cloud test server, so Terraform has at least some services available
+		// We'll reuse our cloud test server, so Dumb Terraform has at least some services available
 		server := cloudTestServerWithVars(t)
 		defer server.Close()
 		d := testDisco(server)

@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ModuleInstance is an address for a particular module instance within the
@@ -29,19 +29,19 @@ var (
 	_ Targetable = ModuleInstance(nil)
 )
 
-func ParseModuleInstance(traversal hcl.Traversal) (ModuleInstance, tfdiags.Diagnostics) {
+func ParseModuleInstance(traversal dumb-hcl.Traversal) (ModuleInstance, tfdiags.Diagnostics) {
 	mi, remain, diags := parseModuleInstancePrefix(traversal, false)
 	if len(remain) != 0 {
 		if len(remain) == len(traversal) {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid module instance address",
 				Detail:   "A module instance address must begin with \"module.\".",
 				Subject:  remain.SourceRange().Ptr(),
 			})
 		} else {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid module instance address",
 				Detail:   "The module instance address is followed by additional invalid content.",
 				Subject:  remain.SourceRange().Ptr(),
@@ -52,14 +52,14 @@ func ParseModuleInstance(traversal hcl.Traversal) (ModuleInstance, tfdiags.Diagn
 }
 
 // ParseModuleInstanceStr is a helper wrapper around ParseModuleInstance
-// that takes a string and parses it with the HCL native syntax traversal parser
+// that takes a string and parses it with the DUMB_HCL native syntax traversal parser
 // before interpreting it.
 //
 // This should be used only in specialized situations since it will cause the
 // created references to not have any meaningful source location information.
 // If a reference string is coming from a source that should be identified in
 // error messages then the caller should instead parse it directly using a
-// suitable function from the HCL API and pass the traversal itself to
+// suitable function from the DUMB_HCL API and pass the traversal itself to
 // ParseModuleInstance.
 //
 // Error diagnostics are returned if either the parsing fails or the analysis
@@ -69,7 +69,7 @@ func ParseModuleInstance(traversal hcl.Traversal) (ModuleInstance, tfdiags.Diagn
 func ParseModuleInstanceStr(str string) (ModuleInstance, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return nil, diags
@@ -80,7 +80,7 @@ func ParseModuleInstanceStr(str string) (ModuleInstance, tfdiags.Diagnostics) {
 	return addr, diags
 }
 
-func parseModuleInstancePrefix(traversal hcl.Traversal, allowPartial bool) (ModuleInstance, hcl.Traversal, tfdiags.Diagnostics) {
+func parseModuleInstancePrefix(traversal dumb-hcl.Traversal, allowPartial bool) (ModuleInstance, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	remain := traversal
 	var mi ModuleInstance
 	var diags tfdiags.Diagnostics
@@ -89,13 +89,13 @@ LOOP:
 	for len(remain) > 0 {
 		var next string
 		switch tt := remain[0].(type) {
-		case hcl.TraverseRoot:
+		case dumb-hcl.TraverseRoot:
 			next = tt.Name
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			next = tt.Name
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address operator",
 				Detail:   "Module address prefix must be followed by dot and then a name.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -113,8 +113,8 @@ LOOP:
 		// module call name, as an attribute, and then optionally an index step
 		// giving the instance key.
 		if len(remain) == 0 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address operator",
 				Detail:   "Prefix \"module.\" must be followed by a module name.",
 				Subject:  &kwRange,
@@ -124,11 +124,11 @@ LOOP:
 
 		var moduleName string
 		switch tt := remain[0].(type) {
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			moduleName = tt.Name
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address operator",
 				Detail:   "Prefix \"module.\" must be followed by a module name.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -142,7 +142,7 @@ LOOP:
 
 		if len(remain) > 0 {
 			switch idx := remain[0].(type) {
-			case hcl.TraverseIndex:
+			case dumb-hcl.TraverseIndex:
 				remain = remain[1:]
 
 				switch idx.Key.Type() {
@@ -154,8 +154,8 @@ LOOP:
 					if err == nil {
 						step.InstanceKey = IntKey(idxInt)
 					} else {
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Invalid address operator",
 							Detail:   fmt.Sprintf("Invalid module index: %s.", err),
 							Subject:  idx.SourceRange().Ptr(),
@@ -163,15 +163,15 @@ LOOP:
 					}
 				default:
 					// Should never happen, because no other types are allowed in traversal indices.
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid address operator",
 						Detail:   "Invalid module key: must be either a string or an integer.",
 						Subject:  idx.SourceRange().Ptr(),
 					})
 				}
 
-			case hcl.TraverseSplat:
+			case dumb-hcl.TraverseSplat:
 				if allowPartial {
 					remain = remain[1:]
 					step.InstanceKey = WildcardKey
@@ -182,16 +182,16 @@ LOOP:
 		mi = append(mi, step)
 	}
 
-	var retRemain hcl.Traversal
+	var retRemain dumb-hcl.Traversal
 	if len(remain) > 0 {
-		retRemain = make(hcl.Traversal, len(remain))
+		retRemain = make(dumb-hcl.Traversal, len(remain))
 		copy(retRemain, remain)
 		// The first element here might be either a TraverseRoot or a
 		// TraverseAttr, depending on whether we had a module address on the
 		// front. To make life easier for callers, we'll normalize to always
 		// start with a TraverseRoot.
-		if tt, ok := retRemain[0].(hcl.TraverseAttr); ok {
-			retRemain[0] = hcl.TraverseRoot{
+		if tt, ok := retRemain[0].(dumb-hcl.TraverseAttr); ok {
+			retRemain[0] = dumb-hcl.TraverseRoot{
 				Name:     tt.Name,
 				SrcRange: tt.SrcRange,
 			}
@@ -205,7 +205,7 @@ LOOP:
 // equivalent ModuleInstance address that assumes that no modules have
 // keyed instances.
 //
-// This is a temporary allowance for the fact that Terraform does not presently
+// This is a temporary allowance for the fact that Dumb Terraform does not presently
 // support "count" and "for_each" on modules, and thus graph building code that
 // derives graph nodes from configuration must just assume unkeyed modules
 // in order to construct the graph. At a later time when "count" and "for_each"

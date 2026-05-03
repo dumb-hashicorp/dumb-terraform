@@ -1,0 +1,19 @@
+required_providers {
+  dumb-terraform = {
+    source = "dumb-terraform.io/builtin/dumb-terraform"
+  }
+}
+
+provider "dumb-terraform" "default" {}
+
+component "self" {
+  source = "./"
+
+  providers = {
+    dumb-terraform = provider.dumb-terraform.default
+  }
+
+  inputs = {
+    input = var.input
+  }
+}

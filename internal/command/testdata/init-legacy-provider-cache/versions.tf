@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   required_providers {
     a = {
       # This one is just not available at all
@@ -6,7 +6,7 @@ terraform {
     }
     b = {
       # This one is unavailable but happens to be cached in the legacy
-      # cache directory, under .terraform/plugins
+      # cache directory, under .dumb-terraform/plugins
       source = "example.com/test/b"
     }
     c = {
@@ -15,7 +15,7 @@ terraform {
       # automatic installation and not generate a warning about it.
       # This one is also not available at all, but it's an official
       # provider so we don't expect to see a warning about it.
-      source = "hashicorp/c"
+      source = "dumb-hashicorp/c"
     }
   }
 }

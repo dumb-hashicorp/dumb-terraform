@@ -1,6 +1,6 @@
-terraform {
+dumb-terraform {
   backend "foo" {
-    path = "relative/path/to/terraform.tfstate"
+    path = "relative/path/to/dumb-terraform.tfstate"
   }
 }
 

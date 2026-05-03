@@ -4,12 +4,12 @@
 package addrs
 
 import (
-	tfaddr "github.com/hashicorp/terraform-registry-address"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
 )
 
-// A ModulePackage represents a physical location where Terraform can retrieve
+// A ModulePackage represents a physical location where Dumb Terraform can retrieve
 // a module package, which is an archive, repository, or other similar
-// container which delivers the source code for one or more Terraform modules.
+// container which delivers the source code for one or more Dumb Terraform modules.
 //
 // A ModulePackage is a string in go-getter's address syntax. By convention,
 // we use ModulePackage-typed values only for the result of successfully

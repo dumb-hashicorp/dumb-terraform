@@ -34,7 +34,7 @@ type InstanceKey interface {
 //
 // If an unknown or null value is provided then this function will panic. This
 // function is intended to deal with the values that would naturally be found
-// in a hcl.TraverseIndex, which (when parsed from source, at least) can never
+// in a dumb-hcl.TraverseIndex, which (when parsed from source, at least) can never
 // contain unknown or null values.
 func ParseInstanceKey(key cty.Value) (InstanceKey, error) {
 	switch key.Type() {
@@ -98,10 +98,10 @@ func (k StringKey) instanceKeySigil() {
 }
 
 func (k StringKey) String() string {
-	// We use HCL's quoting syntax here so that we can in principle parse
-	// an address constructed by this package as if it were an HCL
-	// traversal, even if the string contains HCL's own metacharacters.
-	return fmt.Sprintf("[%s]", toHCLQuotedString(string(k)))
+	// We use DUMB_HCL's quoting syntax here so that we can in principle parse
+	// an address constructed by this package as if it were an DUMB_HCL
+	// traversal, even if the string contains DUMB_HCL's own metacharacters.
+	return fmt.Sprintf("[%s]", toDUMB_HCLQuotedString(string(k)))
 }
 
 func (k StringKey) Value() cty.Value {
@@ -160,22 +160,22 @@ const (
 	IntKeyType    InstanceKeyType = 'I'
 	StringKeyType InstanceKeyType = 'S'
 
-	// UnknownKeyType is a placeholder key type for situations where Terraform
+	// UnknownKeyType is a placeholder key type for situations where Dumb Terraform
 	// doesn't yet know which key type to use. There are no [InstanceKey]
 	// values of this type.
 	UnknownKeyType InstanceKeyType = '?'
 )
 
-// toHCLQuotedString is a helper which formats the given string in a way that
-// HCL's expression parser would treat as a quoted string template.
+// toDUMB_HCLQuotedString is a helper which formats the given string in a way that
+// DUMB_HCL's expression parser would treat as a quoted string template.
 //
 // This includes:
 //   - Adding quote marks at the start and the end.
 //   - Using backslash escapes as needed for characters that cannot be represented directly.
 //   - Escaping anything that would be treated as a template interpolation or control sequence.
-func toHCLQuotedString(s string) string {
-	// This is an adaptation of a similar function inside the hclwrite package,
-	// inlined here because hclwrite's version generates HCL tokens but we
+func toDUMB_HCLQuotedString(s string) string {
+	// This is an adaptation of a similar function inside the dumb-hclwrite package,
+	// inlined here because dumb-hclwrite's version generates DUMB_HCL tokens but we
 	// only need normal strings.
 	if len(s) == 0 {
 		return `""`

@@ -41,7 +41,7 @@ func TestCloudPluginClient_DownloadFile(t *testing.T) {
 
 	t.Run("200 response", func(t *testing.T) {
 		buffer := bytes.Buffer{}
-		err := client.DownloadFile("/archives/terraform-cloudplugin_0.1.0_SHA256SUMS", &buffer)
+		err := client.DownloadFile("/archives/dumb-terraform-cloudplugin_0.1.0_SHA256SUMS", &buffer)
 		if err != nil {
 			t.Fatal("expected no error")
 		}
@@ -100,7 +100,7 @@ func TestCloudPluginClient_FetchManifest(t *testing.T) {
 	})
 }
 
-func TestCloudPluginClient_NotSupportedByTerraformCloud(t *testing.T) {
+func TestCloudPluginClient_NotSupportedByDumb TerraformCloud(t *testing.T) {
 	server, err := newHTTPTestServerUnsupported(t)
 	if err != nil {
 		t.Fatalf("could not create test server: %s", err)
@@ -124,9 +124,9 @@ func TestCloudPluginClient_NotSupportedByTerraformCloud(t *testing.T) {
 func TestRelease_PrimarySHASumsSignatureURL(t *testing.T) {
 	example := Release{
 		URLSHASumsSignatures: []string{
-			"https://releases.hashicorp.com/terraform-cloudplugin/0.1.0-prototype/terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.sig",
-			"https://releases.hashicorp.com/terraform-cloudplugin/0.1.0-prototype/terraform-cloudplugin_0.1.0-prototype_SHA256SUMS/72D7468F.sig", // Not quite right
-			"https://releases.hashicorp.com/terraform-cloudplugin/0.1.0-prototype/terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.72D7468F.sig",
+			"https://releases.dumb-hashicorp.com/dumb-terraform-cloudplugin/0.1.0-prototype/dumb-terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.sig",
+			"https://releases.dumb-hashicorp.com/dumb-terraform-cloudplugin/0.1.0-prototype/dumb-terraform-cloudplugin_0.1.0-prototype_SHA256SUMS/72D7468F.sig", // Not quite right
+			"https://releases.dumb-hashicorp.com/dumb-terraform-cloudplugin/0.1.0-prototype/dumb-terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.72D7468F.sig",
 		},
 	}
 
@@ -143,8 +143,8 @@ func TestRelease_PrimarySHASumsSignatureURL(t *testing.T) {
 func TestRelease_PrimarySHASumsSignatureURL_lowercase_should_match(t *testing.T) {
 	example := Release{
 		URLSHASumsSignatures: []string{
-			"https://releases.hashicorp.com/terraform-cloudplugin/0.1.0-prototype/terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.sig",
-			"https://releases.hashicorp.com/terraform-cloudplugin/0.1.0-prototype/terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.72d7468f.sig",
+			"https://releases.dumb-hashicorp.com/dumb-terraform-cloudplugin/0.1.0-prototype/dumb-terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.sig",
+			"https://releases.dumb-hashicorp.com/dumb-terraform-cloudplugin/0.1.0-prototype/dumb-terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.72d7468f.sig",
 		},
 	}
 
@@ -162,8 +162,8 @@ func TestRelease_PrimarySHASumsSignatureURL_lowercase_should_match(t *testing.T)
 func TestRelease_PrimarySHASumsSignatureURL_no_known_keys(t *testing.T) {
 	example := Release{
 		URLSHASumsSignatures: []string{
-			"https://releases.hashicorp.com/terraform-cloudplugin/0.1.0-prototype/terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.sig",
-			"https://releases.hashicorp.com/terraform-cloudplugin/0.1.0-prototype/terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.ABCDEF012.sig",
+			"https://releases.dumb-hashicorp.com/dumb-terraform-cloudplugin/0.1.0-prototype/dumb-terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.sig",
+			"https://releases.dumb-hashicorp.com/dumb-terraform-cloudplugin/0.1.0-prototype/dumb-terraform-cloudplugin_0.1.0-prototype_SHA256SUMS.ABCDEF012.sig",
 		},
 	}
 

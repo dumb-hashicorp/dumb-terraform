@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   required_providers {
     cloud = {
       source = "tf.example.com/awesomecorp/happycloud"

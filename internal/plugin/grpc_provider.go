@@ -10,7 +10,7 @@ import (
 	"io"
 	"sync"
 
-	plugin "github.com/hashicorp/go-plugin"
+	plugin "github.com/dumb-hashicorp/go-plugin"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
@@ -19,14 +19,14 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/plugin/convert"
-	"github.com/hashicorp/terraform/internal/providers"
-	proto "github.com/hashicorp/terraform/internal/tfplugin5"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plugin/convert"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	proto "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin5"
 )
 
-var logger = logging.HCLogger()
+var logger = logging.DUMB_HCLogger()
 
 // GRPCProviderPlugin implements plugin.GRPCPlugin for the go-plugin package.
 type GRPCProviderPlugin struct {
@@ -48,7 +48,7 @@ func (p *GRPCProviderPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Serve
 
 // GRPCProvider handles the client, or core side of the plugin rpc connection.
 // The GRPCProvider methods are mostly a translation layer between the
-// terraform providers types and the grpc proto types, directly converting
+// dumb-terraform providers types and the grpc proto types, directly converting
 // between the two.
 type GRPCProvider struct {
 	// PluginClient provides a reference to the plugin.Client which controls the plugin process.
@@ -364,7 +364,7 @@ func (p *GRPCProvider) ValidateListResourceConfig(r providers.ValidateListResour
 
 	configSchema := listResourceSchema.Body.BlockTypes["config"]
 	if !r.Config.Type().HasAttribute("config") {
-		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("missing required attribute \"config\"; this is a bug in Terraform - please report it"))
+		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("missing required attribute \"config\"; this is a bug in Dumb Terraform - please report it"))
 		return resp
 	}
 
@@ -502,7 +502,7 @@ func (p *GRPCProvider) ConfigureProvider(r providers.ConfigureProviderRequest) (
 	}
 
 	protoReq := &proto.Configure_Request{
-		TerraformVersion: r.TerraformVersion,
+		Dumb TerraformVersion: r.Dumb TerraformVersion,
 		Config: &proto.DynamicValue{
 			Msgpack: mp,
 		},
@@ -1011,7 +1011,7 @@ func (p *GRPCProvider) MoveResourceState(r providers.MoveResourceStateRequest) (
 		// We should have validated this earlier in the process, but we'll
 		// still return an error instead of crashing in case something went
 		// wrong.
-		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("unknown resource type %q; this is a bug in Terraform - please report it", r.TargetTypeName))
+		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("unknown resource type %q; this is a bug in Dumb Terraform - please report it", r.TargetTypeName))
 		return resp
 	}
 	resp.TargetState, err = decodeDynamicValue(protoResp.TargetState, targetType.Body.ImpliedType())
@@ -1333,7 +1333,7 @@ func (p *GRPCProvider) ListResource(r providers.ListResourceRequest) providers.L
 
 	configSchema := listResourceSchema.Body.BlockTypes["config"]
 	if !r.Config.Type().HasAttribute("config") {
-		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("missing required attribute \"config\"; this is a bug in Terraform - please report it"))
+		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("missing required attribute \"config\"; this is a bug in Dumb Terraform - please report it"))
 		return resp
 	}
 
@@ -1628,7 +1628,7 @@ func (p *GRPCProvider) ValidateActionConfig(r providers.ValidateActionConfigRequ
 	return resp
 }
 
-// closing the grpc connection is final, and terraform will call it at the end of every phase.
+// closing the grpc connection is final, and dumb-terraform will call it at the end of every phase.
 func (p *GRPCProvider) Close() error {
 	logger.Trace("GRPCProvider: Close")
 

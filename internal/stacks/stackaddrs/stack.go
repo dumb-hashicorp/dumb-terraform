@@ -6,8 +6,8 @@ package stackaddrs
 import (
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
 )
 
 // Stack represents the address of a stack within the tree of stacks.

@@ -9,17 +9,17 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/cloud/cloudplan"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
-	tftesting "github.com/hashicorp/terraform/internal/terraform/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud/cloudplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	tftesting "github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform/testing"
 
 	"github.com/zclconf/go-cty/cty"
 )
@@ -34,7 +34,7 @@ func TestShowHuman(t *testing.T) {
 		plan       *plans.Plan
 		jsonPlan   *cloudplan.RemotePlanJSON
 		stateFile  *statefile.File
-		schemas    *terraform.Schemas
+		schemas    *dumb-terraform.Schemas
 		wantExact  bool
 		wantString string
 	}{
@@ -53,7 +53,7 @@ func TestShowHuman(t *testing.T) {
 				Redacted:  true,
 				Mode:      plans.NormalMode,
 				Qualities: []plans.Quality{},
-				RunHeader: "[reset][yellow]To view this run in a browser, visit:\nhttps://app.terraform.io/app/example_org/example_workspace/runs/run-run-bugsBUGSbugsBUGS[reset]",
+				RunHeader: "[reset][yellow]To view this run in a browser, visit:\nhttps://app.dumb-terraform.io/app/example_org/example_workspace/runs/run-run-bugsBUGSbugsBUGS[reset]",
 				RunFooter: "[reset][green]Run status: planned and saved (confirmable)[reset]\n[green]Workspace is unlocked[reset]",
 			},
 			nil,
@@ -139,7 +139,7 @@ func TestShowJSON(t *testing.T) {
 				Redacted:  false,
 				Mode:      plans.NormalMode,
 				Qualities: []plans.Quality{},
-				RunHeader: "[reset][yellow]To view this run in a browser, visit:\nhttps://app.terraform.io/app/example_org/example_workspace/runs/run-run-bugsBUGSbugsBUGS[reset]",
+				RunHeader: "[reset][yellow]To view this run in a browser, visit:\nhttps://app.dumb-terraform.io/app/example_org/example_workspace/runs/run-run-bugsBUGSbugsBUGS[reset]",
 				RunFooter: "[reset][green]Run status: planned and saved (confirmable)[reset]\n[green]Workspace is unlocked[reset]",
 			},
 			nil,
@@ -179,7 +179,7 @@ func TestShowJSON(t *testing.T) {
 			view.Configure(&arguments.View{NoColor: true})
 			v := NewShow(arguments.ViewJSON, view)
 
-			schemas := &terraform.Schemas{
+			schemas := &dumb-terraform.Schemas{
 				Providers: map[addrs.Provider]providers.ProviderSchema{
 					addrs.NewDefaultProvider("test"): {
 						ResourceTypes: map[string]providers.Schema{

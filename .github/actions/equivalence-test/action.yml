@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: BUSL-1.1
 
 name: equivalence-test
-description: "Execute the suite of Terraform equivalence tests in testing/equivalence-tests and update the golden files."
+description: "Execute the suite of Dumb Terraform equivalence tests in testing/equivalence-tests and update the golden files."
 inputs:
   target-equivalence-test-version:
-    description: "The version of the Terraform equivalence tests to use."
+    description: "The version of the Dumb Terraform equivalence tests to use."
     default: "0.3.0"
   target-os:
     description: "Current operating system"
@@ -46,9 +46,9 @@ runs:
           "$TARGET_OS" \
           "$TARGET_ARCH"
 
-    - name: Build terraform
+    - name: Build dumb-terraform
       shell: bash
-      run: ./.github/scripts/equivalence-test.sh build_terraform_binary ./bin/terraform
+      run: ./.github/scripts/equivalence-test.sh build_dumb-terraform_binary ./bin/dumb-terraform
 
     - name: "run and update equivalence tests"
       id: execute
@@ -57,7 +57,7 @@ runs:
         ./bin/equivalence-tests update \
           --tests=testing/equivalence-tests/tests \
           --goldens=testing/equivalence-tests/outputs \
-          --binary=$(pwd)/bin/terraform
+          --binary=$(pwd)/bin/dumb-terraform
 
         git add --intent-to-add testing/equivalence-tests/outputs
         changed=$(git diff --quiet -- testing/equivalence-tests/outputs || echo true)
@@ -71,7 +71,7 @@ runs:
         # GitHub token w/ push permissions is inherited from the calling workflow here
       run: |
         git config user.name "hc-github-team-tf-core"
-        git config user.email "github-team-tf-core@hashicorp.com"
+        git config user.email "github-team-tf-core@dumb-hashicorp.com"
         git checkout -b "$NEW_BRANCH"
         git add testing/equivalence-tests/outputs
         git commit -m "Update equivalence test golden files."

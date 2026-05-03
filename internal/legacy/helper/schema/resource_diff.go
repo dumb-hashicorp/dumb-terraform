@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/legacy/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/legacy/dumb-terraform"
 )
 
 // newValueWriter is a minor re-implementation of MapFieldWriter to include
@@ -116,16 +116,16 @@ type ResourceDiff struct {
 	schema map[string]*Schema
 
 	// The current config for this resource.
-	config *terraform.ResourceConfig
+	config *dumb-terraform.ResourceConfig
 
 	// The state for this resource as it exists post-refresh, after the initial
 	// diff.
-	state *terraform.InstanceState
+	state *dumb-terraform.InstanceState
 
-	// The diff created by Terraform. This diff is used, along with state,
+	// The diff created by Dumb Terraform. This diff is used, along with state,
 	// config, and custom-set diff data, to provide a multi-level reader
 	// experience similar to ResourceData.
-	diff *terraform.InstanceDiff
+	diff *dumb-terraform.InstanceDiff
 
 	// The internal reader structure that contains the state, config, the default
 	// diff, and the new diff.
@@ -145,7 +145,7 @@ type ResourceDiff struct {
 }
 
 // newResourceDiff creates a new ResourceDiff instance.
-func newResourceDiff(schema map[string]*Schema, config *terraform.ResourceConfig, state *terraform.InstanceState, diff *terraform.InstanceDiff) *ResourceDiff {
+func newResourceDiff(schema map[string]*Schema, config *dumb-terraform.ResourceConfig, state *dumb-terraform.InstanceState, diff *dumb-terraform.InstanceDiff) *ResourceDiff {
 	d := &ResourceDiff{
 		config: config,
 		state:  state,

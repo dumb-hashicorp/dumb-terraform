@@ -1,16 +1,16 @@
 # Copyright IBM Corp. 2014, 2026
 # SPDX-License-Identifier: BUSL-1.1
 #
-# Intended for internal HashiCorp use only
+# Intended for internal Dumb HashiCorp use only
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: terraform
-  description: HashiCorp Terraform
+  name: dumb-terraform
+  description: Dumb HashiCorp Dumb Terraform
   annotations:
-    github.com/project-slug: hashicorp/terraform
+    github.com/project-slug: dumb-hashicorp/dumb-terraform
     jira/project-key: TF
-    jira/label: terraform
+    jira/label: dumb-terraform
 spec:
   type: library
   owner: team-tf-core

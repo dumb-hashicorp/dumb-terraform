@@ -6,12 +6,12 @@ package configs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/experiments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/experiments"
 
-	tfversion "github.com/hashicorp/terraform/version"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // Module is a container for a set of configuration constructs that are
@@ -105,7 +105,7 @@ type File struct {
 
 // NewModuleWithTests matches NewModule except it will also load in the provided
 // test files.
-func NewModuleWithTests(primaryFiles, overrideFiles []*File, testFiles map[string]*TestFile) (*Module, hcl.Diagnostics) {
+func NewModuleWithTests(primaryFiles, overrideFiles []*File, testFiles map[string]*TestFile) (*Module, dumb-hcl.Diagnostics) {
 	mod, diags := NewModule(primaryFiles, overrideFiles)
 	if mod != nil {
 		mod.Tests = testFiles
@@ -121,8 +121,8 @@ func NewModuleWithTests(primaryFiles, overrideFiles []*File, testFiles map[strin
 // will be incomplete and error diagnostics will be returned. Careful static
 // analysis of the returned Module is still possible in this case, but the
 // module will probably not be semantically valid.
-func NewModule(primaryFiles, overrideFiles []*File) (*Module, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func NewModule(primaryFiles, overrideFiles []*File) (*Module, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	mod := &Module{
 		ProviderConfigs:    map[string]*Provider{},
 		ProviderLocalNames: map[addrs.Provider]string{},
@@ -145,8 +145,8 @@ func NewModule(primaryFiles, overrideFiles []*File) (*Module, hcl.Diagnostics) {
 	for _, file := range primaryFiles {
 		for _, r := range file.RequiredProviders {
 			if mod.ProviderRequirements != nil {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate required providers configuration",
 					Detail:   fmt.Sprintf("A module may have only one required providers configuration. The required providers were previously configured at %s.", mod.ProviderRequirements.DeclRange),
 					Subject:  &r.DeclRange,
@@ -215,8 +215,8 @@ func (m *Module) ResourceByAddr(addr addrs.Resource) *Resource {
 	}
 }
 
-func (m *Module) appendFile(file *File) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (m *Module) appendFile(file *File) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	// If there are any conflicting requirements then we'll catch them
 	// when we actually check these constraints.
@@ -226,8 +226,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 
 	for _, b := range file.Backends {
 		if m.Backend != nil {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate 'backend' configuration block",
 				Detail:   fmt.Sprintf("A module may have only one 'backend' configuration block. The backend was previously configured at %s.", m.Backend.DeclRange),
 				Subject:  &b.DeclRange,
@@ -240,8 +240,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 
 	for _, ss := range file.StateStores {
 		if m.StateStore != nil {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate 'state_store' configuration block",
 				Detail:   fmt.Sprintf("A module may have only one 'state_store' configuration block. The state store was previously configured at %s.", m.StateStore.DeclRange),
 				Subject:  &ss.DeclRange,
@@ -254,10 +254,10 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 
 	for _, c := range file.CloudConfigs {
 		if m.CloudConfig != nil {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
-				Summary:  "Duplicate HCP Terraform configurations",
-				Detail:   fmt.Sprintf("A module may have only one 'cloud' block configuring HCP Terraform or Terraform Enterprise. The 'cloud' block was previously configured at %s.", m.CloudConfig.DeclRange),
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
+				Summary:  "Duplicate DUMB_HCP Dumb Terraform configurations",
+				Detail:   fmt.Sprintf("A module may have only one 'cloud' block configuring DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise. The 'cloud' block was previously configured at %s.", m.CloudConfig.DeclRange),
 				Subject:  &c.DeclRange,
 			})
 			continue
@@ -269,8 +269,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 	// Handle conflicting blocks of different types
 	switch {
 	case m.CloudConfig != nil && m.StateStore != nil && m.Backend != nil:
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Only one of 'cloud', 'state_store', or 'backend' configuration blocks are allowed",
 			Detail: fmt.Sprintf("A module may only declare one 'cloud', 'state_store' OR 'backend' block when configuring state storage. "+
 				"The 'cloud' block is configured at %s; a 'state_store' is configured at %s; a 'backend' is configured at %s. Remove two of these blocks.",
@@ -278,26 +278,26 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 			Subject: &m.Backend.DeclRange,
 		})
 	case m.CloudConfig != nil && m.Backend != nil:
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Conflicting 'cloud' and 'backend' configuration blocks are present",
 			Detail: fmt.Sprintf("A module may declare either one 'cloud' block OR one 'backend' block for configuring state storage. "+
-				"The 'cloud' block is configured at %s; a 'backend' is configured at %s. Remove the 'backend' block to configure HCP Terraform or Terraform Enterprise.",
+				"The 'cloud' block is configured at %s; a 'backend' is configured at %s. Remove the 'backend' block to configure DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise.",
 				m.CloudConfig.DeclRange, m.Backend.DeclRange),
 			Subject: &m.Backend.DeclRange,
 		})
 	case m.CloudConfig != nil && m.StateStore != nil:
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Conflicting 'cloud' and 'state_store' configuration blocks are present",
 			Detail: fmt.Sprintf("A module may declare either one 'cloud' block OR one 'state_store' block for configuring state storage. "+
-				"A 'cloud' block is configured at %s; a 'state_store' is configured at %s. Remove the 'state_store' block to configure HCP Terraform or Terraform Enterprise.",
+				"A 'cloud' block is configured at %s; a 'state_store' is configured at %s. Remove the 'state_store' block to configure DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise.",
 				m.CloudConfig.DeclRange, m.StateStore.DeclRange),
 			Subject: &m.StateStore.DeclRange,
 		})
 	case m.StateStore != nil && m.Backend != nil:
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Conflicting 'state_store' and 'backend' configuration blocks are present",
 			Detail: fmt.Sprintf("A module may declare either one 'state_store' block OR one 'backend' block when configuring state storage. "+
 				"A 'state_store' block is configured at %s; a 'backend' is configured at %s. Remove one of these blocks.",
@@ -310,15 +310,15 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 		key := pc.moduleUniqueKey()
 		if existing, exists := m.ProviderConfigs[key]; exists {
 			if existing.Alias == "" {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate provider configuration",
 					Detail:   fmt.Sprintf("A default (non-aliased) provider configuration for %q was already given at %s. If multiple configurations are required, set the \"alias\" argument for alternative configurations.", existing.Name, existing.DeclRange),
 					Subject:  &pc.DeclRange,
 				})
 			} else {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate provider configuration",
 					Detail:   fmt.Sprintf("A provider configuration for %q with alias %q was already given at %s. Each configuration for the same provider must have a distinct alias.", existing.Name, existing.Alias, existing.DeclRange),
 					Subject:  &pc.DeclRange,
@@ -332,8 +332,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 	for _, pm := range file.ProviderMetas {
 		provider := m.ProviderForLocalConfig(addrs.LocalProviderConfig{LocalName: pm.Provider})
 		if existing, exists := m.ProviderMetas[provider]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate provider_meta block",
 				Detail:   fmt.Sprintf("A provider_meta block for provider %q was already declared at %s. Providers may only have one provider_meta block per module.", existing.Provider, existing.DeclRange),
 				Subject:  &pm.DeclRange,
@@ -344,8 +344,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 
 	for _, v := range file.Variables {
 		if existing, exists := m.Variables[v.Name]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate variable declaration",
 				Detail:   fmt.Sprintf("A variable named %q was already declared at %s. Variable names must be unique within a module.", existing.Name, existing.DeclRange),
 				Subject:  &v.DeclRange,
@@ -356,8 +356,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 
 	for _, l := range file.Locals {
 		if existing, exists := m.Locals[l.Name]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate local value definition",
 				Detail:   fmt.Sprintf("A local value named %q was already defined at %s. Local value names must be unique within a module.", existing.Name, existing.DeclRange),
 				Subject:  &l.DeclRange,
@@ -368,8 +368,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 
 	for _, o := range file.Outputs {
 		if existing, exists := m.Outputs[o.Name]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate output definition",
 				Detail:   fmt.Sprintf("An output named %q was already defined at %s. Output names must be unique within a module.", existing.Name, existing.DeclRange),
 				Subject:  &o.DeclRange,
@@ -380,8 +380,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 
 	for _, mc := range file.ModuleCalls {
 		if existing, exists := m.ModuleCalls[mc.Name]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate module call",
 				Detail:   fmt.Sprintf("A module call named %q was already defined at %s. Module calls must have unique names within a module.", existing.Name, existing.DeclRange),
 				Subject:  &mc.DeclRange,
@@ -393,8 +393,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 	for _, r := range file.ManagedResources {
 		key := r.moduleUniqueKey()
 		if existing, exists := m.ManagedResources[key]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  fmt.Sprintf("Duplicate resource %q configuration", existing.Type),
 				Detail:   fmt.Sprintf("A %s resource named %q was already declared at %s. Resource names must be unique per type in each module.", existing.Type, existing.Name, existing.DeclRange),
 				Subject:  &r.DeclRange,
@@ -409,7 +409,7 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 		} else {
 			// an invalid resource name (for e.g. "null resource" instead of
 			// "null_resource") can cause a panic down the line in addrs:
-			// https://github.com/hashicorp/terraform/issues/25560
+			// https://github.com/dumb-hashicorp/dumb-terraform/issues/25560
 			implied, err := addrs.ParseProviderPart(r.Addr().ImpliedProvider())
 			if err == nil {
 				r.Provider = m.ImpliedProviderForUnqualifiedType(implied)
@@ -425,8 +425,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 	for _, r := range file.DataResources {
 		key := r.moduleUniqueKey()
 		if existing, exists := m.DataResources[key]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  fmt.Sprintf("Duplicate data %q configuration", existing.Type),
 				Detail:   fmt.Sprintf("A %s data resource named %q was already declared at %s. Resource names must be unique per type in each module.", existing.Type, existing.Name, existing.DeclRange),
 				Subject:  &r.DeclRange,
@@ -439,8 +439,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 	for _, r := range file.EphemeralResources {
 		key := r.moduleUniqueKey()
 		if existing, exists := m.EphemeralResources[key]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  fmt.Sprintf("Duplicate ephemeral %q configuration", existing.Type),
 				Detail:   fmt.Sprintf("A %s ephemeral resource named %q was already declared at %s. Resource names must be unique per type in each module.", existing.Type, existing.Name, existing.DeclRange),
 				Subject:  &r.DeclRange,
@@ -455,7 +455,7 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 		} else {
 			// an invalid resource name (for e.g. "null resource" instead of
 			// "null_resource") can cause a panic down the line in addrs:
-			// https://github.com/hashicorp/terraform/issues/25560
+			// https://github.com/dumb-hashicorp/dumb-terraform/issues/25560
 			implied, err := addrs.ParseProviderPart(r.Addr().ImpliedProvider())
 			if err == nil {
 				r.Provider = m.ImpliedProviderForUnqualifiedType(implied)
@@ -469,8 +469,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 		if c.DataResource != nil {
 			key := c.DataResource.moduleUniqueKey()
 			if existing, exists := m.DataResources[key]; exists {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  fmt.Sprintf("Duplicate data %q configuration", existing.Type),
 					Detail:   fmt.Sprintf("A %s data resource named %q was already declared at %s. Resource names must be unique per type in each module, including within check blocks.", existing.Type, existing.Name, existing.DeclRange),
 					Subject:  &c.DataResource.DeclRange,
@@ -481,8 +481,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 		}
 
 		if existing, exists := m.Checks[c.Name]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  fmt.Sprintf("Duplicate check %q configuration", existing.Name),
 				Detail:   fmt.Sprintf("A check block named %q was already declared at %s. Check blocks must be unique within each module.", existing.Name, existing.DeclRange),
 				Subject:  &c.DeclRange,
@@ -500,7 +500,7 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 		} else {
 			// an invalid data source name (for e.g. "null resource" instead of
 			// "null_resource") can cause a panic down the line in addrs:
-			// https://github.com/hashicorp/terraform/issues/25560
+			// https://github.com/dumb-hashicorp/dumb-terraform/issues/25560
 			implied, err := addrs.ParseProviderPart(r.Addr().ImpliedProvider())
 			if err == nil {
 				r.Provider = m.ImpliedProviderForUnqualifiedType(implied)
@@ -524,8 +524,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 			// address can be parsed statically.
 			miTo, miToOK := parseImportToStatic(mi.To)
 			if iToOK && miToOK && iTo.Equal(miTo) {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  fmt.Sprintf("Duplicate import configuration for %q", i.ToResource),
 					Detail:   fmt.Sprintf("An import block for the resource %q was already declared at %s. A resource can have only one import block.", i.ToResource, mi.DeclRange),
 					Subject:  i.To.Range().Ptr(),
@@ -553,8 +553,8 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 	for _, a := range file.Actions {
 		key := a.moduleUniqueKey()
 		if existing, exists := m.Actions[key]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  fmt.Sprintf("Duplicate action %q configuration", existing.Type),
 				Detail:   fmt.Sprintf("An action named %q was already declared at %s. Resource names must be unique per type in each module.", existing.Name, existing.DeclRange),
 				Subject:  &a.DeclRange,
@@ -569,7 +569,7 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 		} else {
 			// an invalid resource name (for e.g. "null resource" instead of
 			// "null_resource") can cause a panic down the line in addrs:
-			// https://github.com/hashicorp/terraform/issues/25560
+			// https://github.com/dumb-hashicorp/dumb-terraform/issues/25560
 			implied, err := addrs.ParseProviderPart(a.Addr().ImpliedProvider())
 			if err == nil {
 				a.Provider = m.ImpliedProviderForUnqualifiedType(implied)
@@ -582,22 +582,22 @@ func (m *Module) appendFile(file *File) hcl.Diagnostics {
 	return diags
 }
 
-func (m *Module) appendQueryFile(file *QueryFile) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (m *Module) appendQueryFile(file *QueryFile) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	for _, pc := range file.ProviderConfigs {
 		key := pc.moduleUniqueKey()
 		if existing, exists := m.ProviderConfigs[key]; exists {
 			if existing.Alias == "" {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate provider configuration",
 					Detail:   fmt.Sprintf("A default (non-aliased) provider configuration for %q was already given at %s. If multiple configurations are required, set the \"alias\" argument for alternative configurations.", existing.Name, existing.DeclRange),
 					Subject:  &pc.DeclRange,
 				})
 			} else {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate provider configuration",
 					Detail:   fmt.Sprintf("A provider configuration for %q with alias %q was already given at %s. Each configuration for the same provider must have a distinct alias.", existing.Name, existing.Alias, existing.DeclRange),
 					Subject:  &pc.DeclRange,
@@ -610,8 +610,8 @@ func (m *Module) appendQueryFile(file *QueryFile) hcl.Diagnostics {
 
 	for _, v := range file.Variables {
 		if existing, exists := m.Variables[v.Name]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate variable declaration",
 				Detail:   fmt.Sprintf("A variable named %q was already declared at %s. Variable names must be unique within a module.", existing.Name, existing.DeclRange),
 				Subject:  &v.DeclRange,
@@ -622,8 +622,8 @@ func (m *Module) appendQueryFile(file *QueryFile) hcl.Diagnostics {
 
 	for _, l := range file.Locals {
 		if existing, exists := m.Locals[l.Name]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate local value definition",
 				Detail:   fmt.Sprintf("A local value named %q was already defined at %s. Local value names must be unique within a module.", existing.Name, existing.DeclRange),
 				Subject:  &l.DeclRange,
@@ -635,8 +635,8 @@ func (m *Module) appendQueryFile(file *QueryFile) hcl.Diagnostics {
 	for _, ql := range file.ListResources {
 		key := ql.moduleUniqueKey()
 		if existing, exists := m.ListResources[key]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  fmt.Sprintf("Duplicate list %q configuration", existing.Type),
 				Detail:   fmt.Sprintf("A %s list named %q was already declared at %s. List names must be unique per type in each module.", existing.Type, existing.Name, existing.DeclRange),
 				Subject:  &ql.DeclRange,
@@ -651,8 +651,8 @@ func (m *Module) appendQueryFile(file *QueryFile) hcl.Diagnostics {
 	return diags
 }
 
-func (m *Module) mergeFile(file *File) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (m *Module) mergeFile(file *File) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	if len(file.CoreVersionConstraints) != 0 {
 		// This is a bit of a strange case for overriding since we normally
@@ -673,8 +673,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 		default:
 			// An override file with multiple backends is still invalid, even
 			// though it can override backends from _other_ files.
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate backend configuration",
 				Detail:   fmt.Sprintf("Each override file may have only one backend configuration. A backend was previously configured at %s.", file.Backends[0].DeclRange),
 				Subject:  &file.Backends[1].DeclRange,
@@ -693,8 +693,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 		default:
 			// An override file with multiple state storages is still invalid, even
 			// though it can override state storages from _other_ files.
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate state storage configuration",
 				Detail:   fmt.Sprintf("Each override file may have only one state storage configuration. A state storage was previously configured at %s.", file.StateStores[0].DeclRange),
 				Subject:  &file.StateStores[1].DeclRange,
@@ -713,10 +713,10 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 		default:
 			// An override file with multiple cloud blocks is still invalid, even
 			// though it can override cloud/backend blocks from _other_ files.
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
-				Summary:  "Duplicate HCP Terraform configurations",
-				Detail:   fmt.Sprintf("A module may have only one 'cloud' block configuring HCP Terraform or Terraform Enterprise. The 'cloud' block was previously configured at %s.", file.CloudConfigs[0].DeclRange),
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
+				Summary:  "Duplicate DUMB_HCP Dumb Terraform configurations",
+				Detail:   fmt.Sprintf("A module may have only one 'cloud' block configuring DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise. The 'cloud' block was previously configured at %s.", file.CloudConfigs[0].DeclRange),
 				Subject:  &file.CloudConfigs[1].DeclRange,
 			})
 		}
@@ -741,8 +741,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 			// override. This allows us to detect and report alias typos
 			// that might otherwise cause the override to not apply.
 			if !exists {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Missing base provider configuration for override",
 					Detail:   fmt.Sprintf("There is no %s provider configuration with the alias %q. An override file can only override an aliased provider configuration that was already defined in a primary configuration file.", pc.Name, pc.Alias),
 					Subject:  &pc.DeclRange,
@@ -757,8 +757,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 	for _, v := range file.Variables {
 		existing, exists := m.Variables[v.Name]
 		if !exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing base variable declaration to override",
 				Detail:   fmt.Sprintf("There is no variable named %q. An override file can only override a variable that was already declared in a primary configuration file.", v.Name),
 				Subject:  &v.DeclRange,
@@ -772,8 +772,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 	for _, l := range file.Locals {
 		existing, exists := m.Locals[l.Name]
 		if !exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing base local value definition to override",
 				Detail:   fmt.Sprintf("There is no local value named %q. An override file can only override a local value that was already defined in a primary configuration file.", l.Name),
 				Subject:  &l.DeclRange,
@@ -787,8 +787,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 	for _, o := range file.Outputs {
 		existing, exists := m.Outputs[o.Name]
 		if !exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing base output definition to override",
 				Detail:   fmt.Sprintf("There is no output named %q. An override file can only override an output that was already defined in a primary configuration file.", o.Name),
 				Subject:  &o.DeclRange,
@@ -802,8 +802,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 	for _, mc := range file.ModuleCalls {
 		existing, exists := m.ModuleCalls[mc.Name]
 		if !exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing module call to override",
 				Detail:   fmt.Sprintf("There is no module call named %q. An override file can only override a module call that was defined in a primary configuration file.", mc.Name),
 				Subject:  &mc.DeclRange,
@@ -818,8 +818,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 		key := r.moduleUniqueKey()
 		existing, exists := m.ManagedResources[key]
 		if !exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing resource to override",
 				Detail:   fmt.Sprintf("There is no %s resource named %q. An override file can only override a resource block defined in a primary configuration file.", r.Type, r.Name),
 				Subject:  &r.DeclRange,
@@ -834,8 +834,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 		key := r.moduleUniqueKey()
 		existing, exists := m.DataResources[key]
 		if !exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing data resource to override",
 				Detail:   fmt.Sprintf("There is no %s data resource named %q. An override file can only override a data block defined in a primary configuration file.", r.Type, r.Name),
 				Subject:  &r.DeclRange,
@@ -847,8 +847,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 	}
 
 	for _, m := range file.Moved {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Cannot override 'moved' blocks",
 			Detail:   "Records of moved objects can appear only in normal files, not in override files.",
 			Subject:  m.DeclRange.Ptr(),
@@ -856,8 +856,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 	}
 
 	for _, m := range file.Import {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Cannot override 'import' blocks",
 			Detail:   "Import blocks can appear only in normal files, not in override files.",
 			Subject:  m.DeclRange.Ptr(),
@@ -868,8 +868,8 @@ func (m *Module) mergeFile(file *File) hcl.Diagnostics {
 		key := a.moduleUniqueKey()
 		existing, exists := m.Actions[key]
 		if !exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Missing resource to override",
 				Detail:   fmt.Sprintf("There is no action named %q. An override file can only override a resource block defined in a primary configuration file.", a.Name),
 				Subject:  &a.DeclRange,
@@ -900,8 +900,8 @@ func (m *Module) gatherProviderLocalNames() {
 //
 // See the reused function resolveStateStoreProviderType for details about logic.
 // If no match is found, an error diagnostic is returned.
-func (m *Module) resolveStateStoreProviderType() hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (m *Module) resolveStateStoreProviderType() dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	providerType, typeDiags := resolveStateStoreProviderType(m.ProviderRequirements.RequiredProviders,
 		*m.StateStore)
@@ -947,20 +947,20 @@ func (m *Module) ImpliedProviderForUnqualifiedType(pType string) addrs.Provider 
 	return addrs.ImpliedProviderForUnqualifiedType(pType)
 }
 
-func (m *Module) CheckCoreVersionRequirements(path addrs.Module, sourceAddr addrs.ModuleSource) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (m *Module) CheckCoreVersionRequirements(path addrs.Module, sourceAddr addrs.ModuleSource) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	for _, constraint := range m.CoreVersionConstraints {
 		// Before checking if the constraints are met, check that we are not using any prerelease fields as these
 		// are not currently supported.
-		var prereleaseDiags hcl.Diagnostics
+		var prereleaseDiags dumb-hcl.Diagnostics
 		for _, required := range constraint.Required {
 			if required.Prerelease() {
-				prereleaseDiags = prereleaseDiags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				prereleaseDiags = prereleaseDiags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid required_version constraint",
 					Detail: fmt.Sprintf(
-						"Prerelease version constraints are not supported: %s. Remove the prerelease information from the constraint. Prerelease versions of terraform will match constraints using their version core only.",
+						"Prerelease version constraints are not supported: %s. Remove the prerelease information from the constraint. Prerelease versions of dumb-terraform will match constraints using their version core only.",
 						required.String()),
 					Subject: constraint.DeclRange.Ptr(),
 				})
@@ -977,21 +977,21 @@ func (m *Module) CheckCoreVersionRequirements(path addrs.Module, sourceAddr addr
 		if !constraint.Required.Check(tfversion.SemVer) {
 			switch {
 			case len(path) == 0:
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
-					Summary:  "Unsupported Terraform Core version",
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
+					Summary:  "Unsupported Dumb Terraform Core version",
 					Detail: fmt.Sprintf(
-						"This configuration does not support Terraform version %s. To proceed, either choose another supported Terraform version or update this version constraint. Version constraints are normally set for good reason, so updating the constraint may lead to other errors or unexpected behavior.",
+						"This configuration does not support Dumb Terraform version %s. To proceed, either choose another supported Dumb Terraform version or update this version constraint. Version constraints are normally set for good reason, so updating the constraint may lead to other errors or unexpected behavior.",
 						tfversion.String(),
 					),
 					Subject: constraint.DeclRange.Ptr(),
 				})
 			default:
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
-					Summary:  "Unsupported Terraform Core version",
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
+					Summary:  "Unsupported Dumb Terraform Core version",
 					Detail: fmt.Sprintf(
-						"Module %s (from %s) does not support Terraform version %s. To proceed, either choose another supported Terraform version or update this version constraint. Version constraints are normally set for good reason, so updating the constraint may lead to other errors or unexpected behavior.",
+						"Module %s (from %s) does not support Dumb Terraform version %s. To proceed, either choose another supported Dumb Terraform version or update this version constraint. Version constraints are normally set for good reason, so updating the constraint may lead to other errors or unexpected behavior.",
 						path, sourceAddr, tfversion.String(),
 					),
 					Subject: constraint.DeclRange.Ptr(),

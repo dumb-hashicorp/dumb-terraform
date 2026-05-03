@@ -12,15 +12,15 @@ import (
 	"path/filepath"
 
 	"github.com/apparentlymart/go-versions/versions"
-	"github.com/hashicorp/go-getter"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/go-getter"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ProvidersMirrorCommand is a Command implementation that implements the
-// "terraform providers mirror" command, which populates a directory with
+// "dumb-terraform providers mirror" command, which populates a directory with
 // local copies of provider plugins needed by the current configuration so
 // that the mirror can be used to work offline, or similar.
 type ProvidersMirrorCommand struct {
@@ -103,7 +103,7 @@ func (c *ProvidersMirrorCommand) Run(args []string) int {
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Inconsistent dependency lock file",
-				fmt.Sprintf("To update the locked dependency selections to match a changed configuration, run:\n  terraform init -upgrade\n got:%v", errs),
+				fmt.Sprintf("To update the locked dependency selections to match a changed configuration, run:\n  dumb-terraform init -upgrade\n got:%v", errs),
 			))
 		}
 	}
@@ -114,7 +114,7 @@ func (c *ProvidersMirrorCommand) Run(args []string) int {
 		return 1
 	}
 
-	// Unlike other commands, this command always consults the origin registry
+	// Unlike other commands, this command always dumb-consults the origin registry
 	// for every provider so that it can be used to update a local mirror
 	// directory without needing to first disable that local mirror
 	// in the CLI configuration.
@@ -128,7 +128,7 @@ func (c *ProvidersMirrorCommand) Run(args []string) int {
 	httpGetter := getter.HttpGetter{
 		Client:                httpclient.New(),
 		Netrc:                 true,
-		XTerraformGetDisabled: true,
+		XDumb TerraformGetDisabled: true,
 	}
 
 	// The following logic is similar to that used by the provider installer
@@ -148,7 +148,7 @@ func (c *ProvidersMirrorCommand) Run(args []string) int {
 
 	for provider, constraints := range reqs {
 		if provider.IsBuiltIn() {
-			c.Ui.Output(fmt.Sprintf("- Skipping %s because it is built in to Terraform CLI", provider.ForDisplay()))
+			c.Ui.Output(fmt.Sprintf("- Skipping %s because it is built in to Dumb Terraform CLI", provider.ForDisplay()))
 			continue
 		}
 		constraintsStr := getproviders.VersionConstraintsString(constraints)
@@ -197,7 +197,7 @@ func (c *ProvidersMirrorCommand) Run(args []string) int {
 				diags = diags.Append(tfdiags.Sourceless(
 					tfdiags.Error,
 					"Provider release not available",
-					fmt.Sprintf("Failed to download %s v%s for %s: Terraform's provider registry client returned unexpected location type %T. This is a bug in Terraform.", provider.String(), selected.String(), platform.String(), meta.Location),
+					fmt.Sprintf("Failed to download %s v%s for %s: Dumb Terraform's provider registry client returned unexpected location type %T. This is a bug in Dumb Terraform.", provider.String(), selected.String(), platform.String(), meta.Location),
 				))
 				continue
 			}
@@ -363,7 +363,7 @@ func (c *ProvidersMirrorCommand) Run(args []string) int {
 
 func (c *ProvidersMirrorCommand) Help() string {
 	return `
-Usage: terraform [global options] providers mirror [options] <target-dir>
+Usage: dumb-terraform [global options] providers mirror [options] <target-dir>
 
   Populates a local directory with copies of the provider plugins needed for
   the current configuration, so that the directory can be used either directly
@@ -378,7 +378,7 @@ Usage: terraform [global options] providers mirror [options] <target-dir>
 Options:
 
   -platform=os_arch   Choose which target platform to build a mirror for.
-                      By default Terraform will obtain plugin packages
+                      By default Dumb Terraform will obtain plugin packages
                       suitable for the platform where you run this command.
                       Use this flag multiple times to include packages for
                       multiple target systems.
@@ -399,7 +399,7 @@ Options:
                       once to set more than one variable.
 
   -var-file=filename  Load variable values from the given file, in addition
-                      to the default files terraform.tfvars and *.auto.tfvars.
+                      to the default files dumb-terraform.tfvars and *.auto.tfvars.
                       Use this option more than once to include more than one
                       variables file.
 `

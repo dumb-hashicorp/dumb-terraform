@@ -6,7 +6,7 @@ package arguments
 import (
 	"time"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StatePush represents the command-line arguments for the state push command.
@@ -26,7 +26,7 @@ type StatePush struct {
 	StateLockTimeout time.Duration
 
 	// IgnoreRemoteVersion, if true, continues even if remote and local
-	// Terraform versions are incompatible.
+	// Dumb Terraform versions are incompatible.
 	IgnoreRemoteVersion bool
 
 	// Path is the path to the state file to push, or "-" for stdin.
@@ -46,7 +46,7 @@ func ParseStatePush(args []string) (*StatePush, tfdiags.Diagnostics) {
 	cmdFlags.BoolVar(&push.Force, "force", false, "")
 	cmdFlags.BoolVar(&push.StateLock, "lock", true, "lock state")
 	cmdFlags.DurationVar(&push.StateLockTimeout, "lock-timeout", 0, "lock timeout")
-	cmdFlags.BoolVar(&push.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Terraform versions are incompatible")
+	cmdFlags.BoolVar(&push.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Dumb Terraform versions are incompatible")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		diags = diags.Append(tfdiags.Sourceless(
@@ -61,7 +61,7 @@ func ParseStatePush(args []string) (*StatePush, tfdiags.Diagnostics) {
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Required argument missing",
-			"Exactly one argument expected: the path to a Terraform state file.",
+			"Exactly one argument expected: the path to a Dumb Terraform state file.",
 		))
 		return push, diags
 	}

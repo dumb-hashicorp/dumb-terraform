@@ -4,11 +4,11 @@
 package stackconfig
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig/typeexpr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/typeexpr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -49,18 +49,18 @@ type InputVariable struct {
 // Defaults is populated only if Constraint is, and if not nil represents any
 // default values from the type constraint expression.
 type TypeConstraint struct {
-	Expression hcl.Expression
+	Expression dumb-hcl.Expression
 	Constraint cty.Type
 	Defaults   *typeexpr.Defaults
 }
 
-func decodeInputVariableBlock(block *hcl.Block) (*InputVariable, tfdiags.Diagnostics) {
+func decodeInputVariableBlock(block *dumb-hcl.Block) (*InputVariable, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	ret := &InputVariable{
 		Name:      block.Labels[0],
-		DeclRange: tfdiags.SourceRangeFromHCL(block.DefRange),
+		DeclRange: tfdiags.SourceRangeFromDUMB_HCL(block.DefRange),
 	}
-	if !hclsyntax.ValidIdentifier(ret.Name) {
+	if !dumb-hclsyntax.ValidIdentifier(ret.Name) {
 		diags = diags.Append(invalidNameDiagnostic(
 			"Invalid name for input variable",
 			block.LabelRanges[0],
@@ -68,31 +68,31 @@ func decodeInputVariableBlock(block *hcl.Block) (*InputVariable, tfdiags.Diagnos
 		return nil, diags
 	}
 
-	content, hclDiags := block.Body.Content(inputVariableBlockSchema)
-	diags = diags.Append(hclDiags)
+	content, dumb-hclDiags := block.Body.Content(inputVariableBlockSchema)
+	diags = diags.Append(dumb-hclDiags)
 
 	if attr, ok := content.Attributes["type"]; ok {
 		ret.Type.Expression = attr.Expr
 	}
 	if attr, ok := content.Attributes["default"]; ok {
-		val, hclDiags := attr.Expr.Value(nil)
-		diags = diags.Append(hclDiags)
+		val, dumb-hclDiags := attr.Expr.Value(nil)
+		diags = diags.Append(dumb-hclDiags)
 		if val == cty.NilVal {
 			val = cty.DynamicVal
 		}
 		ret.DefaultValue = val
 	}
 	if attr, ok := content.Attributes["description"]; ok {
-		hclDiags := gohcl.DecodeExpression(attr.Expr, nil, &ret.Description)
-		diags = diags.Append(hclDiags)
+		dumb-hclDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &ret.Description)
+		diags = diags.Append(dumb-hclDiags)
 	}
 	if attr, ok := content.Attributes["sensitive"]; ok {
-		hclDiags := gohcl.DecodeExpression(attr.Expr, nil, &ret.Sensitive)
-		diags = diags.Append(hclDiags)
+		dumb-hclDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &ret.Sensitive)
+		diags = diags.Append(dumb-hclDiags)
 	}
 	if attr, ok := content.Attributes["ephemeral"]; ok {
-		hclDiags := gohcl.DecodeExpression(attr.Expr, nil, &ret.Ephemeral)
-		diags = diags.Append(hclDiags)
+		dumb-hclDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &ret.Ephemeral)
+		diags = diags.Append(dumb-hclDiags)
 	}
 
 	// Process any nested blocks (currently only validation blocks are supported)
@@ -102,12 +102,12 @@ func decodeInputVariableBlock(block *hcl.Block) (*InputVariable, tfdiags.Diagnos
 			// Decode the validation block into a CheckRule structure.
 			// This only validates the syntax and structure of the validation block itself,
 			// not the actual runtime validation of input values.
-			vv, hclDiags := decodeCheckRuleBlock(block)
-			diags = diags.Append(hclDiags)
+			vv, dumb-hclDiags := decodeCheckRuleBlock(block)
+			diags = diags.Append(dumb-hclDiags)
 			// Only add the validation rule if it was successfully parsed.
 			// If there were errors (e.g., missing condition or error_message),
 			// those errors are already captured in diags above.
-			if !hclDiags.HasErrors() {
+			if !dumb-hclDiags.HasErrors() {
 				ret.Validations = append(ret.Validations, vv)
 			}
 		default:
@@ -119,8 +119,8 @@ func decodeInputVariableBlock(block *hcl.Block) (*InputVariable, tfdiags.Diagnos
 	return ret, diags
 }
 
-var inputVariableBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var inputVariableBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "type", Required: true},
 		{Name: "default", Required: false},
 		{Name: "description", Required: false},
@@ -129,7 +129,7 @@ var inputVariableBlockSchema = &hcl.BodySchema{
 	},
 	// Validation blocks allow custom validation rules for input variables.
 	// Multiple validation blocks are allowed per variable.
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "validation"},
 	},
 }

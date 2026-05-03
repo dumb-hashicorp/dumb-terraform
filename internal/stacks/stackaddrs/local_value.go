@@ -3,7 +3,7 @@
 
 package stackaddrs
 
-import "github.com/hashicorp/terraform/internal/collections"
+import "github.com/dumb-hashicorp/dumb-terraform/internal/collections"
 
 type LocalValue struct {
 	Name string

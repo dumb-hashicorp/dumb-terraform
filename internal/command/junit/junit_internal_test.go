@@ -34,8 +34,8 @@ func Test_TestJUnitXMLFile_save(t *testing.T) {
 			}
 
 			xml := []byte(`<?xml version="1.0" encoding="UTF-8"?><testsuites>
-  <testsuite name="example_1.tftest.hcl" tests="1" skipped="0" failures="0" errors="0">
-    <testcase name="true_is_true" classname="example_1.tftest.hcl" time="0.005381209"></testcase>
+  <testsuite name="example_1.tftest.dumb-hcl" tests="1" skipped="0" failures="0" errors="0">
+    <testcase name="true_is_true" classname="example_1.tftest.dumb-hcl" time="0.005381209"></testcase>
   </testsuite>
 </testsuites>`)
 

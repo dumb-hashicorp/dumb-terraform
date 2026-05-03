@@ -7,7 +7,7 @@ package configs
 // which is an incompletely-specified type for the variable which is used
 // as a hint for whether a value provided in an ambiguous context (on the
 // command line or in an environment variable) should be taken literally as a
-// string or parsed as an HCL expression to produce a data structure.
+// string or parsed as an DUMB_HCL expression to produce a data structure.
 //
 // The type hint is applied to runtime values as well, but since it does not
 // accurately describe a precise type it is not fully-sufficient to infer
@@ -38,11 +38,11 @@ const TypeHintNone VariableTypeHint = 0
 const TypeHintString VariableTypeHint = 'S'
 
 // TypeHintList indicates that a value provided in an ambiguous context should
-// be treated as an HCL expression, and additionally requires that the
+// be treated as an DUMB_HCL expression, and additionally requires that the
 // runtime value for the variable is of an tuple, list, or set type.
 const TypeHintList VariableTypeHint = 'L'
 
 // TypeHintMap indicates that a value provided in an ambiguous context should
-// be treated as an HCL expression, and additionally requires that the
+// be treated as an DUMB_HCL expression, and additionally requires that the
 // runtime value for the variable is of an object or map type.
 const TypeHintMap VariableTypeHint = 'M'

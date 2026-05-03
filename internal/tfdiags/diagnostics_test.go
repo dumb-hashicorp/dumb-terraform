@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 func TestBuild(t *testing.T) {
@@ -57,21 +57,21 @@ func TestBuild(t *testing.T) {
 				},
 			},
 		},
-		"hcl.Diagnostic": {
+		"dumb-hcl.Diagnostic": {
 			func(diags Diagnostics) Diagnostics {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Something bad happened",
 					Detail:   "It was really, really bad.",
-					Subject: &hcl.Range{
+					Subject: &dumb-hcl.Range{
 						Filename: "foo.tf",
-						Start:    hcl.Pos{Line: 1, Column: 10, Byte: 9},
-						End:      hcl.Pos{Line: 2, Column: 3, Byte: 25},
+						Start:    dumb-hcl.Pos{Line: 1, Column: 10, Byte: 9},
+						End:      dumb-hcl.Pos{Line: 2, Column: 3, Byte: 25},
 					},
-					Context: &hcl.Range{
+					Context: &dumb-hcl.Range{
 						Filename: "foo.tf",
-						Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-						End:      hcl.Pos{Line: 3, Column: 1, Byte: 30},
+						Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+						End:      dumb-hcl.Pos{Line: 3, Column: 1, Byte: 30},
 					},
 				})
 				return diags
@@ -94,16 +94,16 @@ func TestBuild(t *testing.T) {
 				},
 			},
 		},
-		"hcl.Diagnostics": {
+		"dumb-hcl.Diagnostics": {
 			func(diags Diagnostics) Diagnostics {
-				diags = diags.Append(hcl.Diagnostics{
+				diags = diags.Append(dumb-hcl.Diagnostics{
 					{
-						Severity: hcl.DiagError,
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Something bad happened",
 						Detail:   "It was really, really bad.",
 					},
 					{
-						Severity: hcl.DiagWarning,
+						Severity: dumb-hcl.DiagWarning,
 						Summary:  "Also, somebody sneezed",
 						Detail:   "How rude!",
 					},
@@ -476,14 +476,14 @@ func TestDiagnosticsNonFatalErr(t *testing.T) {
 }
 
 func TestWarnings(t *testing.T) {
-	errorDiag := &hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	errorDiag := &dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "something bad happened",
 		Detail:   "details of the error",
 	}
 
-	warnDiag := &hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	warnDiag := &dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "something bad happened",
 		Detail:   "details of the warning",
 	}
@@ -581,53 +581,53 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 				},
 			},
 		},
-		"hcl.Diagnostic": {
+		"dumb-hcl.Diagnostic": {
 			func(diags Diagnostics) Diagnostics {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Something bad happened",
 					Detail:   "It was really, really bad.",
-					Subject: &hcl.Range{
+					Subject: &dumb-hcl.Range{
 						Filename: "foo.tf",
-						Start:    hcl.Pos{Line: 1, Column: 10, Byte: 9},
-						End:      hcl.Pos{Line: 2, Column: 3, Byte: 25},
+						Start:    dumb-hcl.Pos{Line: 1, Column: 10, Byte: 9},
+						End:      dumb-hcl.Pos{Line: 2, Column: 3, Byte: 25},
 					},
-					Context: &hcl.Range{
+					Context: &dumb-hcl.Range{
 						Filename: "foo.tf",
-						Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-						End:      hcl.Pos{Line: 3, Column: 1, Byte: 30},
+						Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+						End:      dumb-hcl.Pos{Line: 3, Column: 1, Byte: 30},
 					},
 				})
 				// exact same diag
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Something bad happened",
 					Detail:   "It was really, really bad.",
-					Subject: &hcl.Range{
+					Subject: &dumb-hcl.Range{
 						Filename: "foo.tf",
-						Start:    hcl.Pos{Line: 1, Column: 10, Byte: 9},
-						End:      hcl.Pos{Line: 2, Column: 3, Byte: 25},
+						Start:    dumb-hcl.Pos{Line: 1, Column: 10, Byte: 9},
+						End:      dumb-hcl.Pos{Line: 2, Column: 3, Byte: 25},
 					},
-					Context: &hcl.Range{
+					Context: &dumb-hcl.Range{
 						Filename: "foo.tf",
-						Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-						End:      hcl.Pos{Line: 3, Column: 1, Byte: 30},
+						Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+						End:      dumb-hcl.Pos{Line: 3, Column: 1, Byte: 30},
 					},
 				})
 				// same diag as prev, different location
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Something bad happened",
 					Detail:   "It was really, really bad.",
-					Subject: &hcl.Range{
+					Subject: &dumb-hcl.Range{
 						Filename: "foo.tf",
-						Start:    hcl.Pos{Line: 4, Column: 10, Byte: 40},
-						End:      hcl.Pos{Line: 5, Column: 3, Byte: 55},
+						Start:    dumb-hcl.Pos{Line: 4, Column: 10, Byte: 40},
+						End:      dumb-hcl.Pos{Line: 5, Column: 3, Byte: 55},
 					},
-					Context: &hcl.Range{
+					Context: &dumb-hcl.Range{
 						Filename: "foo.tf",
-						Start:    hcl.Pos{Line: 4, Column: 1, Byte: 40},
-						End:      hcl.Pos{Line: 6, Column: 1, Byte: 60},
+						Start:    dumb-hcl.Pos{Line: 4, Column: 1, Byte: 40},
+						End:      dumb-hcl.Pos{Line: 6, Column: 1, Byte: 60},
 					},
 				})
 				return diags
@@ -682,30 +682,30 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 				},
 			},
 		},
-		"hcl.Diagnostic extra": {
+		"dumb-hcl.Diagnostic extra": {
 			// Extra can contain anything, and we don't know how to compare
 			// those values, so we can't dedupe them
 			func(diags Diagnostics) Diagnostics {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Something bad happened",
 					Detail:   "It was really, really bad.",
 					Extra:    42,
-					Subject: &hcl.Range{
+					Subject: &dumb-hcl.Range{
 						Filename: "foo.tf",
-						Start:    hcl.Pos{Line: 1, Column: 10, Byte: 9},
-						End:      hcl.Pos{Line: 2, Column: 3, Byte: 25},
+						Start:    dumb-hcl.Pos{Line: 1, Column: 10, Byte: 9},
+						End:      dumb-hcl.Pos{Line: 2, Column: 3, Byte: 25},
 					},
 				})
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Something bad happened",
 					Detail:   "It was really, really bad.",
 					Extra:    38,
-					Subject: &hcl.Range{
+					Subject: &dumb-hcl.Range{
 						Filename: "foo.tf",
-						Start:    hcl.Pos{Line: 1, Column: 10, Byte: 9},
-						End:      hcl.Pos{Line: 2, Column: 3, Byte: 25},
+						Start:    dumb-hcl.Pos{Line: 1, Column: 10, Byte: 9},
+						End:      dumb-hcl.Pos{Line: 2, Column: 3, Byte: 25},
 					},
 				})
 				return diags
@@ -733,17 +733,17 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 				},
 			},
 		},
-		"hcl.Diagnostic no-location": {
+		"dumb-hcl.Diagnostic no-location": {
 			// Extra can contain anything, and we don't know how to compare
 			// those values, so we can't dedupe them
 			func(diags Diagnostics) Diagnostics {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Something bad happened",
 					Detail:   "It was really, really bad.",
 				})
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Something bad happened",
 					Detail:   "It was really, really bad.",
 				})

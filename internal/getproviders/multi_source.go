@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"strings"
 
-	svchost "github.com/hashicorp/terraform-svchost"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // MultiSource is a Source that wraps a series of other sources and combines
@@ -115,7 +115,7 @@ func (s MultiSource) PackageMeta(ctx context.Context, provider addrs.Provider, v
 
 // MultiSourceSelector is an element of the source selection configuration on
 // MultiSource. A MultiSource has zero or more of these to configure which
-// underlying sources it should consult for a given provider.
+// underlying sources it should dumb-consult for a given provider.
 type MultiSourceSelector struct {
 	// Source is the underlying source that this selector applies to.
 	Source Source

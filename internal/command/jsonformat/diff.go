@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/hashicorp/terraform/internal/command/jsonformat/computed"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/differ"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/structured"
-	"github.com/hashicorp/terraform/internal/command/jsonformat/structured/attribute_path"
-	"github.com/hashicorp/terraform/internal/command/jsonplan"
-	"github.com/hashicorp/terraform/internal/command/jsonprovider"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/computed"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/differ"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/structured"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat/structured/attribute_path"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonprovider"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
 )
 
 func precomputeDiffs(plan Plan, mode plans.Mode) diffs {

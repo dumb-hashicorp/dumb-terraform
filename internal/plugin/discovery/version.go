@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sort"
 
-	version "github.com/hashicorp/go-version"
+	version "github.com/dumb-hashicorp/go-version"
 )
 
 const VersionZero = "0.0.0"

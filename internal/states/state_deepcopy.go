@@ -7,7 +7,7 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // Taking deep copies of states is an important operation because state is

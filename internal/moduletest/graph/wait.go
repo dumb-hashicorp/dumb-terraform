@@ -10,18 +10,18 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 // operationWaiter waits for an operation within
 // a test run execution to complete.
 type operationWaiter struct {
-	ctx        *terraform.Context
+	ctx        *dumb-terraform.Context
 	runningCtx context.Context
 	run        *moduletest.Run
 	file       *moduletest.File
@@ -47,7 +47,7 @@ func (a *atomicProgress[T]) Store(progress T) {
 }
 
 // NewOperationWaiter creates a new operation waiter.
-func NewOperationWaiter(ctx *terraform.Context, evalCtx *EvalContext, file *moduletest.File, run *moduletest.Run,
+func NewOperationWaiter(ctx *dumb-terraform.Context, evalCtx *EvalContext, file *moduletest.File, run *moduletest.Run,
 	progress moduletest.Progress, start int64) *operationWaiter {
 	identifier := "validate"
 	if file != nil {
@@ -117,9 +117,9 @@ func (w *operationWaiter) wait() bool {
 	return false
 }
 
-// update refreshes the operationWaiter with the latest terraform context, progress, and any newly created resources.
-// This should be called before starting a new Terraform operation.
-func (w *operationWaiter) update(ctx *terraform.Context, progress moduletest.Progress, created []*plans.ResourceInstanceChangeSrc) {
+// update refreshes the operationWaiter with the latest dumb-terraform context, progress, and any newly created resources.
+// This should be called before starting a new Dumb Terraform operation.
+func (w *operationWaiter) update(ctx *dumb-terraform.Context, progress moduletest.Progress, created []*plans.ResourceInstanceChangeSrc) {
 	w.ctx = ctx
 	w.progress.Store(progress)
 	w.created = created

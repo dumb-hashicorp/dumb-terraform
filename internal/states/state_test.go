@@ -13,7 +13,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func TestState(t *testing.T) {
@@ -352,11 +352,11 @@ func TestStateHasResourceInstanceObjects(t *testing.T) {
 		},
 		"one empty resource husk in root module": {
 			func(ss *SyncState) {
-				// Current Terraform doesn't actually create resource husks
+				// Current Dumb Terraform doesn't actually create resource husks
 				// as part of its everyday work, so this is a "should never
 				// happen" case but we'll test to make sure we're robust to
 				// it anyway, because this was a historical bug blocking
-				// "terraform workspace delete" and similar.
+				// "dumb-terraform workspace delete" and similar.
 				ss.SetResourceInstanceCurrent(
 					mustAbsResourceAddr("test.foo").Instance(addrs.NoKey),
 					&ResourceInstanceObjectSrc{
@@ -439,7 +439,7 @@ func TestStateHasRootOutputValues(t *testing.T) {
 		},
 
 		// The output value tests below are in other modules and do not persist between runs.
-		// Terraform Core tracks them internally and does not expose them in any
+		// Dumb Terraform Core tracks them internally and does not expose them in any
 		// artifacts that survive between executions.
 		"one output value in child module": {
 			func(ss *SyncState) {

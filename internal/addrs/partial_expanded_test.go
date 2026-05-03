@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -118,19 +118,19 @@ func TestPartialExpandedResourceIsTargetedBy(t *testing.T) {
 func TestParsePartialExpandedModule(t *testing.T) {
 
 	// these functions are a bit weird, as the normal parsing supported by
-	// HCL can't put unknown values into the instance keys. So we need to
+	// DUMB_HCL can't put unknown values into the instance keys. So we need to
 	// build the traversals in the same way the thing that is calling these
 	// functions does.
 
 	tcs := []struct {
-		traversal func(t *testing.T) (string, hcl.Traversal)
+		traversal func(t *testing.T) (string, dumb-hcl.Traversal)
 		want      PartialExpandedModule
 		remain    int
 	}{
 		{
-			traversal: func(t *testing.T) (string, hcl.Traversal) {
+			traversal: func(t *testing.T) (string, dumb-hcl.Traversal) {
 				addr := "module.mod"
-				traversal, diags := hclsyntax.ParseTraversalAbs([]byte(addr), "", hcl.InitialPos)
+				traversal, diags := dumb-hclsyntax.ParseTraversalAbs([]byte(addr), "", dumb-hcl.InitialPos)
 				if len(diags) > 0 {
 					t.Fatalf("unexpected diagnostics: %v", diags)
 				}
@@ -146,14 +146,14 @@ func TestParsePartialExpandedModule(t *testing.T) {
 			remain: 0,
 		},
 		{
-			traversal: func(t *testing.T) (string, hcl.Traversal) {
+			traversal: func(t *testing.T) (string, dumb-hcl.Traversal) {
 				addr := "module.mod[0]"
-				traversal, diags := hclsyntax.ParseTraversalAbs([]byte(addr), "", hcl.InitialPos)
+				traversal, diags := dumb-hclsyntax.ParseTraversalAbs([]byte(addr), "", dumb-hcl.InitialPos)
 				if len(diags) > 0 {
 					t.Fatalf("unexpected diagnostics: %v", diags)
 				}
 				// Hack the key into an unknown value.
-				traversal[2] = hcl.TraverseIndex{
+				traversal[2] = dumb-hcl.TraverseIndex{
 					Key: cty.UnknownVal(cty.Number),
 				}
 				return "module.mod[*]", traversal
@@ -166,9 +166,9 @@ func TestParsePartialExpandedModule(t *testing.T) {
 			remain: 0,
 		},
 		{
-			traversal: func(t *testing.T) (string, hcl.Traversal) {
+			traversal: func(t *testing.T) (string, dumb-hcl.Traversal) {
 				addr := "module.child.module.grandchild"
-				traversal, diags := hclsyntax.ParseTraversalAbs([]byte(addr), "", hcl.InitialPos)
+				traversal, diags := dumb-hclsyntax.ParseTraversalAbs([]byte(addr), "", dumb-hcl.InitialPos)
 				if len(diags) > 0 {
 					t.Fatalf("unexpected diagnostics: %v", diags)
 				}
@@ -187,9 +187,9 @@ func TestParsePartialExpandedModule(t *testing.T) {
 			remain: 0,
 		},
 		{
-			traversal: func(t *testing.T) (string, hcl.Traversal) {
+			traversal: func(t *testing.T) (string, dumb-hcl.Traversal) {
 				addr := "module.child[0].module.grandchild"
-				traversal, diags := hclsyntax.ParseTraversalAbs([]byte(addr), "", hcl.InitialPos)
+				traversal, diags := dumb-hclsyntax.ParseTraversalAbs([]byte(addr), "", dumb-hcl.InitialPos)
 				if len(diags) > 0 {
 					t.Fatalf("unexpected diagnostics: %v", diags)
 				}
@@ -209,13 +209,13 @@ func TestParsePartialExpandedModule(t *testing.T) {
 			remain: 0,
 		},
 		{
-			traversal: func(t *testing.T) (string, hcl.Traversal) {
+			traversal: func(t *testing.T) (string, dumb-hcl.Traversal) {
 				addr := "module.child[0].module.grandchild"
-				traversal, diags := hclsyntax.ParseTraversalAbs([]byte(addr), "", hcl.InitialPos)
+				traversal, diags := dumb-hclsyntax.ParseTraversalAbs([]byte(addr), "", dumb-hcl.InitialPos)
 				if len(diags) > 0 {
 					t.Fatalf("unexpected diagnostics: %v", diags)
 				}
-				traversal[2] = hcl.TraverseIndex{
+				traversal[2] = dumb-hcl.TraverseIndex{
 					Key: cty.UnknownVal(cty.Number),
 				}
 				return "module.child[*].module.grandchild", traversal
@@ -229,13 +229,13 @@ func TestParsePartialExpandedModule(t *testing.T) {
 			remain: 0,
 		},
 		{
-			traversal: func(t *testing.T) (string, hcl.Traversal) {
+			traversal: func(t *testing.T) (string, dumb-hcl.Traversal) {
 				addr := "module.child.module.grandchild[0]"
-				traversal, diags := hclsyntax.ParseTraversalAbs([]byte(addr), "", hcl.InitialPos)
+				traversal, diags := dumb-hclsyntax.ParseTraversalAbs([]byte(addr), "", dumb-hcl.InitialPos)
 				if len(diags) > 0 {
 					t.Fatalf("unexpected diagnostics: %v", diags)
 				}
-				traversal[4] = hcl.TraverseIndex{
+				traversal[4] = dumb-hcl.TraverseIndex{
 					Key: cty.UnknownVal(cty.Number),
 				}
 				return "module.child.module.grandchild[*]", traversal
@@ -253,13 +253,13 @@ func TestParsePartialExpandedModule(t *testing.T) {
 			remain: 0,
 		},
 		{
-			traversal: func(t *testing.T) (string, hcl.Traversal) {
+			traversal: func(t *testing.T) (string, dumb-hcl.Traversal) {
 				addr := "module.child.module.grandchild[0].resource_type.resource_name"
-				traversal, diags := hclsyntax.ParseTraversalAbs([]byte(addr), "", hcl.InitialPos)
+				traversal, diags := dumb-hclsyntax.ParseTraversalAbs([]byte(addr), "", dumb-hcl.InitialPos)
 				if len(diags) > 0 {
 					t.Fatalf("unexpected diagnostics: %v", diags)
 				}
-				traversal[4] = hcl.TraverseIndex{
+				traversal[4] = dumb-hcl.TraverseIndex{
 					Key: cty.UnknownVal(cty.Number),
 				}
 				return "module.child.module.grandchild[*].resource_type.resource_name", traversal
@@ -372,7 +372,7 @@ func TestParsePartialExpandedResource(t *testing.T) {
 
 	for _, tc := range tcs {
 		t.Run(tc.addr, func(t *testing.T) {
-			traversal, traversalDiags := hclsyntax.ParseTraversalAbs([]byte(tc.addr), "", hcl.InitialPos)
+			traversal, traversalDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(tc.addr), "", dumb-hcl.InitialPos)
 			if len(traversalDiags) > 0 {
 				t.Fatalf("unexpected diagnostics: %v", traversalDiags)
 			}

@@ -12,12 +12,12 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 func ptrOf[T any](v T) *T {
@@ -210,7 +210,7 @@ func TestMarshalAttributeValues(t *testing.T) {
 			t.Fatalf("unexpected success; want error")
 		}
 		got := err.Error()
-		want := `.disallowed: cannot serialize value marked as cty.NewValueMarks("unsupported") for inclusion in a state snapshot (this is a bug in Terraform)`
+		want := `.disallowed: cannot serialize value marked as cty.NewValueMarks("unsupported") for inclusion in a state snapshot (this is a bug in Dumb Terraform)`
 		if got != want {
 			t.Errorf("wrong error\ngot:  %s\nwant: %s", got, want)
 		}
@@ -221,7 +221,7 @@ func TestMarshalResources(t *testing.T) {
 	deposedKey := states.NewDeposedKey()
 	tests := map[string]struct {
 		Resources map[string]*states.Resource
-		Schemas   *terraform.Schemas
+		Schemas   *dumb-terraform.Schemas
 		Want      []Resource
 		Err       bool
 	}{
@@ -263,7 +263,7 @@ func TestMarshalResources(t *testing.T) {
 					Type:         "test_thing",
 					Name:         "bar",
 					Index:        nil,
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					AttributeValues: AttributeValues{
 						"foozles": json.RawMessage(`null`),
 						"woozles": json.RawMessage(`"confuzles"`),
@@ -305,7 +305,7 @@ func TestMarshalResources(t *testing.T) {
 					Type:         "test_thing",
 					Name:         "bar",
 					Index:        nil,
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					AttributeValues: AttributeValues{
 						"foozles": json.RawMessage(`"sensuzles"`),
 						"woozles": json.RawMessage(`"confuzles"`),
@@ -350,7 +350,7 @@ func TestMarshalResources(t *testing.T) {
 					Type:         "test_thing",
 					Name:         "bar",
 					Index:        nil,
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					AttributeValues: AttributeValues{
 						"foozles": json.RawMessage(`"confuzles"`),
 						"woozles": json.RawMessage(`null`),
@@ -421,7 +421,7 @@ func TestMarshalResources(t *testing.T) {
 					Type:         "test_thing",
 					Name:         "bar",
 					Index:        json.RawMessage(`0`),
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					AttributeValues: AttributeValues{
 						"foozles": json.RawMessage(`null`),
 						"woozles": json.RawMessage(`"confuzles"`),
@@ -463,7 +463,7 @@ func TestMarshalResources(t *testing.T) {
 					Type:         "test_thing",
 					Name:         "bar",
 					Index:        json.RawMessage(`"rockhopper"`),
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					AttributeValues: AttributeValues{
 						"foozles": json.RawMessage(`null`),
 						"woozles": json.RawMessage(`"confuzles"`),
@@ -507,7 +507,7 @@ func TestMarshalResources(t *testing.T) {
 					Type:         "test_thing",
 					Name:         "bar",
 					Index:        nil,
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					DeposedKey:   deposedKey.String(),
 					AttributeValues: AttributeValues{
 						"foozles": json.RawMessage(`null`),
@@ -556,7 +556,7 @@ func TestMarshalResources(t *testing.T) {
 					Type:         "test_thing",
 					Name:         "bar",
 					Index:        nil,
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					AttributeValues: AttributeValues{
 						"foozles": json.RawMessage(`null`),
 						"woozles": json.RawMessage(`"confuzles"`),
@@ -569,7 +569,7 @@ func TestMarshalResources(t *testing.T) {
 					Type:         "test_thing",
 					Name:         "bar",
 					Index:        nil,
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					DeposedKey:   deposedKey.String(),
 					AttributeValues: AttributeValues{
 						"foozles": json.RawMessage(`null`),
@@ -615,7 +615,7 @@ func TestMarshalResources(t *testing.T) {
 					Type:         "test_map_attr",
 					Name:         "bar",
 					Index:        nil,
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					AttributeValues: AttributeValues{
 						"data": json.RawMessage(`{"woozles":"confuzles"}`),
 					},
@@ -657,7 +657,7 @@ func TestMarshalResources(t *testing.T) {
 					Type:         "test_identity",
 					Name:         "bar",
 					Index:        nil,
-					ProviderName: "registry.terraform.io/hashicorp/test",
+					ProviderName: "registry.dumb-terraform.io/dumb-hashicorp/test",
 					AttributeValues: AttributeValues{
 						"name":    json.RawMessage(`"bar"`),
 						"foozles": json.RawMessage(`"sensuzles"`),
@@ -951,8 +951,8 @@ func TestMarshalModules_parent_no_resources(t *testing.T) {
 	}
 }
 
-func testSchemas() *terraform.Schemas {
-	return &terraform.Schemas{
+func testSchemas() *dumb-terraform.Schemas {
+	return &dumb-terraform.Schemas{
 		Providers: map[addrs.Provider]providers.ProviderSchema{
 			addrs.NewDefaultProvider("test"): {
 				ResourceTypes: map[string]providers.Schema{

@@ -8,16 +8,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var (
@@ -56,7 +56,7 @@ func (r *RemovedStackCallConfig) TargetConfig() *StackConfig {
 
 func (r *RemovedStackCallConfig) InputVariableValues(ctx context.Context, phase EvalPhase) (map[stackaddrs.InputVariable]cty.Value, tfdiags.Diagnostics) {
 
-	return doOnceWithDiags(ctx, r.tracingName()+" inputs", r.inputVariableValues.For(phase), validateStackCallInputsFn(r.config.Inputs, r.config.DeclRange.ToHCL(), r.TargetConfig(), r, phase))
+	return doOnceWithDiags(ctx, r.tracingName()+" inputs", r.inputVariableValues.For(phase), validateStackCallInputsFn(r.config.Inputs, r.config.DeclRange.ToDUMB_HCL(), r.TargetConfig(), r, phase))
 }
 
 func (r *RemovedStackCallConfig) ForEachValue(ctx context.Context, phase EvalPhase) (cty.Value, tfdiags.Diagnostics) {
@@ -109,11 +109,11 @@ func (r *RemovedStackCallConfig) ResolveExpressionReference(ctx context.Context,
 	if _, ok := ret.(*ProviderConfig); ok {
 		// We can't reference other providers from anywhere inside an embedded
 		// stack call - they should define their own providers.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   fmt.Sprintf("The object %s is not in scope at this location.", ref.Target.String()),
-			Subject:  ref.SourceRange.ToHCL().Ptr(),
+			Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 		})
 	}
 

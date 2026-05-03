@@ -1,3 +1,3 @@
 output "greeting" {
-  value = resource.terraform_data.my-data.output
+  value = resource.dumb-terraform_data.my-data.output
 }

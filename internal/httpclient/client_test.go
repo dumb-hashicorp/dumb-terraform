@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func TestNew_userAgent(t *testing.T) {
@@ -30,7 +30,7 @@ func TestNew_userAgent(t *testing.T) {
 		request  func(c *http.Client) error
 	}{
 		{
-			fmt.Sprintf("Terraform/%s", version.Version),
+			fmt.Sprintf("Dumb Terraform/%s", version.Version),
 			func(c *http.Client) error {
 				_, err := c.Get(ts.URL)
 				return err

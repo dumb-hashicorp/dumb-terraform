@@ -10,16 +10,16 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestTestHuman_Conclusion(t *testing.T) {
@@ -36,8 +36,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 			Suite: &moduletest.Suite{
 				Status: moduletest.Skip,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Skip,
 						Runs: []*moduletest.Run{
 							{
@@ -54,8 +54,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Skip,
 						Runs: []*moduletest.Run{
 							{
@@ -81,8 +81,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 			Suite: &moduletest.Suite{
 				Status: moduletest.Pass,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Pass,
 						Runs: []*moduletest.Run{
 							{
@@ -99,8 +99,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Pass,
 						Runs: []*moduletest.Run{
 							{
@@ -126,8 +126,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 			Suite: &moduletest.Suite{
 				Status: moduletest.Pass,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Pass,
 						Runs: []*moduletest.Run{
 							{
@@ -144,8 +144,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Pass,
 						Runs: []*moduletest.Run{
 							{
@@ -171,8 +171,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 			Suite: &moduletest.Suite{
 				Status: moduletest.Fail,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -189,8 +189,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -216,8 +216,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 			Suite: &moduletest.Suite{
 				Status: moduletest.Fail,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -234,8 +234,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -261,8 +261,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 			Suite: &moduletest.Suite{
 				Status: moduletest.Fail,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -279,8 +279,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -306,8 +306,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 			Suite: &moduletest.Suite{
 				Status: moduletest.Error,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Error,
 						Runs: []*moduletest.Run{
 							{
@@ -324,8 +324,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Error,
 						Runs: []*moduletest.Run{
 							{
@@ -351,8 +351,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 			Suite: &moduletest.Suite{
 				Status: moduletest.Error,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -369,8 +369,8 @@ func TestTestHuman_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Error,
 						Runs: []*moduletest.Run{
 							{
@@ -445,14 +445,14 @@ func TestTestHuman_File(t *testing.T) {
 			Expected: "main.tf... fail\n",
 		},
 		"starting": {
-			File:     &moduletest.File{Name: "main.tftest.hcl", Status: moduletest.Pending},
+			File:     &moduletest.File{Name: "main.tftest.dumb-hcl", Status: moduletest.Pending},
 			Progress: moduletest.Starting,
-			Expected: "main.tftest.hcl... in progress\n",
+			Expected: "main.tftest.dumb-hcl... in progress\n",
 		},
 		"tear_down": {
-			File:     &moduletest.File{Name: "main.tftest.hcl", Status: moduletest.Pending},
+			File:     &moduletest.File{Name: "main.tftest.dumb-hcl", Status: moduletest.Pending},
 			Progress: moduletest.TearDown,
-			Expected: "main.tftest.hcl... tearing down\n",
+			Expected: "main.tftest.dumb-hcl... tearing down\n",
 		},
 	}
 	for name, tc := range tcs {
@@ -597,7 +597,7 @@ something bad happened during this test
 										Module: addrs.RootModule,
 										Provider: addrs.Provider{
 											Hostname:  addrs.DefaultProviderRegistryHost,
-											Namespace: "hashicorp",
+											Namespace: "dumb-hashicorp",
 											Type:      "test",
 										},
 									},
@@ -621,7 +621,7 @@ something bad happened during this test
 					Providers: map[addrs.Provider]providers.ProviderSchema{
 						addrs.Provider{
 							Hostname:  addrs.DefaultProviderRegistryHost,
-							Namespace: "hashicorp",
+							Namespace: "dumb-hashicorp",
 							Type:      "test",
 						}: {
 							ResourceTypes: map[string]providers.Schema{
@@ -642,11 +642,11 @@ something bad happened during this test
 			Progress: moduletest.Complete,
 			StdOut: `  run "run_block"... pass
 
-Terraform used the selected providers to generate the following execution
+Dumb Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   + create
 
-Terraform will perform the following actions:
+Dumb Terraform will perform the following actions:
 
   # test_resource.creating will be created
   + resource "test_resource" "creating" {
@@ -685,7 +685,7 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 								Module: addrs.RootModule,
 								Provider: addrs.Provider{
 									Hostname:  addrs.DefaultProviderRegistryHost,
-									Namespace: "hashicorp",
+									Namespace: "dumb-hashicorp",
 									Type:      "test",
 								},
 							})
@@ -694,7 +694,7 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 					Providers: map[addrs.Provider]providers.ProviderSchema{
 						addrs.Provider{
 							Hostname:  addrs.DefaultProviderRegistryHost,
-							Namespace: "hashicorp",
+							Namespace: "dumb-hashicorp",
 							Type:      "test",
 						}: {
 							ResourceTypes: map[string]providers.Schema{
@@ -740,7 +740,7 @@ resource "test_resource" "creating" {
 	for name, tc := range tcs {
 		t.Run(name, func(t *testing.T) {
 			file := &moduletest.File{
-				Name: "main.tftest.hcl",
+				Name: "main.tftest.dumb-hcl",
 			}
 
 			streams, done := terminal.StreamsForTesting(t)
@@ -773,7 +773,7 @@ func TestTestHuman_DestroySummary(t *testing.T) {
 	}{
 		"empty": {
 			diags: nil,
-			file:  &moduletest.File{Name: "main.tftest.hcl"},
+			file:  &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.NewState(),
 		},
 		"empty_state_only_warnings": {
@@ -781,7 +781,7 @@ func TestTestHuman_DestroySummary(t *testing.T) {
 				tfdiags.Sourceless(tfdiags.Warning, "first warning", "some thing not very bad happened"),
 				tfdiags.Sourceless(tfdiags.Warning, "second warning", "some thing not very bad happened again"),
 			},
-			file:  &moduletest.File{Name: "main.tftest.hcl"},
+			file:  &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.NewState(),
 			stdout: `
 Warning: first warning
@@ -799,7 +799,7 @@ some thing not very bad happened again
 				tfdiags.Sourceless(tfdiags.Warning, "second warning", "some thing not very bad happened again"),
 				tfdiags.Sourceless(tfdiags.Error, "first error", "this time it is very bad"),
 			},
-			file:  &moduletest.File{Name: "main.tftest.hcl"},
+			file:  &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.NewState(),
 			stdout: `
 Warning: first warning
@@ -810,8 +810,8 @@ Warning: second warning
 
 some thing not very bad happened again
 `,
-			stderr: `Terraform encountered an error destroying resources created while executing
-main.tftest.hcl.
+			stderr: `Dumb Terraform encountered an error destroying resources created while executing
+main.tftest.dumb-hcl.
 
 Error: first error
 
@@ -823,10 +823,10 @@ this time it is very bad
 				tfdiags.Sourceless(tfdiags.Error, "first error", "this time it is very bad"),
 			},
 			run:   &moduletest.Run{Name: "run_block", Config: &configs.TestRun{}},
-			file:  &moduletest.File{Name: "main.tftest.hcl"},
+			file:  &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.NewState(),
-			stderr: `Terraform encountered an error destroying resources created while executing
-main.tftest.hcl/run_block.
+			stderr: `Dumb Terraform encountered an error destroying resources created while executing
+main.tftest.dumb-hcl/run_block.
 
 Error: first error
 
@@ -835,7 +835,7 @@ this time it is very bad
 		},
 		"state_with_skip_cleanup": {
 			run:  &moduletest.Run{Name: "run_block", Config: &configs.TestRun{SkipCleanup: true}},
-			file: &moduletest.File{Name: "main.tftest.hcl"},
+			file: &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.BuildState(func(state *states.SyncState) {
 				state.SetResourceInstanceCurrent(
 					addrs.Resource{
@@ -852,8 +852,8 @@ this time it is very bad
 					})
 			}),
 			stdout: `
-Terraform left the following resources in state after executing
-main.tftest.hcl/run_block because the skip_cleanup attribute was set:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl/run_block because the skip_cleanup attribute was set:
   - test.foo
 `,
 		},
@@ -862,7 +862,7 @@ main.tftest.hcl/run_block because the skip_cleanup attribute was set:
 				tfdiags.Sourceless(tfdiags.Warning, "first warning", "some thing not very bad happened"),
 				tfdiags.Sourceless(tfdiags.Warning, "second warning", "some thing not very bad happened again"),
 			},
-			file: &moduletest.File{Name: "main.tftest.hcl"},
+			file: &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.BuildState(func(state *states.SyncState) {
 				state.SetResourceInstanceCurrent(
 					addrs.Resource{
@@ -915,8 +915,8 @@ Warning: second warning
 some thing not very bad happened again
 `,
 			stderr: `
-Terraform left the following resources in state after executing
-main.tftest.hcl, and they need to be cleaned up manually:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl, and they need to be cleaned up manually:
   - test.bar
   - test.bar (0fcb640a)
   - test.foo
@@ -928,7 +928,7 @@ main.tftest.hcl, and they need to be cleaned up manually:
 				tfdiags.Sourceless(tfdiags.Warning, "second warning", "some thing not very bad happened again"),
 				tfdiags.Sourceless(tfdiags.Error, "first error", "this time it is very bad"),
 			},
-			file: &moduletest.File{Name: "main.tftest.hcl"},
+			file: &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.BuildState(func(state *states.SyncState) {
 				state.SetResourceInstanceCurrent(
 					addrs.Resource{
@@ -980,15 +980,15 @@ Warning: second warning
 
 some thing not very bad happened again
 `,
-			stderr: `Terraform encountered an error destroying resources created while executing
-main.tftest.hcl.
+			stderr: `Dumb Terraform encountered an error destroying resources created while executing
+main.tftest.dumb-hcl.
 
 Error: first error
 
 this time it is very bad
 
-Terraform left the following resources in state after executing
-main.tftest.hcl, and they need to be cleaned up manually:
+Dumb Terraform left the following resources in state after executing
+main.tftest.dumb-hcl, and they need to be cleaned up manually:
   - test.bar
   - test.bar (0fcb640a)
   - test.foo
@@ -1062,10 +1062,10 @@ func TestTestHuman_FatalInterruptSummary(t *testing.T) {
 				},
 			},
 			want: `
-Terraform was interrupted while executing main.tftest.hcl, and may not have
+Dumb Terraform was interrupted while executing main.tftest.dumb-hcl, and may not have
 performed the expected cleanup operations.
 
-Terraform was in the process of creating the following resources for
+Dumb Terraform was in the process of creating the following resources for
 "run_block" from the module under test, and they may not have been destroyed:
   - test_instance.one
   - test_instance.two
@@ -1105,10 +1105,10 @@ Terraform was in the process of creating the following resources for
 			},
 			created: nil,
 			want: `
-Terraform was interrupted while executing main.tftest.hcl, and may not have
+Dumb Terraform was interrupted while executing main.tftest.dumb-hcl, and may not have
 performed the expected cleanup operations.
 
-Terraform has already created the following resources from the module under
+Dumb Terraform has already created the following resources from the module under
 test:
   - test_instance.one
   - test_instance.two
@@ -1148,10 +1148,10 @@ test:
 			},
 			created: nil,
 			want: `
-Terraform was interrupted while executing main.tftest.hcl, and may not have
+Dumb Terraform was interrupted while executing main.tftest.dumb-hcl, and may not have
 performed the expected cleanup operations.
 
-Terraform has already created the following resources for "../setup":
+Dumb Terraform has already created the following resources for "../setup":
   - test_instance.one
   - test_instance.two
 `,
@@ -1254,19 +1254,19 @@ Terraform has already created the following resources for "../setup":
 				Name:   "run_block",
 			},
 			want: `
-Terraform was interrupted while executing main.tftest.hcl, and may not have
+Dumb Terraform was interrupted while executing main.tftest.dumb-hcl, and may not have
 performed the expected cleanup operations.
 
-Terraform has already created the following resources from the module under
+Dumb Terraform has already created the following resources from the module under
 test:
   - test_instance.one
   - test_instance.two
 
-Terraform has already created the following resources for "../setup":
+Dumb Terraform has already created the following resources for "../setup":
   - test_instance.setup_one
   - test_instance.setup_two
 
-Terraform was in the process of creating the following resources for
+Dumb Terraform was in the process of creating the following resources for
 "run_block" from the module under test, and they may not have been destroyed:
   - test_instance.new_one
   - test_instance.new_two
@@ -1279,7 +1279,7 @@ Terraform was in the process of creating the following resources for
 			view := NewTest(arguments.ViewHuman, NewView(streams))
 
 			file := &moduletest.File{
-				Name: "main.tftest.hcl",
+				Name: "main.tftest.dumb-hcl",
 			}
 
 			view.FatalInterruptSummary(tc.run, file, tc.states, tc.created)
@@ -1299,7 +1299,7 @@ func TestTestJSON_Abstract(t *testing.T) {
 		"single": {
 			suite: &moduletest.Suite{
 				Files: map[string]*moduletest.File{
-					"main.tftest.hcl": {
+					"main.tftest.dumb-hcl": {
 						Runs: []*moduletest.Run{
 							{
 								Name: "setup",
@@ -1312,9 +1312,9 @@ func TestTestJSON_Abstract(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Found 1 file and 1 run block",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_abstract": map[string]interface{}{
-						"main.tftest.hcl": []interface{}{
+						"main.tftest.dumb-hcl": []interface{}{
 							"setup",
 						},
 					},
@@ -1325,7 +1325,7 @@ func TestTestJSON_Abstract(t *testing.T) {
 		"plural": {
 			suite: &moduletest.Suite{
 				Files: map[string]*moduletest.File{
-					"main.tftest.hcl": {
+					"main.tftest.dumb-hcl": {
 						Runs: []*moduletest.Run{
 							{
 								Name: "setup",
@@ -1335,7 +1335,7 @@ func TestTestJSON_Abstract(t *testing.T) {
 							},
 						},
 					},
-					"other.tftest.hcl": {
+					"other.tftest.dumb-hcl": {
 						Runs: []*moduletest.Run{
 							{
 								Name: "test",
@@ -1348,13 +1348,13 @@ func TestTestJSON_Abstract(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Found 2 files and 3 run blocks",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_abstract": map[string]interface{}{
-						"main.tftest.hcl": []interface{}{
+						"main.tftest.dumb-hcl": []interface{}{
 							"setup",
 							"test",
 						},
-						"other.tftest.hcl": []interface{}{
+						"other.tftest.dumb-hcl": []interface{}{
 							"test",
 						},
 					},
@@ -1385,7 +1385,7 @@ func TestTestJSON_Conclusion(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Executed 0 tests.",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_summary": map[string]interface{}{
 						"status":  "pending",
 						"errored": 0.0,
@@ -1402,8 +1402,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 			suite: &moduletest.Suite{
 				Status: moduletest.Skip,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Skip,
 						Runs: []*moduletest.Run{
 							{
@@ -1420,8 +1420,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Skip,
 						Runs: []*moduletest.Run{
 							{
@@ -1444,7 +1444,7 @@ func TestTestJSON_Conclusion(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Executed 0 tests, 6 skipped.",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_summary": map[string]interface{}{
 						"status":  "skip",
 						"errored": 0.0,
@@ -1461,8 +1461,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 			suite: &moduletest.Suite{
 				Status: moduletest.Pass,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Pass,
 						Runs: []*moduletest.Run{
 							{
@@ -1479,8 +1479,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Pass,
 						Runs: []*moduletest.Run{
 							{
@@ -1503,7 +1503,7 @@ func TestTestJSON_Conclusion(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Success! 6 passed, 0 failed.",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_summary": map[string]interface{}{
 						"status":  "pass",
 						"errored": 0.0,
@@ -1520,8 +1520,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 			suite: &moduletest.Suite{
 				Status: moduletest.Pass,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Pass,
 						Runs: []*moduletest.Run{
 							{
@@ -1538,8 +1538,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Pass,
 						Runs: []*moduletest.Run{
 							{
@@ -1562,7 +1562,7 @@ func TestTestJSON_Conclusion(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Success! 4 passed, 0 failed, 2 skipped.",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_summary": map[string]interface{}{
 						"status":  "pass",
 						"errored": 0.0,
@@ -1579,8 +1579,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 			suite: &moduletest.Suite{
 				Status: moduletest.Fail,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -1597,8 +1597,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -1621,7 +1621,7 @@ func TestTestJSON_Conclusion(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Failure! 0 passed, 6 failed.",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_summary": map[string]interface{}{
 						"status":  "fail",
 						"errored": 0.0,
@@ -1638,8 +1638,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 			suite: &moduletest.Suite{
 				Status: moduletest.Fail,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -1656,8 +1656,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -1680,7 +1680,7 @@ func TestTestJSON_Conclusion(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Failure! 0 passed, 4 failed, 2 skipped.",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_summary": map[string]interface{}{
 						"status":  "fail",
 						"errored": 0.0,
@@ -1697,8 +1697,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 			suite: &moduletest.Suite{
 				Status: moduletest.Fail,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -1715,8 +1715,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -1739,7 +1739,7 @@ func TestTestJSON_Conclusion(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Failure! 2 passed, 2 failed, 2 skipped.",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_summary": map[string]interface{}{
 						"status":  "fail",
 						"errored": 0.0,
@@ -1756,8 +1756,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 			suite: &moduletest.Suite{
 				Status: moduletest.Error,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Error,
 						Runs: []*moduletest.Run{
 							{
@@ -1774,8 +1774,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Error,
 						Runs: []*moduletest.Run{
 							{
@@ -1798,7 +1798,7 @@ func TestTestJSON_Conclusion(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Failure! 0 passed, 6 failed.",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_summary": map[string]interface{}{
 						"status":  "error",
 						"errored": 3.0,
@@ -1815,8 +1815,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 			suite: &moduletest.Suite{
 				Status: moduletest.Error,
 				Files: map[string]*moduletest.File{
-					"descriptive_test_name.tftest.hcl": {
-						Name:   "descriptive_test_name.tftest.hcl",
+					"descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Fail,
 						Runs: []*moduletest.Run{
 							{
@@ -1833,8 +1833,8 @@ func TestTestJSON_Conclusion(t *testing.T) {
 							},
 						},
 					},
-					"other_descriptive_test_name.tftest.hcl": {
-						Name:   "other_descriptive_test_name.tftest.hcl",
+					"other_descriptive_test_name.tftest.dumb-hcl": {
+						Name:   "other_descriptive_test_name.tftest.dumb-hcl",
 						Status: moduletest.Error,
 						Runs: []*moduletest.Run{
 							{
@@ -1857,7 +1857,7 @@ func TestTestJSON_Conclusion(t *testing.T) {
 				{
 					"@level":   "info",
 					"@message": "Failure! 2 passed, 2 failed, 2 skipped.",
-					"@module":  "terraform.ui",
+					"@module":  "dumb-terraform.ui",
 					"test_summary": map[string]interface{}{
 						"status":  "error",
 						"errored": 1.0,
@@ -1894,14 +1894,14 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				tfdiags.Sourceless(tfdiags.Warning, "first warning", "something not very bad happened"),
 				tfdiags.Sourceless(tfdiags.Warning, "second warning", "something not very bad happened again"),
 			},
-			file:  &moduletest.File{Name: "main.tftest.hcl"},
+			file:  &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.NewState(),
 			want: []map[string]interface{}{
 				{
 					"@level":    "warn",
 					"@message":  "Warning: first warning",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"diagnostic": map[string]interface{}{
 						"detail":   "something not very bad happened",
 						"severity": "warning",
@@ -1912,8 +1912,8 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				{
 					"@level":    "warn",
 					"@message":  "Warning: second warning",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"diagnostic": map[string]interface{}{
 						"detail":   "something not very bad happened again",
 						"severity": "warning",
@@ -1929,14 +1929,14 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				tfdiags.Sourceless(tfdiags.Warning, "second warning", "something not very bad happened again"),
 				tfdiags.Sourceless(tfdiags.Error, "first error", "this time it is very bad"),
 			},
-			file:  &moduletest.File{Name: "main.tftest.hcl"},
+			file:  &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.NewState(),
 			want: []map[string]interface{}{
 				{
 					"@level":    "warn",
 					"@message":  "Warning: first warning",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"diagnostic": map[string]interface{}{
 						"detail":   "something not very bad happened",
 						"severity": "warning",
@@ -1947,8 +1947,8 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				{
 					"@level":    "warn",
 					"@message":  "Warning: second warning",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"diagnostic": map[string]interface{}{
 						"detail":   "something not very bad happened again",
 						"severity": "warning",
@@ -1959,8 +1959,8 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				{
 					"@level":    "error",
 					"@message":  "Error: first error",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"diagnostic": map[string]interface{}{
 						"detail":   "this time it is very bad",
 						"severity": "error",
@@ -1971,7 +1971,7 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 			},
 		},
 		"state_from_run": {
-			file: &moduletest.File{Name: "main.tftest.hcl"},
+			file: &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			run:  &moduletest.Run{Name: "run_block", Config: &configs.TestRun{}},
 			state: states.BuildState(func(state *states.SyncState) {
 				state.SetResourceInstanceCurrent(
@@ -1991,9 +1991,9 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 			want: []map[string]interface{}{
 				{
 					"@level":    "error",
-					"@message":  "Terraform left some resources in state after executing main.tftest.hcl/run_block, they need to be cleaned up manually.",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@message":  "Dumb Terraform left some resources in state after executing main.tftest.dumb-hcl/run_block, they need to be cleaned up manually.",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_cleanup": map[string]interface{}{
 						"failed_resources": []interface{}{
@@ -2007,7 +2007,7 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 			},
 		},
 		"state_from_run_skip_cleanup": {
-			file: &moduletest.File{Name: "main.tftest.hcl"},
+			file: &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			run:  &moduletest.Run{Name: "run_block", Config: &configs.TestRun{SkipCleanup: true}},
 			state: states.BuildState(func(state *states.SyncState) {
 				state.SetResourceInstanceCurrent(
@@ -2027,9 +2027,9 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 			want: []map[string]interface{}{
 				{
 					"@level":    "info",
-					"@message":  "Terraform left some resources in state after executing main.tftest.hcl/run_block because the skip_cleanup attribute was set.",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@message":  "Dumb Terraform left some resources in state after executing main.tftest.dumb-hcl/run_block because the skip_cleanup attribute was set.",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_cleanup": map[string]interface{}{
 						"skipped_resources": []interface{}{
@@ -2047,7 +2047,7 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				tfdiags.Sourceless(tfdiags.Warning, "first warning", "something not very bad happened"),
 				tfdiags.Sourceless(tfdiags.Warning, "second warning", "something not very bad happened again"),
 			},
-			file: &moduletest.File{Name: "main.tftest.hcl"},
+			file: &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.BuildState(func(state *states.SyncState) {
 				state.SetResourceInstanceCurrent(
 					addrs.Resource{
@@ -2093,9 +2093,9 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 			want: []map[string]interface{}{
 				{
 					"@level":    "error",
-					"@message":  "Terraform left some resources in state after executing main.tftest.hcl, they need to be cleaned up manually.",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@message":  "Dumb Terraform left some resources in state after executing main.tftest.dumb-hcl, they need to be cleaned up manually.",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"test_cleanup": map[string]interface{}{
 						"failed_resources": []interface{}{
 							map[string]interface{}{
@@ -2115,8 +2115,8 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				{
 					"@level":    "warn",
 					"@message":  "Warning: first warning",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"diagnostic": map[string]interface{}{
 						"detail":   "something not very bad happened",
 						"severity": "warning",
@@ -2127,8 +2127,8 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				{
 					"@level":    "warn",
 					"@message":  "Warning: second warning",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"diagnostic": map[string]interface{}{
 						"detail":   "something not very bad happened again",
 						"severity": "warning",
@@ -2144,7 +2144,7 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				tfdiags.Sourceless(tfdiags.Warning, "second warning", "something not very bad happened again"),
 				tfdiags.Sourceless(tfdiags.Error, "first error", "this time it is very bad"),
 			},
-			file: &moduletest.File{Name: "main.tftest.hcl"},
+			file: &moduletest.File{Name: "main.tftest.dumb-hcl"},
 			state: states.BuildState(func(state *states.SyncState) {
 				state.SetResourceInstanceCurrent(
 					addrs.Resource{
@@ -2190,9 +2190,9 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 			want: []map[string]interface{}{
 				{
 					"@level":    "error",
-					"@message":  "Terraform left some resources in state after executing main.tftest.hcl, they need to be cleaned up manually.",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@message":  "Dumb Terraform left some resources in state after executing main.tftest.dumb-hcl, they need to be cleaned up manually.",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"test_cleanup": map[string]interface{}{
 						"failed_resources": []interface{}{
 							map[string]interface{}{
@@ -2212,8 +2212,8 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				{
 					"@level":    "warn",
 					"@message":  "Warning: first warning",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"diagnostic": map[string]interface{}{
 						"detail":   "something not very bad happened",
 						"severity": "warning",
@@ -2224,8 +2224,8 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				{
 					"@level":    "warn",
 					"@message":  "Warning: second warning",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"diagnostic": map[string]interface{}{
 						"detail":   "something not very bad happened again",
 						"severity": "warning",
@@ -2236,8 +2236,8 @@ func TestTestJSON_DestroySummary(t *testing.T) {
 				{
 					"@level":    "error",
 					"@message":  "Error: first error",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"diagnostic": map[string]interface{}{
 						"detail":   "this time it is very bad",
 						"severity": "error",
@@ -2272,7 +2272,7 @@ func TestTestJSON_File(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "main.tf... pass",
-					"@module":   "terraform.ui",
+					"@module":   "dumb-terraform.ui",
 					"@testfile": "main.tf",
 					"test_file": map[string]interface{}{
 						"path":     "main.tf",
@@ -2291,7 +2291,7 @@ func TestTestJSON_File(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "main.tf... pending",
-					"@module":   "terraform.ui",
+					"@module":   "dumb-terraform.ui",
 					"@testfile": "main.tf",
 					"test_file": map[string]interface{}{
 						"path":     "main.tf",
@@ -2310,7 +2310,7 @@ func TestTestJSON_File(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "main.tf... skip",
-					"@module":   "terraform.ui",
+					"@module":   "dumb-terraform.ui",
 					"@testfile": "main.tf",
 					"test_file": map[string]interface{}{
 						"path":     "main.tf",
@@ -2329,7 +2329,7 @@ func TestTestJSON_File(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "main.tf... fail",
-					"@module":   "terraform.ui",
+					"@module":   "dumb-terraform.ui",
 					"@testfile": "main.tf",
 					"test_file": map[string]interface{}{
 						"path":     "main.tf",
@@ -2348,7 +2348,7 @@ func TestTestJSON_File(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "main.tf... fail",
-					"@module":   "terraform.ui",
+					"@module":   "dumb-terraform.ui",
 					"@testfile": "main.tf",
 					"test_file": map[string]interface{}{
 						"path":     "main.tf",
@@ -2361,16 +2361,16 @@ func TestTestJSON_File(t *testing.T) {
 		},
 
 		"starting": {
-			file:     &moduletest.File{Name: "main.tftest.hcl", Status: moduletest.Pending},
+			file:     &moduletest.File{Name: "main.tftest.dumb-hcl", Status: moduletest.Pending},
 			progress: moduletest.Starting,
 			want: []map[string]interface{}{
 				{
 					"@level":    "info",
-					"@message":  "main.tftest.hcl... in progress",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@message":  "main.tftest.dumb-hcl... in progress",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"test_file": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"progress": "starting",
 					},
 					"type": "test_file",
@@ -2379,16 +2379,16 @@ func TestTestJSON_File(t *testing.T) {
 		},
 
 		"tear_down": {
-			file:     &moduletest.File{Name: "main.tftest.hcl", Status: moduletest.Pending},
+			file:     &moduletest.File{Name: "main.tftest.dumb-hcl", Status: moduletest.Pending},
 			progress: moduletest.TearDown,
 			want: []map[string]interface{}{
 				{
 					"@level":    "info",
-					"@message":  "main.tftest.hcl... tearing down",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@message":  "main.tftest.dumb-hcl... tearing down",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"test_file": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"progress": "teardown",
 					},
 					"type": "test_file",
@@ -2421,11 +2421,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... in progress",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "starting",
 						"elapsed":  float64(0),
@@ -2443,11 +2443,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... in progress",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "running",
 						"elapsed":  float64(2024),
@@ -2464,11 +2464,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... tearing down",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "teardown",
 						"elapsed":  float64(0),
@@ -2485,11 +2485,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... pass",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "complete",
 						"status":   "pass",
@@ -2510,11 +2510,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... pass",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "complete",
 						"status":   "pass",
@@ -2524,8 +2524,8 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "warn",
 					"@message":  "Warning: a warning occurred",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"diagnostic": map[string]interface{}{
 						"detail":   "some warning happened during this test",
@@ -2544,11 +2544,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... pending",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "complete",
 						"status":   "pending",
@@ -2565,11 +2565,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... skip",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "complete",
 						"status":   "skip",
@@ -2586,11 +2586,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... fail",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "complete",
 						"status":   "fail",
@@ -2614,11 +2614,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... fail",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "complete",
 						"status":   "fail",
@@ -2628,8 +2628,8 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "error",
 					"@message":  "Error: a comparison failed",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"diagnostic": map[string]interface{}{
 						"detail":   "details details details",
@@ -2641,8 +2641,8 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "error",
 					"@message":  "Error: a second comparison failed",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"diagnostic": map[string]interface{}{
 						"detail":   "other details",
@@ -2661,11 +2661,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... fail",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "complete",
 						"status":   "error",
@@ -2686,11 +2686,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... fail",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "complete",
 						"status":   "error",
@@ -2700,8 +2700,8 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "error",
 					"@message":  "Error: an error occurred",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"diagnostic": map[string]interface{}{
 						"detail":   "something bad happened during this test",
@@ -2749,7 +2749,7 @@ func TestTestJSON_Run(t *testing.T) {
 										Module: addrs.RootModule,
 										Provider: addrs.Provider{
 											Hostname:  addrs.DefaultProviderRegistryHost,
-											Namespace: "hashicorp",
+											Namespace: "dumb-hashicorp",
 											Type:      "test",
 										},
 									},
@@ -2777,7 +2777,7 @@ func TestTestJSON_Run(t *testing.T) {
 					Providers: map[addrs.Provider]providers.ProviderSchema{
 						addrs.Provider{
 							Hostname:  addrs.DefaultProviderRegistryHost,
-							Namespace: "hashicorp",
+							Namespace: "dumb-hashicorp",
 							Type:      "test",
 						}: {
 							ResourceTypes: map[string]providers.Schema{
@@ -2800,11 +2800,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... pass",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "complete",
 						"status":   "pass",
@@ -2814,8 +2814,8 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "-verbose flag enabled, printing plan",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_plan": map[string]interface{}{
 						"plan_format_version":     "1.2",
@@ -2835,12 +2835,12 @@ func TestTestJSON_Run(t *testing.T) {
 								},
 								"mode":          "managed",
 								"name":          "creating",
-								"provider_name": "registry.terraform.io/hashicorp/test",
+								"provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
 								"type":          "test_resource",
 							},
 						},
 						"provider_schemas": map[string]interface{}{
-							"registry.terraform.io/hashicorp/test": map[string]interface{}{
+							"registry.dumb-terraform.io/dumb-hashicorp/test": map[string]interface{}{
 								"provider": map[string]interface{}{
 									"version": 0.0,
 								},
@@ -2894,7 +2894,7 @@ func TestTestJSON_Run(t *testing.T) {
 								Module: addrs.RootModule,
 								Provider: addrs.Provider{
 									Hostname:  addrs.DefaultProviderRegistryHost,
-									Namespace: "hashicorp",
+									Namespace: "dumb-hashicorp",
 									Type:      "test",
 								},
 							})
@@ -2905,7 +2905,7 @@ func TestTestJSON_Run(t *testing.T) {
 					Providers: map[addrs.Provider]providers.ProviderSchema{
 						addrs.Provider{
 							Hostname:  addrs.DefaultProviderRegistryHost,
-							Namespace: "hashicorp",
+							Namespace: "dumb-hashicorp",
 							Type:      "test",
 						}: {
 							ResourceTypes: map[string]providers.Schema{
@@ -2928,11 +2928,11 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "  \"run_block\"... pass",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_run": map[string]interface{}{
-						"path":     "main.tftest.hcl",
+						"path":     "main.tftest.dumb-hcl",
 						"run":      "run_block",
 						"progress": "complete",
 						"status":   "pass",
@@ -2942,8 +2942,8 @@ func TestTestJSON_Run(t *testing.T) {
 				{
 					"@level":    "info",
 					"@message":  "-verbose flag enabled, printing state",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_state": map[string]interface{}{
 						"state_format_version":    "1.0",
@@ -2954,7 +2954,7 @@ func TestTestJSON_Run(t *testing.T) {
 									"address":          "test_resource.creating",
 									"mode":             "managed",
 									"name":             "creating",
-									"provider_name":    "registry.terraform.io/hashicorp/test",
+									"provider_name":    "registry.dumb-terraform.io/dumb-hashicorp/test",
 									"schema_version":   0.0,
 									"sensitive_values": map[string]interface{}{},
 									"type":             "test_resource",
@@ -2965,7 +2965,7 @@ func TestTestJSON_Run(t *testing.T) {
 							},
 						},
 						"provider_schemas": map[string]interface{}{
-							"registry.terraform.io/hashicorp/test": map[string]interface{}{
+							"registry.dumb-terraform.io/dumb-hashicorp/test": map[string]interface{}{
 								"provider": map[string]interface{}{
 									"version": 0.0,
 								},
@@ -2996,7 +2996,7 @@ func TestTestJSON_Run(t *testing.T) {
 			streams, done := terminal.StreamsForTesting(t)
 			view := NewTest(arguments.ViewJSON, NewView(streams))
 
-			file := &moduletest.File{Name: "main.tftest.hcl"}
+			file := &moduletest.File{Name: "main.tftest.dumb-hcl"}
 
 			view.Run(tc.run, file, tc.progress, tc.elapsed)
 			testJSONViewOutputEquals(t, done(t).All(), tc.want, cmp.FilterPath(func(path cmp.Path) bool {
@@ -3049,9 +3049,9 @@ func TestTestJSON_FatalInterruptSummary(t *testing.T) {
 			want: []map[string]interface{}{
 				{
 					"@level":    "error",
-					"@message":  "Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@message":  "Dumb Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_interrupt": map[string]interface{}{
 						"planned": []interface{}{
@@ -3099,9 +3099,9 @@ func TestTestJSON_FatalInterruptSummary(t *testing.T) {
 			want: []map[string]interface{}{
 				{
 					"@level":    "error",
-					"@message":  "Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@message":  "Dumb Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_interrupt": map[string]interface{}{
 						"state": []interface{}{
@@ -3153,9 +3153,9 @@ func TestTestJSON_FatalInterruptSummary(t *testing.T) {
 			want: []map[string]interface{}{
 				{
 					"@level":    "error",
-					"@message":  "Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@message":  "Dumb Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_interrupt": map[string]interface{}{
 						"states": map[string]interface{}{
@@ -3269,9 +3269,9 @@ func TestTestJSON_FatalInterruptSummary(t *testing.T) {
 			want: []map[string]interface{}{
 				{
 					"@level":    "error",
-					"@message":  "Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
-					"@module":   "terraform.ui",
-					"@testfile": "main.tftest.hcl",
+					"@message":  "Dumb Terraform was interrupted during test execution, and may not have performed the expected cleanup operations.",
+					"@module":   "dumb-terraform.ui",
+					"@testfile": "main.tftest.dumb-hcl",
 					"@testrun":  "run_block",
 					"test_interrupt": map[string]interface{}{
 						"state": []interface{}{
@@ -3307,7 +3307,7 @@ func TestTestJSON_FatalInterruptSummary(t *testing.T) {
 			streams, done := terminal.StreamsForTesting(t)
 			view := NewTest(arguments.ViewJSON, NewView(streams))
 
-			file := &moduletest.File{Name: "main.tftest.hcl"}
+			file := &moduletest.File{Name: "main.tftest.dumb-hcl"}
 			run := &moduletest.Run{Name: "run_block"}
 
 			view.FatalInterruptSummary(run, file, tc.states, tc.changes)

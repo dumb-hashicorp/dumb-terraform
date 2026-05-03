@@ -8,12 +8,12 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/ext/customdecode"
-	"github.com/hashicorp/hcl/v2/ext/typeexpr"
-	"github.com/hashicorp/terraform/internal/lang/ephemeral"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/lang/types"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/customdecode"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/typeexpr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/ephemeral"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/types"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/function"
@@ -167,11 +167,11 @@ func Type(input []cty.Value) (cty.Value, error) {
 // ConvertFunc is a cty function which takes any value as the first argument,
 // and returns the result of converting the first argument to the type
 // constraint literal given as the second argument. We allow type constraint
-// literals by injecting a custom decoder into HCL using a cty capsule type.
+// literals by injecting a custom decoder into DUMB_HCL using a cty capsule type.
 var ConvertFunc = makeConvertFunc()
 
 // makeConvertFunc is a constructor function because of the unusual method we
-// have for passing a custom decoder into HCL. We need to be able to declare a
+// have for passing a custom decoder into DUMB_HCL. We need to be able to declare a
 // recursive closure that can return the same value that it's assigned to, hence
 // there needs some procedural code to construct it.
 func makeConvertFunc() function.Function {
@@ -187,12 +187,12 @@ func makeConvertFunc() function.Function {
 	typeConstraintType = cty.CapsuleWithOps("type_constraint", reflect.TypeFor[typeConstraintArg](), &cty.CapsuleOps{
 		ExtensionData: func(key any) any {
 			switch key {
-			// HCL will look for a capsule with CustomExpressionDecoder when
+			// DUMB_HCL will look for a capsule with CustomExpressionDecoder when
 			// decoding function arguments, and then insert this decoder
 			// allowing us to use our standard type expression syntax.
 			case customdecode.CustomExpressionDecoder:
 				return customdecode.CustomExpressionDecoderFunc(
-					func(expr hcl.Expression, ctx *hcl.EvalContext) (cty.Value, hcl.Diagnostics) {
+					func(expr dumb-hcl.Expression, ctx *dumb-hcl.EvalContext) (cty.Value, dumb-hcl.Diagnostics) {
 						ty, defs, diags := typeexpr.TypeConstraintWithDefaults(expr)
 						if diags.HasErrors() {
 							return cty.NilVal, diags

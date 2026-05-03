@@ -7,19 +7,19 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// stackResource represents a resource that was found in the terraform state.
+// stackResource represents a resource that was found in the dumb-terraform state.
 // It contains the stack and component configuration for the resource.
 type stackResource struct {
 	// The fully qualified target address
@@ -90,8 +90,8 @@ func (m *migration) migrateResources(resources map[string]string, modules map[st
 
 			schema := provider.GetProviderSchema().SchemaForResourceType(resource.Addr.Resource.Mode, resource.Addr.Resource.Type)
 			if schema.Body == nil {
-				m.emitDiags(diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				m.emitDiags(diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid resource type",
 					Detail:   fmt.Sprintf("Resource type %s not found in provider schema.", resource.Addr.Resource.Type),
 					Subject:  target.StackModuleConfig.SourceAddrRange.Ptr(),
@@ -236,11 +236,11 @@ func (m *migration) getOwningProvider(source addrs.AbsResourceInstance, resource
 	expr, ok := component.ProviderConfigs[providerConfig]
 	if !ok {
 		// Then the module uses a provider not referenced in the component.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider not found for component",
 			Detail:   fmt.Sprintf("Provider %q not found in component %q.", providerConfig.LocalName, resource.AbsResourceInstance.Component.Item.Component.Name),
-			Subject:  component.SourceAddrRange.ToHCL().Ptr(),
+			Subject:  component.SourceAddrRange.ToDUMB_HCL().Ptr(),
 		})
 		return ret, nil, diags
 	}
@@ -249,8 +249,8 @@ func (m *migration) getOwningProvider(source addrs.AbsResourceInstance, resource
 	if len(vars) != 1 {
 		// This should be an exact reference to a single provider, if it's not
 		// we can't really do anything.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider reference",
 			Detail:   "Provider references should be a simple reference to a single provider.",
 			Subject:  expr.Range().Ptr(),
@@ -265,11 +265,11 @@ func (m *migration) getOwningProvider(source addrs.AbsResourceInstance, resource
 	case stackaddrs.ProviderConfigRef:
 		providerAddr, ok := stackCfg.RequiredProviders.ProviderForLocalName(ref.ProviderLocalName)
 		if !ok {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Provider not found for component",
 				Detail:   fmt.Sprintf("Provider %s was needed by the resource %s but was not found in the stack configuration.", ref.ProviderLocalName, resource.AbsResourceInstance.String()),
-				Subject:  component.SourceAddrRange.ToHCL().Ptr(),
+				Subject:  component.SourceAddrRange.ToDUMB_HCL().Ptr(),
 			})
 			return ret, nil, diags
 		}
@@ -284,19 +284,19 @@ func (m *migration) getOwningProvider(source addrs.AbsResourceInstance, resource
 		// pull in source information for diagnostics if available.
 		for _, diag := range pDiags {
 			if diag.Source().Subject == nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: diag.Severity().ToHCL(),
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: diag.Severity().ToDUMB_HCL(),
 					Summary:  diag.Description().Summary,
 					Detail:   diag.Description().Detail,
-					Subject:  resource.ComponentConfig.SourceAddrRange.ToHCL().Ptr(),
+					Subject:  resource.ComponentConfig.SourceAddrRange.ToDUMB_HCL().Ptr(),
 				})
 			}
 		}
 
 		return addr, provider, diags
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   "Non-provider reference found in provider configuration.",
 			Subject:  expr.Range().Ptr(),
@@ -375,11 +375,11 @@ func (m *migration) loadConfig(resource *stackResource) tfdiags.Diagnostics {
 
 	moduleConfig, diags := m.moduleConfig(component)
 	if diags.HasErrors() {
-		return diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Module configuration not found",
 			Detail:   fmt.Sprintf("Module configuration for component %q not found.", instance.Item.Component.Name),
-			Subject:  component.SourceAddrRange.ToHCL().Ptr(),
+			Subject:  component.SourceAddrRange.ToDUMB_HCL().Ptr(),
 		})
 	}
 	resource.StackModuleConfig = moduleConfig

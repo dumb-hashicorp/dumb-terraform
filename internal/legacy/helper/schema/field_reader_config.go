@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/legacy/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/legacy/dumb-terraform"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -19,7 +19,7 @@ import (
 // field readers do not need default handling because they source fully
 // populated data structures.)
 type ConfigFieldReader struct {
-	Config *terraform.ResourceConfig
+	Config *dumb-terraform.ResourceConfig
 	Schema map[string]*Schema
 
 	indexMaps map[string]map[string]int

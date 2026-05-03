@@ -15,9 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-getter"
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform/internal/releaseauth"
+	"github.com/dumb-hashicorp/go-getter"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/releaseauth"
 )
 
 // BinaryManager downloads, caches, and returns information about the

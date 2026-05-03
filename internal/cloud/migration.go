@@ -4,8 +4,8 @@
 package cloud
 
 import (
-	"github.com/hashicorp/terraform/internal/command/workdir"
-	"github.com/hashicorp/terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/workdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
 )
 
 // Most of the logic for migrating into and out of "cloud mode" actually lives
@@ -59,7 +59,7 @@ func DetectConfigChangeType(wdState *workdir.BackendConfigState, config *configs
 
 	// "uninit" here means that the working directory is totally uninitialized,
 	// even taking into account the possibility of implied local state that
-	// therefore doesn't typically require explicit "terraform init".
+	// therefore doesn't typically require explicit "dumb-terraform init".
 	wdIsUninit := wdState == nil && !haveLocalStates
 
 	switch {

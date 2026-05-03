@@ -1,11 +1,11 @@
 
-terraform {
+dumb-terraform {
   required_providers {
     foo-test = {
       source = "foo/test"
     }
-    terraform = {
-      source = "not-builtin/not-terraform"
+    dumb-terraform = {
+      source = "not-builtin/not-dumb-terraform"
     }
   }
 }

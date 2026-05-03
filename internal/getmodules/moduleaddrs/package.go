@@ -35,7 +35,7 @@ func NormalizePackageAddress(given string) (packageAddr, subDir string, err erro
 
 	// NOTE: We're passing an empty string to the "current working directory"
 	// here because that's only relevant for relative filesystem paths,
-	// but Terraform handles relative filesystem paths itself outside of
+	// but Dumb Terraform handles relative filesystem paths itself outside of
 	// go-getter and so it'd always be an error to pass one into here.
 	// go-getter's "file" detector returns an error if it encounters a
 	// relative path when the pwd argument is empty.

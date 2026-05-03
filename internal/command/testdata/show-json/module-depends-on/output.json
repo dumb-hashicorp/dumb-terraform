@@ -1,6 +1,6 @@
 {
     "format_version": "1.0",
-    "terraform_version": "0.13.1-dev",
+    "dumb-terraform_version": "0.13.1-dev",
     "applyable": true,
     "complete": true,
     "planned_values": {
@@ -11,7 +11,7 @@
                     "mode": "managed",
                     "type": "test_instance",
                     "name": "test",
-                    "provider_name": "registry.terraform.io/hashicorp/test",
+                    "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                     "schema_version": 0,
                     "values": {
                         "ami": "foo-bar"
@@ -27,7 +27,7 @@
             "mode": "managed",
             "type": "test_instance",
             "name": "test",
-            "provider_name": "registry.terraform.io/hashicorp/test",
+            "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
             "change": {
                 "actions": [
                     "create"
@@ -48,7 +48,7 @@
         "provider_config": {
             "test": {
                 "name": "test",
-                "full_name": "registry.terraform.io/hashicorp/test"
+                "full_name": "registry.dumb-terraform.io/dumb-hashicorp/test"
             }
         },
         "root_module": {

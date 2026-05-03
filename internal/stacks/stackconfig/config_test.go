@@ -7,11 +7,11 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestLoadConfigDirErrors(t *testing.T) {
@@ -36,7 +36,7 @@ func TestLoadConfigDirErrors(t *testing.T) {
 	})
 
 	wantDiags := tfdiags.Diagnostics{
-		tfdiags.Sourceless(tfdiags.Error, "Component exists for removed block", "A removed block for component \"a\" was declared without an index, but a component block with the same name was declared at git::https://example.com/errored.git//main.tfcomponent.hcl:10,1-14.\n\nA removed block without an index indicates that the component and all instances were removed from the configuration, and this is not the case."),
+		tfdiags.Sourceless(tfdiags.Error, "Component exists for removed block", "A removed block for component \"a\" was declared without an index, but a component block with the same name was declared at git::https://example.com/errored.git//main.tfcomponent.dumb-hcl:10,1-14.\n\nA removed block without an index indicates that the component and all instances were removed from the configuration, and this is not the case."),
 		tfdiags.Sourceless(tfdiags.Error, "Invalid for_each expression", "A removed block with a for_each expression must reference that expression within the `from` attribute."),
 		tfdiags.Sourceless(tfdiags.Error, "Invalid for_each expression", "A removed block with a for_each expression must reference that expression within the `from` attribute."),
 	}

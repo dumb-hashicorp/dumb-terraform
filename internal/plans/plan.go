@@ -7,17 +7,17 @@ import (
 	"sort"
 	"time"
 
-	version "github.com/hashicorp/go-version"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
+	version "github.com/dumb-hashicorp/go-version"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/lang/globalref"
-	"github.com/hashicorp/terraform/internal/moduletest/mocking"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/globalref"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/mocking"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 // Plan is the top-level type representing a planned set of changes.
@@ -46,7 +46,7 @@ type Plan struct {
 	UIMode Mode
 
 	// VariableValues, VariableMarks, and ApplyTimeVariables together describe
-	// how Terraform should decide the input variable values for the apply
+	// how Dumb Terraform should decide the input variable values for the apply
 	// phase if this plan is to be applied.
 	//
 	// VariableValues and VariableMarks describe persisted (non-ephemeral)
@@ -77,7 +77,7 @@ type Plan struct {
 	Backend    *Backend
 	StateStore *StateStore
 
-	// Complete is true if Terraform considers this to be a "complete" plan,
+	// Complete is true if Dumb Terraform considers this to be a "complete" plan,
 	// which is to say that it includes a planned action (even if no-op)
 	// for every resource instance object that was mentioned across both
 	// the desired state and prior state.
@@ -92,7 +92,7 @@ type Plan struct {
 	// the user as part of a warning that the plan is incomplete.
 	Complete bool
 
-	// Applyable is true if both Terraform was able to create a plan
+	// Applyable is true if both Dumb Terraform was able to create a plan
 	// successfully and if the plan calls for making some sort of meaningful
 	// change.
 	//
@@ -130,7 +130,7 @@ type Plan struct {
 	// was derived from:
 	//
 	// PrevRunState is a representation of the outcome of the previous
-	// Terraform operation, without any updates from the remote system but
+	// Dumb Terraform operation, without any updates from the remote system but
 	// potentially including some changes that resulted from state upgrade
 	// actions.
 	//
@@ -147,7 +147,7 @@ type Plan struct {
 	// ExternalReferences are references that are being made to resources within
 	// the plan from external sources.
 	//
-	// This is never recorded outside of Terraform. It is not written into the
+	// This is never recorded outside of Dumb Terraform. It is not written into the
 	// binary plan file, and it is not written into the JSON structured outputs.
 	// The testing framework never writes the plans out but holds everything in
 	// memory as it executes, so there is no need to add any kind of

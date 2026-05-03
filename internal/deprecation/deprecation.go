@@ -6,11 +6,11 @@ package deprecation
 import (
 	"sync"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -43,7 +43,7 @@ func (d *Deprecations) SuppressModuleCallDeprecation(addr addrs.Module) {
 // This is only appropriate for non-terminal values (values that can be referenced) and primitive
 // values.
 // If the value can not be referenced, use ValidateExpressionDeepAndUnmark or ValidateConfigAndUnmark instead.
-func (d *Deprecations) ValidateAndUnmark(value cty.Value, module addrs.Module, rng *hcl.Range) (cty.Value, tfdiags.Diagnostics) {
+func (d *Deprecations) ValidateAndUnmark(value cty.Value, module addrs.Module, rng *dumb-hcl.Range) (cty.Value, tfdiags.Diagnostics) {
 	notDeprecatedValue, deprecationMarks := marks.GetDeprecationMarks(value)
 	return notDeprecatedValue, d.deprecationMarksToDiagnostics(deprecationMarks, module, rng)
 }
@@ -52,7 +52,7 @@ func (d *Deprecations) ValidateAndUnmark(value cty.Value, module addrs.Module, r
 // and returns the value with deprecation marks removed along with diagnostics for each
 // deprecation found, unless deprecation warnings are suppressed for the given module.
 // It finds the most specific range possible for each diagnostic.
-func (d *Deprecations) ValidateExpressionDeepAndUnmark(value cty.Value, module addrs.Module, expr hcl.Expression) (cty.Value, tfdiags.Diagnostics) {
+func (d *Deprecations) ValidateExpressionDeepAndUnmark(value cty.Value, module addrs.Module, expr dumb-hcl.Expression) (cty.Value, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	undeprecatedVal, pdms := marks.GetDeprecationMarksDeep(value)
 
@@ -69,7 +69,7 @@ func (d *Deprecations) ValidateExpressionDeepAndUnmark(value cty.Value, module a
 	return undeprecatedVal, diags
 }
 
-func (d *Deprecations) deprecationMarksToDiagnostics(deprecationMarks []marks.DeprecationMark, module addrs.Module, rng *hcl.Range) tfdiags.Diagnostics {
+func (d *Deprecations) deprecationMarksToDiagnostics(deprecationMarks []marks.DeprecationMark, module addrs.Module, rng *dumb-hcl.Range) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 	if len(deprecationMarks) == 0 {
 		return diags
@@ -86,9 +86,9 @@ func (d *Deprecations) deprecationMarksToDiagnostics(deprecationMarks []marks.De
 	return diags
 }
 
-func deprecationMarkToDiagnostic(depMark marks.DeprecationMark, subject *hcl.Range) *hcl.Diagnostic {
-	diag := &hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+func deprecationMarkToDiagnostic(depMark marks.DeprecationMark, subject *dumb-hcl.Range) *dumb-hcl.Diagnostic {
+	diag := &dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "Deprecated value used",
 		Detail:   depMark.Message,
 		Subject:  subject,

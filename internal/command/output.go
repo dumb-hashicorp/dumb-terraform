@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // OutputCommand is a Command implementation that reads an output
-// from a Terraform state and prints it.
+// from a Dumb Terraform state and prints it.
 type OutputCommand struct {
 	Meta
 }
@@ -99,9 +99,9 @@ func (c *OutputCommand) Outputs(statePath string, view arguments.ViewType) (map[
 
 func (c *OutputCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] output [options] [NAME]
+Usage: dumb-terraform [global options] output [options] [NAME]
 
-  Reads an output variable from a Terraform state file and prints
+  Reads an output variable from a Dumb Terraform state file and prints
   the value. With no additional arguments, output will display all
   the outputs for the root module.  If NAME is not specified, all
   outputs are printed.
@@ -109,7 +109,7 @@ Usage: terraform [global options] output [options] [NAME]
 Options:
 
   -state=path      Path to the state file to read. Defaults to
-                   "terraform.tfstate".
+                   "dumb-terraform.tfstate".
                    Legacy option for the local backend only. See
                    the local backend's documentation for more
                    information.

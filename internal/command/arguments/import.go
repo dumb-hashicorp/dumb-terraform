@@ -6,7 +6,7 @@ package arguments
 import (
 	"os"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // getwd is a package-level variable that defaults to os.Getwd.
@@ -19,18 +19,18 @@ type Import struct {
 	State *State
 	Vars  *Vars
 
-	// ConfigPath is the path to a directory of Terraform configuration files
+	// ConfigPath is the path to a directory of Dumb Terraform configuration files
 	// to use to configure the provider. An empty string means the caller
 	// should use the current working directory.
 	ConfigPath string
 
-	// Parallelism is the limit Terraform places on total parallel operations
+	// Parallelism is the limit Dumb Terraform places on total parallel operations
 	// as it walks the dependency graph.
 	Parallelism int
 
 	// IgnoreRemoteVersion controls whether to suppress the error when the
-	// configured Terraform version on the remote workspace does not match the
-	// local Terraform version.
+	// configured Dumb Terraform version on the remote workspace does not match the
+	// local Dumb Terraform version.
 	IgnoreRemoteVersion bool
 
 	// InputEnabled is used to disable interactive input for unspecified

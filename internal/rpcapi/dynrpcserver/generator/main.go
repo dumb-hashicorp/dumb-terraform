@@ -24,9 +24,9 @@ import (
 )
 
 var protobufPkgs = map[string]string{
-	"dependencies": "github.com/hashicorp/terraform/internal/rpcapi/terraform1/dependencies",
-	"stacks":       "github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks",
-	"packages":     "github.com/hashicorp/terraform/internal/rpcapi/terraform1/packages",
+	"dependencies": "github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/dependencies",
+	"stacks":       "github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks",
+	"packages":     "github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/packages",
 }
 
 var additionalImportsByName = map[string]string{
@@ -271,8 +271,8 @@ func typeRef(fullType, name, pkg string) string {
 		return name + "." + fullType[len(pkg)+1:]
 	case grpcGenericRe.MatchString(fullType):
 		// Handling use of google.golang.org/grpc.Foobar[T...] generic types.
-		// Example 1: google.golang.org/grpc.ServerStreamingServer[github.com/hashicorp/terraform/internal/rpcapi/terraform1/dependencies.BuildProviderPluginCache_Event]
-		// Example 2: google.golang.org/grpc.ClientStreamingServer[github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks.OpenStackPlan_RequestItem, github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks.OpenStackPlan_Response]
+		// Example 1: google.golang.org/grpc.ServerStreamingServer[github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/dependencies.BuildProviderPluginCache_Event]
+		// Example 2: google.golang.org/grpc.ClientStreamingServer[github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks.OpenStackPlan_RequestItem, github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks.OpenStackPlan_Response]
 
 		// Pull grpc.Foobar out of fullType string
 		grpcGenericRe := regexp.MustCompile(`^google\.golang\.org\/(?P<GrpcType>grpc\.\w+)\[github.com`)

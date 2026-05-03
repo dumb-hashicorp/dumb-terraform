@@ -6,7 +6,7 @@ package tfdiags
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 func TestOverride_UpdatesSeverity(t *testing.T) {
@@ -19,8 +19,8 @@ func TestOverride_UpdatesSeverity(t *testing.T) {
 }
 
 func TestOverride_MaintainsExtra(t *testing.T) {
-	original := hclDiagnostic{&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	original := dumb-hclDiagnostic{&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "summary",
 		Detail:   "detail",
 		Extra:    "extra",
@@ -33,8 +33,8 @@ func TestOverride_MaintainsExtra(t *testing.T) {
 }
 
 func TestOverride_WrapsExtra(t *testing.T) {
-	original := hclDiagnostic{&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	original := dumb-hclDiagnostic{&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "summary",
 		Detail:   "detail",
 		Extra:    "extra",

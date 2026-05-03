@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -228,7 +228,7 @@ func TestBackendEncryptionKeyEmptyConflict(t *testing.T) {
 		"encryption_key":     cty.StringVal(""),
 		"kms_encryption_key": cty.StringVal(""),
 	})
-	// The following mimicks how the terraform_remote_state data source
+	// The following mimicks how the dumb-terraform_remote_state data source
 	// treats its "config" argument, which is a realistic situation where
 	// we take an arbitrary object and try to force it to conform to the
 	// backend's schema.

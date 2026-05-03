@@ -22,13 +22,13 @@ import (
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
-	baselogging "github.com/hashicorp/aws-sdk-go-base/v2/logging"
-	"github.com/hashicorp/go-hclog"
-	uuid "github.com/hashicorp/go-uuid"
+	baselogging "github.com/dumb-hashicorp/aws-sdk-go-base/v2/logging"
+	"github.com/dumb-hashicorp/go-dumb-hclog"
+	uuid "github.com/dumb-hashicorp/go-uuid"
 
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const (
@@ -348,8 +348,8 @@ func (c *RemoteClient) Lock(info *statemgr.LockInfo) (string, error) {
 // This method is used when the S3 native locking mechanism is in use. It uploads a lock file (JSON)
 // to an S3 bucket to establish a lock on the state file. If the lock file does not already
 // exist, the operation will succeed, acquiring the lock. If the lock file already exists, the operation
-// will fail due to a conditional write, indicating that the lock is already held by another Terraform client.
-func (c *RemoteClient) lockWithFile(ctx context.Context, info *statemgr.LockInfo, log hclog.Logger) error {
+// will fail due to a conditional write, indicating that the lock is already held by another Dumb Terraform client.
+func (c *RemoteClient) lockWithFile(ctx context.Context, info *statemgr.LockInfo, log dumb-hclog.Logger) error {
 	lockFileJson, err := json.Marshal(info)
 	if err != nil {
 		return err
@@ -504,8 +504,8 @@ func (c *RemoteClient) Unlock(id string) error {
 //
 // This method is used when the S3 native locking mechanism is in use, which uses a `.tflock` file
 // to manage state locking. The function deletes the lock file to release the lock, allowing other
-// Terraform clients to acquire the lock on the same state file.
-func (c *RemoteClient) unlockWithFile(ctx context.Context, id string, lockErr *statemgr.LockError, log hclog.Logger) error {
+// Dumb Terraform clients to acquire the lock on the same state file.
+func (c *RemoteClient) unlockWithFile(ctx context.Context, id string, lockErr *statemgr.LockError, log dumb-hclog.Logger) error {
 	getInput := &s3.GetObjectInput{
 		Bucket: aws.String(c.bucketName),
 		Key:    aws.String(c.lockFilePath),
@@ -745,7 +745,7 @@ func (c *RemoteClient) getSSECustomerKeyMD5() string {
 }
 
 // logger returns the S3 backend logger configured with the client's bucket and path and the operation
-func (c *RemoteClient) logger(operation string) hclog.Logger {
+func (c *RemoteClient) logger(operation string) dumb-hclog.Logger {
 	log := logger().With(
 		logKeyBucket, c.bucketName,
 		logKeyPath, c.path,

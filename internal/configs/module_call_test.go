@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 )
 
 func TestLoadModuleCall(t *testing.T) {
@@ -32,50 +32,50 @@ func TestLoadModuleCall(t *testing.T) {
 	wantModules := []*ModuleCall{
 		{
 			Name: "foo",
-			SourceExpr: mustExpr(hclsyntax.ParseExpression(
+			SourceExpr: mustExpr(dumb-hclsyntax.ParseExpression(
 				[]byte("\"./foo\""), "module-calls.tf",
-				hcl.Pos{Line: 3, Column: 12, Byte: 27},
+				dumb-hcl.Pos{Line: 3, Column: 12, Byte: 27},
 			)),
-			DeclRange: hcl.Range{
+			DeclRange: dumb-hcl.Range{
 				Filename: "module-calls.tf",
-				Start:    hcl.Pos{Line: 2, Column: 1, Byte: 1},
-				End:      hcl.Pos{Line: 2, Column: 13, Byte: 13},
+				Start:    dumb-hcl.Pos{Line: 2, Column: 1, Byte: 1},
+				End:      dumb-hcl.Pos{Line: 2, Column: 13, Byte: 13},
 			},
 		},
 		{
 			Name: "bar",
-			SourceExpr: mustExpr(hclsyntax.ParseExpression(
-				[]byte("\"hashicorp/bar/aws\""), "module-calls.tf",
-				hcl.Pos{Line: 8, Column: 12, Byte: 113},
+			SourceExpr: mustExpr(dumb-hclsyntax.ParseExpression(
+				[]byte("\"dumb-hashicorp/bar/aws\""), "module-calls.tf",
+				dumb-hcl.Pos{Line: 8, Column: 12, Byte: 113},
 			)),
-			DeclRange: hcl.Range{
+			DeclRange: dumb-hcl.Range{
 				Filename: "module-calls.tf",
-				Start:    hcl.Pos{Line: 7, Column: 1, Byte: 87},
-				End:      hcl.Pos{Line: 7, Column: 13, Byte: 99},
+				Start:    dumb-hcl.Pos{Line: 7, Column: 1, Byte: 87},
+				End:      dumb-hcl.Pos{Line: 7, Column: 13, Byte: 99},
 			},
 		},
 		{
 			Name: "baz",
-			SourceExpr: mustExpr(hclsyntax.ParseExpression(
+			SourceExpr: mustExpr(dumb-hclsyntax.ParseExpression(
 				[]byte("\"git::https://example.com/\""), "module-calls.tf",
-				hcl.Pos{Line: 15, Column: 12, Byte: 193},
+				dumb-hcl.Pos{Line: 15, Column: 12, Byte: 193},
 			)),
-			DependsOn: []hcl.Traversal{
+			DependsOn: []dumb-hcl.Traversal{
 				{
-					hcl.TraverseRoot{
+					dumb-hcl.TraverseRoot{
 						Name: "module",
-						SrcRange: hcl.Range{
+						SrcRange: dumb-hcl.Range{
 							Filename: "module-calls.tf",
-							Start:    hcl.Pos{Line: 23, Column: 5, Byte: 295},
-							End:      hcl.Pos{Line: 23, Column: 11, Byte: 301},
+							Start:    dumb-hcl.Pos{Line: 23, Column: 5, Byte: 295},
+							End:      dumb-hcl.Pos{Line: 23, Column: 11, Byte: 301},
 						},
 					},
-					hcl.TraverseAttr{
+					dumb-hcl.TraverseAttr{
 						Name: "bar",
-						SrcRange: hcl.Range{
+						SrcRange: dumb-hcl.Range{
 							Filename: "module-calls.tf",
-							Start:    hcl.Pos{Line: 23, Column: 11, Byte: 301},
-							End:      hcl.Pos{Line: 23, Column: 15, Byte: 305},
+							Start:    dumb-hcl.Pos{Line: 23, Column: 11, Byte: 301},
+							End:      dumb-hcl.Pos{Line: 23, Column: 15, Byte: 305},
 						},
 					},
 				},
@@ -84,32 +84,32 @@ func TestLoadModuleCall(t *testing.T) {
 				{
 					InChild: &ProviderConfigRef{
 						Name: "aws",
-						NameRange: hcl.Range{
+						NameRange: dumb-hcl.Range{
 							Filename: "module-calls.tf",
-							Start:    hcl.Pos{Line: 27, Column: 5, Byte: 332},
-							End:      hcl.Pos{Line: 27, Column: 8, Byte: 335},
+							Start:    dumb-hcl.Pos{Line: 27, Column: 5, Byte: 332},
+							End:      dumb-hcl.Pos{Line: 27, Column: 8, Byte: 335},
 						},
 					},
 					InParent: &ProviderConfigRef{
 						Name: "aws",
-						NameRange: hcl.Range{
+						NameRange: dumb-hcl.Range{
 							Filename: "module-calls.tf",
-							Start:    hcl.Pos{Line: 27, Column: 11, Byte: 338},
-							End:      hcl.Pos{Line: 27, Column: 14, Byte: 341},
+							Start:    dumb-hcl.Pos{Line: 27, Column: 11, Byte: 338},
+							End:      dumb-hcl.Pos{Line: 27, Column: 14, Byte: 341},
 						},
 						Alias: "foo",
-						AliasRange: &hcl.Range{
+						AliasRange: &dumb-hcl.Range{
 							Filename: "module-calls.tf",
-							Start:    hcl.Pos{Line: 27, Column: 14, Byte: 341},
-							End:      hcl.Pos{Line: 27, Column: 18, Byte: 345},
+							Start:    dumb-hcl.Pos{Line: 27, Column: 14, Byte: 341},
+							End:      dumb-hcl.Pos{Line: 27, Column: 18, Byte: 345},
 						},
 					},
 				},
 			},
-			DeclRange: hcl.Range{
+			DeclRange: dumb-hcl.Range{
 				Filename: "module-calls.tf",
-				Start:    hcl.Pos{Line: 14, Column: 1, Byte: 167},
-				End:      hcl.Pos{Line: 14, Column: 13, Byte: 179},
+				Start:    dumb-hcl.Pos{Line: 14, Column: 1, Byte: 167},
+				End:      dumb-hcl.Pos{Line: 14, Column: 13, Byte: 179},
 			},
 		},
 	}

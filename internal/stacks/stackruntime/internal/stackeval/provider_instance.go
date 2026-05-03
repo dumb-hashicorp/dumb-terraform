@@ -8,20 +8,20 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // ProviderInstance represents one instance of a provider.
@@ -60,7 +60,7 @@ func (p *ProviderInstance) ProviderType() *ProviderType {
 	return p.main.ProviderType(p.addr.Item.ProviderConfig.Provider)
 }
 
-func (p *ProviderInstance) ProviderArgsDecoderSpec(ctx context.Context) (hcldec.Spec, error) {
+func (p *ProviderInstance) ProviderArgsDecoderSpec(ctx context.Context) (dumb-hcldec.Spec, error) {
 	return p.provider.config.ProviderArgsDecoderSpec(ctx)
 }
 
@@ -83,14 +83,14 @@ func (p *ProviderInstance) CheckProviderArgs(ctx context.Context, phase EvalPhas
 			decl := p.provider.config.config
 			spec, err := p.ProviderArgsDecoderSpec(ctx)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Failed to read provider schema",
 					Detail: fmt.Sprintf(
 						"Error while reading the schema for %q: %s.",
 						providerType.Addr(), err,
 					),
-					Subject: decl.DeclRange.ToHCL().Ptr(),
+					Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 				return cty.DynamicVal, diags
 			}
@@ -99,24 +99,24 @@ func (p *ProviderInstance) CheckProviderArgs(ctx context.Context, phase EvalPhas
 			var moreDiags tfdiags.Diagnostics
 			configBody := decl.Config
 			if configBody == nil {
-				configBody = hcl.EmptyBody()
+				configBody = dumb-hcl.EmptyBody()
 			}
 			configVal, moreDiags = EvalBody(ctx, configBody, spec, phase, p)
 			diags = diags.Append(moreDiags)
 			if moreDiags.HasErrors() {
-				return cty.UnknownVal(hcldec.ImpliedType(spec)), diags
+				return cty.UnknownVal(dumb-hcldec.ImpliedType(spec)), diags
 			}
 
 			unconfClient, err := providerType.UnconfiguredClient()
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Failed to start provider plugin",
 					Detail: fmt.Sprintf(
 						"Error while instantiating %q: %s.",
 						providerType.Addr(), err,
 					),
-					Subject: decl.DeclRange.ToHCL().Ptr(),
+					Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 				return cty.DynamicVal, diags
 			}
@@ -159,7 +159,7 @@ func (p *ProviderInstance) CheckClient(ctx context.Context, phase EvalPhase) (pr
 
 			if p.repetition.EachKey != cty.NilVal && !p.repetition.EachKey.IsKnown() {
 				// We should have triggered and returned a stub.UnknownProvider
-				// in this case, so there's a bug somewhere in Terraform if
+				// in this case, so there's a bug somewhere in Dumb Terraform if
 				// this happens.
 				panic("provider instance with unknown for_each key")
 			}
@@ -174,14 +174,14 @@ func (p *ProviderInstance) CheckClient(ctx context.Context, phase EvalPhase) (pr
 
 			client, err := p.main.ProviderFactories().NewUnconfiguredClient(providerType.Addr())
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Failed to start provider plugin",
 					Detail: fmt.Sprintf(
 						"Could not create an instance of %s for %s: %s.",
 						providerType.Addr(), p.addr, err,
 					),
-					Subject: decl.DeclRange.ToHCL().Ptr(),
+					Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 				return stubs.ErroredProvider(), diags
 			}
@@ -210,14 +210,14 @@ func (p *ProviderInstance) CheckClient(ctx context.Context, phase EvalPhase) (pr
 				localCancel() // make sure our cancel-monitoring goroutine terminates
 				err := client.Close()
 				if err != nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Failed to terminate provider plugin",
 						Detail: fmt.Sprintf(
 							"Error closing the instance of %s for %s: %s.",
 							providerType.Addr(), p.addr, err,
 						),
-						Subject: decl.DeclRange.ToHCL().Ptr(),
+						Subject: decl.DeclRange.ToDUMB_HCL().Ptr(),
 					})
 				}
 				return diags
@@ -231,7 +231,7 @@ func (p *ProviderInstance) CheckClient(ctx context.Context, phase EvalPhase) (pr
 			// supports the "I don't need you to fetch my schema" capability
 			// and, if not, do a redundant re-fetch of the schema in here
 			// somewhere. Refer to the corresponding behavior in the
-			// "terraform" package for non-Stacks usage and try to mimick
+			// "dumb-terraform" package for non-Stacks usage and try to mimick
 			// what it does in as lightweight a way as possible.
 
 			// We unmark the config before making the RPC call, as marks cannot
@@ -244,7 +244,7 @@ func (p *ProviderInstance) CheckClient(ctx context.Context, phase EvalPhase) (pr
 			}
 
 			resp := client.ConfigureProvider(providers.ConfigureProviderRequest{
-				TerraformVersion:   version.SemVer.String(),
+				Dumb TerraformVersion:   version.SemVer.String(),
 				Config:             unmarkedArgs,
 				ClientCapabilities: ClientCapabilities(),
 			})

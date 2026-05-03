@@ -4,7 +4,7 @@
 package stackaddrs
 
 import (
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // Targetable is the stacks analog to [addrs.Targetable], representing something
@@ -14,7 +14,7 @@ type Targetable interface {
 }
 
 // ComponentTargetable is an adapter type that makes everything that's
-// targetable in the main Terraform language also targetable through a
+// targetable in the main Dumb Terraform language also targetable through a
 // component instance when in a stack configuration.
 //
 // To represent targeting an entire component, place [addrs.RootModuleInstance]

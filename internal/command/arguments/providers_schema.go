@@ -3,7 +3,7 @@
 
 package arguments
 
-import "github.com/hashicorp/terraform/internal/tfdiags"
+import "github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
 // ProvidersSchema represents the command-line arguments for the providers
 // schema command.
@@ -47,7 +47,7 @@ func ParseProvidersSchema(args []string) (*ProvidersSchema, tfdiags.Diagnostics)
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"The -json flag is required",
-			"The `terraform providers schema` command requires the `-json` flag.",
+			"The `dumb-terraform providers schema` command requires the `-json` flag.",
 		))
 	}
 

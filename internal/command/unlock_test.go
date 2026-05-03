@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 
-	"github.com/hashicorp/terraform/internal/backend/remote-state/inmem"
-	"github.com/hashicorp/terraform/internal/command/workdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/inmem"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/workdir"
 )
 
 // Since we can't unlock a local state file, just test that calling unlock

@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Reference describes a reference to an address with source location
@@ -19,14 +19,14 @@ import (
 type Reference struct {
 	Subject     Referenceable
 	SourceRange tfdiags.SourceRange
-	Remaining   hcl.Traversal
+	Remaining   dumb-hcl.Traversal
 }
 
 // DisplayString returns a string that approximates the subject and remaining
-// traversal of the receiver in a way that resembles the Terraform language
+// traversal of the receiver in a way that resembles the Dumb Terraform language
 // syntax that could've produced it.
 //
-// It's not guaranteed to actually be a valid Terraform language expression,
+// It's not guaranteed to actually be a valid Dumb Terraform language expression,
 // since the intended use here is primarily for UI messages such as
 // diagnostics.
 func (r *Reference) DisplayString() string {
@@ -39,12 +39,12 @@ func (r *Reference) DisplayString() string {
 	ret.WriteString(r.Subject.String())
 	for _, step := range r.Remaining {
 		switch tStep := step.(type) {
-		case hcl.TraverseRoot:
+		case dumb-hcl.TraverseRoot:
 			ret.WriteString(tStep.Name)
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			ret.WriteByte('.')
 			ret.WriteString(tStep.Name)
-		case hcl.TraverseIndex:
+		case dumb-hcl.TraverseIndex:
 			ret.WriteByte('[')
 			switch tStep.Key.Type() {
 			case cty.String:
@@ -70,7 +70,7 @@ func (r *Reference) DisplayString() string {
 //
 // If error diagnostics are returned then the Reference value is invalid and
 // must not be used.
-func ParseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
+func ParseRef(traversal dumb-hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 	ref, diags := parseRef(traversal)
 
 	// Normalize a little to make life easier for callers.
@@ -88,7 +88,7 @@ func ParseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 //
 // The testing files and functionality have a slightly expanded referencing
 // scope and so should use this function to retrieve references.
-func ParseRefFromTestingScope(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
+func ParseRefFromTestingScope(traversal dumb-hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 	root := traversal.RootName()
 	rootRange := traversal[0].SourceRange()
 
@@ -100,7 +100,7 @@ func ParseRefFromTestingScope(traversal hcl.Traversal) (*Reference, tfdiags.Diag
 		name, rng, remain, outputDiags := parseSingleAttrRef(traversal)
 		reference = &Reference{
 			Subject:     OutputValue{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 			Remaining:   remain,
 		}
 		diags = outputDiags
@@ -108,7 +108,7 @@ func ParseRefFromTestingScope(traversal hcl.Traversal) (*Reference, tfdiags.Diag
 		name, rng, remain, checkDiags := parseSingleAttrRef(traversal)
 		reference = &Reference{
 			Subject:     Check{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 			Remaining:   remain,
 		}
 		diags = checkDiags
@@ -116,7 +116,7 @@ func ParseRefFromTestingScope(traversal hcl.Traversal) (*Reference, tfdiags.Diag
 		name, rng, remain, runDiags := parseSingleAttrRef(traversal)
 		reference = &Reference{
 			Subject:     Run{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 			Remaining:   remain,
 		}
 		diags = runDiags
@@ -124,10 +124,10 @@ func ParseRefFromTestingScope(traversal hcl.Traversal) (*Reference, tfdiags.Diag
 		// These names are all pre-emptively reserved in the hope of landing
 		// some version of referencing the plan and state files in test
 		// assertions.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Reserved symbol name",
-			Detail:   fmt.Sprintf("The symbol name %q is reserved for use in a future Terraform version. If you are using a provider that already uses this as a resource type name, add the prefix \"resource.\" to force interpretation as a resource type name.", root),
+			Detail:   fmt.Sprintf("The symbol name %q is reserved for use in a future Dumb Terraform version. If you are using a provider that already uses this as a resource type name, add the prefix \"resource.\" to force interpretation as a resource type name.", root),
 			Subject:  rootRange.Ptr(),
 		})
 		return nil, diags
@@ -145,14 +145,14 @@ func ParseRefFromTestingScope(traversal hcl.Traversal) (*Reference, tfdiags.Diag
 }
 
 // ParseRefStr is a helper wrapper around ParseRef that takes a string
-// and parses it with the HCL native syntax traversal parser before
+// and parses it with the DUMB_HCL native syntax traversal parser before
 // interpreting it.
 //
 // This should be used only in specialized situations since it will cause the
 // created references to not have any meaningful source location information.
 // If a reference string is coming from a source that should be identified in
 // error messages then the caller should instead parse it directly using a
-// suitable function from the HCL API and pass the traversal itself to
+// suitable function from the DUMB_HCL API and pass the traversal itself to
 // ParseRef.
 //
 // Error diagnostics are returned if either the parsing fails or the analysis
@@ -162,7 +162,7 @@ func ParseRefFromTestingScope(traversal hcl.Traversal) (*Reference, tfdiags.Diag
 func ParseRefStr(str string) (*Reference, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return nil, diags
@@ -178,7 +178,7 @@ func ParseRefStr(str string) (*Reference, tfdiags.Diagnostics) {
 func ParseRefStrFromTestingScope(str string) (*Reference, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return nil, diags
@@ -189,7 +189,7 @@ func ParseRefStrFromTestingScope(str string) (*Reference, tfdiags.Diagnostics) {
 	return ref, diags
 }
 
-func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
+func parseRef(traversal dumb-hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	root := traversal.RootName()
@@ -201,7 +201,7 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		return &Reference{
 			Subject:     CountAttr{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 			Remaining:   remain,
 		}, diags
 
@@ -209,14 +209,14 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		return &Reference{
 			Subject:     ForEachAttr{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 			Remaining:   remain,
 		}, diags
 
 	case "data":
 		if len(traversal) < 3 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   `The "data" object must be followed by two attribute names: the data source type and the resource name.`,
 				Subject:  traversal.SourceRange().Ptr(),
@@ -229,15 +229,15 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 	case "resource":
 		// This is an alias for the normal case of just using a managed resource
 		// type as a top-level symbol, which will serve as an escape mechanism
-		// if a later edition of the Terraform language introduces a new
+		// if a later edition of the Dumb Terraform language introduces a new
 		// reference prefix that conflicts with a resource type name in an
 		// existing provider. In that case, the edition upgrade tool can
 		// rewrite foo.bar into resource.foo.bar to ensure that "foo" remains
 		// interpreted as a resource type name rather than as the new reserved
 		// word.
 		if len(traversal) < 3 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   `The "resource" object must be followed by two attribute names: the resource type and the resource name.`,
 				Subject:  traversal.SourceRange().Ptr(),
@@ -249,8 +249,8 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 
 	case "ephemeral":
 		if len(traversal) < 3 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   `The "ephemeral" object must be followed by two attribute names: the ephemeral resource type and the resource name.`,
 				Subject:  traversal.SourceRange().Ptr(),
@@ -261,8 +261,8 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 		return parseResourceRef(EphemeralResourceMode, rootRange, remain)
 	case "list":
 		if len(traversal) < 3 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   `The "list" object must be followed by two attribute names: the list resource type and the list resource name.`,
 				Subject:  traversal.SourceRange().Ptr(),
@@ -275,7 +275,7 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		return &Reference{
 			Subject:     LocalValue{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 			Remaining:   remain,
 		}, diags
 
@@ -302,17 +302,17 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 			// enough context here.
 			return &Reference{
 				Subject:     callInstance.Call,
-				SourceRange: tfdiags.SourceRangeFromHCL(callRange),
+				SourceRange: tfdiags.SourceRangeFromDUMB_HCL(callRange),
 				Remaining:   remain,
 			}, diags
 		}
 
-		if idxTrav, ok := remain[0].(hcl.TraverseIndex); ok {
+		if idxTrav, ok := remain[0].(dumb-hcl.TraverseIndex); ok {
 			var err error
 			callInstance.Key, err = ParseInstanceKey(idxTrav.Key)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid index key",
 					Detail:   fmt.Sprintf("Invalid index for module instance: %s.", err),
 					Subject:  &idxTrav.SrcRange,
@@ -326,26 +326,26 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 				// now.
 				return &Reference{
 					Subject:     callInstance,
-					SourceRange: tfdiags.SourceRangeFromHCL(hcl.RangeBetween(callRange, idxTrav.SrcRange)),
+					SourceRange: tfdiags.SourceRangeFromDUMB_HCL(dumb-hcl.RangeBetween(callRange, idxTrav.SrcRange)),
 					Remaining:   remain,
 				}, diags
 			}
 		}
 
-		if attrTrav, ok := remain[0].(hcl.TraverseAttr); ok {
+		if attrTrav, ok := remain[0].(dumb-hcl.TraverseAttr); ok {
 			remain = remain[1:]
 			return &Reference{
 				Subject: ModuleCallInstanceOutput{
 					Name: attrTrav.Name,
 					Call: callInstance,
 				},
-				SourceRange: tfdiags.SourceRangeFromHCL(hcl.RangeBetween(callRange, attrTrav.SrcRange)),
+				SourceRange: tfdiags.SourceRangeFromDUMB_HCL(dumb-hcl.RangeBetween(callRange, attrTrav.SrcRange)),
 				Remaining:   remain,
 			}, diags
 		}
 
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   "Module instance objects do not support this operation.",
 			Subject:  remain[0].SourceRange().Ptr(),
@@ -356,22 +356,22 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		return &Reference{
 			Subject:     PathAttr{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 			Remaining:   remain,
 		}, diags
 
 	case "self":
 		return &Reference{
 			Subject:     Self,
-			SourceRange: tfdiags.SourceRangeFromHCL(rootRange),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rootRange),
 			Remaining:   traversal[1:],
 		}, diags
 
-	case "terraform":
+	case "dumb-terraform":
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		return &Reference{
-			Subject:     TerraformAttr{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			Subject:     Dumb TerraformAttr{Name: name},
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 			Remaining:   remain,
 		}, diags
 
@@ -379,7 +379,7 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 		name, rng, remain, diags := parseSingleAttrRef(traversal)
 		return &Reference{
 			Subject:     InputVariable{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 			Remaining:   remain,
 		}, diags
 
@@ -387,18 +387,18 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 		// These names are all pre-emptively reserved in the hope of landing
 		// some version of "template values" or "lazy expressions" feature
 		// before the next opt-in language edition, but don't yet do anything.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Reserved symbol name",
-			Detail:   fmt.Sprintf("The symbol name %q is reserved for use in a future Terraform version. If you are using a provider that already uses this as a resource type name, add the prefix \"resource.\" to force interpretation as a resource type name.", root),
+			Detail:   fmt.Sprintf("The symbol name %q is reserved for use in a future Dumb Terraform version. If you are using a provider that already uses this as a resource type name, add the prefix \"resource.\" to force interpretation as a resource type name.", root),
 			Subject:  rootRange.Ptr(),
 		})
 		return nil, diags
 
 	case "action":
 		if len(traversal) < 3 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   `The "action" object must be followed by two attribute names: the action type and the action name.`,
 				Subject:  traversal.SourceRange().Ptr(),
@@ -423,44 +423,44 @@ func parseRef(traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 	}
 }
 
-func parseResourceRef(mode ResourceMode, startRange hcl.Range, traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
+func parseResourceRef(mode ResourceMode, startRange dumb-hcl.Range, traversal dumb-hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	if len(traversal) < 2 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   `A reference to a resource type must be followed by at least one attribute access, specifying the resource name.`,
-			Subject:  hcl.RangeBetween(traversal[0].SourceRange(), traversal[len(traversal)-1].SourceRange()).Ptr(),
+			Subject:  dumb-hcl.RangeBetween(traversal[0].SourceRange(), traversal[len(traversal)-1].SourceRange()).Ptr(),
 		})
 		return nil, diags
 	}
 
 	var typeName, name string
 	switch tt := traversal[0].(type) { // Could be either root or attr, depending on our resource mode
-	case hcl.TraverseRoot:
+	case dumb-hcl.TraverseRoot:
 		typeName = tt.Name
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		typeName = tt.Name
 	default:
 		switch mode {
 		case ManagedResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   `The "resource" object does not support this operation.`,
 				Subject:  traversal[0].SourceRange().Ptr(),
 			})
 		case DataResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   `The "data" object does not support this operation.`,
 				Subject:  traversal[0].SourceRange().Ptr(),
 			})
 		case EphemeralResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   `The "ephemeral" object does not support this operation.`,
 				Subject:  traversal[0].SourceRange().Ptr(),
@@ -470,8 +470,8 @@ func parseResourceRef(mode ResourceMode, startRange hcl.Range, traversal hcl.Tra
 			// all of the resource modes. But we'll still return a
 			// minimally-passable error message so that the won't totally
 			// misbehave if we forget to update this in future.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
 				Detail:   `The left operand does not support this operation.`,
 				Subject:  traversal[0].SourceRange().Ptr(),
@@ -480,7 +480,7 @@ func parseResourceRef(mode ResourceMode, startRange hcl.Range, traversal hcl.Tra
 		return nil, diags
 	}
 
-	attrTrav, ok := traversal[1].(hcl.TraverseAttr)
+	attrTrav, ok := traversal[1].(dumb-hcl.TraverseAttr)
 	if !ok {
 		var what string
 		switch mode {
@@ -491,8 +491,8 @@ func parseResourceRef(mode ResourceMode, startRange hcl.Range, traversal hcl.Tra
 		default:
 			what = "a resource type"
 		}
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   fmt.Sprintf(`A reference to %s must be followed by at least one attribute access, specifying the resource name.`, what),
 			Subject:  traversal[1].SourceRange().Ptr(),
@@ -500,7 +500,7 @@ func parseResourceRef(mode ResourceMode, startRange hcl.Range, traversal hcl.Tra
 		return nil, diags
 	}
 	name = attrTrav.Name
-	rng := hcl.RangeBetween(startRange, attrTrav.SrcRange)
+	rng := dumb-hcl.RangeBetween(startRange, attrTrav.SrcRange)
 	remain := traversal[2:]
 
 	resourceAddr := Resource{
@@ -519,16 +519,16 @@ func parseResourceRef(mode ResourceMode, startRange hcl.Range, traversal hcl.Tra
 		// so we'll let the caller resolve that ambiguity.
 		return &Reference{
 			Subject:     resourceAddr,
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 		}, diags
 	}
 
-	if idxTrav, ok := remain[0].(hcl.TraverseIndex); ok {
+	if idxTrav, ok := remain[0].(dumb-hcl.TraverseIndex); ok {
 		var err error
 		resourceInstAddr.Key, err = ParseInstanceKey(idxTrav.Key)
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid index key",
 				Detail:   fmt.Sprintf("Invalid index for resource instance: %s.", err),
 				Subject:  &idxTrav.SrcRange,
@@ -536,78 +536,78 @@ func parseResourceRef(mode ResourceMode, startRange hcl.Range, traversal hcl.Tra
 			return nil, diags
 		}
 		remain = remain[1:]
-		rng = hcl.RangeBetween(rng, idxTrav.SrcRange)
+		rng = dumb-hcl.RangeBetween(rng, idxTrav.SrcRange)
 	}
 
 	return &Reference{
 		Subject:     resourceInstAddr,
-		SourceRange: tfdiags.SourceRangeFromHCL(rng),
+		SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 		Remaining:   remain,
 	}, diags
 }
 
-func parseSingleAttrRef(traversal hcl.Traversal) (string, hcl.Range, hcl.Traversal, tfdiags.Diagnostics) {
+func parseSingleAttrRef(traversal dumb-hcl.Traversal) (string, dumb-hcl.Range, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	root := traversal.RootName()
 	rootRange := traversal[0].SourceRange()
 
 	if len(traversal) < 2 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   fmt.Sprintf("The %q object cannot be accessed directly. Instead, access one of its attributes.", root),
 			Subject:  &rootRange,
 		})
-		return "", hcl.Range{}, nil, diags
+		return "", dumb-hcl.Range{}, nil, diags
 	}
-	if attrTrav, ok := traversal[1].(hcl.TraverseAttr); ok {
-		return attrTrav.Name, hcl.RangeBetween(rootRange, attrTrav.SrcRange), traversal[2:], diags
+	if attrTrav, ok := traversal[1].(dumb-hcl.TraverseAttr); ok {
+		return attrTrav.Name, dumb-hcl.RangeBetween(rootRange, attrTrav.SrcRange), traversal[2:], diags
 	}
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "Invalid reference",
 		Detail:   fmt.Sprintf("The %q object does not support this operation.", root),
 		Subject:  traversal[1].SourceRange().Ptr(),
 	})
-	return "", hcl.Range{}, nil, diags
+	return "", dumb-hcl.Range{}, nil, diags
 }
 
 // similar to parseResourceRef, but for Actions (which don't have Modes, so it's simpler!)
-func parseActionRef(startRange hcl.Range, traversal hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
+func parseActionRef(startRange dumb-hcl.Range, traversal dumb-hcl.Traversal) (*Reference, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	if len(traversal) < 2 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   `A reference to an action type must be followed by at least one attribute access, specifying the action name.`,
-			Subject:  hcl.RangeBetween(traversal[0].SourceRange(), traversal[len(traversal)-1].SourceRange()).Ptr(),
+			Subject:  dumb-hcl.RangeBetween(traversal[0].SourceRange(), traversal[len(traversal)-1].SourceRange()).Ptr(),
 		})
 		return nil, diags
 	}
 
 	var typeName, name string
 	switch tt := traversal[0].(type) { // Could be either root or attr, depending on our resource mode
-	case hcl.TraverseRoot:
+	case dumb-hcl.TraverseRoot:
 		typeName = tt.Name
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		typeName = tt.Name
 	default:
 		// Shouldn't get here, but we'll still return a minimally-passable error
 		// message.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   `The left operand does not support this operation.`,
 			Subject:  traversal[0].SourceRange().Ptr(),
 		})
 	}
 
-	attrTrav, ok := traversal[1].(hcl.TraverseAttr)
+	attrTrav, ok := traversal[1].(dumb-hcl.TraverseAttr)
 	if !ok {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   `A reference to an action must be followed by at least one attribute access, specifying the action name.`,
 			Subject:  traversal[1].SourceRange().Ptr(),
@@ -615,7 +615,7 @@ func parseActionRef(startRange hcl.Range, traversal hcl.Traversal) (*Reference, 
 		return nil, diags
 	}
 	name = attrTrav.Name
-	rng := hcl.RangeBetween(startRange, attrTrav.SrcRange)
+	rng := dumb-hcl.RangeBetween(startRange, attrTrav.SrcRange)
 	remain := traversal[2:]
 
 	actionAddr := Action{
@@ -633,16 +633,16 @@ func parseActionRef(startRange hcl.Range, traversal hcl.Traversal) (*Reference, 
 		// so we'll let the caller resolve that ambiguity.
 		return &Reference{
 			Subject:     actionAddr,
-			SourceRange: tfdiags.SourceRangeFromHCL(rng),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 		}, diags
 	}
 
-	if idxTrav, ok := remain[0].(hcl.TraverseIndex); ok {
+	if idxTrav, ok := remain[0].(dumb-hcl.TraverseIndex); ok {
 		var err error
 		actionInstAddr.Key, err = ParseInstanceKey(idxTrav.Key)
 		if err != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid index key",
 				Detail:   fmt.Sprintf("Invalid index for resource instance: %s.", err),
 				Subject:  &idxTrav.SrcRange,
@@ -650,12 +650,12 @@ func parseActionRef(startRange hcl.Range, traversal hcl.Traversal) (*Reference, 
 			return nil, diags
 		}
 		remain = remain[1:]
-		rng = hcl.RangeBetween(rng, idxTrav.SrcRange)
+		rng = dumb-hcl.RangeBetween(rng, idxTrav.SrcRange)
 	}
 
 	return &Reference{
 		Subject:     actionInstAddr,
-		SourceRange: tfdiags.SourceRangeFromHCL(rng),
+		SourceRange: tfdiags.SourceRangeFromDUMB_HCL(rng),
 		Remaining:   remain,
 	}, diags
 }

@@ -1,9 +1,9 @@
-terraform {
+dumb-terraform {
   required_providers {
     nonexist = {
-      source = "terraform.io/builtin/nonexist"
+      source = "dumb-terraform.io/builtin/nonexist"
     }
-    terraform = {
+    dumb-terraform = {
       version = "1.2.0"
     }
   }

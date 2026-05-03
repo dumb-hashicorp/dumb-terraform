@@ -11,26 +11,26 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hashicorp/go-slug/sourcebundle"
-	"github.com/hashicorp/hcl/v2"
-	builtinProviders "github.com/hashicorp/terraform/internal/builtin/providers"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	builtinProviders "github.com/dumb-hashicorp/dumb-terraform/internal/builtin/providers"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	fileProvisioner "github.com/hashicorp/terraform/internal/builtin/provisioners/file"
-	remoteExecProvisioner "github.com/hashicorp/terraform/internal/builtin/provisioners/remote-exec"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/provisioners"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	fileProvisioner "github.com/dumb-hashicorp/dumb-terraform/internal/builtin/provisioners/file"
+	remoteExecProvisioner "github.com/dumb-hashicorp/dumb-terraform/internal/builtin/provisioners/remote-exec"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/provisioners"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Main is the central node of all data required for performing the major
@@ -384,10 +384,10 @@ func (m *Main) ProviderFunctions(ctx context.Context, config *StackConfig) (lang
 		if err != nil {
 			// We should have started these providers before we got here, so
 			// this error shouldn't ever occur.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Failed to retrieve provider schema",
-				Detail:   fmt.Sprintf("Failed to retrieve schema for provider %s while gathering provider functions: %s. This is a bug in Terraform, please report it!", addr, err),
+				Detail:   fmt.Sprintf("Failed to retrieve schema for provider %s while gathering provider functions: %s. This is a bug in Dumb Terraform, please report it!", addr, err),
 			})
 			continue // just skip this provider and keep going
 		}
@@ -532,11 +532,11 @@ func (m *Main) ResolveAbsExpressionReference(ctx context.Context, ref stackaddrs
 	var diags tfdiags.Diagnostics
 	stack := m.Stack(ctx, ref.Stack, phase)
 	if stack == nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Reference to undeclared stack",
 			Detail:   fmt.Sprintf("Cannot resolve reference to object in undeclared stack %s.", ref.Stack),
-			Subject:  ref.SourceRange().ToHCL().Ptr(),
+			Subject:  ref.SourceRange().ToDUMB_HCL().Ptr(),
 		})
 		return nil, diags
 	}

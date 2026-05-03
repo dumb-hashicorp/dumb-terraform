@@ -11,17 +11,17 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/hcl/v2/hcltest"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
 	"github.com/mitchellh/colorstring"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 
-	viewsjson "github.com/hashicorp/terraform/internal/command/views/json"
-	"github.com/hashicorp/terraform/internal/lang/marks"
+	viewsjson "github.com/dumb-hashicorp/dumb-terraform/internal/command/views/json"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestDiagnostic(t *testing.T) {
@@ -61,14 +61,14 @@ func TestDiagnostic(t *testing.T) {
 `,
 		},
 		"error with source code subject": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
 			},
 			`[red]╷[reset]
@@ -82,20 +82,20 @@ func TestDiagnostic(t *testing.T) {
 `,
 		},
 		"error with source code subject and known expression": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.StringVal("blah"),
@@ -116,20 +116,20 @@ func TestDiagnostic(t *testing.T) {
 `,
 		},
 		"error with source code subject and expression referring to sensitive value": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.StringVal("blah").Mark(marks.Sensitive),
@@ -151,20 +151,20 @@ func TestDiagnostic(t *testing.T) {
 `,
 		},
 		"error with source code subject and unknown string expression": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.UnknownVal(cty.String),
@@ -186,20 +186,20 @@ func TestDiagnostic(t *testing.T) {
 `,
 		},
 		"error with source code subject and unknown expression of unknown type": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.UnknownVal(cty.DynamicPseudoType),
@@ -221,17 +221,17 @@ func TestDiagnostic(t *testing.T) {
 `,
 		},
 		"error with source code subject and function call annotation": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprLiteral(cty.True),
-				EvalContext: &hcl.EvalContext{
+				Expression: dumb-hcltest.MockExprLiteral(cty.True),
+				EvalContext: &dumb-hcl.EvalContext{
 					Functions: map[string]function.Function{
 						"beep": function.New(&function.Spec{
 							Params: []function.Parameter{
@@ -251,7 +251,7 @@ func TestDiagnostic(t *testing.T) {
 						}),
 					},
 				},
-				// This is simulating what the HCL function call expression
+				// This is simulating what the DUMB_HCL function call expression
 				// type would generate on evaluation, by implementing the
 				// same interface it uses.
 				Extra: fakeDiagFunctionCallExtra("beep"),
@@ -269,36 +269,36 @@ func TestDiagnostic(t *testing.T) {
 `,
 		},
 		"error origination from failed test assertion": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Test assertion failed",
 				Detail:   "LHS not equal to RHS",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: &hclsyntax.BinaryOpExpr{
-					Op: hclsyntax.OpEqual,
-					LHS: &hclsyntax.LiteralValueExpr{
+				Expression: &dumb-hclsyntax.BinaryOpExpr{
+					Op: dumb-hclsyntax.OpEqual,
+					LHS: &dumb-hclsyntax.LiteralValueExpr{
 						Val: cty.ObjectVal(map[string]cty.Value{
 							"inner": cty.StringVal("str1"),
 							"extra": cty.StringVal("str2"),
 						}),
 					},
-					RHS: &hclsyntax.LiteralValueExpr{
+					RHS: &dumb-hclsyntax.LiteralValueExpr{
 						Val: cty.ObjectVal(map[string]cty.Value{
 							"inner": cty.StringVal("str11"),
 							"extra": cty.StringVal("str21"),
 						}),
 					},
-					SrcRange: hcl.Range{
+					SrcRange: dumb-hcl.Range{
 						Filename: "test.tf",
-						Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-						End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+						Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+						End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 					},
 				},
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"foo": cty.ObjectVal(map[string]cty.Value{
 							"inner": cty.StringVal("str1"),
@@ -345,41 +345,41 @@ func TestDiagnostic(t *testing.T) {
 `,
 		},
 		"error originating from failed wrapped test assertion by function": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Test assertion failed",
 				Detail:   "Example crash",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: &hclsyntax.FunctionCallExpr{
+				Expression: &dumb-hclsyntax.FunctionCallExpr{
 					Name: "tobool",
-					Args: []hclsyntax.Expression{
-						&hclsyntax.BinaryOpExpr{
-							Op: hclsyntax.OpEqual,
-							LHS: &hclsyntax.LiteralValueExpr{
+					Args: []dumb-hclsyntax.Expression{
+						&dumb-hclsyntax.BinaryOpExpr{
+							Op: dumb-hclsyntax.OpEqual,
+							LHS: &dumb-hclsyntax.LiteralValueExpr{
 								Val: cty.ObjectVal(map[string]cty.Value{
 									"inner": cty.StringVal("str1"),
 									"extra": cty.StringVal("str2"),
 								}),
 							},
-							RHS: &hclsyntax.LiteralValueExpr{
+							RHS: &dumb-hclsyntax.LiteralValueExpr{
 								Val: cty.ObjectVal(map[string]cty.Value{
 									"inner": cty.StringVal("str11"),
 									"extra": cty.StringVal("str21"),
 								}),
 							},
-							SrcRange: hcl.Range{
+							SrcRange: dumb-hcl.Range{
 								Filename: "test.tf",
-								Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-								End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+								Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+								End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 							},
 						},
 					},
 				},
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{},
 					Functions: map[string]function.Function{
 						"tobool": function.New(&function.Spec{
@@ -408,14 +408,14 @@ func TestDiagnostic(t *testing.T) {
 `,
 		},
 		"warning from deprecation": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagWarning,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagWarning,
 				Summary:  "Deprecation detected",
 				Detail:   "Countermeasures must be taken.",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
 				Extra: &tfdiags.DeprecationOriginDiagnosticExtra{
 					OriginDescription: "module.foo.bar",
@@ -494,14 +494,14 @@ wrap over multiple lines.
 `,
 		},
 		"error with source code subject": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
 			},
 			`
@@ -514,20 +514,20 @@ Whatever shall we do?
 `,
 		},
 		"error with source code subject and known expression": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.StringVal("blah"),
@@ -547,20 +547,20 @@ Whatever shall we do?
 `,
 		},
 		"error with source code subject and expression referring to sensitive value": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.StringVal("blah").Mark(marks.Sensitive),
@@ -581,20 +581,20 @@ Whatever shall we do?
 `,
 		},
 		"error with source code subject and expression referring to sensitive value when not related to sensitivity": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.StringVal("blah").Mark(marks.Sensitive),
@@ -612,20 +612,20 @@ Whatever shall we do?
 `,
 		},
 		"error with source code subject and unknown string expression": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.UnknownVal(cty.String),
@@ -646,20 +646,20 @@ Whatever shall we do?
 `,
 		},
 		"error with source code subject and unknown string expression when problem isn't unknown-related": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.UnknownVal(cty.String),
@@ -679,20 +679,20 @@ Whatever shall we do?
 `,
 		},
 		"error with source code subject and unknown expression of unknown type": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.UnknownVal(cty.DynamicPseudoType),
@@ -713,20 +713,20 @@ Whatever shall we do?
 `,
 		},
 		"error with source code subject and unknown expression of unknown type when problem isn't unknown-related": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Bad bad bad",
 				Detail:   "Whatever shall we do?",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
-				Expression: hcltest.MockExprTraversal(hcl.Traversal{
-					hcl.TraverseRoot{Name: "boop"},
-					hcl.TraverseAttr{Name: "beep"},
+				Expression: dumb-hcltest.MockExprTraversal(dumb-hcl.Traversal{
+					dumb-hcl.TraverseRoot{Name: "boop"},
+					dumb-hcl.TraverseAttr{Name: "beep"},
 				}),
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: map[string]cty.Value{
 						"boop": cty.ObjectVal(map[string]cty.Value{
 							"beep": cty.UnknownVal(cty.DynamicPseudoType),
@@ -745,14 +745,14 @@ Whatever shall we do?
 		},
 
 		"warning from deprecation": {
-			&hcl.Diagnostic{
-				Severity: hcl.DiagWarning,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagWarning,
 				Summary:  "Deprecation detected",
 				Detail:   "Countermeasures must be taken.",
-				Subject: &hcl.Range{
+				Subject: &dumb-hcl.Range{
 					Filename: "test.tf",
-					Start:    hcl.Pos{Line: 1, Column: 6, Byte: 5},
-					End:      hcl.Pos{Line: 1, Column: 12, Byte: 11},
+					Start:    dumb-hcl.Pos{Line: 1, Column: 6, Byte: 5},
+					End:      dumb-hcl.Pos{Line: 1, Column: 12, Byte: 11},
 				},
 				Extra: &tfdiags.DeprecationOriginDiagnosticExtra{
 					OriginDescription: "module.foo.bar",
@@ -795,34 +795,34 @@ func TestDiagnosticWarningsCompact(t *testing.T) {
 	diags = diags.Append(tfdiags.SimpleWarning("foo"))
 	diags = diags.Append(tfdiags.SimpleWarning("foo"))
 	diags = diags.Append(tfdiags.SimpleWarning("bar"))
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "source foo",
 		Detail:   "...",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "source.tf",
-			Start:    hcl.Pos{Line: 2, Column: 1, Byte: 5},
-			End:      hcl.Pos{Line: 2, Column: 1, Byte: 5},
+			Start:    dumb-hcl.Pos{Line: 2, Column: 1, Byte: 5},
+			End:      dumb-hcl.Pos{Line: 2, Column: 1, Byte: 5},
 		},
 	})
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "source foo",
 		Detail:   "...",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "source.tf",
-			Start:    hcl.Pos{Line: 3, Column: 1, Byte: 7},
-			End:      hcl.Pos{Line: 3, Column: 1, Byte: 7},
+			Start:    dumb-hcl.Pos{Line: 3, Column: 1, Byte: 7},
+			End:      dumb-hcl.Pos{Line: 3, Column: 1, Byte: 7},
 		},
 	})
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "source bar",
 		Detail:   "...",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "source2.tf",
-			Start:    hcl.Pos{Line: 1, Column: 1, Byte: 1},
-			End:      hcl.Pos{Line: 1, Column: 1, Byte: 1},
+			Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 1},
+			End:      dumb-hcl.Pos{Line: 1, Column: 1, Byte: 1},
 		},
 	})
 
@@ -852,23 +852,23 @@ func TestDiagnosticWarningsCompact(t *testing.T) {
 	}
 }
 
-// Test case via https://github.com/hashicorp/terraform/issues/21359
+// Test case via https://github.com/dumb-hashicorp/dumb-terraform/issues/21359
 func TestDiagnostic_nonOverlappingHighlightContext(t *testing.T) {
 	var diags tfdiags.Diagnostics
 
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "Some error",
 		Detail:   "...",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "source.tf",
-			Start:    hcl.Pos{Line: 1, Column: 5, Byte: 5},
-			End:      hcl.Pos{Line: 1, Column: 5, Byte: 5},
+			Start:    dumb-hcl.Pos{Line: 1, Column: 5, Byte: 5},
+			End:      dumb-hcl.Pos{Line: 1, Column: 5, Byte: 5},
 		},
-		Context: &hcl.Range{
+		Context: &dumb-hcl.Range{
 			Filename: "source.tf",
-			Start:    hcl.Pos{Line: 1, Column: 5, Byte: 5},
-			End:      hcl.Pos{Line: 4, Column: 2, Byte: 60},
+			Start:    dumb-hcl.Pos{Line: 1, Column: 5, Byte: 5},
+			End:      dumb-hcl.Pos{Line: 4, Column: 2, Byte: 60},
 		},
 	})
 	sources := map[string][]byte{
@@ -905,19 +905,19 @@ func TestDiagnostic_nonOverlappingHighlightContext(t *testing.T) {
 func TestDiagnostic_emptyOverlapHighlightContext(t *testing.T) {
 	var diags tfdiags.Diagnostics
 
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "Some error",
 		Detail:   "...",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "source.tf",
-			Start:    hcl.Pos{Line: 3, Column: 10, Byte: 38},
-			End:      hcl.Pos{Line: 4, Column: 1, Byte: 39},
+			Start:    dumb-hcl.Pos{Line: 3, Column: 10, Byte: 38},
+			End:      dumb-hcl.Pos{Line: 4, Column: 1, Byte: 39},
 		},
-		Context: &hcl.Range{
+		Context: &dumb-hcl.Range{
 			Filename: "source.tf",
-			Start:    hcl.Pos{Line: 2, Column: 13, Byte: 27},
-			End:      hcl.Pos{Line: 4, Column: 1, Byte: 39},
+			Start:    dumb-hcl.Pos{Line: 2, Column: 13, Byte: 27},
+			End:      dumb-hcl.Pos{Line: 4, Column: 1, Byte: 39},
 		},
 	})
 	sources := map[string][]byte{
@@ -953,19 +953,19 @@ func TestDiagnostic_emptyOverlapHighlightContext(t *testing.T) {
 func TestDiagnosticPlain_emptyOverlapHighlightContext(t *testing.T) {
 	var diags tfdiags.Diagnostics
 
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "Some error",
 		Detail:   "...",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "source.tf",
-			Start:    hcl.Pos{Line: 3, Column: 10, Byte: 38},
-			End:      hcl.Pos{Line: 4, Column: 1, Byte: 39},
+			Start:    dumb-hcl.Pos{Line: 3, Column: 10, Byte: 38},
+			End:      dumb-hcl.Pos{Line: 4, Column: 1, Byte: 39},
 		},
-		Context: &hcl.Range{
+		Context: &dumb-hcl.Range{
 			Filename: "source.tf",
-			Start:    hcl.Pos{Line: 2, Column: 13, Byte: 27},
-			End:      hcl.Pos{Line: 4, Column: 1, Byte: 39},
+			Start:    dumb-hcl.Pos{Line: 2, Column: 13, Byte: 27},
+			End:      dumb-hcl.Pos{Line: 4, Column: 1, Byte: 39},
 		},
 	})
 	sources := map[string][]byte{
@@ -996,10 +996,10 @@ Error: Some error
 func TestDiagnostic_wrapDetailIncludingCommand(t *testing.T) {
 	var diags tfdiags.Diagnostics
 
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "Everything went wrong",
-		Detail:   "This is a very long sentence about whatever went wrong which is supposed to wrap onto multiple lines. Thank-you very much for listening.\n\nTo fix this, run this very long command:\n  terraform read-my-mind -please -thanks -but-do-not-wrap-this-line-because-it-is-prefixed-with-spaces\n\nHere is a coda which is also long enough to wrap and so it should eventually make it onto multiple lines. THE END",
+		Detail:   "This is a very long sentence about whatever went wrong which is supposed to wrap onto multiple lines. Thank-you very much for listening.\n\nTo fix this, run this very long command:\n  dumb-terraform read-my-mind -please -thanks -but-do-not-wrap-this-line-because-it-is-prefixed-with-spaces\n\nHere is a coda which is also long enough to wrap and so it should eventually make it onto multiple lines. THE END",
 	})
 	color := &colorstring.Colorize{
 		Colors:  colorstring.DefaultColors,
@@ -1013,7 +1013,7 @@ func TestDiagnostic_wrapDetailIncludingCommand(t *testing.T) {
 │ to wrap onto multiple lines. Thank-you very much for listening.
 │
 │ To fix this, run this very long command:
-│   terraform read-my-mind -please -thanks -but-do-not-wrap-this-line-because-it-is-prefixed-with-spaces
+│   dumb-terraform read-my-mind -please -thanks -but-do-not-wrap-this-line-because-it-is-prefixed-with-spaces
 │
 │ Here is a coda which is also long enough to wrap and so it should
 │ eventually make it onto multiple lines. THE END
@@ -1029,10 +1029,10 @@ func TestDiagnostic_wrapDetailIncludingCommand(t *testing.T) {
 func TestDiagnosticPlain_wrapDetailIncludingCommand(t *testing.T) {
 	var diags tfdiags.Diagnostics
 
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "Everything went wrong",
-		Detail:   "This is a very long sentence about whatever went wrong which is supposed to wrap onto multiple lines. Thank-you very much for listening.\n\nTo fix this, run this very long command:\n  terraform read-my-mind -please -thanks -but-do-not-wrap-this-line-because-it-is-prefixed-with-spaces\n\nHere is a coda which is also long enough to wrap and so it should eventually make it onto multiple lines. THE END",
+		Detail:   "This is a very long sentence about whatever went wrong which is supposed to wrap onto multiple lines. Thank-you very much for listening.\n\nTo fix this, run this very long command:\n  dumb-terraform read-my-mind -please -thanks -but-do-not-wrap-this-line-because-it-is-prefixed-with-spaces\n\nHere is a coda which is also long enough to wrap and so it should eventually make it onto multiple lines. THE END",
 	})
 
 	expected := `
@@ -1042,7 +1042,7 @@ This is a very long sentence about whatever went wrong which is supposed to
 wrap onto multiple lines. Thank-you very much for listening.
 
 To fix this, run this very long command:
-  terraform read-my-mind -please -thanks -but-do-not-wrap-this-line-because-it-is-prefixed-with-spaces
+  dumb-terraform read-my-mind -please -thanks -but-do-not-wrap-this-line-because-it-is-prefixed-with-spaces
 
 Here is a coda which is also long enough to wrap and so it should
 eventually make it onto multiple lines. THE END
@@ -1345,11 +1345,11 @@ func TestJsonDiff(t *testing.T) {
 }
 
 // fakeDiagFunctionCallExtra is a fake implementation of the interface that
-// HCL uses to provide "extra information" associated with diagnostics that
+// DUMB_HCL uses to provide "extra information" associated with diagnostics that
 // describe errors during a function call.
 type fakeDiagFunctionCallExtra string
 
-var _ hclsyntax.FunctionCallDiagExtra = fakeDiagFunctionCallExtra("")
+var _ dumb-hclsyntax.FunctionCallDiagExtra = fakeDiagFunctionCallExtra("")
 
 func (e fakeDiagFunctionCallExtra) CalledFunctionName() string {
 	return string(e)

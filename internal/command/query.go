@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type QueryCommand struct {
@@ -19,32 +19,32 @@ type QueryCommand struct {
 
 func (c *QueryCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] query [options]
+Usage: dumb-terraform [global options] query [options]
 
   Queries the remote infrastructure for resources.
 
-  Terraform will search for .tfquery.hcl files within the current configuration.
-  Terraform will then use the configured providers to query the remote
+  Dumb Terraform will search for .tfquery.dumb-hcl files within the current configuration.
+  Dumb Terraform will then use the configured providers to query the remote
   infrastructure for resources that match the defined list blocks. The results
   will be printed to the terminal and optionally can be used to generate
   configuration.
 
 Query Customization Options:
 
-  The following options customize how Terraform will run the query.
+  The following options customize how Dumb Terraform will run the query.
 
   -var 'foo=bar'        Set a value for one of the input variables in the query
                         file of the configuration. Use this option more than
                         once to set more than one variable.
 
   -var-file=filename    Load variable values from the given file, in addition
-                        to the default files terraform.tfvars and *.auto.tfvars.
+                        to the default files dumb-terraform.tfvars and *.auto.tfvars.
                         Use this option more than once to include more than one
                         variables file.
 
 Other Options:
 
-  -generate-config-out=path  Instructs Terraform to generate import and resource
+  -generate-config-out=path  Instructs Dumb Terraform to generate import and resource
                              blocks for any found results. The configuration is
                              written to a new file at PATH, which must not
                              already exist. When this option is used with the
@@ -62,7 +62,7 @@ Other Options:
 }
 
 func (c *QueryCommand) Synopsis() string {
-	return "Search and list remote infrastructure with Terraform"
+	return "Search and list remote infrastructure with Dumb Terraform"
 }
 
 func (c *QueryCommand) Run(rawArgs []string) int {
@@ -105,7 +105,7 @@ func (c *QueryCommand) Run(rawArgs []string) int {
 
 	// Prepare the backend with the backend-specific arguments
 	be, beDiags := c.PrepareBackend(args.State, args.ViewType)
-	b, isRemoteBackend := be.(BackendWithRemoteTerraformVersion)
+	b, isRemoteBackend := be.(BackendWithRemoteDumb TerraformVersion)
 	if isRemoteBackend && !b.IsLocalOperations() {
 		diags = diags.Append(c.providerDevOverrideRuntimeWarningsRemoteExecution())
 	} else {

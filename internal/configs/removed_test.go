@@ -6,49 +6,49 @@ package configs
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcltest"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/zclconf/go-cty/cty"
 )
 
 func TestRemovedBlock_decode(t *testing.T) {
-	blockRange := hcl.Range{
+	blockRange := dumb-hcl.Range{
 		Filename: "mock.tf",
-		Start:    hcl.Pos{Line: 3, Column: 12, Byte: 27},
-		End:      hcl.Pos{Line: 3, Column: 19, Byte: 34},
+		Start:    dumb-hcl.Pos{Line: 3, Column: 12, Byte: 27},
+		End:      dumb-hcl.Pos{Line: 3, Column: 19, Byte: 34},
 	}
 
-	foo_expr := hcltest.MockExprTraversalSrc("test_instance.foo")
-	foo_index_expr := hcltest.MockExprTraversalSrc("test_instance.foo[1]")
-	mod_foo_expr := hcltest.MockExprTraversalSrc("module.foo")
-	mod_foo_index_expr := hcltest.MockExprTraversalSrc("module.foo[1]")
+	foo_expr := dumb-hcltest.MockExprTraversalSrc("test_instance.foo")
+	foo_index_expr := dumb-hcltest.MockExprTraversalSrc("test_instance.foo[1]")
+	mod_foo_expr := dumb-hcltest.MockExprTraversalSrc("module.foo")
+	mod_foo_index_expr := dumb-hcltest.MockExprTraversalSrc("module.foo[1]")
 
 	tests := map[string]struct {
-		input *hcl.Block
+		input *dumb-hcl.Block
 		want  *Removed
 		err   string
 	}{
 		"destroy true": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: foo_expr,
 						},
 					},
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type: "lifecycle",
-							Body: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{
 									"destroy": {
 										Name: "destroy",
-										Expr: hcltest.MockExprLiteral(cty.BoolVal(true)),
+										Expr: dumb-hcltest.MockExprLiteral(cty.BoolVal(true)),
 									},
 								},
 							}),
@@ -66,23 +66,23 @@ func TestRemovedBlock_decode(t *testing.T) {
 			``,
 		},
 		"destroy false": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: foo_expr,
 						},
 					},
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type: "lifecycle",
-							Body: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{
 									"destroy": {
 										Name: "destroy",
-										Expr: hcltest.MockExprLiteral(cty.BoolVal(false)),
+										Expr: dumb-hcltest.MockExprLiteral(cty.BoolVal(false)),
 									},
 								},
 							}),
@@ -100,25 +100,25 @@ func TestRemovedBlock_decode(t *testing.T) {
 			``,
 		},
 		"provisioner when = destroy": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: foo_expr,
 						},
 					},
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type:        "provisioner",
 							Labels:      []string{"remote-exec"},
-							LabelRanges: []hcl.Range{{}},
-							Body: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{
+							LabelRanges: []dumb-hcl.Range{{}},
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{
 									"when": {
 										Name: "when",
-										Expr: hcltest.MockExprTraversalSrc("destroy"),
+										Expr: dumb-hcltest.MockExprTraversalSrc("destroy"),
 									},
 								},
 							}),
@@ -134,9 +134,9 @@ func TestRemovedBlock_decode(t *testing.T) {
 					Provisioners: []*Provisioner{
 						{
 							Type: "remote-exec",
-							Config: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{},
-								Blocks:     hcl.Blocks{},
+							Config: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{},
+								Blocks:     dumb-hcl.Blocks{},
 							}),
 							When:      ProvisionerWhenDestroy,
 							OnFailure: ProvisionerOnFailureFail,
@@ -148,25 +148,25 @@ func TestRemovedBlock_decode(t *testing.T) {
 			``,
 		},
 		"provisioner when = create": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: foo_expr,
 						},
 					},
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type:        "provisioner",
 							Labels:      []string{"local-exec"},
-							LabelRanges: []hcl.Range{{}},
-							Body: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{
+							LabelRanges: []dumb-hcl.Range{{}},
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{
 									"when": {
 										Name: "when",
-										Expr: hcltest.MockExprTraversalSrc("create"),
+										Expr: dumb-hcltest.MockExprTraversalSrc("create"),
 									},
 								},
 							}),
@@ -182,9 +182,9 @@ func TestRemovedBlock_decode(t *testing.T) {
 					Provisioners: []*Provisioner{
 						{
 							Type: "local-exec",
-							Config: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{},
-								Blocks:     hcl.Blocks{},
+							Config: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{},
+								Blocks:     dumb-hcl.Blocks{},
 							}),
 							When:      ProvisionerWhenCreate,
 							OnFailure: ProvisionerOnFailureFail,
@@ -196,25 +196,25 @@ func TestRemovedBlock_decode(t *testing.T) {
 			`Invalid provisioner block`,
 		},
 		"provisioner no when": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: foo_expr,
 						},
 					},
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type: "connection",
-							Body: hcltest.MockBody(&hcl.BodyContent{}),
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{}),
 						},
-						&hcl.Block{
+						&dumb-hcl.Block{
 							Type:        "provisioner",
 							Labels:      []string{"local-exec"},
-							LabelRanges: []hcl.Range{{}},
-							Body:        hcltest.MockBody(&hcl.BodyContent{}),
+							LabelRanges: []dumb-hcl.Range{{}},
+							Body:        dumb-hcltest.MockBody(&dumb-hcl.BodyContent{}),
 						},
 					},
 				}),
@@ -225,14 +225,14 @@ func TestRemovedBlock_decode(t *testing.T) {
 				Destroy: true,
 				Managed: &ManagedResource{
 					Connection: &Connection{
-						Config: hcltest.MockBody(&hcl.BodyContent{}),
+						Config: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{}),
 					},
 					Provisioners: []*Provisioner{
 						{
 							Type: "local-exec",
-							Config: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{},
-								Blocks:     hcl.Blocks{},
+							Config: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{},
+								Blocks:     dumb-hcl.Blocks{},
 							}),
 							When:      ProvisionerWhenCreate,
 							OnFailure: ProvisionerOnFailureFail,
@@ -244,23 +244,23 @@ func TestRemovedBlock_decode(t *testing.T) {
 			`Invalid provisioner block`,
 		},
 		"modules": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: mod_foo_expr,
 						},
 					},
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type: "lifecycle",
-							Body: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{
 									"destroy": {
 										Name: "destroy",
-										Expr: hcltest.MockExprLiteral(cty.BoolVal(true)),
+										Expr: dumb-hcltest.MockExprLiteral(cty.BoolVal(true)),
 									},
 								},
 							}),
@@ -277,25 +277,25 @@ func TestRemovedBlock_decode(t *testing.T) {
 			``,
 		},
 		"provisioner for module": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: mod_foo_expr,
 						},
 					},
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type:        "provisioner",
 							Labels:      []string{"local-exec"},
-							LabelRanges: []hcl.Range{{}},
-							Body: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{
+							LabelRanges: []dumb-hcl.Range{{}},
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{
 									"when": {
 										Name: "when",
-										Expr: hcltest.MockExprTraversalSrc("destroy"),
+										Expr: dumb-hcltest.MockExprTraversalSrc("destroy"),
 									},
 								},
 							}),
@@ -312,19 +312,19 @@ func TestRemovedBlock_decode(t *testing.T) {
 			`Invalid provisioner block`,
 		},
 		"connection for module": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: mod_foo_expr,
 						},
 					},
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type: "connection",
-							Body: hcltest.MockBody(&hcl.BodyContent{}),
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{}),
 						},
 					},
 				}),
@@ -339,10 +339,10 @@ func TestRemovedBlock_decode(t *testing.T) {
 		},
 		// KEM Unspecified behaviour
 		"no lifecycle block": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: foo_expr,
@@ -360,17 +360,17 @@ func TestRemovedBlock_decode(t *testing.T) {
 			``,
 		},
 		"error: missing argument": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type: "lifecycle",
-							Body: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{
 									"destroy": {
 										Name: "destroy",
-										Expr: hcltest.MockExprLiteral(cty.BoolVal(true)),
+										Expr: dumb-hcltest.MockExprLiteral(cty.BoolVal(true)),
 									},
 								},
 							}),
@@ -386,23 +386,23 @@ func TestRemovedBlock_decode(t *testing.T) {
 			"Missing required argument",
 		},
 		"error: indexed resource instance": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: foo_index_expr,
 						},
 					},
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type: "lifecycle",
-							Body: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{
 									"destroy": {
 										Name: "destroy",
-										Expr: hcltest.MockExprLiteral(cty.BoolVal(true)),
+										Expr: dumb-hcltest.MockExprLiteral(cty.BoolVal(true)),
 									},
 								},
 							}),
@@ -419,23 +419,23 @@ func TestRemovedBlock_decode(t *testing.T) {
 			`Resource instance keys not allowed`,
 		},
 		"error: indexed module instance": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "removed",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: mod_foo_index_expr,
 						},
 					},
-					Blocks: hcl.Blocks{
-						&hcl.Block{
+					Blocks: dumb-hcl.Blocks{
+						&dumb-hcl.Block{
 							Type: "lifecycle",
-							Body: hcltest.MockBody(&hcl.BodyContent{
-								Attributes: hcl.Attributes{
+							Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+								Attributes: dumb-hcl.Attributes{
 									"destroy": {
 										Name: "destroy",
-										Expr: hcltest.MockExprLiteral(cty.BoolVal(true)),
+										Expr: dumb-hcltest.MockExprLiteral(cty.BoolVal(true)),
 									},
 								},
 							}),
@@ -475,10 +475,10 @@ func TestRemovedBlock_decode(t *testing.T) {
 	}
 }
 
-func mustRemoveEndpointFromExpr(expr hcl.Expression) *addrs.RemoveTarget {
-	traversal, hcldiags := hcl.AbsTraversalForExpr(expr)
-	if hcldiags.HasErrors() {
-		panic(hcldiags.Errs())
+func mustRemoveEndpointFromExpr(expr dumb-hcl.Expression) *addrs.RemoveTarget {
+	traversal, dumb-hcldiags := dumb-hcl.AbsTraversalForExpr(expr)
+	if dumb-hcldiags.HasErrors() {
+		panic(dumb-hcldiags.Errs())
 	}
 
 	ep, diags := addrs.ParseRemoveTarget(traversal)

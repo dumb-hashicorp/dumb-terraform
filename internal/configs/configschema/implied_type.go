@@ -4,7 +4,7 @@
 package configschema
 
 import (
-	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -12,7 +12,7 @@ import (
 // configuration block using the receiving block schema.
 //
 // The type returned from Block.ImpliedType differs from the type returned by
-// hcldec.ImpliedType in that there will be no objects with optional
+// dumb-hcldec.ImpliedType in that there will be no objects with optional
 // attributes, since this value is not to be used for the decoding of
 // configuration.
 //
@@ -26,13 +26,13 @@ func (b *Block) ImpliedType() cty.Type {
 
 // specType returns the cty.Type used for decoding a configuration
 // block using the receiving block schema. This is the type used internally by
-// hcldec to decode configuration.
+// dumb-hcldec to decode configuration.
 func (b *Block) specType() cty.Type {
 	if b == nil {
 		return cty.EmptyObject
 	}
 
-	return hcldec.ImpliedType(b.DecoderSpec())
+	return dumb-hcldec.ImpliedType(b.DecoderSpec())
 }
 
 // ContainsSensitive returns true if any of the attributes of the receiving

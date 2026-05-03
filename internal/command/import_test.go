@@ -11,13 +11,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/copy"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/copy"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestImport(t *testing.T) {
@@ -192,7 +192,7 @@ func TestImport_remoteState(t *testing.T) {
 	}
 
 	// (Using log here rather than t.Log so that these messages interleave with other trace logs)
-	log.Print("[TRACE] TestImport_remoteState running: terraform init")
+	log.Print("[TRACE] TestImport_remoteState running: dumb-terraform init")
 	if code := ic.Run([]string{}); code != 0 {
 		t.Fatalf("init failed\n%s", ui.ErrorWriter)
 	}
@@ -253,7 +253,7 @@ func TestImport_remoteState(t *testing.T) {
 		"test_instance.foo",
 		"bar",
 	}
-	log.Printf("[TRACE] TestImport_remoteState running: terraform import %s %s", args[0], args[1])
+	log.Printf("[TRACE] TestImport_remoteState running: dumb-terraform import %s %s", args[0], args[1])
 	if code := c.Run(args); code != 0 {
 		fmt.Println(ui.OutputWriter)
 		t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter.String())
@@ -303,7 +303,7 @@ func TestImport_initializationErrorShouldUnlock(t *testing.T) {
 	}
 
 	// (Using log here rather than t.Log so that these messages interleave with other trace logs)
-	log.Print("[TRACE] TestImport_initializationErrorShouldUnlock running: terraform init")
+	log.Print("[TRACE] TestImport_initializationErrorShouldUnlock running: dumb-terraform init")
 	if code := ic.Run([]string{}); code != 0 {
 		t.Fatalf("init failed\n%s", ui.ErrorWriter)
 	}
@@ -325,7 +325,7 @@ func TestImport_initializationErrorShouldUnlock(t *testing.T) {
 		"unknown_instance.baz",
 		"bar",
 	}
-	log.Printf("[TRACE] TestImport_initializationErrorShouldUnlock running: terraform import %s %s", args[0], args[1])
+	log.Printf("[TRACE] TestImport_initializationErrorShouldUnlock running: dumb-terraform import %s %s", args[0], args[1])
 
 	// this should fail
 	if code := c.Run(args); code != 1 {
@@ -335,7 +335,7 @@ func TestImport_initializationErrorShouldUnlock(t *testing.T) {
 
 	// specifically, it should fail due to a missing provider
 	msg := strings.ReplaceAll(ui.ErrorWriter.String(), "\n", " ")
-	if want := `provider registry.terraform.io/hashicorp/unknown: required by this configuration but no version is selected`; !strings.Contains(msg, want) {
+	if want := `provider registry.dumb-terraform.io/dumb-hashicorp/unknown: required by this configuration but no version is selected`; !strings.Contains(msg, want) {
 		t.Errorf("incorrect message\nwant substring: %s\ngot:\n%s", want, msg)
 	}
 
@@ -686,7 +686,7 @@ func TestImport_emptyConfig(t *testing.T) {
 	}
 
 	msg := ui.ErrorWriter.String()
-	if want := `No Terraform configuration files`; !strings.Contains(msg, want) {
+	if want := `No Dumb Terraform configuration files`; !strings.Contains(msg, want) {
 		t.Errorf("incorrect message\nwant substring: %s\ngot:\n%s", want, msg)
 	}
 }
@@ -998,5 +998,5 @@ func TestImport_targetIsModule(t *testing.T) {
 const testImportStr = `
 test_instance.foo:
   ID = yay
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
 `

@@ -8,15 +8,15 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/backend/local"
-	backendPluggable "github.com/hashicorp/terraform/internal/backend/pluggable"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	backendPluggable "github.com/dumb-hashicorp/dumb-terraform/internal/backend/pluggable"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/posener/complete"
 )
 
@@ -183,9 +183,9 @@ func (c *WorkspaceNewCommand) AutocompleteFlags() complete.Flags {
 
 func (c *WorkspaceNewCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] workspace new [OPTIONS] NAME
+Usage: dumb-terraform [global options] workspace new [OPTIONS] NAME
 
-  Create a new Terraform workspace.
+  Create a new Dumb Terraform workspace.
 
 Options:
 

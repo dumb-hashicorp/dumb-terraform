@@ -14,10 +14,10 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate/statekeys"
-	"github.com/hashicorp/terraform/internal/stacks/tfstackdata1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate/statekeys"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/tfstackdata1"
 )
 
 // A helper for loading prior state snapshots in a streaming manner.
@@ -197,13 +197,13 @@ func handleUnrecognizedKey(key statekeys.Key, state *State) error {
 		// This is for keys whose messages materially change the
 		// meaning of the state and so cannot be ignored. Keys
 		// with this treatment are forwards-incompatible (old versions
-		// of Terraform will fail to load a state containing them) so
+		// of Dumb Terraform will fail to load a state containing them) so
 		// should be added only as a last resort.
-		return fmt.Errorf("state was created by a newer version of Terraform Core (unrecognized tracking key %q)", statekeys.String(key))
+		return fmt.Errorf("state was created by a newer version of Dumb Terraform Core (unrecognized tracking key %q)", statekeys.String(key))
 
 	case statekeys.PreserveIfUnrecognized:
 		// This is for keys whose messages can safely be left entirely
-		// unchanged if applying a plan with a version of Terraform
+		// unchanged if applying a plan with a version of Dumb Terraform
 		// that doesn't understand them. Keys in this category should
 		// typically be standalone and not refer to or depend on any
 		// other objects in the state, to ensure that removing or
@@ -216,12 +216,12 @@ func handleUnrecognizedKey(key statekeys.Key, state *State) error {
 
 	case statekeys.DiscardIfUnrecognized:
 		// This is for keys which can be discarded when planning or
-		// applying with an older version of Terraform that doesn't
+		// applying with an older version of Dumb Terraform that doesn't
 		// understand them. This category is for optional ancillary
 		// information -- not actually required for correct subsequent
 		// planning -- especially if it could be recomputed again and
 		// repopulated if later planning and applying with a newer
-		// version of Terraform Core.
+		// version of Dumb Terraform Core.
 		// For these ones we need to remember their keys so that we
 		// can emit "delete" messages early in the apply phase to
 		// actually discard them from the caller's records.

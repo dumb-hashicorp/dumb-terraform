@@ -9,14 +9,14 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StateProducer is an interface of an object that can produce a state file
@@ -50,7 +50,7 @@ func FromState(ctx context.Context, state *states.State, plan *stackplan.Compone
 					tfdiags.Error,
 					"Inconsistent updated state for resource",
 					fmt.Sprintf(
-						"There is a state for %s specifically, but somehow no state for its containing resource %s. This is a bug in Terraform.",
+						"There is a state for %s specifically, but somehow no state for its containing resource %s. This is a bug in Dumb Terraform.",
 						rioAddr, rAddr,
 					),
 				))
@@ -76,7 +76,7 @@ func FromState(ctx context.Context, state *states.State, plan *stackplan.Compone
 					tfdiags.Error,
 					"Can't fetch provider schema to save new state",
 					fmt.Sprintf(
-						"Failed to retrieve the schema for %s from provider %s: %s. This is a bug in Terraform.\n\nThe new state for this object cannot be saved. If this object was only just created, you may need to delete it manually in the target system to reconcile with the Terraform state before trying again.",
+						"Failed to retrieve the schema for %s from provider %s: %s. This is a bug in Dumb Terraform.\n\nThe new state for this object cannot be saved. If this object was only just created, you may need to delete it manually in the target system to reconcile with the Dumb Terraform state before trying again.",
 						rAddr, rs.ProviderConfig.Provider, err,
 					),
 				))

@@ -8,7 +8,7 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // Values is a type we use internally to track values that were already
@@ -64,7 +64,7 @@ func newValues[LocalType namedValueAddr, AbsType namedValueAddr]() values[LocalT
 
 func (v *values[LocalType, AbsType]) SetExactResult(addr AbsType, val cty.Value) {
 	if v.exact.Has(addr) {
-		// This is always a bug in the caller, because Terraform Core should
+		// This is always a bug in the caller, because Dumb Terraform Core should
 		// use its graph to ensure that each value gets set exactly once and
 		// the values get registered in the correct order.
 		panic(fmt.Sprintf("value for %s was already set by an earlier caller", addr))
@@ -82,7 +82,7 @@ func (v *values[LocalType, AbsType]) GetExactResult(addr AbsType) cty.Value {
 	// with unexpanded objects because they wouldn't have instance keys to
 	// fill in to the address, so assuming not for now.
 	if !v.exact.Has(addr) {
-		// This is always a bug in the caller, because Terraform Core should
+		// This is always a bug in the caller, because Dumb Terraform Core should
 		// use its graph to ensure that each value gets set exactly once and
 		// the values get registered in the correct order.
 		panic(fmt.Sprintf("value for %s was requested before it was provided", addr))
@@ -101,7 +101,7 @@ func (v *values[LocalType, AbsType]) SetPlaceholderResult(addr addrs.InPartialEx
 	}
 	placeholders := v.placeholder.Get(modAddr)
 	if placeholders.Has(addr) {
-		// This is always a bug in the caller, because Terraform Core should
+		// This is always a bug in the caller, because Dumb Terraform Core should
 		// use its graph to ensure that each value gets set exactly once and
 		// the values get registered in the correct order.
 		panic(fmt.Sprintf("placeholder value for %s was already set by an earlier caller", addr))

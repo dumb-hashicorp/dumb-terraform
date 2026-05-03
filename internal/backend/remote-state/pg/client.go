@@ -8,10 +8,10 @@ import (
 	"database/sql"
 	"fmt"
 
-	uuid "github.com/hashicorp/go-uuid"
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	uuid "github.com/dumb-hashicorp/go-uuid"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	_ "github.com/lib/pq"
 )
 

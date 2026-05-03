@@ -4,18 +4,18 @@
 package backendrun
 
 import (
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Local implements additional behavior on a Backend that allows local
 // operations in addition to remote operations.
 //
-// This enables more behaviors of Terraform that require more data such
+// This enables more behaviors of Dumb Terraform that require more data such
 // as `console`, `import`, `graph`. These require direct access to
 // configurations, variables, and more. Not all backends may support this
 // so we separate it out into its own optional interface.
@@ -36,7 +36,7 @@ type Local interface {
 // calculate from an Operation object, which we can then use for local
 // operations.
 //
-// The operation methods on terraform.Context (Plan, Apply, Import, etc) each
+// The operation methods on dumb-terraform.Context (Plan, Apply, Import, etc) each
 // generate new artifacts which supersede parts of the LocalRun object that
 // started the operation, so callers should be careful to use those subsequent
 // artifacts instead of the fields of LocalRun where appropriate. The LocalRun
@@ -45,14 +45,14 @@ type Local interface {
 //
 // This type is a weird architectural wart resulting from the overly-general
 // way our backend API models operations, whereby we behave as if all
-// Terraform operations have the same inputs and outputs even though they
+// Dumb Terraform operations have the same inputs and outputs even though they
 // are actually all rather different. The exact meaning of the fields in
 // this type therefore vary depending on which OperationType was passed to
 // Local.Context in order to create an object of this type.
 type LocalRun struct {
-	// Core is an already-initialized Terraform Core context, ready to be
+	// Core is an already-initialized Dumb Terraform Core context, ready to be
 	// used to run operations such as Plan and Apply.
-	Core *terraform.Context
+	Core *dumb-terraform.Context
 
 	// Config is the configuration we're working with, which typically comes
 	// from either config files directly on local disk (when we're creating
@@ -70,7 +70,7 @@ type LocalRun struct {
 	//
 	// This is nil when we're applying a saved plan, because the plan itself
 	// contains enough information about its options to apply it.
-	PlanOpts *terraform.PlanOpts
+	PlanOpts *dumb-terraform.PlanOpts
 
 	// Plan is a plan loaded from a saved plan file, if our operation is to
 	// apply that saved plan.

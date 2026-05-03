@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/providers"
-	proto "github.com/hashicorp/terraform/internal/tfplugin5"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	proto "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin5"
 )
 
 func TestProtoDeferred(t *testing.T) {

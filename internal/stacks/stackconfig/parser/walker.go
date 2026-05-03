@@ -7,14 +7,14 @@ import (
 	"fmt"
 
 	"github.com/apparentlymart/go-versions/versions"
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
-	"github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // SourceBundleModuleWalker is an implementation of [configs.ModuleWalker]
@@ -36,8 +36,8 @@ func NewSourceBundleModuleWalker(rootModuleSource sourceaddrs.FinalSource, sourc
 }
 
 // LoadModule implements configs.ModuleWalker.
-func (w *SourceBundleModuleWalker) LoadModule(req *configs.ModuleRequest) (*configs.Module, *version.Version, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func (w *SourceBundleModuleWalker) LoadModule(req *configs.ModuleRequest) (*configs.Module, *version.Version, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	// First we need to assemble the "final source address" for the module
 	// by asking the source bundle to match the given source address and
@@ -47,11 +47,11 @@ func (w *SourceBundleModuleWalker) LoadModule(req *configs.ModuleRequest) (*conf
 	finalSourceAddr, err := w.finalSourceForModule(req.SourceAddr, &req.VersionConstraint.Required)
 	if err != nil {
 		// We should not typically get here because we're translating
-		// Terraform's own source address representations to the same
+		// Dumb Terraform's own source address representations to the same
 		// representations the source bundle builder would've used, but
 		// we'll be robust about it nonetheless.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Can't load module for component",
 			Detail:   fmt.Sprintf("Invalid source address: %s.", err),
 			Subject:  req.SourceAddrRange.Ptr(),
@@ -63,8 +63,8 @@ func (w *SourceBundleModuleWalker) LoadModule(req *configs.ModuleRequest) (*conf
 	if err != nil {
 		// Again, this should not happen, but let's ensure we can debug if it
 		// does.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Can't load module for component",
 			Detail:   fmt.Sprintf("Unable to determine absolute source address: %s.", err),
 			Subject:  req.SourceAddrRange.Ptr(),
@@ -81,8 +81,8 @@ func (w *SourceBundleModuleWalker) LoadModule(req *configs.ModuleRequest) (*conf
 	if err != nil {
 		// We should not get here if the source bundle was constructed
 		// correctly.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Can't load module for component",
 			Detail:   fmt.Sprintf("Failed to load this component's module %s: %s.", req.Path.String(), tfdiags.FormatError(err)),
 			Subject:  req.SourceAddrRange.Ptr(),
@@ -103,8 +103,8 @@ func (w *SourceBundleModuleWalker) LoadModule(req *configs.ModuleRequest) (*conf
 			// already round-tripped between the legacy and modern version
 			// constraint representations once, so we should have a version
 			// number that's compatible with both.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Can't load module for component",
 				Detail:   fmt.Sprintf("Invalid version string %q: %s.", modSrc.SelectedVersion(), err),
 				Subject:  req.SourceAddrRange.Ptr(),
@@ -116,9 +116,9 @@ func (w *SourceBundleModuleWalker) LoadModule(req *configs.ModuleRequest) (*conf
 
 func (w *SourceBundleModuleWalker) finalSourceForModule(tfSourceAddr addrs.ModuleSource, versionConstraints *version.Constraints) (sourceaddrs.FinalSource, error) {
 	// Unfortunately the configs package still uses our old model of version
-	// constraints and Terraform's own form of source addresses, so we need
+	// constraints and Dumb Terraform's own form of source addresses, so we need
 	// to adapt to what the sourcebundle API is expecting.
-	sourceAddr, err := w.bundleSourceAddrForTerraformSourceAddr(tfSourceAddr)
+	sourceAddr, err := w.bundleSourceAddrForDumb TerraformSourceAddr(tfSourceAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (w *SourceBundleModuleWalker) finalSourceForModule(tfSourceAddr addrs.Modul
 	}
 }
 
-func (w *SourceBundleModuleWalker) bundleSourceAddrForTerraformSourceAddr(tfSourceAddr addrs.ModuleSource) (sourceaddrs.Source, error) {
+func (w *SourceBundleModuleWalker) bundleSourceAddrForDumb TerraformSourceAddr(tfSourceAddr addrs.ModuleSource) (sourceaddrs.Source, error) {
 	// In practice this should always succeed because the source bundle builder
 	// would've parsed the same source addresses using these same parsers
 	// and so source bundle building would've failed if the given address were

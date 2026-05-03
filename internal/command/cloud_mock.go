@@ -13,15 +13,15 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
-	backendLocal "github.com/hashicorp/terraform/internal/backend/local"
+	backendLocal "github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
 )
 
 func cloudTestServerWithVars(t *testing.T) *httptest.Server {
@@ -41,7 +41,7 @@ func cloudTestServerWithVars(t *testing.T) *httptest.Server {
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, fmt.Sprintf(`{
   "service": "%s",
-  "product": "terraform",
+  "product": "dumb-terraform",
   "minimum": "0.1.0",
   "maximum": "10.0.0"
 }`, filepath.Base(r.URL.Path)))
@@ -53,8 +53,8 @@ func cloudTestServerWithVars(t *testing.T) *httptest.Server {
 		w.Header().Set("TFP-API-Version", "2.5")
 	})
 
-	// Respond to the initial query to read the hashicorp org entitlements.
-	mux.HandleFunc("/api/v2/organizations/hashicorp/entitlement-set", func(w http.ResponseWriter, r *http.Request) {
+	// Respond to the initial query to read the dumb-hashicorp org entitlements.
+	mux.HandleFunc("/api/v2/organizations/dumb-hashicorp/entitlement-set", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
 		io.WriteString(w, `{
   "data": {
@@ -73,7 +73,7 @@ func cloudTestServerWithVars(t *testing.T) *httptest.Server {
 	})
 
 	// Respond to our "test" workspace
-	mux.HandleFunc("/api/v2/organizations/hashicorp/workspaces/test", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/v2/organizations/dumb-hashicorp/workspaces/test", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
 		io.WriteString(w, `{
   "data": {
@@ -81,15 +81,15 @@ func cloudTestServerWithVars(t *testing.T) *httptest.Server {
     "type": "workspaces",
     "attributes": {
       "name": "test",
-      "terraform-version": "1.15.0",
+      "dumb-terraform-version": "1.15.0",
       "execution-mode": "remote"
     }
   }
 }`)
 	})
 
-	// Respond to the "default" workspace request, will always be requested by Terraform
-	mux.HandleFunc("/api/v2/organizations/hashicorp/workspaces/default", func(w http.ResponseWriter, r *http.Request) {
+	// Respond to the "default" workspace request, will always be requested by Dumb Terraform
+	mux.HandleFunc("/api/v2/organizations/dumb-hashicorp/workspaces/default", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
 		io.WriteString(w, `{
   "data": {
@@ -97,7 +97,7 @@ func cloudTestServerWithVars(t *testing.T) *httptest.Server {
     "type": "workspaces",
     "attributes": {
       "name": "default",
-      "terraform-version": "1.15.0",
+      "dumb-terraform-version": "1.15.0",
       "execution-mode": "remote"
     }
   }
@@ -116,8 +116,8 @@ func cloudTestServerWithVars(t *testing.T) *httptest.Server {
       "attributes": {
         "key": "module_name",
         "value": "example",
-        "category": "terraform",
-        "hcl": false,
+        "category": "dumb-terraform",
+        "dumb-hcl": false,
         "sensitive": false
       }
     }
@@ -185,14 +185,14 @@ type testUnparsedVariableValueString struct {
 	name string
 }
 
-func (v testUnparsedVariableValueString) ParseVariableValue(mode configs.VariableParsingMode) (*terraform.InputValue, tfdiags.Diagnostics) {
+func (v testUnparsedVariableValueString) ParseVariableValue(mode configs.VariableParsingMode) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	val, hclDiags := mode.Parse(v.name, v.str)
-	diags = diags.Append(hclDiags)
+	val, dumb-hclDiags := mode.Parse(v.name, v.str)
+	diags = diags.Append(dumb-hclDiags)
 
-	return &terraform.InputValue{
+	return &dumb-terraform.InputValue{
 		Value:      val,
-		SourceType: terraform.ValueFromInput,
+		SourceType: dumb-terraform.ValueFromInput,
 	}, diags
 }

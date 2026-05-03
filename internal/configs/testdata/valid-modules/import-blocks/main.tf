@@ -1,10 +1,10 @@
-terraform {
+dumb-terraform {
     required_providers {
         localname = {
-            source = "hashicorp/random"
+            source = "dumb-hashicorp/random"
         }
         random = {
-            source = "hashicorp/random"
+            source = "dumb-hashicorp/random"
         }
     }
 }

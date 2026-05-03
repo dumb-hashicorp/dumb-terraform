@@ -23,9 +23,9 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth" // Import to initialize client auth plugins.
 	"k8s.io/utils/pointer"
 
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
 	"maps"
 
@@ -37,7 +37,7 @@ const (
 	tfstateKey                = "tfstate"
 	tfstateSecretSuffixKey    = "tfstateSecretSuffix"
 	tfstateWorkspaceKey       = "tfstateWorkspace"
-	tfstateLockInfoAnnotation = "app.terraform.io/lock-info"
+	tfstateLockInfoAnnotation = "app.dumb-terraform.io/lock-info"
 
 	managedByKey = "app.kubernetes.io/managed-by"
 
@@ -105,7 +105,7 @@ func (c *RemoteClient) getSecrets() ([]unstructured.Unstructured, error) {
 	for _, item := range res.Items {
 		name := item.GetName()
 		nameParts := strings.Split(name, "-")
-		// Because large Terraform state files are split into multiple secrets,
+		// Because large Dumb Terraform state files are split into multiple secrets,
 		// we parse the index from the secret name.
 		index, err := strconv.Atoi(nameParts[len(nameParts)-1])
 		if err != nil {
@@ -282,7 +282,7 @@ func (c *RemoteClient) Lock(info *statemgr.LockInfo) (string, error) {
 
 		lockErr := &statemgr.LockError{
 			Info: currentLockInfo,
-			Err:  errors.New("the state is already locked by another terraform client"),
+			Err:  errors.New("the state is already locked by another dumb-terraform client"),
 		}
 		return "", lockErr
 	}
@@ -355,7 +355,7 @@ func (c *RemoteClient) getLabels() map[string]string {
 		tfstateKey:             "true",
 		tfstateSecretSuffixKey: c.nameSuffix,
 		tfstateWorkspaceKey:    c.workspace,
-		managedByKey:           "terraform",
+		managedByKey:           "dumb-terraform",
 	}
 	maps.Copy(l, c.labels)
 

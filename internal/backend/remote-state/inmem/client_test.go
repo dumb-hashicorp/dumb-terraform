@@ -6,9 +6,9 @@ package inmem
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
 )
 
 func TestRemoteClient_impl(t *testing.T) {
@@ -18,7 +18,7 @@ func TestRemoteClient_impl(t *testing.T) {
 
 func TestRemoteClient(t *testing.T) {
 	defer Reset()
-	b := backend.TestBackendConfig(t, New(), hcl.EmptyBody())
+	b := backend.TestBackendConfig(t, New(), dumb-hcl.EmptyBody())
 
 	s, sDiags := b.StateMgr(backend.DefaultStateName)
 	if sDiags.HasErrors() {
@@ -30,7 +30,7 @@ func TestRemoteClient(t *testing.T) {
 
 func TestInmemLocks(t *testing.T) {
 	defer Reset()
-	s, err := backend.TestBackendConfig(t, New(), hcl.EmptyBody()).StateMgr(backend.DefaultStateName)
+	s, err := backend.TestBackendConfig(t, New(), dumb-hcl.EmptyBody()).StateMgr(backend.DefaultStateName)
 	if err != nil {
 		t.Fatal(err)
 	}

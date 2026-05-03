@@ -10,32 +10,32 @@ import (
 	"io"
 	"time"
 
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
-	"github.com/hashicorp/terraform-svchost/disco"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
 	"go.opentelemetry.io/otel/attribute"
 	otelCodes "go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providercache"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackmigrate"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/hooks"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providercache"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackmigrate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/hooks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type stacksServer struct {
@@ -487,7 +487,7 @@ Events:
 					tfdiags.Error,
 					"Incorrectly-constructed change",
 					fmt.Sprintf(
-						"Failed to serialize a %T value for recording in the saved plan: %s.\n\nThis is a bug in Terraform; please report it!",
+						"Failed to serialize a %T value for recording in the saved plan: %s.\n\nThis is a bug in Dumb Terraform; please report it!",
 						protoChange, err,
 					),
 				))
@@ -723,7 +723,7 @@ Events:
 					tfdiags.Error,
 					"Incorrectly-constructed apply result",
 					fmt.Sprintf(
-						"Failed to serialize a %T value for recording in the updated state: %s.\n\nThis is a bug in Terraform; please report it!",
+						"Failed to serialize a %T value for recording in the updated state: %s.\n\nThis is a bug in Dumb Terraform; please report it!",
 						protoChange, err,
 					),
 				))
@@ -885,9 +885,9 @@ func (s *stacksServer) InspectExpressionResult(ctx context.Context, req *stacks.
 	return insp.InspectExpressionResult(ctx, req)
 }
 
-func (s *stacksServer) OpenTerraformState(ctx context.Context, request *stacks.OpenTerraformState_Request) (*stacks.OpenTerraformState_Response, error) {
+func (s *stacksServer) OpenDumb TerraformState(ctx context.Context, request *stacks.OpenDumb TerraformState_Request) (*stacks.OpenDumb TerraformState_Response, error) {
 	switch data := request.State.(type) {
-	case *stacks.OpenTerraformState_Request_ConfigPath:
+	case *stacks.OpenDumb TerraformState_Request_ConfigPath:
 		// Load the state from the backend.
 		// This function should return an empty state even if the diags
 		// has errors. This makes it easier for the caller, as they should
@@ -895,21 +895,21 @@ func (s *stacksServer) OpenTerraformState(ctx context.Context, request *stacks.O
 		loader := stackmigrate.Loader{Discovery: s.services}
 		state, diags := loader.LoadState(data.ConfigPath)
 
-		hnd := s.handles.NewTerraformState(state)
-		return &stacks.OpenTerraformState_Response{
+		hnd := s.handles.NewDumb TerraformState(state)
+		return &stacks.OpenDumb TerraformState_Response{
 			StateHandle: hnd.ForProtobuf(),
 			Diagnostics: diagnosticsToProto(diags),
 		}, nil
 
-	case *stacks.OpenTerraformState_Request_Raw:
+	case *stacks.OpenDumb TerraformState_Request_Raw:
 		// load the state from the raw data
 		file, err := statefile.Read(bytes.NewReader(data.Raw))
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid raw state data: %s", err)
 		}
 
-		hnd := s.handles.NewTerraformState(file.State)
-		return &stacks.OpenTerraformState_Response{
+		hnd := s.handles.NewDumb TerraformState(file.State)
+		return &stacks.OpenDumb TerraformState_Response{
 			StateHandle: hnd.ForProtobuf(),
 		}, nil
 
@@ -918,18 +918,18 @@ func (s *stacksServer) OpenTerraformState(ctx context.Context, request *stacks.O
 	}
 }
 
-func (s *stacksServer) CloseTerraformState(ctx context.Context, request *stacks.CloseTerraformState_Request) (*stacks.CloseTerraformState_Response, error) {
+func (s *stacksServer) CloseDumb TerraformState(ctx context.Context, request *stacks.CloseDumb TerraformState_Request) (*stacks.CloseDumb TerraformState_Response, error) {
 	hnd := handle[*states.State](request.StateHandle)
-	err := s.handles.CloseTerraformState(hnd)
+	err := s.handles.CloseDumb TerraformState(hnd)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	return new(stacks.CloseTerraformState_Response), nil
+	return new(stacks.CloseDumb TerraformState_Response), nil
 }
 
-func (s *stacksServer) MigrateTerraformState(request *stacks.MigrateTerraformState_Request, server stacks.Stacks_MigrateTerraformStateServer) error {
+func (s *stacksServer) MigrateDumb TerraformState(request *stacks.MigrateDumb TerraformState_Request, server stacks.Stacks_MigrateDumb TerraformStateServer) error {
 	previousStateHandle := handle[*states.State](request.StateHandle)
-	previousState := s.handles.TerraformState(previousStateHandle)
+	previousState := s.handles.Dumb TerraformState(previousStateHandle)
 	if previousState == nil {
 		return status.Error(codes.InvalidArgument, "the given state handle is invalid")
 	}
@@ -974,10 +974,10 @@ func (s *stacksServer) MigrateTerraformState(request *stacks.MigrateTerraformSta
 	emit := func(change stackstate.AppliedChange) {
 		proto, err := change.AppliedChangeProto()
 		if err != nil {
-			server.Send(&stacks.MigrateTerraformState_Event{
-				Result: &stacks.MigrateTerraformState_Event_Diagnostic{
-					Diagnostic: &terraform1.Diagnostic{
-						Severity: terraform1.Diagnostic_ERROR,
+			server.Send(&stacks.MigrateDumb TerraformState_Event{
+				Result: &stacks.MigrateDumb TerraformState_Event_Diagnostic{
+					Diagnostic: &dumb-terraform1.Diagnostic{
+						Severity: dumb-terraform1.Diagnostic_ERROR,
 						Summary:  "Failed to serialize change",
 						Detail:   fmt.Sprintf("Failed to serialize state change for recording in the migration plan: %s", err),
 					},
@@ -986,16 +986,16 @@ func (s *stacksServer) MigrateTerraformState(request *stacks.MigrateTerraformSta
 			return
 		}
 
-		server.Send(&stacks.MigrateTerraformState_Event{
-			Result: &stacks.MigrateTerraformState_Event_AppliedChange{
+		server.Send(&stacks.MigrateDumb TerraformState_Event{
+			Result: &stacks.MigrateDumb TerraformState_Event_AppliedChange{
 				AppliedChange: proto,
 			},
 		})
 	}
 
 	emitDiag := func(diagnostic tfdiags.Diagnostic) {
-		server.Send(&stacks.MigrateTerraformState_Event{
-			Result: &stacks.MigrateTerraformState_Event_Diagnostic{
+		server.Send(&stacks.MigrateDumb TerraformState_Event{
+			Result: &stacks.MigrateDumb TerraformState_Event_Diagnostic{
 				Diagnostic: diagnosticToProto(diagnostic),
 			},
 		})
@@ -1006,7 +1006,7 @@ func (s *stacksServer) MigrateTerraformState(request *stacks.MigrateTerraformSta
 		return status.Error(codes.InvalidArgument, "missing migration mapping")
 	}
 	switch mapping := mapping.(type) {
-	case *stacks.MigrateTerraformState_Request_Simple:
+	case *stacks.MigrateDumb TerraformState_Request_Simple:
 		migrate.Migrate(
 			mapping.Simple.ResourceAddressMap,
 			mapping.Simple.ModuleAddressMap,
@@ -1162,7 +1162,7 @@ func stackChangeHooks(send func(*stacks.StackChangeProgress) error, mainStackSou
 			return nil
 		},
 
-		// When Terraform core reports a resource instance plan status, we
+		// When Dumb Terraform core reports a resource instance plan status, we
 		// forward it to the events client.
 		ReportResourceInstanceStatus: func(ctx context.Context, span any, rihd *hooks.ResourceInstanceStatusHookData) any {
 			// addrs.Provider.String() will panic on the zero value. In this

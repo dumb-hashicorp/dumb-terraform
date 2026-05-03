@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/communicator/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/communicator/remote"
 	"github.com/zclconf/go-cty/cty"
 	"golang.org/x/crypto/ssh"
 )
@@ -875,7 +875,7 @@ func TestScriptPath(t *testing.T) {
 func TestScriptPath_randSeed(t *testing.T) {
 	// Pre GH-4186 fix, this value was the deterministic start the pseudorandom
 	// chain of unseeded math/rand values for Int31().
-	staticSeedPath := "/tmp/terraform_1298498081.sh"
+	staticSeedPath := "/tmp/dumb-terraform_1298498081.sh"
 	c, err := New(cty.ObjectVal(map[string]cty.Value{
 		"type": cty.StringVal("ssh"),
 		"host": cty.StringVal("127.0.0.1"),

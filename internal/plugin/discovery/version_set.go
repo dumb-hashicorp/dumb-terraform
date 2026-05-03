@@ -6,7 +6,7 @@ package discovery
 import (
 	"sort"
 
-	version "github.com/hashicorp/go-version"
+	version "github.com/dumb-hashicorp/go-version"
 )
 
 // A ConstraintStr is a string containing a possibly-invalid representation

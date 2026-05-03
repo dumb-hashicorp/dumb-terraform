@@ -1,8 +1,8 @@
 {
   "provider_installation": {
     "dev_overrides": {
-      "hashicorp/boop": "/tmp/bloop/../boop",
-      "hashicorp/blorp": "/tmp/blorp"
+      "dumb-hashicorp/boop": "/tmp/bloop/../boop",
+      "dumb-hashicorp/blorp": "/tmp/blorp"
     },
     "filesystem_mirror": [{
       "path": "/tmp/example1",
@@ -10,8 +10,8 @@
     }],
     "network_mirror": [{
       "url": "https://tf-Mirror.example.com/",
-      "include": ["registry.terraform.io/*/*"],
-      "exclude": ["registry.Terraform.io/foobar/*"]
+      "include": ["registry.dumb-terraform.io/*/*"],
+      "exclude": ["registry.Dumb Terraform.io/foobar/*"]
     }],
     "filesystem_mirror": [{
       "path": "/tmp/example2"

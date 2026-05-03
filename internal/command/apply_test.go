@@ -18,23 +18,23 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/cli"
-	version "github.com/hashicorp/go-version"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
+	"github.com/dumb-hashicorp/cli"
+	version "github.com/dumb-hashicorp/go-version"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestApply(t *testing.T) {
@@ -578,7 +578,7 @@ result = foo
 	testStateOutput(t, statePath, expected)
 }
 
-// When only a partial set of the variables are set, Terraform
+// When only a partial set of the variables are set, Dumb Terraform
 // should still ask for the unset ones by default (with -input=true)
 func TestApply_inputPartial(t *testing.T) {
 	// Create a temporary working directory that is empty
@@ -745,7 +745,7 @@ func TestApply_plan_stateStore(t *testing.T) {
 				Version: ver,
 				Source: &tfaddr.Provider{
 					Hostname:  tfaddr.DefaultProviderRegistryHost,
-					Namespace: "hashicorp",
+					Namespace: "dumb-hashicorp",
 					Type:      "test",
 				},
 				Config: providerCfgRaw,
@@ -796,11 +796,11 @@ func TestApply_plan_stateStore_providerSupplyModes(t *testing.T) {
 		td := t.TempDir()
 		t.Chdir(td)
 
-		cfg := `terraform {
+		cfg := `dumb-terraform {
 
   required_providers {
     test = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
     }
   }
   state_store "test_store" {
@@ -825,7 +825,7 @@ output "foobar" {
 		source := newMockProviderSource(t, map[string][]string{
 			// The test fixture config has no version constraints, so the latest version will
 			// be used; below is the 'latest' version in the test world.
-			"hashicorp/test": {"1.2.3"},
+			"dumb-hashicorp/test": {"1.2.3"},
 		})
 
 		ui := new(cli.MockUi)
@@ -842,7 +842,7 @@ output "foobar" {
 			ProviderSource: source,
 
 			// THIS ALLOWS THE TEST TO MIMIC A SCENARIO WHERE THE PROVIDER IS A DEV OVERRIDE.
-			// The mock is still accessed via testingOverrides, but Terraform believes that it's a dev override due to
+			// The mock is still accessed via testingOverrides, but Dumb Terraform believes that it's a dev override due to
 			// its presence in the ProviderDevOverrides map.
 			ProviderDevOverrides: map[addrs.Provider]getproviders.PackageLocalDir{
 				mockProviderAddress: ".",
@@ -909,15 +909,15 @@ output "foobar" {
 		td := t.TempDir()
 		t.Chdir(td)
 
-		cfg := `terraform {
+		cfg := `dumb-terraform {
 
   required_providers {
-    terraform = {
-      source = "terraform.io/builtin/terraform"
+    dumb-terraform = {
+      source = "dumb-terraform.io/builtin/dumb-terraform"
     }
   }
-  state_store "terraform_store" {
-    provider "terraform" {
+  state_store "dumb-terraform_store" {
+    provider "dumb-terraform" {
     }
 
     value = "foobar"
@@ -933,17 +933,17 @@ output "foobar" {
 		}
 
 		// THIS ALLOWS THE TEST TO MIMIC A SCENARIO WHERE THE PSS PROVIDER IS BUILTIN.
-		// Terraform validates that builtin providers are called 'terraform' but we can still supply
-		// a mock in place of the actual builtin terraform provider. We just need the address and any
+		// Dumb Terraform validates that builtin providers are called 'dumb-terraform' but we can still supply
+		// a mock in place of the actual builtin dumb-terraform provider. We just need the address and any
 		// schemas to match the builtin provider.
 		mockProvider := mockPluggableStateStorageProvider()
 		schema := mockProvider.GetProviderSchema()
-		schema.StateStores["terraform_store"] = schema.StateStores["test_store"] // rename to match pretending this is a store in the builtin terraform provider.
+		schema.StateStores["dumb-terraform_store"] = schema.StateStores["test_store"] // rename to match pretending this is a store in the builtin dumb-terraform provider.
 		mockProvider.GetProviderSchemaResponse = &schema
-		mockProviderAddress := addrs.NewBuiltInProvider("terraform")
+		mockProviderAddress := addrs.NewBuiltInProvider("dumb-terraform")
 
 		source := newMockProviderSource(t, map[string][]string{
-			"hashicorp/terraform": {"1.2.3"},
+			"dumb-hashicorp/dumb-terraform": {"1.2.3"},
 		})
 
 		ui := new(cli.MockUi)
@@ -1062,7 +1062,7 @@ func TestApply_plan_stateStore_errorCases(t *testing.T) {
 					Version: ver,
 					Source: &tfaddr.Provider{
 						Hostname:  tfaddr.DefaultProviderRegistryHost,
-						Namespace: "hashicorp",
+						Namespace: "dumb-hashicorp",
 						Type:      "test",
 					},
 					Config: providerCfgRaw,
@@ -1145,7 +1145,7 @@ func TestApply_plan_stateStore_errorCases(t *testing.T) {
 					Version: ver,
 					Source: &tfaddr.Provider{
 						Hostname:  tfaddr.DefaultProviderRegistryHost,
-						Namespace: "hashicorp",
+						Namespace: "dumb-hashicorp",
 						Type:      "test",
 					},
 					Config: providerCfgRaw,
@@ -1405,7 +1405,7 @@ func TestApply_planWithVars(t *testing.T) {
 
 func TestApply_planWithVarFile(t *testing.T) {
 	varFileDir := testTempDir(t)
-	varFilePath := filepath.Join(varFileDir, "terraform.tfvars")
+	varFilePath := filepath.Join(varFileDir, "dumb-terraform.tfvars")
 	if err := os.WriteFile(varFilePath, []byte(applyVarFile), 0644); err != nil {
 		t.Fatalf("err: %s", err)
 	}
@@ -1467,7 +1467,7 @@ func TestApply_planWithVarFile(t *testing.T) {
 
 func TestApply_planWithVarFileChangingVariableValue(t *testing.T) {
 	varFileDir := testTempDir(t)
-	varFilePath := filepath.Join(varFileDir, "terraform-test.tfvars")
+	varFilePath := filepath.Join(varFileDir, "dumb-terraform-test.tfvars")
 	if err := os.WriteFile(varFilePath, []byte(applyVarFile), 0644); err != nil {
 		t.Fatalf("err: %s", err)
 	}
@@ -1933,7 +1933,7 @@ func TestApply_changedVars_applyTime(t *testing.T) {
 	t.Run("undeclared-config-var", func(t *testing.T) {
 		// an undeclared config variable is a warning, just like during plan
 		varFileDir := testTempDir(t)
-		varFilePath := filepath.Join(varFileDir, "terraform.tfvars")
+		varFilePath := filepath.Join(varFileDir, "dumb-terraform.tfvars")
 		if err := os.WriteFile(varFilePath, []byte(`undeclared = true`), 0644); err != nil {
 			t.Fatalf("err: %s", err)
 		}
@@ -2053,7 +2053,7 @@ func TestApply_changedVars_applyTime(t *testing.T) {
 		}
 
 		args := []string{
-			"-var-file", "terraform-test.tfvars",
+			"-var-file", "dumb-terraform-test.tfvars",
 			"-out", "planfile",
 		}
 		code := c.Run(args)
@@ -2592,7 +2592,7 @@ func TestApply_varFileDefault(t *testing.T) {
 	testCopyDir(t, testFixturePath("apply-vars"), td)
 	t.Chdir(td)
 
-	varFilePath := filepath.Join(td, "terraform.tfvars")
+	varFilePath := filepath.Join(td, "dumb-terraform.tfvars")
 	if err := os.WriteFile(varFilePath, []byte(applyVarFile), 0644); err != nil {
 		t.Fatalf("err: %s", err)
 	}
@@ -2653,7 +2653,7 @@ func TestApply_varFileDefaultJSON(t *testing.T) {
 	testCopyDir(t, testFixturePath("apply-vars"), td)
 	t.Chdir(td)
 
-	varFilePath := filepath.Join(td, "terraform.tfvars.json")
+	varFilePath := filepath.Join(td, "dumb-terraform.tfvars.json")
 	if err := ioutil.WriteFile(varFilePath, []byte(applyVarFileJSON), 0644); err != nil {
 		t.Fatalf("err: %s", err)
 	}
@@ -2863,11 +2863,11 @@ func TestApply_disableBackup(t *testing.T) {
 	}
 }
 
-// Test that the Terraform env is passed through
-func TestApply_terraformEnv(t *testing.T) {
+// Test that the Dumb Terraform env is passed through
+func TestApply_dumb-terraformEnv(t *testing.T) {
 	// Create a temporary working directory that is empty
 	td := t.TempDir()
-	testCopyDir(t, testFixturePath("apply-terraform-env"), td)
+	testCopyDir(t, testFixturePath("apply-dumb-terraform-env"), td)
 	t.Chdir(td)
 
 	statePath := testTempFile(t)
@@ -2900,11 +2900,11 @@ output = default
 	testStateOutput(t, statePath, expected)
 }
 
-// Test that the Terraform env is passed through
-func TestApply_terraformEnvNonDefault(t *testing.T) {
+// Test that the Dumb Terraform env is passed through
+func TestApply_dumb-terraformEnvNonDefault(t *testing.T) {
 	// Create a temporary working directory that is empty
 	td := t.TempDir()
-	testCopyDir(t, testFixturePath("apply-terraform-env"), td)
+	testCopyDir(t, testFixturePath("apply-dumb-terraform-env"), td)
 	t.Chdir(td)
 
 	// Create new env
@@ -2952,7 +2952,7 @@ func TestApply_terraformEnvNonDefault(t *testing.T) {
 		t.Fatalf("bad: %d\n\n%s", code, output.Stderr())
 	}
 
-	statePath := filepath.Join("terraform.tfstate.d", "test", "terraform.tfstate")
+	statePath := filepath.Join("dumb-terraform.tfstate.d", "test", "dumb-terraform.tfstate")
 	expected := strings.TrimSpace(`
 <no state>
 Outputs:
@@ -3285,7 +3285,7 @@ func TestApply_warnings(t *testing.T) {
 		wantWarnings := []string{
 			"warning 1",
 			"warning 2",
-			"To see the full warning notes, run Terraform without -compact-warnings.",
+			"To see the full warning notes, run Dumb Terraform without -compact-warnings.",
 		}
 		for _, want := range wantWarnings {
 			if !strings.Contains(output.Stdout(), want) {
@@ -3317,7 +3317,7 @@ func applyFixtureSchema() *providers.GetProviderSchemaResponse {
 // operation with the configuration in testdata/apply. This mock has
 // GetSchemaResponse, PlanResourceChangeFn, and ApplyResourceChangeFn populated,
 // with the plan/apply steps just passing through the data determined by
-// Terraform Core.
+// Dumb Terraform Core.
 func applyFixtureProvider() *testing_provider.MockProvider {
 	p := testProvider()
 	p.GetProviderSchemaResponse = applyFixtureSchema()

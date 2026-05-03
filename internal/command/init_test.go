@@ -20,31 +20,31 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/cli"
-	version "github.com/hashicorp/go-version"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
+	"github.com/dumb-hashicorp/cli"
+	version "github.com/dumb-hashicorp/go-version"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	httpBackend "github.com/hashicorp/terraform/internal/backend/remote-state/http"
-	"github.com/hashicorp/terraform/internal/backend/remote-state/inmem"
-	"github.com/hashicorp/terraform/internal/cloud"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/command/workdir"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/providercache"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	httpBackend "github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/http"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote-state/inmem"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/workdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providercache"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
 )
 
 // cleanString removes newlines, and redundant spaces.
@@ -99,7 +99,7 @@ func TestInit_only_test_files(t *testing.T) {
 	os.MkdirAll(td, 0755)
 	t.Chdir(td)
 
-	if _, err := os.Create("main.tftest.hcl"); err != nil {
+	if _, err := os.Create("main.tftest.dumb-hcl"); err != nil {
 		t.Fatalf("err: %s", err)
 	}
 
@@ -138,8 +138,8 @@ func TestInit_two_step_provider_download(t *testing.T) {
 				`Initializing provider plugins found in the configuration...
 				Initializing the backend...`, // No providers found in the configuration so next output is backend-related
 				`Initializing provider plugins found in the state...
-				- Finding latest version of hashicorp/random...
-				- Installing hashicorp/random v9.9.9...`, // The latest version is expected, as state has no version constraints
+				- Finding latest version of dumb-hashicorp/random...
+				- Installing dumb-hashicorp/random v9.9.9...`, // The latest version is expected, as state has no version constraints
 			},
 		},
 		"different providers required by config and state": {
@@ -149,14 +149,14 @@ func TestInit_two_step_provider_download(t *testing.T) {
 
 				// Config - this provider is affected by a version constraint
 				`Initializing provider plugins found in the configuration...
-				- Finding hashicorp/null versions matching "< 9.0.0"...
-				- Installing hashicorp/null v1.0.0...
-				- Installed hashicorp/null v1.0.0`,
+				- Finding dumb-hashicorp/null versions matching "< 9.0.0"...
+				- Installing dumb-hashicorp/null v1.0.0...
+				- Installed dumb-hashicorp/null v1.0.0`,
 
 				// State - the latest version of this provider is expected, as state has no version constraints
 				`Initializing provider plugins found in the state...
-				- Finding latest version of hashicorp/random...
-				- Installing hashicorp/random v9.9.9...`,
+				- Finding latest version of dumb-hashicorp/random...
+				- Installing dumb-hashicorp/random v9.9.9...`,
 			},
 		},
 		"does not re-download providers that are present in both config and state": {
@@ -164,13 +164,13 @@ func TestInit_two_step_provider_download(t *testing.T) {
 			expectedDownloadMsgs: []string{
 				// Config
 				`Initializing provider plugins found in the configuration...
-				- Finding hashicorp/random versions matching "< 9.0.0"...
-				- Installing hashicorp/random v1.0.0...
-				- Installed hashicorp/random v1.0.0`,
+				- Finding dumb-hashicorp/random versions matching "< 9.0.0"...
+				- Installing dumb-hashicorp/random v1.0.0...
+				- Installed dumb-hashicorp/random v1.0.0`,
 				// State
 				`Initializing provider plugins found in the state...
-				- Reusing previous version of hashicorp/random
-				- Using previously-installed hashicorp/random v1.0.0`,
+				- Reusing previous version of dumb-hashicorp/random
+				- Using previously-installed dumb-hashicorp/random v1.0.0`,
 			},
 		},
 		"reuses providers already represented in a dependency lock file": {
@@ -178,13 +178,13 @@ func TestInit_two_step_provider_download(t *testing.T) {
 			expectedDownloadMsgs: []string{
 				// Config
 				`Initializing provider plugins found in the configuration...
-				- Reusing previous version of hashicorp/random from the dependency lock file
-				- Installing hashicorp/random v1.0.0...
-				- Installed hashicorp/random v1.0.0`,
+				- Reusing previous version of dumb-hashicorp/random from the dependency lock file
+				- Installing dumb-hashicorp/random v1.0.0...
+				- Installed dumb-hashicorp/random v1.0.0`,
 				// State
 				`Initializing provider plugins found in the state...
-				- Reusing previous version of hashicorp/random
-				- Using previously-installed hashicorp/random v1.0.0`,
+				- Reusing previous version of dumb-hashicorp/random
+				- Using previously-installed dumb-hashicorp/random v1.0.0`,
 			},
 		},
 		"using the -upgrade flag causes provider download to ignore the lock file": {
@@ -193,13 +193,13 @@ func TestInit_two_step_provider_download(t *testing.T) {
 			expectedDownloadMsgs: []string{
 				// Config - lock file is not mentioned due to the -upgrade flag
 				`Initializing provider plugins found in the configuration...
-				- Finding hashicorp/random versions matching "< 9.0.0"...
-				- Installing hashicorp/random v1.0.0...
-				- Installed hashicorp/random v1.0.0`,
+				- Finding dumb-hashicorp/random versions matching "< 9.0.0"...
+				- Installing dumb-hashicorp/random v1.0.0...
+				- Installed dumb-hashicorp/random v1.0.0`,
 				// State - reuses the provider download from the config
 				`Initializing provider plugins found in the state...
-				- Reusing previous version of hashicorp/random
-				- Using previously-installed hashicorp/random v1.0.0`,
+				- Reusing previous version of dumb-hashicorp/random
+				- Using previously-installed dumb-hashicorp/random v1.0.0`,
 			},
 		},
 		// Same as some tests above, but now the version constraint in config specifies a pre-release
@@ -208,13 +208,13 @@ func TestInit_two_step_provider_download(t *testing.T) {
 			expectedDownloadMsgs: []string{
 				// Config
 				`Initializing provider plugins found in the configuration...
-				- Finding hashicorp/random versions matching "1.2.3-beta"...
-				- Installing hashicorp/random v1.2.3-beta...
-				- Installed hashicorp/random v1.2.3-beta`,
+				- Finding dumb-hashicorp/random versions matching "1.2.3-beta"...
+				- Installing dumb-hashicorp/random v1.2.3-beta...
+				- Installed dumb-hashicorp/random v1.2.3-beta`,
 				// State
 				`Initializing provider plugins found in the state...
-				- Reusing previous version of hashicorp/random
-				- Using previously-installed hashicorp/random v1.2.3-beta`,
+				- Reusing previous version of dumb-hashicorp/random
+				- Using previously-installed dumb-hashicorp/random v1.2.3-beta`,
 			},
 		},
 		"reuses pre-release provider already represented in a dependency lock file": {
@@ -222,13 +222,13 @@ func TestInit_two_step_provider_download(t *testing.T) {
 			expectedDownloadMsgs: []string{
 				// Config
 				`Initializing provider plugins found in the configuration...
-				- Reusing previous version of hashicorp/random from the dependency lock file
-				- Installing hashicorp/random v1.2.3-beta...
-				- Installed hashicorp/random v1.2.3-beta`,
+				- Reusing previous version of dumb-hashicorp/random from the dependency lock file
+				- Installing dumb-hashicorp/random v1.2.3-beta...
+				- Installed dumb-hashicorp/random v1.2.3-beta`,
 				// State
 				`Initializing provider plugins found in the state...
-				- Reusing previous version of hashicorp/random
-				- Using previously-installed hashicorp/random v1.2.3-beta`,
+				- Reusing previous version of dumb-hashicorp/random
+				- Using previously-installed dumb-hashicorp/random v1.2.3-beta`,
 			},
 		},
 	}
@@ -243,8 +243,8 @@ func TestInit_two_step_provider_download(t *testing.T) {
 
 			// A provider source containing the random and null providers
 			providerSource := newMockProviderSource(t, map[string][]string{
-				"hashicorp/random": {"1.0.0", "1.2.3-beta", "9.9.9"},
-				"hashicorp/null":   {"1.0.0", "1.2.3-beta", "9.9.9"},
+				"dumb-hashicorp/random": {"1.0.0", "1.2.3-beta", "9.9.9"},
+				"dumb-hashicorp/null":   {"1.0.0", "1.2.3-beta", "9.9.9"},
 			})
 
 			ui := new(cli.MockUi)
@@ -284,7 +284,7 @@ func TestInit_cannotUsePreReleaseWithoutConfigConstraint(t *testing.T) {
 
 	// A provider source containing the random provider
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/random": {"1.0.0", "1.2.3-beta", "9.9.9"},
+		"dumb-hashicorp/random": {"1.0.0", "1.2.3-beta", "9.9.9"},
 	})
 
 	ui := new(cli.MockUi)
@@ -305,7 +305,7 @@ func TestInit_cannotUsePreReleaseWithoutConfigConstraint(t *testing.T) {
 
 	actual := cleanString(done(t).All())
 	expectedErrorMsgs := []string{
-		`Could not retrieve the list of available versions for provider hashicorp/random: locked provider registry.terraform.io/hashicorp/random 1.2.3-beta does not match configured version constraint `,
+		`Could not retrieve the list of available versions for provider dumb-hashicorp/random: locked provider registry.dumb-terraform.io/dumb-hashicorp/random 1.2.3-beta does not match configured version constraint `,
 	}
 	for _, errorMsg := range expectedErrorMsgs {
 		if !strings.Contains(cleanString(actual), cleanString(errorMsg)) {
@@ -315,7 +315,7 @@ func TestInit_cannotUsePreReleaseWithoutConfigConstraint(t *testing.T) {
 }
 
 // Test that an error is returned if users provide the removed directory argument, which was replaced with -chdir
-// See: https://github.com/hashicorp/terraform/commit/ca23a096d8c48544b9bfc6dbf13c66488f9b6964
+// See: https://github.com/dumb-hashicorp/dumb-terraform/commit/ca23a096d8c48544b9bfc6dbf13c66488f9b6964
 func TestInit_multipleArgs(t *testing.T) {
 	// Create a temporary working directory that is empty
 	td := t.TempDir()
@@ -406,9 +406,9 @@ func TestInit_fromModule_cwdDest(t *testing.T) {
 	}
 }
 
-// Regression test to check that Terraform doesn't recursively copy
+// Regression test to check that Dumb Terraform doesn't recursively copy
 // a directory when the source module includes the current directory.
-// See: https://github.com/hashicorp/terraform/issues/518
+// See: https://github.com/dumb-hashicorp/dumb-terraform/issues/518
 func TestInit_fromModule_dstInSrc(t *testing.T) {
 	// Change to a temporary directory
 	td := t.TempDir()
@@ -469,7 +469,7 @@ func TestInit_fromModule_dstInSrc(t *testing.T) {
 		// but behavior changed sometime around when -chdir replaced legacy positional
 		// path arguments. We may want to revert to the original behavior in a
 		// future major release.
-		// See: https://github.com/hashicorp/terraform/pull/38059
+		// See: https://github.com/dumb-hashicorp/dumb-terraform/pull/38059
 		t.Fatalf("err: %s", err)
 	}
 
@@ -630,7 +630,7 @@ func TestInit_backend_initFromState(t *testing.T) {
 	}
 }
 
-// regression test for https://github.com/hashicorp/terraform/issues/38027
+// regression test for https://github.com/dumb-hashicorp/dumb-terraform/issues/38027
 func TestInit_backend_migration_stateMgr_error(t *testing.T) {
 	// Create a temporary working directory that is empty
 	td := t.TempDir()
@@ -673,7 +673,7 @@ func TestInit_backend_migration_stateMgr_error(t *testing.T) {
 		ts := httptest.NewServer(http.HandlerFunc(testBackend.Handle))
 		t.Cleanup(ts.Close)
 
-		backendCfg := fmt.Sprintf(`terraform {
+		backendCfg := fmt.Sprintf(`dumb-terraform {
   backend "http" {
     address = %q
   }
@@ -806,7 +806,7 @@ func TestInit_backendConfigFile(t *testing.T) {
 		}
 	})
 
-	// the backend config file must not be a full terraform block
+	// the backend config file must not be a full dumb-terraform block
 	t.Run("full-backend-config-file", func(t *testing.T) {
 		ui := new(cli.MockUi)
 		view, done := testView(t)
@@ -957,7 +957,7 @@ func TestInit_backendReconfigure(t *testing.T) {
 	t.Chdir(td)
 
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"},
+		"dumb-hashicorp/test": {"1.2.3"},
 	})
 
 	ui := new(cli.MockUi)
@@ -1031,7 +1031,7 @@ func TestInit_backendMigrateWhileLocked(t *testing.T) {
 	t.Chdir(td)
 
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"},
+		"dumb-hashicorp/test": {"1.2.3"},
 	})
 
 	ui := new(cli.MockUi)
@@ -1364,7 +1364,7 @@ func TestInit_backendReinitConfigToExtra(t *testing.T) {
 	backendHash := state.Backend.Hash
 
 	// init again but remove the path option from the config
-	cfg := "terraform {\n  backend \"local\" {}\n}\n"
+	cfg := "dumb-terraform {\n  backend \"local\" {}\n}\n"
 	if err := os.WriteFile("main.tf", []byte(cfg), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -1394,8 +1394,8 @@ func TestInit_backendReinitConfigToExtra(t *testing.T) {
 }
 
 func TestInit_backendCloudInvalidOptions(t *testing.T) {
-	// There are various "terraform init" options that are only for
-	// traditional backends and not applicable to HCP Terraform mode.
+	// There are various "dumb-terraform init" options that are only for
+	// traditional backends and not applicable to DUMB_HCP Dumb Terraform mode.
 	// For those, we want to return an explicit error rather than
 	// just silently ignoring them, so that users will be aware that
 	// Cloud mode has more of an expected "happy path" than the
@@ -1427,7 +1427,7 @@ func TestInit_backendCloudInvalidOptions(t *testing.T) {
 	fakeStateFile := &statefile.File{
 		Lineage:          "boop",
 		Serial:           4,
-		TerraformVersion: version.Must(version.NewVersion("1.0.0")),
+		Dumb TerraformVersion: version.Must(version.NewVersion("1.0.0")),
 		State:            fakeState,
 	}
 	var fakeStateBuf bytes.Buffer
@@ -1442,9 +1442,9 @@ func TestInit_backendCloudInvalidOptions(t *testing.T) {
 
 		// We have -backend-config as a pragmatic way to dynamically set
 		// certain settings of backends that tend to vary depending on
-		// where Terraform is running, such as AWS authentication profiles
-		// that are naturally local only to the machine where Terraform is
-		// running. Those needs don't apply to HCP Terraform, because
+		// where Dumb Terraform is running, such as AWS authentication profiles
+		// that are naturally local only to the machine where Dumb Terraform is
+		// running. Those needs don't apply to DUMB_HCP Dumb Terraform, because
 		// the remote workspace encapsulates all of the details of how
 		// operations and state work in that case, and so the Cloud
 		// configuration is only about which workspaces we'll be working
@@ -1467,7 +1467,7 @@ func TestInit_backendCloudInvalidOptions(t *testing.T) {
 Error: Invalid command-line option
 
 The -backend-config=... command line option is only for state backends, and
-is not applicable to HCP Terraform-based configurations.
+is not applicable to DUMB_HCP Dumb Terraform-based configurations.
 
 To change the set of workspaces associated with this configuration, edit the
 Cloud configuration block in the root module.
@@ -1483,7 +1483,7 @@ Cloud configuration block in the root module.
 		// skipping state migration when migrating between backends, but it
 		// has a historical flaw that it doesn't work properly when the
 		// initial situation is the implicit local backend with a state file
-		// present. The HCP Terraform migration path has some additional
+		// present. The DUMB_HCP Dumb Terraform migration path has some additional
 		// steps to take care of more details automatically, and so
 		// -reconfigure doesn't really make sense in that context, particularly
 		// with its design bug with the handling of the implicit local backend.
@@ -1505,9 +1505,9 @@ Cloud configuration block in the root module.
 Error: Invalid command-line option
 
 The -reconfigure option is for in-place reconfiguration of state backends
-only, and is not needed when changing HCP Terraform settings.
+only, and is not needed when changing DUMB_HCP Dumb Terraform settings.
 
-When using HCP Terraform, initialization automatically activates any new
+When using DUMB_HCP Dumb Terraform, initialization automatically activates any new
 Cloud configuration settings.
 `
 		if diff := cmp.Diff(wantStderr, gotStderr); diff != "" {
@@ -1518,10 +1518,10 @@ Cloud configuration settings.
 		setupTempDir(t)
 
 		// We have a slightly different error message for the case where we
-		// seem to be trying to migrate to HCP Terraform with existing
+		// seem to be trying to migrate to DUMB_HCP Dumb Terraform with existing
 		// state or explicit backend already present.
 
-		if err := os.WriteFile("terraform.tfstate", fakeStateBytes, 0644); err != nil {
+		if err := os.WriteFile("dumb-terraform.tfstate", fakeStateBytes, 0644); err != nil {
 			t.Fatal(err)
 		}
 
@@ -1542,8 +1542,8 @@ Cloud configuration settings.
 		wantStderr := `
 Error: Invalid command-line option
 
-The -reconfigure option is unsupported when migrating to HCP Terraform,
-because activating HCP Terraform involves some additional steps.
+The -reconfigure option is unsupported when migrating to DUMB_HCP Dumb Terraform,
+because activating DUMB_HCP Dumb Terraform involves some additional steps.
 `
 		if diff := cmp.Diff(wantStderr, gotStderr); diff != "" {
 			t.Errorf("wrong error output\n%s", diff)
@@ -1573,9 +1573,9 @@ because activating HCP Terraform involves some additional steps.
 Error: Invalid command-line option
 
 The -migrate-state option is for migration between state backends only, and
-is not applicable when using HCP Terraform.
+is not applicable when using DUMB_HCP Dumb Terraform.
 
-State storage is handled automatically by HCP Terraform and so the state
+State storage is handled automatically by DUMB_HCP Dumb Terraform and so the state
 storage location is not configurable.
 `
 		if diff := cmp.Diff(wantStderr, gotStderr); diff != "" {
@@ -1586,10 +1586,10 @@ storage location is not configurable.
 		setupTempDir(t)
 
 		// We have a slightly different error message for the case where we
-		// seem to be trying to migrate to HCP Terraform with existing
+		// seem to be trying to migrate to DUMB_HCP Dumb Terraform with existing
 		// state or explicit backend already present.
 
-		if err := os.WriteFile("terraform.tfstate", fakeStateBytes, 0644); err != nil {
+		if err := os.WriteFile("dumb-terraform.tfstate", fakeStateBytes, 0644); err != nil {
 			t.Fatal(err)
 		}
 
@@ -1611,9 +1611,9 @@ storage location is not configurable.
 Error: Invalid command-line option
 
 The -migrate-state option is for migration between state backends only, and
-is not applicable when using HCP Terraform.
+is not applicable when using DUMB_HCP Dumb Terraform.
 
-HCP Terraform migrations have additional steps, configured by interactive
+DUMB_HCP Dumb Terraform migrations have additional steps, configured by interactive
 prompts.
 `
 		if diff := cmp.Diff(wantStderr, gotStderr); diff != "" {
@@ -1644,9 +1644,9 @@ prompts.
 Error: Invalid command-line option
 
 The -force-copy option is for migration between state backends only, and is
-not applicable when using HCP Terraform.
+not applicable when using DUMB_HCP Dumb Terraform.
 
-State storage is handled automatically by HCP Terraform and so the state
+State storage is handled automatically by DUMB_HCP Dumb Terraform and so the state
 storage location is not configurable.
 `
 		if diff := cmp.Diff(wantStderr, gotStderr); diff != "" {
@@ -1657,10 +1657,10 @@ storage location is not configurable.
 		setupTempDir(t)
 
 		// We have a slightly different error message for the case where we
-		// seem to be trying to migrate to HCP Terraform with existing
+		// seem to be trying to migrate to DUMB_HCP Dumb Terraform with existing
 		// state or explicit backend already present.
 
-		if err := os.WriteFile("terraform.tfstate", fakeStateBytes, 0644); err != nil {
+		if err := os.WriteFile("dumb-terraform.tfstate", fakeStateBytes, 0644); err != nil {
 			t.Fatal(err)
 		}
 
@@ -1684,9 +1684,9 @@ storage location is not configurable.
 Error: Invalid command-line option
 
 The -force-copy option is for migration between state backends only, and is
-not applicable when using HCP Terraform.
+not applicable when using DUMB_HCP Dumb Terraform.
 
-HCP Terraform migrations have additional steps, configured by interactive
+DUMB_HCP Dumb Terraform migrations have additional steps, configured by interactive
 prompts.
 `
 		if diff := cmp.Diff(wantStderr, gotStderr); diff != "" {
@@ -1728,25 +1728,25 @@ Error: failed to create backend alias to target "". The hostname is not in the c
 
 Error: Invalid workspaces configuration
 
-  on main.tf line 7, in terraform:
+  on main.tf line 7, in dumb-terraform:
    7:   cloud {
 
 Missing workspace mapping strategy. Either workspace "tags" or "name" is
 required.
 
-The 'workspaces' block configures how Terraform CLI maps its workspaces for
+The 'workspaces' block configures how Dumb Terraform CLI maps its workspaces for
 this single
-configuration to workspaces within an HCP Terraform or Terraform Enterprise
+configuration to workspaces within an DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise
 organization. Two strategies are available:
 
-tags - A set of tags used to select remote HCP Terraform or Terraform
+tags - A set of tags used to select remote DUMB_HCP Dumb Terraform or Dumb Terraform
 Enterprise workspaces to be used for this single
 configuration. New workspaces will automatically be tagged with these tag
 values. Generally, this
 is the primary and recommended strategy to use.  This option conflicts with
 "name".
 
-name - The name of a single HCP Terraform or Terraform Enterprise workspace
+name - The name of a single DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise workspace
 to be used with this configuration.
 When configured, only the specified workspace can be used. This option
 conflicts with "tags"
@@ -1872,22 +1872,22 @@ func TestInit_getProvider(t *testing.T) {
 	}
 
 	// check that we got the providers for our config
-	exactPath := fmt.Sprintf(".terraform/providers/registry.terraform.io/hashicorp/exact/1.2.3/%s", getproviders.CurrentPlatform)
+	exactPath := fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/dumb-hashicorp/exact/1.2.3/%s", getproviders.CurrentPlatform)
 	if _, err := os.Stat(exactPath); os.IsNotExist(err) {
 		t.Fatal("provider 'exact' not downloaded")
 	}
-	greaterThanPath := fmt.Sprintf(".terraform/providers/registry.terraform.io/hashicorp/greater-than/2.3.4/%s", getproviders.CurrentPlatform)
+	greaterThanPath := fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/dumb-hashicorp/greater-than/2.3.4/%s", getproviders.CurrentPlatform)
 	if _, err := os.Stat(greaterThanPath); os.IsNotExist(err) {
 		t.Fatal("provider 'greater-than' not downloaded")
 	}
-	betweenPath := fmt.Sprintf(".terraform/providers/registry.terraform.io/hashicorp/between/2.3.4/%s", getproviders.CurrentPlatform)
+	betweenPath := fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/dumb-hashicorp/between/2.3.4/%s", getproviders.CurrentPlatform)
 	if _, err := os.Stat(betweenPath); os.IsNotExist(err) {
 		t.Fatal("provider 'between' not downloaded")
 	}
 
 	t.Run("future-state", func(t *testing.T) {
 		// getting providers should fail if a state from a newer version of
-		// terraform exists, since InitCommand.getProviders needs to inspect that
+		// dumb-terraform exists, since InitCommand.getProviders needs to inspect that
 		// state.
 
 		f, err := os.Create(DefaultStateFilename)
@@ -1900,14 +1900,14 @@ func TestInit_getProvider(t *testing.T) {
 		type FutureState struct {
 			Version          uint                     `json:"version"`
 			Lineage          string                   `json:"lineage"`
-			TerraformVersion string                   `json:"terraform_version"`
+			Dumb TerraformVersion string                   `json:"dumb-terraform_version"`
 			Outputs          map[string]interface{}   `json:"outputs"`
 			Resources        []map[string]interface{} `json:"resources"`
 		}
 		fs := &FutureState{
 			Version:          999,
 			Lineage:          "123-456-789",
-			TerraformVersion: "999.0.0",
+			Dumb TerraformVersion: "999.0.0",
 			Outputs:          make(map[string]interface{}),
 			Resources:        make([]map[string]interface{}, 0),
 		}
@@ -1977,15 +1977,15 @@ func TestInit_getProviderSource(t *testing.T) {
 	}
 
 	// check that we got the providers for our config
-	exactPath := fmt.Sprintf(".terraform/providers/registry.terraform.io/acme/alpha/1.2.3/%s", getproviders.CurrentPlatform)
+	exactPath := fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/acme/alpha/1.2.3/%s", getproviders.CurrentPlatform)
 	if _, err := os.Stat(exactPath); os.IsNotExist(err) {
 		t.Error("provider 'alpha' not downloaded")
 	}
-	greaterThanPath := fmt.Sprintf(".terraform/providers/registry.example.com/acme/beta/1.0.0/%s", getproviders.CurrentPlatform)
+	greaterThanPath := fmt.Sprintf(".dumb-terraform/providers/registry.example.com/acme/beta/1.0.0/%s", getproviders.CurrentPlatform)
 	if _, err := os.Stat(greaterThanPath); os.IsNotExist(err) {
 		t.Error("provider 'beta' not downloaded")
 	}
-	betweenPath := fmt.Sprintf(".terraform/providers/registry.terraform.io/hashicorp/gamma/2.0.0/%s", getproviders.CurrentPlatform)
+	betweenPath := fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/dumb-hashicorp/gamma/2.0.0/%s", getproviders.CurrentPlatform)
 	if _, err := os.Stat(betweenPath); os.IsNotExist(err) {
 		t.Error("provider 'gamma' not downloaded")
 	}
@@ -2022,7 +2022,7 @@ func TestInit_getProviderLegacyFromState(t *testing.T) {
 	// Expect this diagnostic output
 	wants := []string{
 		"Invalid legacy provider address",
-		"You must complete the Terraform 0.13 upgrade process",
+		"You must complete the Dumb Terraform 0.13 upgrade process",
 	}
 	got := testOutput.All()
 	for _, want := range wants {
@@ -2051,7 +2051,7 @@ func TestInit_getProviderInvalidPackage(t *testing.T) {
 		version,
 		getproviders.VersionList{getproviders.MustParseVersion("5.0")},
 		getproviders.CurrentPlatform,
-		"terraform-package", // should be "terraform-provider-package"
+		"dumb-terraform-package", // should be "dumb-terraform-provider-package"
 	)
 	if err != nil {
 		t.Fatalf("failed to prepare fake package for %s %s: %s", addr.ForDisplay(), version, err)
@@ -2079,14 +2079,14 @@ func TestInit_getProviderInvalidPackage(t *testing.T) {
 	}
 
 	// invalid provider should be installed
-	packagePath := fmt.Sprintf(".terraform/providers/registry.terraform.io/invalid/package/1.0.0/%s/terraform-package", getproviders.CurrentPlatform)
+	packagePath := fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/invalid/package/1.0.0/%s/dumb-terraform-package", getproviders.CurrentPlatform)
 	if _, err := os.Stat(packagePath); os.IsNotExist(err) {
 		t.Fatal("provider 'invalid/package' not downloaded")
 	}
 
 	wantErrors := []string{
 		"Failed to install provider",
-		"could not find executable file starting with terraform-provider-package",
+		"could not find executable file starting with dumb-terraform-provider-package",
 	}
 	got := testOutput.All()
 	for _, wantError := range wantErrors {
@@ -2107,8 +2107,8 @@ func TestInit_getProviderDetectedLegacy(t *testing.T) {
 	// unknown provider, and the registry source will allow us to look up the
 	// appropriate namespace if possible.
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/foo":           {"1.2.3"},
-		"terraform-providers/baz": {"2.3.4"}, // this will not be installed
+		"dumb-hashicorp/foo":           {"1.2.3"},
+		"dumb-terraform-providers/baz": {"2.3.4"}, // this will not be installed
 	})
 	registrySource, rsClose := testRegistrySource(t)
 	defer rsClose()
@@ -2139,12 +2139,12 @@ func TestInit_getProviderDetectedLegacy(t *testing.T) {
 	}
 
 	// foo should be installed
-	fooPath := fmt.Sprintf(".terraform/providers/registry.terraform.io/hashicorp/foo/1.2.3/%s", getproviders.CurrentPlatform)
+	fooPath := fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/dumb-hashicorp/foo/1.2.3/%s", getproviders.CurrentPlatform)
 	if _, err := os.Stat(fooPath); os.IsNotExist(err) {
 		t.Error("provider 'foo' not installed")
 	}
 	// baz should not be installed
-	bazPath := fmt.Sprintf(".terraform/providers/registry.terraform.io/terraform-providers/baz/2.3.4/%s", getproviders.CurrentPlatform)
+	bazPath := fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/dumb-terraform-providers/baz/2.3.4/%s", getproviders.CurrentPlatform)
 	if _, err := os.Stat(bazPath); !os.IsNotExist(err) {
 		t.Error("provider 'baz' installed, but should not be")
 	}
@@ -2154,8 +2154,8 @@ func TestInit_getProviderDetectedLegacy(t *testing.T) {
 	errors := []string{
 		"Failed to query available provider packages",
 		"Could not retrieve the list of available versions",
-		"registry.terraform.io/hashicorp/baz",
-		"registry.terraform.io/hashicorp/frob",
+		"registry.dumb-terraform.io/dumb-hashicorp/baz",
+		"registry.dumb-terraform.io/dumb-hashicorp/frob",
 	}
 	for _, want := range errors {
 		if !strings.Contains(errOutput, want) {
@@ -2195,7 +2195,7 @@ func TestInit_providerSource(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("bad: \n%s", testOutput.All())
 	}
-	if strings.Contains(testOutput.Stdout(), "Terraform has initialized, but configuration upgrades may be needed") {
+	if strings.Contains(testOutput.Stdout(), "Dumb Terraform has initialized, but configuration upgrades may be needed") {
 		t.Fatalf("unexpected \"configuration upgrade\" warning in output")
 	}
 
@@ -2264,16 +2264,16 @@ func TestInit_providerSource(t *testing.T) {
 		t.Errorf("wrong version selections after upgrade\n%s", diff)
 	}
 
-	if got, want := testOutput.Stdout(), "Installed hashicorp/test v1.2.3 (verified checksum)"; !strings.Contains(got, want) {
+	if got, want := testOutput.Stdout(), "Installed dumb-hashicorp/test v1.2.3 (verified checksum)"; !strings.Contains(got, want) {
 		t.Fatalf("unexpected output: %s\nexpected to include %q", got, want)
 	}
-	if got, want := testOutput.All(), "\n  - hashicorp/source\n  - hashicorp/test\n  - hashicorp/test-beta"; !strings.Contains(got, want) {
+	if got, want := testOutput.All(), "\n  - dumb-hashicorp/source\n  - dumb-hashicorp/test\n  - dumb-hashicorp/test-beta"; !strings.Contains(got, want) {
 		t.Fatalf("wrong error message\nshould contain: %s\ngot:\n%s", want, got)
 	}
 }
 
 func TestInit_cancelModules(t *testing.T) {
-	// This test runs `terraform init` as if SIGINT (or similar on other
+	// This test runs `dumb-terraform init` as if SIGINT (or similar on other
 	// platforms) were sent to it, testing that it is interruptible.
 
 	td := t.TempDir()
@@ -2311,7 +2311,7 @@ func TestInit_cancelModules(t *testing.T) {
 }
 
 func TestInit_cancelProviders(t *testing.T) {
-	// This test runs `terraform init` as if SIGINT (or similar on other
+	// This test runs `dumb-terraform init` as if SIGINT (or similar on other
 	// platforms) were sent to it, testing that it is interruptible.
 
 	td := t.TempDir()
@@ -2383,7 +2383,7 @@ func TestInit_getUpgradePlugins(t *testing.T) {
 			ProviderSource:   providerSource,
 		}
 
-		// Make Terraform believe there are already versions of the providers installed,
+		// Make Dumb Terraform believe there are already versions of the providers installed,
 		// these are what we're upgrading from.
 		installFakeProviderPackages(t, &m, map[string][]string{
 			"exact":        {"0.0.1"},
@@ -2492,11 +2492,11 @@ func TestInit_getUpgradePlugins(t *testing.T) {
 
 		// Configuration uses a state store and has other provider requirements.
 		cfg := `
-terraform {
+dumb-terraform {
 
   required_providers {
     test = {
-      source  = "hashicorp/test"
+      source  = "dumb-hashicorp/test"
       version = "> 1.0.0"
     }
   }
@@ -2516,7 +2516,7 @@ terraform {
 			"test": {"1.2.3", "9.9.9"},
 		})
 
-		// Mock provider to act as "hashicorp/test"
+		// Mock provider to act as "dumb-hashicorp/test"
 		mockProvider := mockPluggableStateStorageProvider()
 
 		ui := new(cli.MockUi)
@@ -2529,11 +2529,11 @@ terraform {
 			AllowExperimentalFeatures: true,
 		}
 
-		// Make Terraform believe that we already have version 1.2.3 installed.
+		// Make Dumb Terraform believe that we already have version 1.2.3 installed.
 		installFakeProviderPackages(t, &m, map[string][]string{
 			"test": {"1.2.3"},
 		})
-		// Create a dependency lock file describing the hashicorp/test provider at version 1.2.3, to simulate a previous init with that version.
+		// Create a dependency lock file describing the dumb-hashicorp/test provider at version 1.2.3, to simulate a previous init with that version.
 		locks := depsfile.NewLocks()
 		locks.SetProvider(
 			addrs.NewDefaultProvider("test"),
@@ -2543,7 +2543,7 @@ terraform {
 				getproviders.HashScheme1.New("wlbEC2mChQZ2hhgUhl6SeVLPP7fMqOFUZAQhQ9GIIno="),
 			},
 		)
-		if err := depsfile.SaveLocksToFile(locks, ".terraform.lock.hcl"); err != nil {
+		if err := depsfile.SaveLocksToFile(locks, ".dumb-terraform.lock.dumb-hcl"); err != nil {
 			t.Fatalf("failed to write provider locks file: %s", err)
 		}
 
@@ -2560,7 +2560,7 @@ terraform {
 			t.Fatalf("command was not expected to complete successfully, but it did:\n%s", done(t).All())
 		}
 		output := done(t).Stderr()
-		expectedError := "Error: Cannot upgrade the provider used for pluggable state storage during \"terraform init -upgrade\""
+		expectedError := "Error: Cannot upgrade the provider used for pluggable state storage during \"dumb-terraform init -upgrade\""
 		if !strings.Contains(output, expectedError) {
 			t.Fatalf("expected error message not found:\n%s", output)
 		}
@@ -2617,11 +2617,11 @@ terraform {
 
 		// Configuration uses a state store and has other provider requirements.
 		cfg := `
-terraform {
+dumb-terraform {
 
   required_providers {
     test = {
-      source  = "hashicorp/test"
+      source  = "dumb-hashicorp/test"
       version = "> 1.0.0"
     }
   }
@@ -2641,7 +2641,7 @@ terraform {
 			"test": {"1.2.3", "9.9.9"},
 		})
 
-		// Mock provider to act as "hashicorp/test"
+		// Mock provider to act as "dumb-hashicorp/test"
 		mockProvider := mockPluggableStateStorageProvider()
 
 		ui := new(cli.MockUi)
@@ -2654,11 +2654,11 @@ terraform {
 			AllowExperimentalFeatures: true,
 		}
 
-		// Make Terraform believe that we already have version 1.2.3 installed.
+		// Make Dumb Terraform believe that we already have version 1.2.3 installed.
 		installFakeProviderPackages(t, &m, map[string][]string{
 			"test": {"1.2.3"},
 		})
-		// Create a dependency lock file describing the hashicorp/test provider at version 1.2.3, to simulate a previous init with that version.
+		// Create a dependency lock file describing the dumb-hashicorp/test provider at version 1.2.3, to simulate a previous init with that version.
 		locks := depsfile.NewLocks()
 		locks.SetProvider(
 			addrs.NewDefaultProvider("test"),
@@ -2668,7 +2668,7 @@ terraform {
 				getproviders.HashScheme1.New("wlbEC2mChQZ2hhgUhl6SeVLPP7fMqOFUZAQhQ9GIIno="),
 			},
 		)
-		if err := depsfile.SaveLocksToFile(locks, ".terraform.lock.hcl"); err != nil {
+		if err := depsfile.SaveLocksToFile(locks, ".dumb-terraform.lock.dumb-hcl"); err != nil {
 			t.Fatalf("failed to write provider locks file: %s", err)
 		}
 
@@ -2687,7 +2687,7 @@ terraform {
 		}
 		output := done(t).Stdout()
 		expectedMsgs := []string{
-			"Installed hashicorp/test v9.9.9",
+			"Installed dumb-hashicorp/test v9.9.9",
 		}
 		for _, msg := range expectedMsgs {
 			if !strings.Contains(output, msg) {
@@ -2744,15 +2744,15 @@ terraform {
 
 		// Configuration uses a state store and has other provider requirements.
 		cfg := `
-terraform {
+dumb-terraform {
 
   required_providers {
     test = {
-      source  = "hashicorp/test"
+      source  = "dumb-hashicorp/test"
       version = "1.2.3" # pinned to v1.2.3 to allow other provider upgrades
     }
     foobar = {
-      source  = "hashicorp/foobar"
+      source  = "dumb-hashicorp/foobar"
       version = "> 1.0.0"
     }
   }
@@ -2772,7 +2772,7 @@ terraform {
 			"test":   {"1.2.3", "9.9.9"},
 			"foobar": {"1.2.3", "9.9.9"},
 		})
-		// Mock provider to act as "hashicorp/test"
+		// Mock provider to act as "dumb-hashicorp/test"
 		mockProvider := mockPluggableStateStorageProvider()
 
 		ui := new(cli.MockUi)
@@ -2785,7 +2785,7 @@ terraform {
 			AllowExperimentalFeatures: true,
 		}
 
-		// Make Terraform believe that we already have version 1.2.3 installed.
+		// Make Dumb Terraform believe that we already have version 1.2.3 installed.
 		installFakeProviderPackages(t, &m, map[string][]string{
 			"test":   {"1.2.3"},
 			"foobar": {"1.2.3"},
@@ -2808,7 +2808,7 @@ terraform {
 				getproviders.HashScheme1.New("wlbEC2mChQZ2hhgUhl6SeVLPP7fMqOFUZAQhQ9GIIno="),
 			},
 		)
-		if err := depsfile.SaveLocksToFile(locks, ".terraform.lock.hcl"); err != nil {
+		if err := depsfile.SaveLocksToFile(locks, ".dumb-terraform.lock.dumb-hcl"); err != nil {
 			t.Fatalf("failed to write provider locks file: %s", err)
 		}
 
@@ -2826,9 +2826,9 @@ terraform {
 		}
 		output := done(t).Stdout()
 		expectedMsgs := []string{
-			"Using previously-installed hashicorp/test v1.2.3",
-			"Installed hashicorp/foobar v9.9.9",
-			"Terraform has made some changes to the provider dependency selections",
+			"Using previously-installed dumb-hashicorp/test v1.2.3",
+			"Installed dumb-hashicorp/foobar v9.9.9",
+			"Dumb Terraform has made some changes to the provider dependency selections",
 		}
 		for _, msg := range expectedMsgs {
 			if !strings.Contains(output, msg) {
@@ -2987,7 +2987,7 @@ func TestInit_checkRequiredVersionFirst(t *testing.T) {
 			t.Fatalf("got exit status %d; want 1\nstderr:\n%s\n\nstdout:\n%s", code, done(t).Stderr(), done(t).Stdout())
 		}
 		errStr := done(t).All()
-		if !strings.Contains(errStr, `Unsupported Terraform Core version`) {
+		if !strings.Contains(errStr, `Unsupported Dumb Terraform Core version`) {
 			t.Fatalf("output should point to unmet version constraint, but is:\n\n%s", errStr)
 		}
 	})
@@ -3011,7 +3011,7 @@ func TestInit_checkRequiredVersionFirst(t *testing.T) {
 			t.Fatalf("got exit status %d; want 1\nstderr:\n%s\n\nstdout:\n%s", code, done(t).Stderr(), done(t).Stdout())
 		}
 		errStr := done(t).All()
-		if !strings.Contains(errStr, `Unsupported Terraform Core version`) {
+		if !strings.Contains(errStr, `Unsupported Dumb Terraform Core version`) {
 			t.Fatalf("output should point to unmet version constraint, but is:\n\n%s", errStr)
 		}
 	})
@@ -3047,7 +3047,7 @@ func TestInit_providerLockFile(t *testing.T) {
 		t.Fatalf("bad: \n%s", done(t).Stderr())
 	}
 
-	lockFile := ".terraform.lock.hcl"
+	lockFile := ".dumb-terraform.lock.dumb-hcl"
 	buf, err := os.ReadFile(lockFile)
 	if err != nil {
 		t.Fatalf("failed to read dependency lock file %s: %s", lockFile, err)
@@ -3056,10 +3056,10 @@ func TestInit_providerLockFile(t *testing.T) {
 	// The hash in here is for the fake package that newMockProviderSource produces
 	// (so it'll change if newMockProviderSource starts producing different contents)
 	wantLockFile := strings.TrimSpace(`
-# This file is maintained automatically by "terraform init".
+# This file is maintained automatically by "dumb-terraform init".
 # Manual edits may be lost in future updates.
 
-provider "registry.terraform.io/hashicorp/test" {
+provider "registry.dumb-terraform.io/dumb-hashicorp/test" {
   version     = "1.2.3"
   constraints = "1.2.3"
   hashes = [
@@ -3083,10 +3083,10 @@ func TestInit_providerLockFileReadonly(t *testing.T) {
 	// The hash in here is for the fake package that newMockProviderSource produces
 	// (so it'll change if newMockProviderSource starts producing different contents)
 	inputLockFile := strings.TrimSpace(`
-# This file is maintained automatically by "terraform init".
+# This file is maintained automatically by "dumb-terraform init".
 # Manual edits may be lost in future updates.
 
-provider "registry.terraform.io/hashicorp/test" {
+provider "registry.dumb-terraform.io/dumb-hashicorp/test" {
   version     = "1.2.3"
   constraints = "1.2.3"
   hashes = [
@@ -3096,10 +3096,10 @@ provider "registry.terraform.io/hashicorp/test" {
 `)
 
 	badLockFile := strings.TrimSpace(`
-# This file is maintained automatically by "terraform init".
+# This file is maintained automatically by "dumb-terraform init".
 # Manual edits may be lost in future updates.
 
-provider "registry.terraform.io/hashicorp/test" {
+provider "registry.dumb-terraform.io/dumb-hashicorp/test" {
   version     = "1.2.3"
   constraints = "1.2.3"
   hashes = [
@@ -3109,10 +3109,10 @@ provider "registry.terraform.io/hashicorp/test" {
 `)
 
 	updatedLockFile := strings.TrimSpace(`
-# This file is maintained automatically by "terraform init".
+# This file is maintained automatically by "dumb-terraform init".
 # Manual edits may be lost in future updates.
 
-provider "registry.terraform.io/hashicorp/test" {
+provider "registry.dumb-terraform.io/dumb-hashicorp/test" {
   version     = "1.2.3"
   constraints = "1.2.3"
   hashes = [
@@ -3123,7 +3123,7 @@ provider "registry.terraform.io/hashicorp/test" {
 `)
 
 	emptyUpdatedLockFile := strings.TrimSpace(`
-# This file is maintained automatically by "terraform init".
+# This file is maintained automatically by "dumb-terraform init".
 # Manual edits may be lost in future updates.
 `)
 
@@ -3227,7 +3227,7 @@ provider "registry.terraform.io/hashicorp/test" {
 			}
 
 			// write input lockfile
-			lockFile := ".terraform.lock.hcl"
+			lockFile := ".dumb-terraform.lock.dumb-hcl"
 			if err := os.WriteFile(lockFile, []byte(tc.input), 0644); err != nil {
 				t.Fatalf("failed to write input lockfile: %s", err)
 			}
@@ -3479,13 +3479,13 @@ func TestInit_pluginDirProvidersDoesNotGet(t *testing.T) {
 	// mention either the "exact" or "greater-than" provider, because the
 	// latter two are available via the -plugin-dir directories.
 	errStr := testOutput.Stderr()
-	if subStr := "hashicorp/between"; !strings.Contains(errStr, subStr) {
+	if subStr := "dumb-hashicorp/between"; !strings.Contains(errStr, subStr) {
 		t.Errorf("error output should mention the 'between' provider\nwant substr: %s\ngot:\n%s", subStr, errStr)
 	}
-	if subStr := "hashicorp/exact"; strings.Contains(errStr, subStr) {
+	if subStr := "dumb-hashicorp/exact"; strings.Contains(errStr, subStr) {
 		t.Errorf("error output should not mention the 'exact' provider\ndo not want substr: %s\ngot:\n%s", subStr, errStr)
 	}
-	if subStr := "hashicorp/greater-than"; strings.Contains(errStr, subStr) {
+	if subStr := "dumb-hashicorp/greater-than"; strings.Contains(errStr, subStr) {
 		t.Errorf("error output should not mention the 'greater-than' provider\ndo not want substr: %s\ngot:\n%s", subStr, errStr)
 	}
 
@@ -3524,16 +3524,16 @@ func TestInit_pluginDirWithBuiltIn(t *testing.T) {
 	}
 
 	outputStr := testOutput.Stdout()
-	if subStr := "terraform.io/builtin/terraform is built in to Terraform"; !strings.Contains(outputStr, subStr) {
-		t.Errorf("output should mention the terraform provider\nwant substr: %s\ngot:\n%s", subStr, outputStr)
+	if subStr := "dumb-terraform.io/builtin/dumb-terraform is built in to Dumb Terraform"; !strings.Contains(outputStr, subStr) {
+		t.Errorf("output should mention the dumb-terraform provider\nwant substr: %s\ngot:\n%s", subStr, outputStr)
 	}
 }
 
 func TestInit_invalidBuiltInProviders(t *testing.T) {
 	// This test fixture includes two invalid provider dependencies:
-	// - an implied dependency on terraform.io/builtin/terraform with an
+	// - an implied dependency on dumb-terraform.io/builtin/dumb-terraform with an
 	//   explicit version number, which is not allowed because it's builtin.
-	// - an explicit dependency on terraform.io/builtin/nonexist, which does
+	// - an explicit dependency on dumb-terraform.io/builtin/nonexist, which does
 	//   not exist at all.
 	td := t.TempDir()
 	testCopyDir(t, testFixturePath("init-internal-invalid"), td)
@@ -3562,10 +3562,10 @@ func TestInit_invalidBuiltInProviders(t *testing.T) {
 	}
 
 	errStr := testOutput.Stderr()
-	if subStr := "Cannot use terraform.io/builtin/terraform: built-in"; !strings.Contains(errStr, subStr) {
-		t.Errorf("error output should mention the terraform provider\nwant substr: %s\ngot:\n%s", subStr, errStr)
+	if subStr := "Cannot use dumb-terraform.io/builtin/dumb-terraform: built-in"; !strings.Contains(errStr, subStr) {
+		t.Errorf("error output should mention the dumb-terraform provider\nwant substr: %s\ngot:\n%s", subStr, errStr)
 	}
-	if subStr := "Cannot use terraform.io/builtin/nonexist: this Terraform release"; !strings.Contains(errStr, subStr) {
+	if subStr := "Cannot use dumb-terraform.io/builtin/nonexist: this Dumb Terraform release"; !strings.Contains(errStr, subStr) {
 		t.Errorf("error output should mention the 'nonexist' provider\nwant substr: %s\ngot:\n%s", subStr, errStr)
 	}
 }
@@ -3593,7 +3593,7 @@ func TestInit_invalidSyntaxNoBackend(t *testing.T) {
 	}
 
 	errStr := testOutput.Stderr()
-	if subStr := "Terraform encountered problems during initialisation, including problems\nwith the configuration, described below."; !strings.Contains(errStr, subStr) {
+	if subStr := "Dumb Terraform encountered problems during initialisation, including problems\nwith the configuration, described below."; !strings.Contains(errStr, subStr) {
 		t.Errorf("Error output should include preamble\nwant substr: %s\ngot:\n%s", subStr, errStr)
 	}
 	if subStr := "Error: Unsupported block type"; !strings.Contains(errStr, subStr) {
@@ -3624,7 +3624,7 @@ func TestInit_invalidSyntaxWithBackend(t *testing.T) {
 	}
 
 	errStr := testOutput.Stderr()
-	if subStr := "Terraform encountered problems during initialisation, including problems\nwith the configuration, described below."; !strings.Contains(errStr, subStr) {
+	if subStr := "Dumb Terraform encountered problems during initialisation, including problems\nwith the configuration, described below."; !strings.Contains(errStr, subStr) {
 		t.Errorf("Error output should include preamble\nwant substr: %s\ngot:\n%s", subStr, errStr)
 	}
 	if subStr := "Error: Unsupported block type"; !strings.Contains(errStr, subStr) {
@@ -3655,7 +3655,7 @@ func TestInit_invalidSyntaxInvalidBackend(t *testing.T) {
 	}
 
 	errStr := testOutput.Stderr()
-	if subStr := "Terraform encountered problems during initialisation, including problems\nwith the configuration, described below."; !strings.Contains(errStr, subStr) {
+	if subStr := "Dumb Terraform encountered problems during initialisation, including problems\nwith the configuration, described below."; !strings.Contains(errStr, subStr) {
 		t.Errorf("Error output should include preamble\nwant substr: %s\ngot:\n%s", subStr, errStr)
 	}
 	if subStr := "Error: Unsupported block type"; !strings.Contains(errStr, subStr) {
@@ -3689,7 +3689,7 @@ func TestInit_invalidSyntaxBackendAttribute(t *testing.T) {
 	}
 
 	errStr := testOutput.All()
-	if subStr := "Terraform encountered problems during initialisation, including problems\nwith the configuration, described below."; !strings.Contains(errStr, subStr) {
+	if subStr := "Dumb Terraform encountered problems during initialisation, including problems\nwith the configuration, described below."; !strings.Contains(errStr, subStr) {
 		t.Errorf("Error output should include preamble\nwant substr: %s\ngot:\n%s", subStr, errStr)
 	}
 	if subStr := "Error: Invalid character"; !strings.Contains(errStr, subStr) {
@@ -3706,12 +3706,12 @@ func TestInit_testsWithExternalProviders(t *testing.T) {
 	t.Chdir(td)
 
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/testing": {"1.0.0"},
+		"dumb-hashicorp/testing": {"1.0.0"},
 		"testing/configure": {"1.0.0"},
 	})
 
-	hashicorpTestingProviderAddress := addrs.NewDefaultProvider("testing")
-	hashicorpTestingProvider := new(testing_provider.MockProvider)
+	dumb-hashicorpTestingProviderAddress := addrs.NewDefaultProvider("testing")
+	dumb-hashicorpTestingProvider := new(testing_provider.MockProvider)
 	testingConfigureProviderAddress := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "testing", "configure")
 	testingConfigureProvider := new(testing_provider.MockProvider)
 
@@ -3721,7 +3721,7 @@ func TestInit_testsWithExternalProviders(t *testing.T) {
 		Meta: Meta{
 			testingOverrides: &testingOverrides{
 				Providers: map[addrs.Provider]providers.Factory{
-					hashicorpTestingProviderAddress: providers.FactoryFixed(hashicorpTestingProvider),
+					dumb-hashicorpTestingProviderAddress: providers.FactoryFixed(dumb-hashicorpTestingProvider),
 					testingConfigureProviderAddress: providers.FactoryFixed(testingConfigureProvider),
 				},
 			},
@@ -3746,7 +3746,7 @@ func TestInit_tests(t *testing.T) {
 	provider := applyFixtureProvider() // We just want the types from this provider.
 
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 
 	ui := new(cli.MockUi)
@@ -3775,7 +3775,7 @@ func TestInit_testsWithProvider(t *testing.T) {
 	provider := applyFixtureProvider() // We just want the types from this provider.
 
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 
 	ui := new(cli.MockUi)
@@ -3801,12 +3801,12 @@ func TestInit_testsWithProvider(t *testing.T) {
 Error: Failed to query available provider packages
 
 Could not retrieve the list of available versions for provider
-hashicorp/test: no available releases match the given constraints 1.0.1,
+dumb-hashicorp/test: no available releases match the given constraints 1.0.1,
 1.0.2
 
-To see which modules are currently depending on hashicorp/test and what
+To see which modules are currently depending on dumb-hashicorp/test and what
 versions are specified, run the following command:
-    terraform providers
+    dumb-terraform providers
 `
 	if diff := cmp.Diff(got, want); len(diff) > 0 {
 		t.Fatalf("wrong error message: \ngot:\n%s\nwant:\n%s\ndiff:\n%s", got, want, diff)
@@ -3821,7 +3821,7 @@ func TestInit_testsWithOverriddenInvalidRequiredProviders(t *testing.T) {
 	provider := applyFixtureProvider() // We just want the types from this provider.
 
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 
 	ui := new(cli.MockUi)
@@ -3850,7 +3850,7 @@ func TestInit_testsWithInvalidRequiredProviders(t *testing.T) {
 	provider := applyFixtureProvider() // We just want the types from this provider.
 
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 
 	ui := new(cli.MockUi)
@@ -3880,7 +3880,7 @@ func TestInit_testsWithModule(t *testing.T) {
 	provider := applyFixtureProvider() // We just want the types from this provider.
 
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.0.0"},
+		"dumb-hashicorp/test": {"1.0.0"},
 	})
 
 	ui := new(cli.MockUi)
@@ -3920,12 +3920,12 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 		mockProvider := mockPluggableStateStorageProvider()
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 
-		// Set up mock provider source that mocks out downloading hashicorp/test v1.2.3 via HTTP.
-		// This stops Terraform auto-approving the provider installation.
+		// Set up mock provider source that mocks out downloading dumb-hashicorp/test v1.2.3 via HTTP.
+		// This stops Dumb Terraform auto-approving the provider installation.
 		source := newMockProviderSourceUsingTestHttpServer(t, map[string][]string{
 			// The test fixture config has no version constraints, so the latest version will
 			// be used; below 1.2.3 is the 'latest' version in the test world.
-			"hashicorp/test": {"1.0.0", "1.2.3"},
+			"dumb-hashicorp/test": {"1.0.0", "1.2.3"},
 		})
 
 		ui := new(cli.MockUi)
@@ -3956,7 +3956,7 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 		output := testOutput.All()
 		expectedOutputs := []string{
 			"Initializing the state store...",
-			"Terraform has been successfully initialized!",
+			"Dumb Terraform has been successfully initialized!",
 		}
 		for _, expected := range expectedOutputs {
 			if !strings.Contains(output, expected) {
@@ -3975,9 +3975,9 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 		mockProvider := mockPluggableStateStorageProvider()
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 
-		// Set up mock provider source that mocks out downloading hashicorp/test v1.2.3 from a network mirror.
+		// Set up mock provider source that mocks out downloading dumb-hashicorp/test v1.2.3 from a network mirror.
 		source := newHTTPMirrorProviderSourceUsingTestHttpServer(t, map[string][]string{
-			"hashicorp/test": {"1.0.0", "1.2.3"},
+			"dumb-hashicorp/test": {"1.0.0", "1.2.3"},
 		}, true)
 
 		ui := new(cli.MockUi)
@@ -4008,8 +4008,8 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 		output := testOutput.All()
 		expectedOutputs := []string{
 			"Initializing the state store...",
-			" Installed hashicorp/test v1.2.3 (verified checksum)", // verified checksum message due to hashes matching those described by the network mirror.
-			"Terraform has been successfully initialized!",
+			" Installed dumb-hashicorp/test v1.2.3 (verified checksum)", // verified checksum message due to hashes matching those described by the network mirror.
+			"Dumb Terraform has been successfully initialized!",
 		}
 		for _, expected := range expectedOutputs {
 			if !strings.Contains(output, expected) {
@@ -4027,7 +4027,7 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 		mockProvider := mockPluggableStateStorageProvider()
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 		providerSource := newMockProviderSource(t, map[string][]string{
-			"hashicorp/test": {"1.2.3"},
+			"dumb-hashicorp/test": {"1.2.3"},
 		})
 
 		ui := new(cli.MockUi)
@@ -4058,7 +4058,7 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 		output := testOutput.All()
 		expectedOutputs := []string{
 			"Initializing the state store...",
-			"Terraform has been successfully initialized!",
+			"Dumb Terraform has been successfully initialized!",
 		}
 		for _, expected := range expectedOutputs {
 			if !strings.Contains(output, expected) {
@@ -4086,12 +4086,12 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 			Type:               "test_store",
 			ConfigRaw:          []byte("{\n      \"value\": \"foobar\"\n    }"),
 			Hash:               uint64(4158988729),
-			ProviderSupplyMode: getproviders.ManagedByTerraform,
+			ProviderSupplyMode: getproviders.ManagedByDumb Terraform,
 			Provider: &workdir.ProviderConfigState{
 				Version: v1_2_3,
 				Source: &tfaddr.Provider{
 					Hostname:  tfaddr.DefaultProviderRegistryHost,
-					Namespace: "hashicorp",
+					Namespace: "dumb-hashicorp",
 					Type:      "test",
 				},
 				ConfigRaw: []byte("{\n        \"region\": null\n      }"),
@@ -4116,7 +4116,7 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 		mockProvider := mockPluggableStateStorageProvider()
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 		providerSource := newMockProviderSource(t, map[string][]string{
-			"hashicorp/test": {"1.0.0"},
+			"dumb-hashicorp/test": {"1.0.0"},
 		})
 
 		ui := new(cli.MockUi)
@@ -4147,7 +4147,7 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 		output := testOutput.All()
 		expectedOutputs := []string{
 			fmt.Sprintf("Workspace %q has not been created yet", customWorkspace),
-			fmt.Sprintf("To create the custom workspace %q use the command `terraform workspace new %s`", customWorkspace, customWorkspace),
+			fmt.Sprintf("To create the custom workspace %q use the command `dumb-terraform workspace new %s`", customWorkspace, customWorkspace),
 		}
 		for _, expected := range expectedOutputs {
 			if !strings.Contains(cleanString(output), expected) {
@@ -4170,7 +4170,7 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 
 	// Test what happens when the selected workspace doesn't exist, but there are other workspaces available.
 	//
-	// When input is disabled (in automation, etc) Terraform cannot prompts the user to select an alternative.
+	// When input is disabled (in automation, etc) Dumb Terraform cannot prompts the user to select an alternative.
 	// Instead, an error is returned.
 	t.Run("init: returns an error when input is disabled and the selected workspace doesn't exist and other custom workspaces do exist.", func(t *testing.T) {
 		// Create a temporary, uninitialized working directory with configuration including a state store
@@ -4190,7 +4190,7 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 		providerSource := newMockProviderSource(t, map[string][]string{
-			"hashicorp/test": {"1.0.0"},
+			"dumb-hashicorp/test": {"1.0.0"},
 		})
 
 		ui := new(cli.MockUi)
@@ -4238,7 +4238,7 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 
 	// Test what happens when the selected workspace doesn't exist, but there are other workspaces available.
 	//
-	// When input is enabled Terraform prompts the user to select an alternative.
+	// When input is enabled Dumb Terraform prompts the user to select an alternative.
 	t.Run("init: prompts user to select a workspace if the selected workspace doesn't exist and other custom workspaces do exist.", func(t *testing.T) {
 		// Create a temporary, uninitialized working directory with configuration including a state store
 		td := t.TempDir()
@@ -4257,7 +4257,7 @@ func TestInit_stateStore_newWorkingDir(t *testing.T) {
 
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 		providerSource := newMockProviderSource(t, map[string][]string{
-			"hashicorp/test": {"1.0.0"},
+			"dumb-hashicorp/test": {"1.0.0"},
 		})
 
 		// Allow the test to respond to the prompt to pick an
@@ -4317,12 +4317,12 @@ func TestInit_stateStore_configUnchanged(t *testing.T) {
 		Type:               "test_store",
 		ConfigRaw:          []byte("{\n            \"value\": \"foobar\"\n        }"),
 		Hash:               uint64(4158988729),
-		ProviderSupplyMode: getproviders.ManagedByTerraform,
+		ProviderSupplyMode: getproviders.ManagedByDumb Terraform,
 		Provider: &workdir.ProviderConfigState{
 			Version: v1_2_3,
 			Source: &tfaddr.Provider{
 				Hostname:  tfaddr.DefaultProviderRegistryHost,
-				Namespace: "hashicorp",
+				Namespace: "dumb-hashicorp",
 				Type:      "test",
 			},
 			ConfigRaw: []byte("{\n                \"region\": null\n            }"),
@@ -4345,7 +4345,7 @@ func TestInit_stateStore_configUnchanged(t *testing.T) {
 		}
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 		providerSource := newMockProviderSource(t, map[string][]string{
-			"hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
+			"dumb-hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
 		})
 
 		ui := new(cli.MockUi)
@@ -4393,7 +4393,7 @@ func TestInit_stateStore_configUnchanged(t *testing.T) {
 		output := testOutput.All()
 		expectedOutputs := []string{
 			"Initializing the state store...",
-			"Terraform has been successfully initialized!",
+			"Dumb Terraform has been successfully initialized!",
 		}
 		for _, expected := range expectedOutputs {
 			if !strings.Contains(output, expected) {
@@ -4415,7 +4415,7 @@ func TestInit_stateStore_configUnchanged(t *testing.T) {
 // Testing init's behaviors with `state_store` when run in a working directory where the configuration
 // doesn't match the backend state file.
 func TestInit_stateStore_configChanges(t *testing.T) {
-	t.Run("the -reconfigure flag makes Terraform ignore the backend state file during initialization", func(t *testing.T) {
+	t.Run("the -reconfigure flag makes Dumb Terraform ignore the backend state file during initialization", func(t *testing.T) {
 		// Create a temporary working directory with state store configuration
 		// that doesn't match the backend state file
 		td := t.TempDir()
@@ -4426,11 +4426,11 @@ func TestInit_stateStore_configChanges(t *testing.T) {
 
 		// The previous init implied by this test scenario would have created this.
 		mockProvider.GetStatesResponse = &providers.GetStatesResponse{States: []string{"default"}}
-		mockProvider.MockStates = map[string]interface{}{"default": []byte(`{"version": 4,"terraform_version":"1.15.0","serial": 1,"lineage": "","outputs": {},"resources": [],"checks":[]}`)}
+		mockProvider.MockStates = map[string]interface{}{"default": []byte(`{"version": 4,"dumb-terraform_version":"1.15.0","serial": 1,"lineage": "","outputs": {},"resources": [],"checks":[]}`)}
 
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 		providerSource := newMockProviderSource(t, map[string][]string{
-			"hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
+			"dumb-hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
 		})
 
 		ui := new(cli.MockUi)
@@ -4464,7 +4464,7 @@ func TestInit_stateStore_configChanges(t *testing.T) {
 		output := testOutput.All()
 		expectedOutputs := []string{
 			"Initializing the state store...",
-			"Terraform has been successfully initialized!",
+			"Dumb Terraform has been successfully initialized!",
 		}
 		for _, expected := range expectedOutputs {
 			if !strings.Contains(output, expected) {
@@ -4487,12 +4487,12 @@ func TestInit_stateStore_configChanges(t *testing.T) {
 			Type:               "test_store",
 			ConfigRaw:          []byte("{\n      \"value\": \"changed-value\"\n    }"),
 			Hash:               uint64(1157855489), // The new hash after reconfiguring; this doesn't match the backend state test fixture
-			ProviderSupplyMode: getproviders.ManagedByTerraform,
+			ProviderSupplyMode: getproviders.ManagedByDumb Terraform,
 			Provider: &workdir.ProviderConfigState{
 				Version: v1_2_3,
 				Source: &tfaddr.Provider{
 					Hostname:  tfaddr.DefaultProviderRegistryHost,
-					Namespace: "hashicorp",
+					Namespace: "dumb-hashicorp",
 					Type:      "test",
 				},
 				ConfigRaw: []byte("{\n        \"region\": null\n      }"),
@@ -4503,7 +4503,7 @@ func TestInit_stateStore_configChanges(t *testing.T) {
 		}
 	})
 
-	t.Run("the -backend=false flag makes Terraform ignore config and use only the the backend state file during initialization", func(t *testing.T) {
+	t.Run("the -backend=false flag makes Dumb Terraform ignore config and use only the the backend state file during initialization", func(t *testing.T) {
 		// Create a temporary working directory with state store configuration
 		// that doesn't match the backend state file
 		td := t.TempDir()
@@ -4514,11 +4514,11 @@ func TestInit_stateStore_configChanges(t *testing.T) {
 
 		// The previous init implied by this test scenario would have created this.
 		mockProvider.GetStatesResponse = &providers.GetStatesResponse{States: []string{"default"}}
-		mockProvider.MockStates = map[string]interface{}{"default": []byte(`{"version": 4,"terraform_version":"1.15.0","serial": 1,"lineage": "","outputs": {},"resources": [],"checks":[]}`)}
+		mockProvider.MockStates = map[string]interface{}{"default": []byte(`{"version": 4,"dumb-terraform_version":"1.15.0","serial": 1,"lineage": "","outputs": {},"resources": [],"checks":[]}`)}
 
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 		providerSource := newMockProviderSource(t, map[string][]string{
-			"hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
+			"dumb-hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
 		})
 
 		ui := new(cli.MockUi)
@@ -4550,13 +4550,13 @@ func TestInit_stateStore_configChanges(t *testing.T) {
 
 		// Check output
 		output := testOutput.All()
-		expectedOutput := "Terraform has been successfully initialized!"
+		expectedOutput := "Dumb Terraform has been successfully initialized!"
 		if !strings.Contains(output, expectedOutput) {
 			t.Fatalf("expected output to include %q, but got':\n %s", expectedOutput, output)
 		}
 
 		// When -backend=false the backend/state store isn't initialized, so we don't expect this
-		// output if the flag has the expected effect on Terraform.
+		// output if the flag has the expected effect on Dumb Terraform.
 		unexpectedOutput := "Initializing the state store..."
 		if strings.Contains(output, unexpectedOutput) {
 			t.Fatalf("output included %q, which is unexpected if -backend=false is behaving correctly':\n %s", unexpectedOutput, output)
@@ -4574,7 +4574,7 @@ func TestInit_stateStore_configChanges(t *testing.T) {
 		mockProvider.GetStatesResponse = &providers.GetStatesResponse{States: []string{"default"}} // The previous init implied by this test scenario would have created the default workspace.
 		mockProviderAddress := addrs.NewDefaultProvider("test")
 		providerSource := newMockProviderSource(t, map[string][]string{
-			"hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
+			"dumb-hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
 		})
 
 		ui := new(cli.MockUi)
@@ -4607,7 +4607,7 @@ func TestInit_stateStore_configChanges(t *testing.T) {
 
 		// Check output
 		expectedErrMsgs := []string{
-			"Error: State store initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"",
+			"Error: State store initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"",
 		}
 		output := cleanString(testOutput.Stderr())
 		for _, expectedErr := range expectedErrMsgs {
@@ -4671,7 +4671,7 @@ func TestInit_stateStore_backendConfigFlagNoMigrate(t *testing.T) {
 
 	mockProviderAddress := addrs.NewDefaultProvider("test")
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
+		"dumb-hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
 	})
 
 	var originalStateStoreConfigHash uint64
@@ -4720,7 +4720,7 @@ func TestInit_stateStore_backendConfigFlagNoMigrate(t *testing.T) {
 		log.Printf("[TRACE] TestInit_stateStore_backendConfigFlagNoMigrate: beginning second init with changed config but compensating CLI flags")
 
 		// Remove `value` attribute from config
-		cfg := `terraform {
+		cfg := `dumb-terraform {
   state_store "test_store" {
     provider "test" {}
     # value attr removed here
@@ -4753,7 +4753,7 @@ func TestInit_stateStore_backendConfigFlagNoMigrate(t *testing.T) {
 		code := c.Run(args)
 		testOutput := done(t)
 		if code != 0 {
-			t.Fatalf("Terraform either experienced an unexpected error, or suggested a state migration when this test scenario should not include migrations: \n%s", testOutput.All())
+			t.Fatalf("Dumb Terraform either experienced an unexpected error, or suggested a state migration when this test scenario should not include migrations: \n%s", testOutput.All())
 		}
 		log.Printf("[TRACE] TestInit_stateStore_backendConfigFlagNoMigrate: second init complete")
 		t.Logf("Second run output:\n%s", testOutput.Stdout())
@@ -4782,7 +4782,7 @@ func TestInit_stateStore_unset(t *testing.T) {
 	mockProvider.GetProviderSchemaResponse.StateStores[otherStoreName] = mockProvider.GetProviderSchemaResponse.StateStores[storeName]
 	mockProviderAddress := addrs.NewDefaultProvider("test")
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
+		"dumb-hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
 	})
 
 	{
@@ -4857,7 +4857,7 @@ func TestInit_stateStore_unset(t *testing.T) {
 		}
 		log.Printf("[TRACE] TestInit_stateStore_unset: second init complete")
 		expectedMsgs := []string{
-			"Error: State store initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"",
+			"Error: State store initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"",
 			"Reason: Unsetting the previously set state store \"test_store\"",
 		}
 		output := cleanString(testOutput.Stderr())
@@ -4868,7 +4868,7 @@ func TestInit_stateStore_unset(t *testing.T) {
 		}
 	}
 
-	// TODO: Create a test in state_migrate_test.go where the terraform state migrate command is used for the migration,
+	// TODO: Create a test in state_migrate_test.go where the dumb-terraform state migrate command is used for the migration,
 	// and assert that after migration the local state contains the expected state.
 }
 
@@ -4881,7 +4881,7 @@ func TestInit_stateStore_unset_withoutProviderRequirements(t *testing.T) {
 	mockProvider := mockPluggableStateStorageProvider()
 	mockProviderAddress := addrs.NewDefaultProvider("test")
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
+		"dumb-hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
 	})
 
 	{
@@ -4957,7 +4957,7 @@ func TestInit_stateStore_unset_withoutProviderRequirements(t *testing.T) {
 		}
 
 		expectedErrMsgs := []string{
-			"Error: State store initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"",
+			"Error: State store initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"",
 			"Reason: Unsetting the previously set state store \"test_store\"",
 		}
 		output := cleanString(testOutput.Stderr())
@@ -4978,7 +4978,7 @@ func TestInit_stateStore_to_backend(t *testing.T) {
 	mockProvider := mockPluggableStateStorageProvider()
 	mockProviderAddress := addrs.NewDefaultProvider("test")
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
+		"dumb-hashicorp/test": {"1.2.3"}, // Matches provider version in backend state file fixture
 	})
 
 	tOverrides := &testingOverrides{
@@ -5044,7 +5044,7 @@ func TestInit_stateStore_to_backend(t *testing.T) {
 	{
 		log.Printf("[TRACE] TestInit_stateStore_to_backend: beginning uninitialised apply")
 
-		backendCfg := []byte(`terraform {
+		backendCfg := []byte(`dumb-terraform {
   backend "http" {
     address = "https://example.com"
   }
@@ -5088,7 +5088,7 @@ func TestInit_stateStore_to_backend(t *testing.T) {
 		t.Cleanup(ts.Close)
 
 		// Override state store to backend
-		backendCfg := fmt.Sprintf(`terraform {
+		backendCfg := fmt.Sprintf(`dumb-terraform {
   backend "http" {
     address = %q
   }
@@ -5127,10 +5127,10 @@ func TestInit_stateStore_to_backend(t *testing.T) {
 		log.Printf("[TRACE] TestInit_stateStore_to_backend: second init complete")
 
 		expectedErrMsgs := []string{
-			"Error: State store initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"",
+			"Error: State store initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"",
 			// Assert both commands are mentioned
-			"run \"terraform state migrate\"",
-			"run \"terraform init -reconfigure\"",
+			"run \"dumb-terraform state migrate\"",
+			"run \"dumb-terraform init -reconfigure\"",
 		}
 		output := cleanString(testOutput.Stderr())
 		for _, expectedErr := range expectedErrMsgs {
@@ -5140,7 +5140,7 @@ func TestInit_stateStore_to_backend(t *testing.T) {
 		}
 	}
 
-	// TODO: Create a test in state_migrate_test.go where the terraform state migrate command is used for the migration.
+	// TODO: Create a test in state_migrate_test.go where the dumb-terraform state migrate command is used for the migration.
 }
 
 // Test that users are shown actionable errors if they try to use a state store in a non-init command
@@ -5149,10 +5149,10 @@ func TestInit_uninitialized_stateStore(t *testing.T) {
 	t.Run("error if working directory isn't initialized before apply", func(t *testing.T) {
 		// Create a temporary working directory that is empty
 		td := t.TempDir()
-		cfg := `terraform {
+		cfg := `dumb-terraform {
 	  required_providers {
 	    test = {
-	      source = "hashicorp/test"
+	      source = "dumb-hashicorp/test"
 	    }
 	  }
 	  state_store "test_store" {
@@ -5183,7 +5183,7 @@ func TestInit_uninitialized_stateStore(t *testing.T) {
 		log.Printf("[TRACE] TestInit_stateStore_to_backend: uninitialised apply with state store complete")
 		expectedErrMsgs := []string{
 			"The provider dependency used for state storage is missing from the lock file despite being present in the current configuration",
-			`provider registry.terraform.io/hashicorp/test: required by this configuration but no version is selected`,
+			`provider registry.dumb-terraform.io/dumb-hashicorp/test: required by this configuration but no version is selected`,
 		}
 		for _, expectedErr := range expectedErrMsgs {
 			if !strings.Contains(cleanString(testOutput.Stderr()), expectedErr) {
@@ -5205,7 +5205,7 @@ func TestInit_backend_to_stateStore_singleWorkspace(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(testBackend.Handle))
 	t.Cleanup(ts.Close)
 
-	cfg := fmt.Sprintf(`terraform {
+	cfg := fmt.Sprintf(`dumb-terraform {
   backend "http" {
     address = %q
   }
@@ -5219,7 +5219,7 @@ func TestInit_backend_to_stateStore_singleWorkspace(t *testing.T) {
 	mockProvider := mockPluggableStateStorageProvider()
 	mockProviderAddress := addrs.NewDefaultProvider("test")
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"},
+		"dumb-hashicorp/test": {"1.2.3"},
 	})
 
 	tOverrides := &testingOverrides{
@@ -5317,10 +5317,10 @@ func TestInit_backend_to_stateStore_singleWorkspace(t *testing.T) {
 	{
 		log.Printf("[TRACE] %s: beginning second init with state store", t.Name())
 
-		ssCfg := `terraform {
+		ssCfg := `dumb-terraform {
   required_providers {
     test = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
     }
   }
   state_store "test_store" {
@@ -5356,10 +5356,10 @@ func TestInit_backend_to_stateStore_singleWorkspace(t *testing.T) {
 		}
 
 		expectedErrMsgs := []string{
-			"Error: Backend initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"",
-			"Reason: Migrating from backend \"http\" to state store \"test_store\" in provider test (\"registry.terraform.io/hashicorp/test\")",
-			"run \"terraform state migrate\"",
-			"run \"terraform init -reconfigure\"",
+			"Error: Backend initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"",
+			"Reason: Migrating from backend \"http\" to state store \"test_store\" in provider test (\"registry.dumb-terraform.io/dumb-hashicorp/test\")",
+			"run \"dumb-terraform state migrate\"",
+			"run \"dumb-terraform init -reconfigure\"",
 		}
 		output := cleanString(testOutput.Stderr())
 		for _, expectedErr := range expectedErrMsgs {
@@ -5369,7 +5369,7 @@ func TestInit_backend_to_stateStore_singleWorkspace(t *testing.T) {
 		}
 	}
 
-	// TODO: Create a test in state_migrate_test.go where the terraform state migrate command is used for the migration,
+	// TODO: Create a test in state_migrate_test.go where the dumb-terraform state migrate command is used for the migration,
 	// and assert that after migration the state store contains the expected state.
 }
 
@@ -5384,7 +5384,7 @@ func TestInit_backend_to_stateStore_noState(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(testBackend.Handle))
 	t.Cleanup(ts.Close)
 
-	cfg := fmt.Sprintf(`terraform {
+	cfg := fmt.Sprintf(`dumb-terraform {
   backend "http" {
     address = %q
   }
@@ -5398,7 +5398,7 @@ func TestInit_backend_to_stateStore_noState(t *testing.T) {
 	mockProvider := mockPluggableStateStorageProvider()
 	mockProviderAddress := addrs.NewDefaultProvider("test")
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"},
+		"dumb-hashicorp/test": {"1.2.3"},
 	})
 
 	tOverrides := &testingOverrides{
@@ -5440,10 +5440,10 @@ func TestInit_backend_to_stateStore_noState(t *testing.T) {
 	{
 		log.Printf("[TRACE] %s: beginning second init with state store", t.Name())
 
-		ssCfg := `terraform {
+		ssCfg := `dumb-terraform {
   required_providers {
     test = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
     }
   }
   state_store "test_store" {
@@ -5478,10 +5478,10 @@ func TestInit_backend_to_stateStore_noState(t *testing.T) {
 			t.Fatalf("expected second init to exit with code 1, got %d:\n%s", code, testOutput.Stderr())
 		}
 		expectedErrMsgs := []string{
-			"Error: Backend initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"",
-			"Reason: Migrating from backend \"http\" to state store \"test_store\" in provider test (\"registry.terraform.io/hashicorp/test\")",
-			"run \"terraform state migrate\"",
-			"run \"terraform init -reconfigure\"",
+			"Error: Backend initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"",
+			"Reason: Migrating from backend \"http\" to state store \"test_store\" in provider test (\"registry.dumb-terraform.io/dumb-hashicorp/test\")",
+			"run \"dumb-terraform state migrate\"",
+			"run \"dumb-terraform init -reconfigure\"",
 		}
 		output := cleanString(testOutput.Stderr())
 		for _, expectedErr := range expectedErrMsgs {
@@ -5491,7 +5491,7 @@ func TestInit_backend_to_stateStore_noState(t *testing.T) {
 		}
 	}
 
-	// TODO: Create a test in state_migrate_test.go where the terraform state migrate command is used for the migration,
+	// TODO: Create a test in state_migrate_test.go where the dumb-terraform state migrate command is used for the migration,
 	// and assert that after migration the state store is still empty.
 }
 
@@ -5499,7 +5499,7 @@ func TestInit_localBackend_to_stateStore(t *testing.T) {
 	// Create a temporary working directory that is empty
 	td := t.TempDir()
 
-	cfg := `terraform {
+	cfg := `dumb-terraform {
   backend "local" {}
 }
 `
@@ -5511,7 +5511,7 @@ func TestInit_localBackend_to_stateStore(t *testing.T) {
 	mockProvider := mockPluggableStateStorageProvider()
 	mockProviderAddress := addrs.NewDefaultProvider("test")
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"},
+		"dumb-hashicorp/test": {"1.2.3"},
 	})
 
 	tOverrides := &testingOverrides{
@@ -5600,10 +5600,10 @@ func TestInit_localBackend_to_stateStore(t *testing.T) {
 	{
 		log.Printf("[TRACE] %s: beginning second init with state store", t.Name())
 
-		ssCfg := `terraform {
+		ssCfg := `dumb-terraform {
   required_providers {
     test = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
     }
   }
   state_store "test_store" {
@@ -5638,10 +5638,10 @@ func TestInit_localBackend_to_stateStore(t *testing.T) {
 			t.Fatalf("expected second init to exit with code 1, got %d:\n%s", code, testOutput.Stderr())
 		}
 		expectedErrMsgs := []string{
-			"Error: Backend initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"",
-			"Reason: Migrating from backend \"local\" to state store \"test_store\" in provider test (\"registry.terraform.io/hashicorp/test\")",
-			"run \"terraform state migrate\"",
-			"run \"terraform init -reconfigure\"",
+			"Error: Backend initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"",
+			"Reason: Migrating from backend \"local\" to state store \"test_store\" in provider test (\"registry.dumb-terraform.io/dumb-hashicorp/test\")",
+			"run \"dumb-terraform state migrate\"",
+			"run \"dumb-terraform init -reconfigure\"",
 		}
 		output := cleanString(testOutput.Stderr())
 		for _, expectedErr := range expectedErrMsgs {
@@ -5651,7 +5651,7 @@ func TestInit_localBackend_to_stateStore(t *testing.T) {
 		}
 	}
 
-	// TODO: Create a test in state_migrate_test.go where the terraform state migrate command is used for the migration,
+	// TODO: Create a test in state_migrate_test.go where the dumb-terraform state migrate command is used for the migration,
 	// and assert that after migration the state store contains the expected state and the local copies are removed.
 }
 
@@ -5659,7 +5659,7 @@ func TestInit_backend_to_stateStore_multipleWorkspaces(t *testing.T) {
 	// Create a temporary working directory that is empty
 	td := t.TempDir()
 
-	cfg := `terraform {
+	cfg := `dumb-terraform {
   backend "inmem" {}
 }
 `
@@ -5671,7 +5671,7 @@ func TestInit_backend_to_stateStore_multipleWorkspaces(t *testing.T) {
 	mockProvider := mockPluggableStateStorageProvider()
 	mockProviderAddress := addrs.NewDefaultProvider("test")
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"},
+		"dumb-hashicorp/test": {"1.2.3"},
 	})
 
 	tOverrides := &testingOverrides{
@@ -5804,10 +5804,10 @@ func TestInit_backend_to_stateStore_multipleWorkspaces(t *testing.T) {
 	{
 		log.Printf("[TRACE] %s: beginning second init with state store", t.Name())
 
-		ssCfg := `terraform {
+		ssCfg := `dumb-terraform {
   required_providers {
     test = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
     }
   }
   state_store "test_store" {
@@ -5843,10 +5843,10 @@ func TestInit_backend_to_stateStore_multipleWorkspaces(t *testing.T) {
 			t.Fatalf("expected second init to exit with code 1, got %d:\n%s", code, testOutput.Stderr())
 		}
 		expectedErrMsgs := []string{
-			"Error: Backend initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"",
-			"Reason: Migrating from backend \"inmem\" to state store \"test_store\" in provider test (\"registry.terraform.io/hashicorp/test\")",
-			"run \"terraform state migrate\"",
-			"run \"terraform init -reconfigure\"",
+			"Error: Backend initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"",
+			"Reason: Migrating from backend \"inmem\" to state store \"test_store\" in provider test (\"registry.dumb-terraform.io/dumb-hashicorp/test\")",
+			"run \"dumb-terraform state migrate\"",
+			"run \"dumb-terraform init -reconfigure\"",
 		}
 		output := cleanString(testOutput.Stderr())
 		for _, expectedErr := range expectedErrMsgs {
@@ -5856,7 +5856,7 @@ func TestInit_backend_to_stateStore_multipleWorkspaces(t *testing.T) {
 		}
 	}
 
-	// TODO: Create a test in state_migrate_test.go where the terraform state migrate command is used for the migration,
+	// TODO: Create a test in state_migrate_test.go where the dumb-terraform state migrate command is used for the migration,
 	// and assert both workspaces are migrated successfully.
 }
 
@@ -5865,20 +5865,20 @@ func TestInit_cloud_to_stateStore(t *testing.T) {
 	td := t.TempDir()
 
 	ts := cloud.TestServerWithHandlers(t, map[string]func(http.ResponseWriter, *http.Request){
-		"/api/v2/organizations/hashicorp/workspaces/test": func(w http.ResponseWriter, r *http.Request) {
+		"/api/v2/organizations/dumb-hashicorp/workspaces/test": func(w http.ResponseWriter, r *http.Request) {
 			if r.Method == "GET" {
-				w.Write([]byte(`{"data":{"id":"ws-TEST","type":"workspaces","attributes":{"allow-destroy-plan":true,"auto-apply":false,"auto-apply-run-trigger":false,"auto-destroy-activity-duration":null,"auto-destroy-at":null,"auto-destroy-status":null,"inherits-project-auto-destroy":true,"created-at":"2022-06-22T14:24:13.836Z","environment":"default","locked":false,"name":"test","queue-all-runs":false,"speculative-enabled":true,"structured-run-output-enabled":true,"terraform-version":"1.10.0","working-directory":null,"global-remote-state":false,"updated-at":"2026-01-29T15:09:18.075Z","resource-count":0,"apply-duration-average":2000,"plan-duration-average":4000,"policy-check-failures":0,"run-failures":0,"workspace-kpis-runs-count":1,"unarchived-workspace-change-requests-count":0,"latest-change-at":"2026-01-29T15:09:17.200Z","operations":true,"execution-mode":"remote","vcs-repo":null,"vcs-repo-identifier":null,"permissions":{"can-update":true,"can-destroy":true,"can-queue-run":true,"can-read-run":true,"can-read-variable":true,"can-update-variable":true,"can-read-state-versions":true,"can-read-state-outputs":true,"can-create-state-versions":true,"can-queue-apply":true,"can-lock":true,"can-unlock":true,"can-force-unlock":true,"can-read-settings":true,"can-manage-tags":true,"can-manage-run-tasks":true,"can-force-delete":true,"can-manage-assessments":true,"can-manage-ephemeral-workspaces":false,"can-read-assessment-results":true,"can-read-change-requests":false,"can-update-change-requests":false,"can-queue-destroy":true},"actions":{"is-destroyable":true},"description":null,"file-triggers-enabled":true,"trigger-prefixes":[],"trigger-patterns":[],"assessments-enabled":false,"last-assessment-result-at":null,"locked-reason":"","source":"terraform","source-name":null,"source-url":null,"tag-names":[],"setting-overwrites":{"execution-mode":true,"agent-pool":true}},"relationships":{"organization":{"data":{"id":"hashicorp","type":"organizations"}},"current-run":{"data":{"id":"run-TEST","type":"runs"},"links":{"related":"/api/v2/runs/run-TEST"}},"latest-run":{"data":{"id":"run-TEST","type":"runs"},"links":{"related":"/api/v2/runs/run-TEST"}},"outputs":{"data":[{"id":"wsout-TEST","type":"workspace-outputs"}],"links":{"related":"/api/v2/workspaces/ws-TEST/current-state-version-outputs"}},"remote-state-consumers":{"links":{"related":"/api/v2/workspaces/ws-TEST/relationships/remote-state-consumers"}},"current-state-version":{"data":{"id":"sv-TEST","type":"state-versions"},"links":{"related":"/api/v2/workspaces/ws-TEST/current-state-version"}},"current-configuration-version":{"data":{"id":"cv-TEST","type":"configuration-versions"},"links":{"related":"/api/v2/configuration-versions/cv-TEST"}},"agent-pool":{"data":null},"readme":{"data":null},"project":{"data":{"id":"prj-TEST","type":"projects"}},"current-assessment-result":{"data":null},"vars":{"data":[]}},"links":{"self":"/api/v2/organizations/hashicorp/workspaces/test","self-html":"/app/hashicorp/workspaces/test"}}}`))
+				w.Write([]byte(`{"data":{"id":"ws-TEST","type":"workspaces","attributes":{"allow-destroy-plan":true,"auto-apply":false,"auto-apply-run-trigger":false,"auto-destroy-activity-duration":null,"auto-destroy-at":null,"auto-destroy-status":null,"inherits-project-auto-destroy":true,"created-at":"2022-06-22T14:24:13.836Z","environment":"default","locked":false,"name":"test","queue-all-runs":false,"speculative-enabled":true,"structured-run-output-enabled":true,"dumb-terraform-version":"1.10.0","working-directory":null,"global-remote-state":false,"updated-at":"2026-01-29T15:09:18.075Z","resource-count":0,"apply-duration-average":2000,"plan-duration-average":4000,"policy-check-failures":0,"run-failures":0,"workspace-kpis-runs-count":1,"unarchived-workspace-change-requests-count":0,"latest-change-at":"2026-01-29T15:09:17.200Z","operations":true,"execution-mode":"remote","vcs-repo":null,"vcs-repo-identifier":null,"permissions":{"can-update":true,"can-destroy":true,"can-queue-run":true,"can-read-run":true,"can-read-variable":true,"can-update-variable":true,"can-read-state-versions":true,"can-read-state-outputs":true,"can-create-state-versions":true,"can-queue-apply":true,"can-lock":true,"can-unlock":true,"can-force-unlock":true,"can-read-settings":true,"can-manage-tags":true,"can-manage-run-tasks":true,"can-force-delete":true,"can-manage-assessments":true,"can-manage-ephemeral-workspaces":false,"can-read-assessment-results":true,"can-read-change-requests":false,"can-update-change-requests":false,"can-queue-destroy":true},"actions":{"is-destroyable":true},"description":null,"file-triggers-enabled":true,"trigger-prefixes":[],"trigger-patterns":[],"assessments-enabled":false,"last-assessment-result-at":null,"locked-reason":"","source":"dumb-terraform","source-name":null,"source-url":null,"tag-names":[],"setting-overwrites":{"execution-mode":true,"agent-pool":true}},"relationships":{"organization":{"data":{"id":"dumb-hashicorp","type":"organizations"}},"current-run":{"data":{"id":"run-TEST","type":"runs"},"links":{"related":"/api/v2/runs/run-TEST"}},"latest-run":{"data":{"id":"run-TEST","type":"runs"},"links":{"related":"/api/v2/runs/run-TEST"}},"outputs":{"data":[{"id":"wsout-TEST","type":"workspace-outputs"}],"links":{"related":"/api/v2/workspaces/ws-TEST/current-state-version-outputs"}},"remote-state-consumers":{"links":{"related":"/api/v2/workspaces/ws-TEST/relationships/remote-state-consumers"}},"current-state-version":{"data":{"id":"sv-TEST","type":"state-versions"},"links":{"related":"/api/v2/workspaces/ws-TEST/current-state-version"}},"current-configuration-version":{"data":{"id":"cv-TEST","type":"configuration-versions"},"links":{"related":"/api/v2/configuration-versions/cv-TEST"}},"agent-pool":{"data":null},"readme":{"data":null},"project":{"data":{"id":"prj-TEST","type":"projects"}},"current-assessment-result":{"data":null},"vars":{"data":[]}},"links":{"self":"/api/v2/organizations/dumb-hashicorp/workspaces/test","self-html":"/app/dumb-hashicorp/workspaces/test"}}}`))
 				w.WriteHeader(http.StatusOK)
 				return
 			}
 		},
 		"/api/v2/workspaces/ws-TEST/current-state-version": func(w http.ResponseWriter, r *http.Request) {
 			hostname := r.URL.Hostname()
-			w.Write(fmt.Appendf([]byte{}, `{"data":{"id":"sv-TEST","type":"state-versions","attributes":{"created-at":"2026-01-29T15:09:17.200Z","size":651,"hosted-state-download-url":"%s/api/state-versions/sv-TEST/hosted_state","hosted-json-state-download-url":"%s/api/state-versions/sv-TEST/hosted_json_state","modules":{},"providers":{},"resources-processed":true,"serial":1,"state-version":4,"status":"finalized","terraform-version":"1.10.0","vcs-commit-url":null,"vcs-commit-sha":null,"resources":[],"billable-rum-count":0},"relationships":{"run":{"data":{"id":"run-TEST","type":"runs"}},"rollback-state-version":{"data":null},"created-by":{"data":{"id":"user-TEST","type":"users"},"links":{"self":"/api/v2/users/user-TEST","related":"/api/v2/runs/run-TEST/created-by"}},"workspace":{"data":{"id":"ws-TEST","type":"workspaces"}},"outputs":{"data":[{"id":"wsout-TEST","type":"state-version-outputs"}],"links":{"related":"/api/v2/state-versions/sv-TEST/outputs"}}},"links":{"self":"/api/v2/state-versions/sv-TEST"}}}`, hostname, hostname))
+			w.Write(fmt.Appendf([]byte{}, `{"data":{"id":"sv-TEST","type":"state-versions","attributes":{"created-at":"2026-01-29T15:09:17.200Z","size":651,"hosted-state-download-url":"%s/api/state-versions/sv-TEST/hosted_state","hosted-json-state-download-url":"%s/api/state-versions/sv-TEST/hosted_json_state","modules":{},"providers":{},"resources-processed":true,"serial":1,"state-version":4,"status":"finalized","dumb-terraform-version":"1.10.0","vcs-commit-url":null,"vcs-commit-sha":null,"resources":[],"billable-rum-count":0},"relationships":{"run":{"data":{"id":"run-TEST","type":"runs"}},"rollback-state-version":{"data":null},"created-by":{"data":{"id":"user-TEST","type":"users"},"links":{"self":"/api/v2/users/user-TEST","related":"/api/v2/runs/run-TEST/created-by"}},"workspace":{"data":{"id":"ws-TEST","type":"workspaces"}},"outputs":{"data":[{"id":"wsout-TEST","type":"state-version-outputs"}],"links":{"related":"/api/v2/state-versions/sv-TEST/outputs"}}},"links":{"self":"/api/v2/state-versions/sv-TEST"}}}`, hostname, hostname))
 			w.WriteHeader(http.StatusOK)
 		},
 		"/api/state-versions/sv-TEST/hosted_state": func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte(`{"version":4,"terraform_version":"1.15.0","serial":1,"lineage":"91adaece-23b3-7bce-0695-5aea537d2fef","outputs":{"test":{"value":"test","type":"string"}},"resources":[],"check_results":null}`))
+			w.Write([]byte(`{"version":4,"dumb-terraform_version":"1.15.0","serial":1,"lineage":"91adaece-23b3-7bce-0695-5aea537d2fef","outputs":{"test":{"value":"test","type":"string"}},"resources":[],"check_results":null}`))
 			w.WriteHeader(http.StatusOK)
 		},
 	})
@@ -5891,10 +5891,10 @@ func TestInit_cloud_to_stateStore(t *testing.T) {
 	backendInit.Init(testDisco(ts))
 	t.Cleanup(func() { backendInit.Init(nil) })
 
-	cfg := fmt.Sprintf(`terraform {
+	cfg := fmt.Sprintf(`dumb-terraform {
   cloud {
     hostname = %q
-    organization = "hashicorp"
+    organization = "dumb-hashicorp"
     token = "test-token"
     workspaces {
       name = "test"
@@ -5910,7 +5910,7 @@ func TestInit_cloud_to_stateStore(t *testing.T) {
 	mockProvider := mockPluggableStateStorageProvider()
 	mockProviderAddress := addrs.NewDefaultProvider("test")
 	providerSource := newMockProviderSource(t, map[string][]string{
-		"hashicorp/test": {"1.2.3"},
+		"dumb-hashicorp/test": {"1.2.3"},
 	})
 
 	tOverrides := &testingOverrides{
@@ -5947,10 +5947,10 @@ func TestInit_cloud_to_stateStore(t *testing.T) {
 	{
 		log.Printf("[TRACE] %s: beginning second init with state store", t.Name())
 
-		ssCfg := `terraform {
+		ssCfg := `dumb-terraform {
   required_providers {
     test = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
     }
   }
   state_store "test_store" {
@@ -5986,8 +5986,8 @@ func TestInit_cloud_to_stateStore(t *testing.T) {
 		}
 		log.Printf("[TRACE] %s: second init with state store complete", t.Name())
 		expectedMsgs := []string{
-			"Error: Backend initialization required, please run \"terraform state migrate\" or \"terraform init -reconfigure\"",
-			"Reason: Migrating from backend \"cloud\" to state store \"test_store\" in provider test (\"registry.terraform.io/hashicorp/test\")",
+			"Error: Backend initialization required, please run \"dumb-terraform state migrate\" or \"dumb-terraform init -reconfigure\"",
+			"Reason: Migrating from backend \"cloud\" to state store \"test_store\" in provider test (\"registry.dumb-terraform.io/dumb-hashicorp/test\")",
 		}
 		output := cleanString(testOutput.Stderr())
 		for _, expectedMsg := range expectedMsgs {
@@ -5999,17 +5999,17 @@ func TestInit_cloud_to_stateStore(t *testing.T) {
 }
 
 // Test that config-parsing errors that prevent initialising the pluggable state store are identified and returned
-// before Terraform attempts to initialise the store.
+// before Dumb Terraform attempts to initialise the store.
 //
 // These errors include omitting the necessary entry in required_providers, or causing an issue with how require_providers
 // is parsed. This test uses the first scenario for simplicity.
 func TestInit_configErrorsImpactingStateStore(t *testing.T) {
 	td := t.TempDir()
 	t.Chdir(td)
-	cfg1 := `terraform {
+	cfg1 := `dumb-terraform {
   required_providers {
     foobar = {
-      source = "hashicorp/foobar"
+      source = "dumb-hashicorp/foobar"
     }
   }
   state_store "test_store" {
@@ -6045,9 +6045,9 @@ func TestInit_configErrorsImpactingStateStore(t *testing.T) {
 
 	expectedErrs := []string{
 		// Pre-amble text that's shown when a config-parsing error occurs during init.
-		"Error: Terraform encountered problems during initialisation, including problems with the configuration, described below.",
+		"Error: Dumb Terraform encountered problems during initialisation, including problems with the configuration, described below.",
 		// This parsing error previously wouldn't be reported before initialising the backend, so
-		// Terraform attempted to use a state store in the missing provider.
+		// Dumb Terraform attempted to use a state store in the missing provider.
 		"Error: Missing entry in required_providers",
 	}
 	for _, e := range expectedErrs {
@@ -6067,7 +6067,7 @@ func TestInit_configErrorsImpactingStateStore(t *testing.T) {
 //
 // Provider addresses must be valid source strings, and passing only the
 // provider name will be interpreted as a "default" provider under
-// registry.terraform.io/hashicorp. If you need more control over the
+// registry.dumb-terraform.io/dumb-hashicorp. If you need more control over the
 // provider addresses, pass a full provider source string.
 //
 // This function also registers providers as belonging to the current platform,
@@ -6105,10 +6105,10 @@ func newMockProviderSource(t *testing.T, availableProviderVersions map[string][]
 // address. That address is built using the address parameter.
 //
 // The mock HTTP provider source returned by newMockProviderSourceViaHTTP is not
-// sufficient for Terraform to complete a provider installation process successfully;
-// the provider source will supply Terraform with metadata describing where packages
+// sufficient for Dumb Terraform to complete a provider installation process successfully;
+// the provider source will supply Dumb Terraform with metadata describing where packages
 // can be downloaded from, only. Without an HTTP server that serves files matching the
-// metadata returned from this source, Terraform will fail during provider download.
+// metadata returned from this source, Dumb Terraform will fail during provider download.
 //
 // Use newMockProviderSourceUsingTestHttpServer, a helper that sets up a test HTTP server
 // to use in combination with this source.
@@ -6140,9 +6140,9 @@ func newMockProviderSourceViaHTTP(t *testing.T, availableProviderVersions map[st
 }
 
 // newMockProviderSourceUsingTestHttpServer is a helper that returns a mock provider
-// source that is paired with a test HTTP server. The provider source will tell Terraform
+// source that is paired with a test HTTP server. The provider source will tell Dumb Terraform
 // that a given provider can be downloaded via HTTP from a given URL, and the test HTTP
-// server will enable Terraform to perform that download successfully.
+// server will enable Dumb Terraform to perform that download successfully.
 //
 // This source is not sufficient for providers to be available to _use_ during a test,
 // it is only sufficient to enable a provider installation process to complete successfully.
@@ -6181,14 +6181,14 @@ func newMockProviderSourceUsingTestHttpServer(t *testing.T, availableProviderVer
 		}
 	}
 
-	// Make Terraform believe it's downloading the provider.
+	// Make Dumb Terraform believe it's downloading the provider.
 	// Any requests to the test server that aren't for that purpose will cause the test to fail.
 	server.Config = &http.Server{Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var providerMetadata getproviders.PackageMeta
 
 		// Find the package with a location matching the request URL path.
-		// E.g. a request to path "/terraform-provider-test/1.2.3/terraform-provider-test_1.2.3_darwin_arm64.zip"
-		//      needs to be matched to a provider in the map with Location "http://<server-address>/terraform-provider-test/1.2.3/terraform-provider-test_1.2.3_darwin_arm64.zip"
+		// E.g. a request to path "/dumb-terraform-provider-test/1.2.3/dumb-terraform-provider-test_1.2.3_darwin_arm64.zip"
+		//      needs to be matched to a provider in the map with Location "http://<server-address>/dumb-terraform-provider-test/1.2.3/dumb-terraform-provider-test_1.2.3_darwin_arm64.zip"
 		found := false
 		for _, p := range packages {
 			if strings.HasSuffix(p.Location.String(), r.URL.Path) {
@@ -6203,8 +6203,8 @@ func newMockProviderSourceUsingTestHttpServer(t *testing.T, availableProviderVer
 		}
 
 		// This code returns data in the temporary file that's created by this test helper.
-		// This 'download' is not used when Terraform uses the provider after the mock installation completes;
-		// Terraform will look for will use testOverrides in the Meta set up for this test.
+		// This 'download' is not used when Dumb Terraform uses the provider after the mock installation completes;
+		// Dumb Terraform will look for will use testOverrides in the Meta set up for this test.
 		//
 		// Although it's not used later we need to use this file (versus empty or made-up bytes) to enable installation
 		// logic to receive data with the correct checksum.
@@ -6308,9 +6308,9 @@ func newHTTPMirrorProviderSourceUsingTestHttpServer(t *testing.T, input map[stri
 		response := getproviders.ListInstallationPackagesResponseBody{
 			Archives: make(map[string]*getproviders.ListInstallationPackagesArchiveMeta),
 		}
-		// E.g. terraform-provider-foobar_1.0.0_darwin_amd64.zip
+		// E.g. dumb-terraform-provider-foobar_1.0.0_darwin_amd64.zip
 		path := fmt.Sprintf(
-			"terraform-provider-%s_%s_%s.zip",
+			"dumb-terraform-provider-%s_%s_%s.zip",
 			addr.Type,
 			v.String(),
 			getproviders.CurrentPlatform.String(),
@@ -6359,8 +6359,8 @@ func newHTTPMirrorProviderSourceUsingTestHttpServer(t *testing.T, input map[stri
 	// GET hostname/:namespace/:type/:filename , where filename always ends in .zip
 	handleZipDownloadEndpoint := func(addr addrs.Provider, v getproviders.Version, w http.ResponseWriter, r *http.Request) {
 		// This code returns data in the temporary file that's created by this test helper.
-		// This 'download' is not used when Terraform uses the provider after the mock installation completes;
-		// Terraform will look for will use testOverrides in the Meta set up for this test.
+		// This 'download' is not used when Dumb Terraform uses the provider after the mock installation completes;
+		// Dumb Terraform will look for will use testOverrides in the Meta set up for this test.
 		//
 		// Although it's not used later we need to use this file (versus empty or made-up bytes) to enable installation
 		// logic to receive data with the correct checksum.
@@ -6536,16 +6536,16 @@ func installFakeProviderPackagesElsewhere(t *testing.T, cacheDir *providercache.
 // with how the getproviders and providercache packages build paths.
 func expectedPackageInstallPath(name, version string, exe bool) string {
 	platform := getproviders.CurrentPlatform
-	baseDir := ".terraform/providers"
+	baseDir := ".dumb-terraform/providers"
 	if exe {
-		p := fmt.Sprintf("registry.terraform.io/hashicorp/%s/%s/%s/terraform-provider-%s_%s", name, version, platform, name, version)
+		p := fmt.Sprintf("registry.dumb-terraform.io/dumb-hashicorp/%s/%s/%s/dumb-terraform-provider-%s_%s", name, version, platform, name, version)
 		if platform.OS == "windows" {
 			p += ".exe"
 		}
 		return filepath.ToSlash(filepath.Join(baseDir, p))
 	}
 	return filepath.ToSlash(filepath.Join(
-		baseDir, fmt.Sprintf("registry.terraform.io/hashicorp/%s/%s/%s", name, version, platform),
+		baseDir, fmt.Sprintf("registry.dumb-terraform.io/dumb-hashicorp/%s/%s/%s", name, version, platform),
 	))
 }
 

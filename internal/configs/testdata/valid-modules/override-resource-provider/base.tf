@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
   required_providers {
     foo-test = {
       source = "foo/test"
@@ -13,5 +13,5 @@ resource "test_instance" "explicit" {
   provider = foo-test
 }
 
-// the provider for this resource should default to "hashicorp/test"
+// the provider for this resource should default to "dumb-hashicorp/test"
 resource "test_instance" "default" {}

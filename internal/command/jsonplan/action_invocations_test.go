@@ -11,11 +11,11 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/msgpack"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 func TestMarshalActionInvocations(t *testing.T) {
@@ -35,12 +35,12 @@ func TestMarshalActionInvocations(t *testing.T) {
 		Module: addrs.RootModule,
 		Provider: addrs.Provider{
 			Type:      "test",
-			Namespace: "hashicorp",
+			Namespace: "dumb-hashicorp",
 			Hostname:  addrs.DefaultProviderRegistryHost,
 		},
 	}
 
-	schemas := &terraform.Schemas{
+	schemas := &dumb-terraform.Schemas{
 		Providers: map[addrs.Provider]providers.ProviderSchema{
 			provider.Provider: {
 				Actions: map[string]providers.ActionSchema{
@@ -89,7 +89,7 @@ func TestMarshalActionInvocations(t *testing.T) {
 					"sensitive": true,
 				}),
 				ConfigUnknown:       mustJson(t, map[string]interface{}{}),
-				ProviderName:        "registry.terraform.io/hashicorp/test",
+				ProviderName:        "registry.dumb-terraform.io/dumb-hashicorp/test",
 				InvokeActionTrigger: new(InvokeActionTrigger),
 			},
 		},
@@ -117,7 +117,7 @@ func TestMarshalActionInvocations(t *testing.T) {
 				ConfigUnknown: mustJson(t, map[string]interface{}{
 					"optional": true,
 				}),
-				ProviderName:        "registry.terraform.io/hashicorp/test",
+				ProviderName:        "registry.dumb-terraform.io/dumb-hashicorp/test",
 				InvokeActionTrigger: new(InvokeActionTrigger),
 			},
 		},
@@ -145,7 +145,7 @@ func TestMarshalActionInvocations(t *testing.T) {
 					"sensitive": true,
 				}),
 				ConfigUnknown:       mustJson(t, map[string]interface{}{}),
-				ProviderName:        "registry.terraform.io/hashicorp/test",
+				ProviderName:        "registry.dumb-terraform.io/dumb-hashicorp/test",
 				InvokeActionTrigger: new(InvokeActionTrigger),
 			},
 		},

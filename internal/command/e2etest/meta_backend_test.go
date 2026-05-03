@@ -10,14 +10,14 @@ import (
 	"testing"
 
 	"github.com/apparentlymart/go-versions/versions"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/e2e"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/e2e"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
 )
 
 func TestMetaBackend_GetStateStoreProviderFactory(t *testing.T) {
@@ -33,7 +33,7 @@ func TestMetaBackend_GetStateStoreProviderFactory(t *testing.T) {
 
 		// Set up locks
 		locks := depsfile.NewLocks()
-		providerAddr := addrs.MustParseProviderSourceString("registry.terraform.io/hashicorp/simple")
+		providerAddr := addrs.MustParseProviderSourceString("registry.dumb-terraform.io/dumb-hashicorp/simple")
 		constraint, err := providerreqs.ParseVersionConstraints(">1.0.0")
 		if err != nil {
 			t.Fatalf("test setup failed when making constraint: %s", err)
@@ -47,21 +47,21 @@ func TestMetaBackend_GetStateStoreProviderFactory(t *testing.T) {
 
 		// Set up a local provider cache for the test to use
 		// 1. Build a binary for the current platform
-		simple6Provider := filepath.Join(".", "terraform-provider-simple6")
-		simple6ProviderExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple-v6/main", simple6Provider)
-		// 2. Create a working directory with .terraform/providers directory
+		simple6Provider := filepath.Join(".", "dumb-terraform-provider-simple6")
+		simple6ProviderExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6/main", simple6Provider)
+		// 2. Create a working directory with .dumb-terraform/providers directory
 		td := t.TempDir()
 		t.Chdir(td)
-		providerPath := fmt.Sprintf(".terraform/providers/registry.terraform.io/hashicorp/simple/9.9.9/%s", getproviders.CurrentPlatform.String())
+		providerPath := fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/dumb-hashicorp/simple/9.9.9/%s", getproviders.CurrentPlatform.String())
 		err = os.MkdirAll(providerPath, os.ModePerm)
 		if err != nil {
 			t.Fatal(err)
 		}
 		// 3. Move the binary into the cache folder created above.
-		os.Rename(simple6ProviderExe, fmt.Sprintf("%s/%s/terraform-provider-simple", td, providerPath))
+		os.Rename(simple6ProviderExe, fmt.Sprintf("%s/%s/dumb-terraform-provider-simple", td, providerPath))
 
 		config := &configs.StateStore{
-			ProviderAddr: tfaddr.MustParseProviderSource("registry.terraform.io/hashicorp/simple"),
+			ProviderAddr: tfaddr.MustParseProviderSource("registry.dumb-terraform.io/dumb-hashicorp/simple"),
 			// No other fields necessary for test.
 		}
 
@@ -75,7 +75,7 @@ func TestMetaBackend_GetStateStoreProviderFactory(t *testing.T) {
 		p, _ := factory()
 		defer p.Close()
 		s := p.GetProviderSchema()
-		expectedProviderDescription := "This is terraform-provider-simple v6"
+		expectedProviderDescription := "This is dumb-terraform-provider-simple v6"
 		if s.Provider.Body.Description != expectedProviderDescription {
 			t.Fatalf("expected description to be %q, but got %q", expectedProviderDescription, s.Provider.Body.Description)
 		}

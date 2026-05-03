@@ -12,16 +12,16 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	testing_command "github.com/hashicorp/terraform/internal/command/testing"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	testing_command "github.com/dumb-hashicorp/dumb-terraform/internal/command/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
 )
 
 func setupTest(t *testing.T, fixturepath string, args ...string) (*terminal.TestOutput, int) {
@@ -494,7 +494,7 @@ func TestValidateWithInvalidOverrides(t *testing.T) {
 	expected := `
 Warning: Invalid override target
 
-  on main.tftest.hcl line 4, in mock_provider "test":
+  on main.tftest.dumb-hcl line 4, in mock_provider "test":
    4:     target = test_resource.absent_one
 
 The override target test_resource.absent_one does not exist within the
@@ -629,7 +629,7 @@ func TestValidateWithInvalidListResource(t *testing.T) {
 			wantError: `
 Error: Invalid list resource traversal
 
-  on main.tfquery.hcl line 19, in list "test_instance" "test2":
+  on main.tfquery.dumb-hcl line 19, in list "test_instance" "test2":
   19:   	ami = list.test_instance.test.state.instance_type
 
 The first step in the traversal for a list resource must be an attribute
@@ -696,7 +696,7 @@ The first step in the traversal for a list resource must be an attribute
 }
 
 func TestValidate_backendBlocks(t *testing.T) {
-	// This type of error is detected when parsing hcl, and isn't validation
+	// This type of error is detected when parsing dumb-hcl, and isn't validation
 	// specific to backend blocks.
 	t.Run("invalid when block contains a repeated attribute", func(t *testing.T) {
 		output, code := setupTest(t, "invalid-backend-configuration/repeated-attr")
@@ -733,7 +733,7 @@ func TestValidate_backendBlocks(t *testing.T) {
 		}
 		expectedErrMsgs := []string{
 			"Error: Unsupported backend type",
-			"The \"artifactory\" backend is not supported in Terraform v1.3 or later.",
+			"The \"artifactory\" backend is not supported in Dumb Terraform v1.3 or later.",
 		}
 		for _, msg := range expectedErrMsgs {
 			if !strings.Contains(output.Stderr(), msg) {

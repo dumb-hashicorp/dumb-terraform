@@ -6,10 +6,10 @@ package configs
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
 )
 
 // Removed describes the contents of a "removed" block in configuration.
@@ -27,11 +27,11 @@ type Removed struct {
 	// "removed" blocks support only a subset of the fields in [ManagedResource].
 	Managed *ManagedResource
 
-	DeclRange hcl.Range
+	DeclRange dumb-hcl.Range
 }
 
-func decodeRemovedBlock(block *hcl.Block) (*Removed, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeRemovedBlock(block *dumb-hcl.Block) (*Removed, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	removed := &Removed{
 		DeclRange: block.DefRange,
 	}
@@ -42,11 +42,11 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, hcl.Diagnostics) {
 	var targetKind addrs.RemoveTargetKind
 	var resourceMode addrs.ResourceMode // only valid if targetKind is addrs.RemoveTargetResource
 	if attr, exists := content.Attributes["from"]; exists {
-		from, traversalDiags := hcl.AbsTraversalForExpr(attr.Expr)
+		from, traversalDiags := dumb-hcl.AbsTraversalForExpr(attr.Expr)
 		diags = append(diags, traversalDiags...)
 		if !traversalDiags.HasErrors() {
 			from, fromDiags := addrs.ParseRemoveTarget(from)
-			diags = append(diags, fromDiags.ToHCL()...)
+			diags = append(diags, fromDiags.ToDUMB_HCL()...)
 			removed.From = from
 			if removed.From != nil {
 				targetKind = removed.From.ObjectKind()
@@ -62,7 +62,7 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, hcl.Diagnostics) {
 		removed.Managed = &ManagedResource{}
 	}
 
-	var seenConnection *hcl.Block
+	var seenConnection *dumb-hcl.Block
 	for _, block := range content.Blocks {
 		switch block.Type {
 		case "lifecycle":
@@ -70,15 +70,15 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, hcl.Diagnostics) {
 			diags = append(diags, lcDiags...)
 
 			if attr, exists := lcContent.Attributes["destroy"]; exists {
-				valDiags := gohcl.DecodeExpression(attr.Expr, nil, &removed.Destroy)
+				valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &removed.Destroy)
 				diags = append(diags, valDiags...)
 			}
 
 		case "connection":
 			if removed.Managed == nil {
 				// target is not a managed resource, then
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid connection block",
 					Detail:   "Provisioner connection configuration is valid only when a removed block targets a managed resource.",
 					Subject:  &block.DefRange,
@@ -87,8 +87,8 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, hcl.Diagnostics) {
 			}
 
 			if seenConnection != nil {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate connection block",
 					Detail:   fmt.Sprintf("This \"removed\" block already has a connection block at %s.", seenConnection.DefRange),
 					Subject:  &block.DefRange,
@@ -105,8 +105,8 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, hcl.Diagnostics) {
 		case "provisioner":
 			if removed.Managed == nil {
 				// target is not a managed resource, then
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid provisioner block",
 					Detail:   "Provisioners are valid only when a removed block targets a managed resource.",
 					Subject:  &block.DefRange,
@@ -120,8 +120,8 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, hcl.Diagnostics) {
 				removed.Managed.Provisioners = append(removed.Managed.Provisioners, pv)
 
 				if pv.When != ProvisionerWhenDestroy {
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid provisioner block",
 						Detail:   "Only destroy-time provisioners are valid in \"removed\" blocks. To declare a destroy-time provisioner, use:\n    when = destroy",
 						Subject:  &block.DefRange,
@@ -134,22 +134,22 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, hcl.Diagnostics) {
 	return removed, diags
 }
 
-var removedBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var removedBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name:     "from",
 			Required: true,
 		},
 	},
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "lifecycle"},
 		{Type: "connection"},
 		{Type: "provisioner", LabelNames: []string{"type"}},
 	},
 }
 
-var removedLifecycleBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var removedLifecycleBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name: "destroy",
 		},

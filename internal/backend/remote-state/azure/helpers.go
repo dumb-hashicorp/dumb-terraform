@@ -1,7 +1,7 @@
 // Copyright IBM Corp. 2014, 2026
 // SPDX-License-Identifier: MPL-2.0
 
-// This file is copied from terraform-provider-azurerm: internal/provider/helpers.go
+// This file is copied from dumb-terraform-provider-azurerm: internal/provider/helpers.go
 
 package azure
 
@@ -12,7 +12,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/backend/backendbase"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendbase"
 )
 
 // logEntry avoids log entries showing up in test output

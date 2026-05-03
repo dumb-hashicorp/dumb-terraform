@@ -147,7 +147,7 @@ func TestParseInit_invalid(t *testing.T) {
 		},
 		"with both -migrate-state and -json options set": {
 			args:         []string{"-migrate-state", "-json"},
-			wantErr:      "Terraform cannot ask for interactive approval when -json is set. To use the -migrate-state option, disable the -json option.",
+			wantErr:      "Dumb Terraform cannot ask for interactive approval when -json is set. To use the -migrate-state option, disable the -json option.",
 			wantViewType: ViewJSON,
 		},
 		"with both -migrate-state and -reconfigure options set": {

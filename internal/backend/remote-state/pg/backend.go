@@ -10,10 +10,10 @@ import (
 	"github.com/lib/pq"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendbase"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendbase"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const (
@@ -40,17 +40,17 @@ func New() backend.Backend {
 					"skip_schema_creation": {
 						Type:        cty.Bool,
 						Optional:    true,
-						Description: "If set to `true`, Terraform won't try to create the Postgres schema",
+						Description: "If set to `true`, Dumb Terraform won't try to create the Postgres schema",
 					},
 					"skip_table_creation": {
 						Type:        cty.Bool,
 						Optional:    true,
-						Description: "If set to `true`, Terraform won't try to create the Postgres table",
+						Description: "If set to `true`, Dumb Terraform won't try to create the Postgres table",
 					},
 					"skip_index_creation": {
 						Type:        cty.Bool,
 						Optional:    true,
-						Description: "If set to `true`, Terraform won't try to create the Postgres index",
+						Description: "If set to `true`, Dumb Terraform won't try to create the Postgres index",
 					},
 				},
 			},
@@ -60,7 +60,7 @@ func New() backend.Backend {
 				},
 				"schema_name": {
 					EnvVars:  []string{"PG_SCHEMA_NAME"},
-					Fallback: "terraform_remote_state",
+					Fallback: "dumb-terraform_remote_state",
 				},
 				"skip_schema_creation": {
 					EnvVars:  []string{"PG_SKIP_SCHEMA_CREATION"},

@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Deferred keeps track of deferrals that have already happened, to help
@@ -478,7 +478,7 @@ func (d *Deferred) DependenciesDeferred(deps []addrs.ConfigResource) bool {
 // for that resource.
 func (d *Deferred) ReportResourceExpansionDeferred(addr addrs.PartialExpandedResource, change *plans.ResourceInstanceChange) {
 	if change == nil {
-		// This indicates a bug in Terraform, we shouldn't ever be setting a
+		// This indicates a bug in Dumb Terraform, we shouldn't ever be setting a
 		// null change. Note, if we don't make this check here, then we'll
 		// just crash later anyway. This way the stack trace points to the
 		// source of the problem.
@@ -516,7 +516,7 @@ func (d *Deferred) ReportResourceExpansionDeferred(addr addrs.PartialExpandedRes
 // planning for that data source.
 func (d *Deferred) ReportDataSourceExpansionDeferred(addr addrs.PartialExpandedResource, change *plans.ResourceInstanceChange) {
 	if change == nil {
-		// This indicates a bug in Terraform, we shouldn't ever be setting a
+		// This indicates a bug in Dumb Terraform, we shouldn't ever be setting a
 		// null change. Note, if we don't make this check here, then we'll
 		// just crash later anyway. This way the stack trace points to the
 		// source of the problem.
@@ -600,7 +600,7 @@ func (d *Deferred) ReportActionExpansionDeferred(addr addrs.PartialExpandedActio
 // other than its address being only partially-decided.
 func (d *Deferred) ReportResourceInstanceDeferred(addr addrs.AbsResourceInstance, reason providers.DeferredReason, change *plans.ResourceInstanceChange) {
 	if change == nil {
-		// This indicates a bug in Terraform, we shouldn't ever be setting a
+		// This indicates a bug in Dumb Terraform, we shouldn't ever be setting a
 		// null change. Note, if we don't make this check here, then we'll
 		// just crash later anyway. This way the stack trace points to the
 		// source of the problem.
@@ -629,7 +629,7 @@ func (d *Deferred) ReportResourceInstanceDeferred(addr addrs.AbsResourceInstance
 
 func (d *Deferred) ReportDataSourceInstanceDeferred(addr addrs.AbsResourceInstance, reason providers.DeferredReason, change *plans.ResourceInstanceChange) {
 	if change == nil {
-		// This indicates a bug in Terraform, we shouldn't ever be setting a
+		// This indicates a bug in Dumb Terraform, we shouldn't ever be setting a
 		// null change. Note, if we don't make this check here, then we'll
 		// just crash later anyway. This way the stack trace points to the
 		// source of the problem.
@@ -742,7 +742,7 @@ func (d *Deferred) ReportActionDeferred(addr addrs.AbsActionInstance, reason pro
 //
 // We don't yet have the capability to retroactively defer a resource, so for
 // now actions initiating deferrals themselves is considered an error.
-func (d *Deferred) ShouldDeferActionInvocation(ai plans.ActionInvocationInstance, triggerRange *hcl.Range) (bool, tfdiags.Diagnostics) {
+func (d *Deferred) ShouldDeferActionInvocation(ai plans.ActionInvocationInstance, triggerRange *dumb-hcl.Range) (bool, tfdiags.Diagnostics) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
@@ -765,8 +765,8 @@ func (d *Deferred) ShouldDeferActionInvocation(ai plans.ActionInvocationInstance
 		if c.Has(ai.Addr) {
 			// Then in this case, the resource wasn't deferred but the action
 			// was and so we will consider this to be an error.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid action deferral",
 				Detail:   fmt.Sprintf("The action %s was marked as deferred, but was triggered by a non-deferred resource %s. To work around this, use the -target argument to first apply only the resources that the action block depends on.", ai.Addr, at.TriggeringResourceAddr),
 				Subject:  triggerRange,
@@ -786,5 +786,5 @@ func (d *Deferred) ShouldDeferAction(deps []addrs.ConfigResource) bool {
 // UnexpectedProviderDeferralDiagnostic is a diagnostic that indicates that a
 // provider was deferred although deferrals were not allowed.
 func UnexpectedProviderDeferralDiagnostic(addrs fmt.Stringer) tfdiags.Diagnostic {
-	return tfdiags.Sourceless(tfdiags.Error, "Provider deferred changes when Terraform did not allow deferrals", fmt.Sprintf("The provider signaled a deferred action for %q, but in this context deferrals are disabled. This is a bug in the provider, please file an issue with the provider developers.", addrs.String()))
+	return tfdiags.Sourceless(tfdiags.Error, "Provider deferred changes when Dumb Terraform did not allow deferrals", fmt.Sprintf("The provider signaled a deferred action for %q, but in this context deferrals are disabled. This is a bug in the provider, please file an issue with the provider developers.", addrs.String()))
 }

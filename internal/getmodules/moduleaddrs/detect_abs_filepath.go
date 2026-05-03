@@ -59,5 +59,5 @@ type MaybeRelativePathErr struct {
 }
 
 func (e *MaybeRelativePathErr) Error() string {
-	return fmt.Sprintf("Terraform cannot detect a supported external module source type for %s", e.Addr)
+	return fmt.Sprintf("Dumb Terraform cannot detect a supported external module source type for %s", e.Addr)
 }

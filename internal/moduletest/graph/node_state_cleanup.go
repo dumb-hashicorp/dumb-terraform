@@ -8,14 +8,14 @@ import (
 	"log"
 	"time"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	teststates "github.com/hashicorp/terraform/internal/moduletest/states"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	teststates "github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var (
@@ -65,7 +65,7 @@ func (n *NodeStateCleanup) Execute(evalCtx *EvalContext) {
 		// above. If we do reach here, then something has gone badly wrong
 		// and we can't really recover from it.
 
-		diags := tfdiags.Diagnostics{tfdiags.Sourceless(tfdiags.Error, "Inconsistent state", fmt.Sprintf("Found inconsistent state while cleaning up %s. This is a bug in Terraform - please report it", file.Name))}
+		diags := tfdiags.Diagnostics{tfdiags.Sourceless(tfdiags.Error, "Inconsistent state", fmt.Sprintf("Found inconsistent state while cleaning up %s. This is a bug in Dumb Terraform - please report it", file.Name))}
 		file.UpdateStatus(moduletest.Error)
 		evalCtx.Renderer().DestroySummary(diags, nil, file, state.State)
 		return
@@ -124,7 +124,7 @@ func (n *NodeStateCleanup) restore(ctx *EvalContext, file *configs.TestFile, run
 	// we care about.
 	setVariables, _, _ := FilterVariablesToModule(module, variables)
 
-	planOpts := &terraform.PlanOpts{
+	planOpts := &dumb-terraform.PlanOpts{
 		Mode:                      plans.NormalMode,
 		SetVariables:              setVariables,
 		Overrides:                 ctx.GetOverrides(run.Name),
@@ -135,7 +135,7 @@ func (n *NodeStateCleanup) restore(ctx *EvalContext, file *configs.TestFile, run
 		AllowRootEphemeralOutputs: true,
 	}
 
-	tfCtx, _ := terraform.NewContext(n.opts.ContextOpts)
+	tfCtx, _ := dumb-terraform.NewContext(n.opts.ContextOpts)
 
 	waiter.update(tfCtx, moduletest.TearDown, nil)
 	plan, planDiags := tfCtx.Plan(module, state, planOpts)
@@ -176,7 +176,7 @@ func (n *NodeStateCleanup) destroy(ctx *EvalContext, file *configs.TestFile, run
 	// we care about.
 	setVariables, _, _ := FilterVariablesToModule(module, variables)
 
-	planOpts := &terraform.PlanOpts{
+	planOpts := &dumb-terraform.PlanOpts{
 		Mode:                      plans.DestroyMode,
 		SetVariables:              setVariables,
 		Overrides:                 ctx.GetOverrides(run.Name),
@@ -187,7 +187,7 @@ func (n *NodeStateCleanup) destroy(ctx *EvalContext, file *configs.TestFile, run
 		AllowRootEphemeralOutputs: true,
 	}
 
-	tfCtx, _ := terraform.NewContext(n.opts.ContextOpts)
+	tfCtx, _ := dumb-terraform.NewContext(n.opts.ContextOpts)
 
 	waiter.update(tfCtx, moduletest.TearDown, nil)
 	plan, planDiags := tfCtx.Plan(module, state, planOpts)

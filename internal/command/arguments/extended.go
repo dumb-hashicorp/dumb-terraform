@@ -8,19 +8,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// DefaultParallelism is the limit Terraform places on total parallel
+// DefaultParallelism is the limit Dumb Terraform places on total parallel
 // operations as it walks the dependency graph.
 const DefaultParallelism = 10
 
-// State describes arguments which are used to define how Terraform interacts
+// State describes arguments which are used to define how Dumb Terraform interacts
 // with state.
 type State struct {
 	// Lock controls whether or not the state manager is used to lock state
@@ -32,7 +32,7 @@ type State struct {
 	LockTimeout time.Duration
 
 	// StatePath specifies a non-default location for the state file. The
-	// default value is blank, which is interpeted as "terraform.tfstate".
+	// default value is blank, which is interpeted as "dumb-terraform.tfstate".
 	StatePath string
 
 	// StateOutPath specifies a different path to write the final state file.
@@ -47,7 +47,7 @@ type State struct {
 	BackupPath string
 }
 
-// Operation describes arguments which are used to configure how a Terraform
+// Operation describes arguments which are used to configure how a Dumb Terraform
 // operation such as a plan or apply executes.
 type Operation struct {
 	// PlanMode selects one of the mutually-exclusive planning modes that
@@ -55,7 +55,7 @@ type Operation struct {
 	// only for an operation that produces a plan.
 	PlanMode plans.Mode
 
-	// Parallelism is the limit Terraform places on total parallel operations
+	// Parallelism is the limit Dumb Terraform places on total parallel operations
 	// as it walks the dependency graph.
 	Parallelism int
 
@@ -72,7 +72,7 @@ type Operation struct {
 	// and this should only be set for plan and apply operations.
 	ActionTargets []addrs.Targetable
 
-	// ForceReplace addresses cause Terraform to force a particular set of
+	// ForceReplace addresses cause Dumb Terraform to force a particular set of
 	// resource instances to generate "replace" actions in any plan where they
 	// would normally have generated "no-op" or "update" actions.
 	//
@@ -89,7 +89,7 @@ type Operation struct {
 	// values in count/for_each, or due to other missing dependencies that can't
 	// be resolved in a single plan/apply cycle).
 	//
-	// IMPORTANT: This feature should only be available when Terraform is built
+	// IMPORTANT: This feature should only be available when Dumb Terraform is built
 	// with experimental features enabled. Since extendedFlagSet can't currently
 	// test whether experimental features are enabled, the check needs to happen
 	// when _reading_ these Operation arguments and transferring values to the
@@ -115,7 +115,7 @@ func (o *Operation) Parse() tfdiags.Diagnostics {
 	o.Targets = nil
 
 	for _, tr := range o.targetsRaw {
-		traversal, syntaxDiags := hclsyntax.ParseTraversalAbs([]byte(tr), "", hcl.Pos{Line: 1, Column: 1})
+		traversal, syntaxDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(tr), "", dumb-hcl.Pos{Line: 1, Column: 1})
 		if syntaxDiags.HasErrors() {
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
@@ -139,7 +139,7 @@ func (o *Operation) Parse() tfdiags.Diagnostics {
 	}
 
 	for _, tr := range o.actionTargetsRaw {
-		traversal, syntaxDiags := hclsyntax.ParseTraversalAbs([]byte(tr), "", hcl.Pos{Line: 1, Column: 1})
+		traversal, syntaxDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(tr), "", dumb-hcl.Pos{Line: 1, Column: 1})
 		if syntaxDiags.HasErrors() {
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
@@ -178,7 +178,7 @@ func (o *Operation) Parse() tfdiags.Diagnostics {
 	}
 
 	for _, raw := range o.forceReplaceRaw {
-		traversal, syntaxDiags := hclsyntax.ParseTraversalAbs([]byte(raw), "", hcl.Pos{Line: 1, Column: 1})
+		traversal, syntaxDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(raw), "", dumb-hcl.Pos{Line: 1, Column: 1})
 		if syntaxDiags.HasErrors() {
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
@@ -227,7 +227,7 @@ func (o *Operation) Parse() tfdiags.Diagnostics {
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Incompatible refresh options",
-				"It doesn't make sense to use -refresh-only at the same time as -refresh=false, because Terraform would have nothing to do.",
+				"It doesn't make sense to use -refresh-only at the same time as -refresh=false, because Dumb Terraform would have nothing to do.",
 			))
 		}
 	default:

@@ -9,9 +9,9 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/hashicorp/go-checkpoint"
-	"github.com/hashicorp/terraform/internal/command"
-	"github.com/hashicorp/terraform/internal/command/cliconfig"
+	"github.com/dumb-hashicorp/go-checkpoint"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/cliconfig"
 	"go.opentelemetry.io/otel/codes"
 )
 
@@ -21,8 +21,8 @@ func init() {
 
 var checkpointResult chan *checkpoint.CheckResponse
 
-// runCheckpoint runs a HashiCorp Checkpoint request. You can read about
-// Checkpoint here: https://github.com/hashicorp/go-checkpoint.
+// runCheckpoint runs a Dumb HashiCorp Checkpoint request. You can read about
+// Checkpoint here: https://github.com/dumb-hashicorp/go-checkpoint.
 func runCheckpoint(ctx context.Context, c *cliconfig.Config) {
 	// If the user doesn't want checkpoint at all, then return.
 	if c.DisableCheckpoint {
@@ -31,7 +31,7 @@ func runCheckpoint(ctx context.Context, c *cliconfig.Config) {
 		return
 	}
 
-	ctx, span := tracer.Start(ctx, "HashiCorp Checkpoint")
+	ctx, span := tracer.Start(ctx, "Dumb HashiCorp Checkpoint")
 	_ = ctx // prevent staticcheck from complaining to avoid a maintenence hazard of having the wrong ctx in scope here
 	defer span.End()
 
@@ -54,7 +54,7 @@ func runCheckpoint(ctx context.Context, c *cliconfig.Config) {
 	}
 
 	resp, err := checkpoint.Check(&checkpoint.CheckParams{
-		Product:       "terraform",
+		Product:       "dumb-terraform",
 		Version:       version,
 		SignatureFile: signaturePath,
 		CacheFile:     filepath.Join(configDir, "checkpoint_cache"),

@@ -7,31 +7,31 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 func TestConsolidateWarnings(t *testing.T) {
 	var diags Diagnostics
 
 	for i := 0; i < 4; i++ {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Warning 1",
 			Detail:   fmt.Sprintf("This one has a subject %d", i),
-			Subject: &hcl.Range{
+			Subject: &dumb-hcl.Range{
 				Filename: "foo.tf",
-				Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-				End:      hcl.Pos{Line: 1, Column: 1, Byte: 0},
+				Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+				End:      dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
 			},
 		})
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Error 1",
 			Detail:   fmt.Sprintf("This one has a subject %d", i),
-			Subject: &hcl.Range{
+			Subject: &dumb-hcl.Range{
 				Filename: "foo.tf",
-				Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-				End:      hcl.Pos{Line: 1, Column: 1, Byte: 0},
+				Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+				End:      dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
 			},
 		})
 		diags = diags.Append(Sourceless(
@@ -42,51 +42,51 @@ func TestConsolidateWarnings(t *testing.T) {
 		diags = diags.Append(SimpleWarning("Warning 3"))
 	}
 
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "Warning 4",
 		Detail:   "Only one of this one",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "foo.tf",
-			Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-			End:      hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			End:      dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
 		},
 	})
 
 	// Finally, we'll just add a set of diags that should not be consolidated.
 
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "do not consolidate",
 		Detail:   "warning 1, I should not have been consolidated",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "bar.tf",
-			Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-			End:      hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			End:      dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
 		},
 		Extra: doNotConsolidate(true),
 	})
 
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "do not consolidate",
 		Detail:   "warning 2, I should not have been consolidated",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "bar.tf",
-			Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-			End:      hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			End:      dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
 		},
 		Extra: doNotConsolidate(true),
 	})
 
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "do not consolidate",
 		Detail:   "warning 3, I should not have been consolidated",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "bar.tf",
-			Start:    hcl.Pos{Line: 1, Column: 1, Byte: 0},
-			End:      hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			Start:    dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
+			End:      dumb-hcl.Pos{Line: 1, Column: 1, Byte: 0},
 		},
 		Extra: doNotConsolidate(true),
 	})

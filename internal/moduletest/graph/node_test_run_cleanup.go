@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	teststates "github.com/hashicorp/terraform/internal/moduletest/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	teststates "github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var (
@@ -41,7 +41,7 @@ func (n *NodeTestRunCleanup) References() []*addrs.Reference {
 		// they execute first
 		references = append(references, &addrs.Reference{
 			Subject:     run.Addr(),
-			SourceRange: tfdiags.SourceRangeFromHCL(n.run.Config.DeclRange),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(n.run.Config.DeclRange),
 		})
 	}
 
@@ -62,7 +62,7 @@ func (n *NodeTestRunCleanup) References() []*addrs.Reference {
 
 		references = append(references, &addrs.Reference{
 			Subject:     addrs.InputVariable{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(variable.DeclRange),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(variable.DeclRange),
 		})
 	}
 
@@ -81,8 +81,8 @@ func (n *NodeTestRunCleanup) Execute(ctx *EvalContext) {
 	state, err := ctx.LoadState(n.run.Config)
 	if err != nil {
 		n.run.Status = moduletest.Fail
-		n.run.Diagnostics = n.run.Diagnostics.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		n.run.Diagnostics = n.run.Diagnostics.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Failed to load state",
 			Detail:   fmt.Sprintf("Could not retrieve state for run %s: %s.", n.run.Name, err),
 			Subject:  n.run.Config.Backend.DeclRange.Ptr(),

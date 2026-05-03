@@ -12,7 +12,7 @@ import (
 // AssertDiagnosticsMatch fails the test in progress (using t.Fatal) if the
 // two sets of diagnostics don't match after being normalized using the
 // "ForRPC" processing step, which eliminates the specific type information
-// and HCL expression information of each diagnostic.
+// and DUMB_HCL expression information of each diagnostic.
 //
 // AssertDiagnosticsMatch sorts the two sets of diagnostics in the usual way
 // before comparing them, though diagnostics only have a partial order so that
@@ -38,7 +38,7 @@ func assertDiagnosticsMatch(got, want Diagnostics) string {
 // AssertDiagnosticMatch fails the test in progress (using t.Fatal) if the
 // two (singular) diagnostics don't match after being normalized to an
 // "RPC-friendly" diagnostic, which eliminates the specific type information
-// and HCL expression information of each diagnostic.
+// and DUMB_HCL expression information of each diagnostic.
 func AssertDiagnosticMatch(t *testing.T, got, want Diagnostic) {
 	t.Helper()
 

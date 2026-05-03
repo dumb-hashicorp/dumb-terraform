@@ -9,13 +9,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StatePushCommand is a Command implementation that allows
@@ -99,7 +99,7 @@ func (c *StatePushCommand) Run(args []string) int {
 		return 1
 	}
 
-	// Check remote Terraform version is compatible
+	// Check remote Dumb Terraform version is compatible
 	remoteVersionDiags := c.remoteVersionCheck(b, workspace)
 	c.showDiagnostics(remoteVersionDiags)
 	if remoteVersionDiags.HasErrors() {
@@ -143,7 +143,7 @@ func (c *StatePushCommand) Run(args []string) int {
 	}
 
 	// Get schemas, if possible, before writing state
-	var schemas *terraform.Schemas
+	var schemas *dumb-terraform.Schemas
 	if isCloudMode(b) {
 		schemas, diags = c.MaybeGetSchemas(srcStateFile.State, nil)
 	}
@@ -163,7 +163,7 @@ func (c *StatePushCommand) Run(args []string) int {
 
 func (c *StatePushCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] state push [options] PATH
+Usage: dumb-terraform [global options] state push [options] PATH
 
   Update remote state from a local state file at PATH.
 
@@ -195,7 +195,7 @@ Options:
                       once to set more than one variable.
 
   -var-file=filename  Load variable values from the given file, in addition
-                      to the default files terraform.tfvars and *.auto.tfvars.
+                      to the default files dumb-terraform.tfvars and *.auto.tfvars.
                       Use this option more than once to include more than one
                       variables file.
 

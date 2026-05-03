@@ -1,16 +1,16 @@
 // Copyright IBM Corp. 2014, 2026
 // SPDX-License-Identifier: BUSL-1.1
 
-// Package format contains helpers for formatting various Terraform
+// Package format contains helpers for formatting various Dumb Terraform
 // structures for human-readabout output.
 //
-// This package is used by the official Terraform CLI in formatting any
+// This package is used by the official Dumb Terraform CLI in formatting any
 // output and is exported to encourage non-official frontends to mimic the
-// output formatting as much as possible so that text formats of Terraform
+// output formatting as much as possible so that text formats of Dumb Terraform
 // structures have a consistent look and feel.
 package format
 
-import "github.com/hashicorp/terraform/internal/plans"
+import "github.com/dumb-hashicorp/dumb-terraform/internal/plans"
 
 // DiffActionSymbol returns a string that, once passed through a
 // colorstring.Colorize, will produce a result that can be written

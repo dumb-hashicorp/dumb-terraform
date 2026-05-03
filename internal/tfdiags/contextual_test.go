@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -56,7 +56,7 @@ simple_attr = "val"
 	// TODO: Test interpolation
 	// TODO: Test SplatExpr
 
-	f, parseDiags := hclsyntax.ParseConfig([]byte(testConfig), "test.tf", hcl.Pos{Line: 1, Column: 1})
+	f, parseDiags := dumb-hclsyntax.ParseConfig([]byte(testConfig), "test.tf", dumb-hcl.Pos{Line: 1, Column: 1})
 	if len(parseDiags) != 0 {
 		t.Fatal(parseDiags)
 	}

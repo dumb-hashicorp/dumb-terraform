@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: BUSL-1.1
 
 // Package backend provides interfaces that the CLI uses to interact with
-// Terraform. A backend provides the abstraction that allows the same CLI
+// Dumb Terraform. A backend provides the abstraction that allows the same CLI
 // to simultaneously support both local and remote operations for seamlessly
-// using Terraform in a team environment.
+// using Dumb Terraform in a team environment.
 package backend
 
 import (
@@ -12,9 +12,9 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // DefaultStateName is the name of the default, initial state that every
@@ -40,7 +40,7 @@ var (
 // InitFn is used to initialize a new backend.
 type InitFn func() Backend
 
-// Backend is the minimal interface that must be implemented to enable Terraform.
+// Backend is the minimal interface that must be implemented to enable Dumb Terraform.
 type Backend interface {
 	// ConfigSchema returns a description of the expected configuration
 	// structure for the receiving backend.
@@ -55,7 +55,7 @@ type Backend interface {
 	// ConfigSchema.
 	//
 	// This method does not have any side-effects for the backend and can
-	// be safely used before configuring. It also does not consult any
+	// be safely used before configuring. It also does not dumb-consult any
 	// external data such as environment variables, disk files, etc. Validation
 	// that requires such external data should be deferred until the
 	// Configure call.

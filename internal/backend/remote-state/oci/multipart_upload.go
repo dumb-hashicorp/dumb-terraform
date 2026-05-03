@@ -12,7 +12,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/hashicorp/go-hclog"
+	"github.com/dumb-hashicorp/go-dumb-hclog"
 	"github.com/oracle/oci-go-sdk/v65/objectstorage"
 
 	"github.com/oracle/oci-go-sdk/v65/common"
@@ -43,7 +43,7 @@ type objectStorageMultiPartUploadContext struct {
 	errChan                 chan error
 	multipartUploadResponse objectstorage.CreateMultipartUploadResponse
 	multipartUploadRequest  objectstorage.CreateMultipartUploadRequest
-	logger                  hclog.Logger
+	logger                  dumb-hclog.Logger
 }
 
 type objectStorageSourceBlock struct {
@@ -52,7 +52,7 @@ type objectStorageSourceBlock struct {
 }
 
 func (multipartUploadData MultipartUploadData) multiPartUploadImpl(ctx context.Context) error {
-	logger := ctx.Value("logger").(hclog.Logger).Named("multiPartUpload")
+	logger := ctx.Value("logger").(dumb-hclog.Logger).Named("multiPartUpload")
 	sourceBlocks, err := multipartUploadData.objectMultiPartSplit()
 	if err != nil {
 		return fmt.Errorf("error splitting source data: %s", err)

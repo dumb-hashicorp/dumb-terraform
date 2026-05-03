@@ -6,12 +6,12 @@ package blocktoattr
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/ext/dynblock"
-	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	hcljson "github.com/hashicorp/hcl/v2/json"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/dynblock"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	dumb-hcljson "github.com/dumb-hashicorp/dumb-hcl/v2/json"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -466,7 +466,7 @@ container {
 		},
 	}
 
-	ctx := &hcl.EvalContext{
+	ctx := &dumb-hcl.EvalContext{
 		Variables: map[string]cty.Value{
 			"bar":  cty.StringVal("bar value"),
 			"baz":  cty.StringVal("baz value"),
@@ -476,12 +476,12 @@ container {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			var f *hcl.File
-			var diags hcl.Diagnostics
+			var f *dumb-hcl.File
+			var diags dumb-hcl.Diagnostics
 			if test.json {
-				f, diags = hcljson.Parse([]byte(test.src), "test.tf.json")
+				f, diags = dumb-hcljson.Parse([]byte(test.src), "test.tf.json")
 			} else {
-				f, diags = hclsyntax.ParseConfig([]byte(test.src), "test.tf", hcl.Pos{Line: 1, Column: 1})
+				f, diags = dumb-hclsyntax.ParseConfig([]byte(test.src), "test.tf", dumb-hcl.Pos{Line: 1, Column: 1})
 			}
 			if diags.HasErrors() {
 				for _, diag := range diags {
@@ -496,7 +496,7 @@ container {
 			body := dynblock.Expand(f.Body, ctx)
 
 			body = FixUpBlockAttrs(body, test.schema)
-			got, diags := hcldec.Decode(body, spec, ctx)
+			got, diags := dumb-hcldec.Decode(body, spec, ctx)
 
 			if test.wantErrs {
 				if !diags.HasErrors() {

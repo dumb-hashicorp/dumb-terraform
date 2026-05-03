@@ -6,8 +6,8 @@ package cloud
 import (
 	"context"
 
-	tfe "github.com/hashicorp/go-tfe"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
 )
 
 type OperationResult interface {

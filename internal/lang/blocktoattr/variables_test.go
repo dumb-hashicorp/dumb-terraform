@@ -8,10 +8,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	hcljson "github.com/hashicorp/hcl/v2/json"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	dumb-hcljson "github.com/dumb-hashicorp/dumb-hcl/v2/json"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -35,7 +35,7 @@ func TestExpandedVariables(t *testing.T) {
 		src    string
 		json   bool
 		schema *configschema.Block
-		want   []hcl.Traversal
+		want   []dumb-hcl.Traversal
 	}{
 		"empty": {
 			src:    ``,
@@ -51,14 +51,14 @@ foo = [
 ]
 `,
 			schema: fooSchema,
-			want: []hcl.Traversal{
+			want: []dumb-hcl.Traversal{
 				{
-					hcl.TraverseRoot{
+					dumb-hcl.TraverseRoot{
 						Name: "baz",
-						SrcRange: hcl.Range{
+						SrcRange: dumb-hcl.Range{
 							Filename: "test.tf",
-							Start:    hcl.Pos{Line: 4, Column: 11, Byte: 23},
-							End:      hcl.Pos{Line: 4, Column: 14, Byte: 26},
+							Start:    dumb-hcl.Pos{Line: 4, Column: 11, Byte: 23},
+							End:      dumb-hcl.Pos{Line: 4, Column: 14, Byte: 26},
 						},
 					},
 				},
@@ -71,14 +71,14 @@ foo {
 }
 `,
 			schema: fooSchema,
-			want: []hcl.Traversal{
+			want: []dumb-hcl.Traversal{
 				{
-					hcl.TraverseRoot{
+					dumb-hcl.TraverseRoot{
 						Name: "baz",
-						SrcRange: hcl.Range{
+						SrcRange: dumb-hcl.Range{
 							Filename: "test.tf",
-							Start:    hcl.Pos{Line: 3, Column: 9, Byte: 15},
-							End:      hcl.Pos{Line: 3, Column: 12, Byte: 18},
+							Start:    dumb-hcl.Pos{Line: 3, Column: 9, Byte: 15},
+							End:      dumb-hcl.Pos{Line: 3, Column: 12, Byte: 18},
 						},
 					},
 				},
@@ -104,14 +104,14 @@ foo {
 					},
 				},
 			},
-			want: []hcl.Traversal{
+			want: []dumb-hcl.Traversal{
 				{
-					hcl.TraverseRoot{
+					dumb-hcl.TraverseRoot{
 						Name: "baz",
-						SrcRange: hcl.Range{
+						SrcRange: dumb-hcl.Range{
 							Filename: "test.tf",
-							Start:    hcl.Pos{Line: 4, Column: 12, Byte: 26},
-							End:      hcl.Pos{Line: 4, Column: 15, Byte: 29},
+							Start:    dumb-hcl.Pos{Line: 4, Column: 12, Byte: 26},
+							End:      dumb-hcl.Pos{Line: 4, Column: 15, Byte: 29},
 						},
 					},
 				},
@@ -127,24 +127,24 @@ dynamic "foo" {
 }
 `,
 			schema: fooSchema,
-			want: []hcl.Traversal{
+			want: []dumb-hcl.Traversal{
 				{
-					hcl.TraverseRoot{
+					dumb-hcl.TraverseRoot{
 						Name: "beep",
-						SrcRange: hcl.Range{
+						SrcRange: dumb-hcl.Range{
 							Filename: "test.tf",
-							Start:    hcl.Pos{Line: 3, Column: 14, Byte: 30},
-							End:      hcl.Pos{Line: 3, Column: 18, Byte: 34},
+							Start:    dumb-hcl.Pos{Line: 3, Column: 14, Byte: 30},
+							End:      dumb-hcl.Pos{Line: 3, Column: 18, Byte: 34},
 						},
 					},
 				},
 				{
-					hcl.TraverseRoot{
+					dumb-hcl.TraverseRoot{
 						Name: "baz",
-						SrcRange: hcl.Range{
+						SrcRange: dumb-hcl.Range{
 							Filename: "test.tf",
-							Start:    hcl.Pos{Line: 5, Column: 11, Byte: 57},
-							End:      hcl.Pos{Line: 5, Column: 14, Byte: 60},
+							Start:    dumb-hcl.Pos{Line: 5, Column: 11, Byte: 57},
+							End:      dumb-hcl.Pos{Line: 5, Column: 14, Byte: 60},
 						},
 					},
 				},
@@ -160,14 +160,14 @@ dynamic "bar" {
 }
 `,
 			schema: fooSchema,
-			want: []hcl.Traversal{
+			want: []dumb-hcl.Traversal{
 				{
-					hcl.TraverseRoot{
+					dumb-hcl.TraverseRoot{
 						Name: "beep",
-						SrcRange: hcl.Range{
+						SrcRange: dumb-hcl.Range{
 							Filename: "test.tf",
-							Start:    hcl.Pos{Line: 3, Column: 14, Byte: 30},
-							End:      hcl.Pos{Line: 3, Column: 18, Byte: 34},
+							Start:    dumb-hcl.Pos{Line: 3, Column: 14, Byte: 30},
+							End:      dumb-hcl.Pos{Line: 3, Column: 18, Byte: 34},
 						},
 					},
 				},
@@ -177,12 +177,12 @@ dynamic "bar" {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			var f *hcl.File
-			var diags hcl.Diagnostics
+			var f *dumb-hcl.File
+			var diags dumb-hcl.Diagnostics
 			if test.json {
-				f, diags = hcljson.Parse([]byte(test.src), "test.tf.json")
+				f, diags = dumb-hcljson.Parse([]byte(test.src), "test.tf.json")
 			} else {
-				f, diags = hclsyntax.ParseConfig([]byte(test.src), "test.tf", hcl.Pos{Line: 1, Column: 1})
+				f, diags = dumb-hclsyntax.ParseConfig([]byte(test.src), "test.tf", dumb-hcl.Pos{Line: 1, Column: 1})
 			}
 			if diags.HasErrors() {
 				for _, diag := range diags {
@@ -193,7 +193,7 @@ dynamic "bar" {
 
 			got := ExpandedVariables(f.Body, test.schema)
 
-			co := cmpopts.IgnoreUnexported(hcl.TraverseRoot{})
+			co := cmpopts.IgnoreUnexported(dumb-hcl.TraverseRoot{})
 			if !cmp.Equal(got, test.want, co) {
 				t.Errorf("wrong result\n%s", cmp.Diff(test.want, got, co))
 			}

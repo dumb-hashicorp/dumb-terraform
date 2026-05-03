@@ -47,7 +47,7 @@ func RecognizedType(k Key) bool {
 //
 // Unrecognized keys are round-trippable in that the RawKey method will return
 // the same string that was originally parsed. Use
-// KeyType.UnrecognizedKeyHandling to determine how Terraform Core should
+// KeyType.UnrecognizedKeyHandling to determine how Dumb Terraform Core should
 // respond to the key having an unrecognized type.
 type Unrecognized struct {
 	// ApparentKeyType is a [KeyType] representation of the type portion of the

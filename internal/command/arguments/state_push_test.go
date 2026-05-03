@@ -10,7 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestParseStatePush_valid(t *testing.T) {
@@ -146,7 +146,7 @@ func TestParseStatePush_invalid(t *testing.T) {
 				tfdiags.Sourceless(
 					tfdiags.Error,
 					"Required argument missing",
-					"Exactly one argument expected: the path to a Terraform state file.",
+					"Exactly one argument expected: the path to a Dumb Terraform state file.",
 				),
 			},
 		},
@@ -160,7 +160,7 @@ func TestParseStatePush_invalid(t *testing.T) {
 				tfdiags.Sourceless(
 					tfdiags.Error,
 					"Required argument missing",
-					"Exactly one argument expected: the path to a Terraform state file.",
+					"Exactly one argument expected: the path to a Dumb Terraform state file.",
 				),
 			},
 		},
@@ -179,7 +179,7 @@ func TestParseStatePush_invalid(t *testing.T) {
 				tfdiags.Sourceless(
 					tfdiags.Error,
 					"Required argument missing",
-					"Exactly one argument expected: the path to a Terraform state file.",
+					"Exactly one argument expected: the path to a Dumb Terraform state file.",
 				),
 			},
 		},

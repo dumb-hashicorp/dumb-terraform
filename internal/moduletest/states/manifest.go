@@ -12,16 +12,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/command/workdir"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/workdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const alphanumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -141,8 +141,8 @@ func (manifest *TestManifest) LoadStates(file *moduletest.File, factory func(str
 			if run.Config.Backend != nil {
 				f := factory(run.Config.Backend.Type)
 				if f == nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Unknown backend type",
 						Detail:   fmt.Sprintf("Backend type %q is not a recognised backend.", run.Config.Backend.Type),
 						Subject:  run.Config.Backend.DeclRange.Ptr(),
@@ -152,8 +152,8 @@ func (manifest *TestManifest) LoadStates(file *moduletest.File, factory func(str
 
 				be, err := getBackendInstance(run.Config.StateKey, run.Config.Backend, f)
 				if err != nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid backend configuration",
 						Detail:   fmt.Sprintf("Backend configuration was invalid: %s.", err),
 						Subject:  run.Config.Backend.DeclRange.Ptr(),
@@ -176,8 +176,8 @@ func (manifest *TestManifest) LoadStates(file *moduletest.File, factory func(str
 
 			f := factory(run.Config.Backend.Type)
 			if f == nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Unknown backend type",
 					Detail:   fmt.Sprintf("Backend type %q is not a recognised backend.", run.Config.Backend.Type),
 					Subject:  run.Config.Backend.DeclRange.Ptr(),
@@ -187,8 +187,8 @@ func (manifest *TestManifest) LoadStates(file *moduletest.File, factory func(str
 
 			be, err := getBackendInstance(run.Config.StateKey, run.Config.Backend, f)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid backend configuration",
 					Detail:   fmt.Sprintf("Backend configuration was invalid: %s.", err),
 					Subject:  run.Config.Backend.DeclRange.Ptr(),
@@ -293,8 +293,8 @@ func (manifest *TestManifest) SaveStates(file *moduletest.File, states map[strin
 
 					stmgr, sDiags := state.Backend.StateMgr(backend.DefaultStateName)
 					if sDiags.HasErrors() {
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Failed to write state",
 							Detail:   fmt.Sprintf("Failed to write state file for key %s: %s.", key, sDiags.Err()),
 						})
@@ -302,8 +302,8 @@ func (manifest *TestManifest) SaveStates(file *moduletest.File, states map[strin
 					}
 
 					if err := stmgr.WriteState(state.State); err != nil {
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Failed to write state",
 							Detail:   fmt.Sprintf("Failed to write state file for key %s: %s.", key, err),
 						})
@@ -320,8 +320,8 @@ func (manifest *TestManifest) SaveStates(file *moduletest.File, states map[strin
 
 				} else if state.Manifest.Reason != StateReasonNone {
 					if err := manifest.writeState(state); err != nil {
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Failed to write state",
 							Detail:   fmt.Sprintf("Failed to write state file for key %s: %s.", key, err),
 						})
@@ -336,8 +336,8 @@ func (manifest *TestManifest) SaveStates(file *moduletest.File, states map[strin
 					// existing state file and remove any mention of it.
 
 					if err := manifest.deleteState(existingState); err != nil {
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Failed to delete state",
 							Detail:   fmt.Sprintf("Failed to delete state file for key %s: %s.", key, err),
 						})
@@ -367,8 +367,8 @@ func (manifest *TestManifest) SaveStates(file *moduletest.File, states map[strin
 
 				stmgr, sDiags := state.Backend.StateMgr(backend.DefaultStateName)
 				if sDiags.HasErrors() {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Failed to write state",
 						Detail:   fmt.Sprintf("Failed to write state file for key %s: %s.", key, sDiags.Err()),
 					})
@@ -376,8 +376,8 @@ func (manifest *TestManifest) SaveStates(file *moduletest.File, states map[strin
 				}
 
 				if err := stmgr.WriteState(state.State); err != nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Failed to write state",
 						Detail:   fmt.Sprintf("Failed to write state file for key %s: %s.", key, err),
 					})
@@ -389,8 +389,8 @@ func (manifest *TestManifest) SaveStates(file *moduletest.File, states map[strin
 				}
 			} else if state.Manifest.Reason != StateReasonNone {
 				if err := manifest.writeState(state); err != nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Failed to write state",
 						Detail:   fmt.Sprintf("Failed to write state file for key %s: %s.", key, err),
 					})
@@ -417,8 +417,8 @@ func (manifest *TestManifest) SaveStates(file *moduletest.File, states map[strin
 
 				stmgr, sDiags := state.Backend.StateMgr(backend.DefaultStateName)
 				if sDiags.HasErrors() {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Failed to write state",
 						Detail:   fmt.Sprintf("Failed to write state file for key %s: %s.", key, sDiags.Err()),
 					})
@@ -426,8 +426,8 @@ func (manifest *TestManifest) SaveStates(file *moduletest.File, states map[strin
 				}
 
 				if err := stmgr.WriteState(state.State); err != nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Failed to write state",
 						Detail:   fmt.Sprintf("Failed to write state file for key %s: %s.", key, err),
 					})
@@ -439,8 +439,8 @@ func (manifest *TestManifest) SaveStates(file *moduletest.File, states map[strin
 				}
 			} else if state.Manifest.Reason != StateReasonNone {
 				if err := manifest.writeState(state); err != nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Failed to write state",
 						Detail:   fmt.Sprintf("Failed to write state file for key %s: %s.", key, err),
 					})
@@ -533,9 +533,9 @@ func getBackendInstance(stateKey string, config *configs.Backend, f backend.Init
 
 	schema := b.ConfigSchema()
 	decSpec := schema.NoneRequired().DecoderSpec()
-	configVal, hclDiags := hcldec.Decode(config.Config, decSpec, nil)
-	if hclDiags.HasErrors() {
-		return nil, fmt.Errorf("error decoding backend configuration for state key %s : %v", stateKey, hclDiags.Errs())
+	configVal, dumb-hclDiags := dumb-hcldec.Decode(config.Config, decSpec, nil)
+	if dumb-hclDiags.HasErrors() {
+		return nil, fmt.Errorf("error decoding backend configuration for state key %s : %v", stateKey, dumb-hclDiags.Errs())
 	}
 
 	if !configVal.IsWhollyKnown() {

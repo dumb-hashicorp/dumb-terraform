@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
 	"github.com/posener/complete"
 )
 
@@ -48,7 +48,7 @@ func (c *WorkspaceShowCommand) AutocompleteFlags() complete.Flags {
 
 func (c *WorkspaceShowCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] workspace show
+Usage: dumb-terraform [global options] workspace show
 
   Show the name of the current workspace.
 `

@@ -9,20 +9,20 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ImportCommand is a cli.Command implementation that imports resources
-// into the Terraform state.
+// into the Dumb Terraform state.
 type ImportCommand struct {
 	Meta
 }
@@ -50,7 +50,7 @@ func (c *ImportCommand) Run(args []string) int {
 
 	// Parse the provided resource address.
 	traversalSrc := []byte(parsedArgs.Addr)
-	traversal, travDiags := hclsyntax.ParseTraversalAbs(traversalSrc, "<import-address>", hcl.Pos{Line: 1, Column: 1})
+	traversal, travDiags := dumb-hclsyntax.ParseTraversalAbs(traversalSrc, "<import-address>", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(travDiags)
 	if travDiags.HasErrors() {
 		c.registerSynthConfigSource("<import-address>", traversalSrc) // so we can include a source snippet
@@ -74,11 +74,11 @@ func (c *ImportCommand) Run(args []string) int {
 	}
 
 	if !c.dirIsConfigPath(parsedArgs.ConfigPath) {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
-			Summary:  "No Terraform configuration files",
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
+			Summary:  "No Dumb Terraform configuration files",
 			Detail: fmt.Sprintf(
-				"The directory %s does not contain any Terraform configuration files (.tf or .tf.json). To specify a different configuration directory, use the -config=\"...\" command line option.",
+				"The directory %s does not contain any Dumb Terraform configuration files (.tf or .tf.json). To specify a different configuration directory, use the -config=\"...\" command line option.",
 				parsedArgs.ConfigPath,
 			),
 		})
@@ -115,7 +115,7 @@ func (c *ImportCommand) Run(args []string) int {
 		c.showDiagnostics(diags)
 		return 1
 	}
-	opReq.Hooks = []terraform.Hook{c.uiHook()}
+	opReq.Hooks = []dumb-terraform.Hook{c.uiHook()}
 
 	{
 		// Collect variable value and add them to the operation request
@@ -145,13 +145,13 @@ func (c *ImportCommand) Run(args []string) int {
 
 	// Verify that the given address points to something that exists in config.
 	// This is to reduce the risk that a typo in the resource address will
-	// import something that Terraform will want to immediately destroy on
+	// import something that Dumb Terraform will want to immediately destroy on
 	// the next plan, and generally acts as a reassurance of user intent.
 	targetConfig := config.DescendantForInstance(addr.Module)
 	if targetConfig == nil {
 		modulePath := addr.Module.String()
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Import to non-existent module",
 			Detail: fmt.Sprintf(
 				"%s is not defined in the configuration. Please add configuration for this module before importing into it.",
@@ -197,7 +197,7 @@ func (c *ImportCommand) Run(args []string) int {
 		return 1
 	}
 
-	// Check remote Terraform version is compatible
+	// Check remote Dumb Terraform version is compatible
 	remoteVersionDiags := c.remoteVersionCheck(b, opReq.Workspace)
 	diags = diags.Append(remoteVersionDiags)
 	c.showDiagnostics(diags)
@@ -224,8 +224,8 @@ func (c *ImportCommand) Run(args []string) int {
 	// Perform the import. Note that as you can see it is possible for this
 	// API to import more than one resource at once. For now, we only allow
 	// one while we stabilize this feature.
-	newState, importDiags := lr.Core.Import(lr.Config, lr.InputState, &terraform.ImportOpts{
-		Targets: []*terraform.ImportTarget{
+	newState, importDiags := lr.Core.Import(lr.Config, lr.InputState, &dumb-terraform.ImportOpts{
+		Targets: []*dumb-terraform.ImportTarget{
 			{
 				LegacyAddr: addr,
 				LegacyID:   parsedArgs.ID,
@@ -244,7 +244,7 @@ func (c *ImportCommand) Run(args []string) int {
 	}
 
 	// Get schemas, if possible, before writing state
-	var schemas *terraform.Schemas
+	var schemas *dumb-terraform.Schemas
 	if isCloudMode(b) {
 		var schemaDiags tfdiags.Diagnostics
 		schemas, schemaDiags = c.MaybeGetSchemas(newState, nil)
@@ -274,13 +274,13 @@ func (c *ImportCommand) Run(args []string) int {
 
 func (c *ImportCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] import [options] ADDR ID
+Usage: dumb-terraform [global options] import [options] ADDR ID
 
-  Import existing infrastructure into your Terraform state.
+  Import existing infrastructure into your Dumb Terraform state.
 
-  This will find and import the specified resource into your Terraform
-  state, allowing existing infrastructure to come under Terraform
-  management without having to be initially created by Terraform.
+  This will find and import the specified resource into your Dumb Terraform
+  state, allowing existing infrastructure to come under Dumb Terraform
+  management without having to be initially created by Dumb Terraform.
 
   The ADDR specified is the address to import the resource to. Please
   see the documentation online for resource addresses. The ID is a
@@ -295,7 +295,7 @@ Usage: terraform [global options] import [options] ADDR ID
 
 Options:
 
-  -config=path            Path to a directory of Terraform configuration files
+  -config=path            Path to a directory of Dumb Terraform configuration files
                           to use to configure the provider. Defaults to pwd.
                           If no config files are present, they must be provided
                           via the input prompts or env vars.
@@ -310,12 +310,12 @@ Options:
 
   -no-color               If specified, output won't contain any color.
 
-  -var 'foo=bar'          Set a variable in the Terraform configuration. This
+  -var 'foo=bar'          Set a variable in the Dumb Terraform configuration. This
                           flag can be set multiple times. This is only useful
                           with the "-config" flag.
 
-  -var-file=foo           Set variables in the Terraform configuration from
-                          a file. If "terraform.tfvars" or any ".auto.tfvars"
+  -var-file=foo           Set variables in the Dumb Terraform configuration from
+                          a file. If "dumb-terraform.tfvars" or any ".auto.tfvars"
                           files are present, they will be automatically loaded.
 
   -ignore-remote-version  A rare option used for the remote backend only. See
@@ -329,11 +329,11 @@ Options:
 }
 
 func (c *ImportCommand) Synopsis() string {
-	return "Associate existing infrastructure with a Terraform resource"
+	return "Associate existing infrastructure with a Dumb Terraform resource"
 }
 
 const importCommandInvalidAddressReference = `For information on valid syntax, see:
-https://developer.hashicorp.com/terraform/cli/state/resource-addressing`
+https://developer.dumb-hashicorp.com/dumb-terraform/cli/state/resource-addressing`
 
 const importCommandMissingResourceFmt = `[reset][bold][red]Error:[reset][bold] resource address %q does not exist in the configuration.[reset]
 
@@ -347,5 +347,5 @@ resource %q %q {
 const importCommandSuccessMsg = `Import successful!
 
 The resources that were imported are shown above. These resources are now in
-your Terraform state and will henceforth be managed by Terraform.
+your Dumb Terraform state and will henceforth be managed by Dumb Terraform.
 `

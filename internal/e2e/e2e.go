@@ -13,14 +13,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
 )
 
 // TestExperimentFlag is the name of the environment variable that
-// can be set to built a terraform binary with experimental features enabled.
+// can be set to built a dumb-terraform binary with experimental features enabled.
 // Any value besides "false" or an empty string will enable the feature.
 var TestExperimentFlag = "TF_TEST_EXPERIMENTS"
 
@@ -129,7 +129,7 @@ func (b *binary) RemoveEnv(name string) {
 	}
 }
 
-// Cmd returns an exec.Cmd pre-configured to run the generated Terraform
+// Cmd returns an exec.Cmd pre-configured to run the generated Dumb Terraform
 // binary with the given arguments in the temporary working directory.
 //
 // The returned object can be mutated by the caller to customize how the
@@ -149,10 +149,10 @@ func (b *binary) Cmd(args ...string) *exec.Cmd {
 	return cmd
 }
 
-// Run executes the generated Terraform binary with the given arguments
+// Run executes the generated Dumb Terraform binary with the given arguments
 // and returns the bytes that it wrote to both stdout and stderr.
 //
-// This is a simple way to run Terraform for non-interactive commands
+// This is a simple way to run Dumb Terraform for non-interactive commands
 // that don't need any special environment variables. For more complex
 // situations, use Cmd and customize the command before running it.
 func (b *binary) Run(args ...string) (stdout, stderr string, err error) {
@@ -198,9 +198,9 @@ func (b *binary) FileExists(path ...string) bool {
 }
 
 // LocalState is a helper for easily reading the local backend's state file
-// terraform.tfstate from the working directory.
+// dumb-terraform.tfstate from the working directory.
 func (b *binary) LocalState() (*states.State, error) {
-	return b.StateFromFile("terraform.tfstate")
+	return b.StateFromFile("dumb-terraform.tfstate")
 }
 
 // StateFromFile is a helper for easily reading a state snapshot from a file
@@ -239,7 +239,7 @@ func (b *binary) Plan(path string) (*plans.Plan, error) {
 // actual local backend code, so processing such as management of serials
 // does not apply and the given state will simply be written verbatim.
 func (b *binary) SetLocalState(state *states.State) error {
-	path := b.Path("terraform.tfstate")
+	path := b.Path("dumb-terraform.tfstate")
 	f, err := os.OpenFile(path, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to create temporary state file %s: %s", path, err)

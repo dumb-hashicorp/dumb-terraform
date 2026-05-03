@@ -8,16 +8,16 @@ import (
 	"log"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/moduletest/mocking"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/mocking"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var (
@@ -56,7 +56,7 @@ func (n *NodeTestRun) References() []*addrs.Reference {
 		// they execute first
 		references = append(references, &addrs.Reference{
 			Subject:     run.Addr(),
-			SourceRange: tfdiags.SourceRangeFromHCL(n.run.Config.DeclRange),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(n.run.Config.DeclRange),
 		})
 	}
 
@@ -77,7 +77,7 @@ func (n *NodeTestRun) References() []*addrs.Reference {
 
 		references = append(references, &addrs.Reference{
 			Subject:     addrs.InputVariable{Name: name},
-			SourceRange: tfdiags.SourceRangeFromHCL(variable.DeclRange),
+			SourceRange: tfdiags.SourceRangeFromDUMB_HCL(variable.DeclRange),
 		})
 	}
 
@@ -120,12 +120,12 @@ func (n *NodeTestRun) Execute(evalCtx *EvalContext) {
 		return
 	}
 
-	// Create a waiter which handles waiting for terraform operations to complete.
+	// Create a waiter which handles waiting for dumb-terraform operations to complete.
 	// While waiting, the wait will also respond to cancellation signals, and
 	// handle them appropriately.
 	// The test progress is updated periodically, and the progress status
 	// depends on the async operation being waited on.
-	// Before the terraform operation is started, the operation updates the
+	// Before the dumb-terraform operation is started, the operation updates the
 	// waiter with the cleanup context on cancellation, as well as the
 	// progress status.
 	waiter := NewOperationWaiter(nil, evalCtx, file, run, moduletest.Running, startTime.UnixMilli())
@@ -165,14 +165,14 @@ func (n *NodeTestRun) execute(ctx *EvalContext, waiter *operationWaiter) {
 	// Evaluate the override blocks for this test run.
 	// We use a context that only contains functions, and thus references are currently
 	// not supported in the override/mock blocks.
-	hclCtx, diags := ctx.HclContext(nil)
+	dumb-hclCtx, diags := ctx.Dumb HclContext(nil)
 	if diags != nil {
 		run.Status = moduletest.Error
 		run.Diagnostics = run.Diagnostics.Append(diags)
 		return
 	}
 
-	overrides, diags := mocking.PackageOverrides(hclCtx, run.Config, file.Config, mocks)
+	overrides, diags := mocking.PackageOverrides(dumb-hclCtx, run.Config, file.Config, mocks)
 	if diags != nil {
 		run.Status = moduletest.Error
 		run.Diagnostics = run.Diagnostics.Append(diags)
@@ -206,12 +206,12 @@ func (n *NodeTestRun) testValidate(providers map[addrs.RootProviderConfig]provid
 	config := run.ModuleConfig
 
 	log.Printf("[TRACE] TestFileRunner: called validate for %s/%s", file.Name, run.Name)
-	tfCtx, ctxDiags := terraform.NewContext(n.opts.ContextOpts)
+	tfCtx, ctxDiags := dumb-terraform.NewContext(n.opts.ContextOpts)
 	if ctxDiags.HasErrors() {
 		return
 	}
 	waiter.update(tfCtx, moduletest.Running, nil)
-	validateDiags := tfCtx.Validate(config, &terraform.ValidateOpts{
+	validateDiags := tfCtx.Validate(config, &dumb-terraform.ValidateOpts{
 		ExternalProviders:         providers,
 		AllowRootEphemeralOutputs: true,
 	})
@@ -245,8 +245,8 @@ func getProviders(ctx *EvalContext, file *configs.TestFile, run *configs.TestRun
 			}
 
 			if !testAddr.Provider.Equals(moduleAddr.Provider) {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Mismatched provider configuration",
 					Detail:   fmt.Sprintf("Expected %q but was %q.", moduleAddr.Provider, testAddr.Provider),
 					Subject:  ref.InChild.NameRange.Ptr(),
@@ -263,8 +263,8 @@ func getProviders(ctx *EvalContext, file *configs.TestFile, run *configs.TestRun
 				}
 
 			} else {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Missing provider",
 					Detail:   fmt.Sprintf("Provider %q was not defined within the test file.", ref.InParent.String()),
 					Subject:  ref.InParent.NameRange.Ptr(),

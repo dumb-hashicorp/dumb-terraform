@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StateRmCommand is a Command implementation that removes
@@ -132,7 +132,7 @@ func (c *StateRmCommand) Run(args []string) int {
 	}
 
 	// Get schemas, if possible, before writing state
-	var schemas *terraform.Schemas
+	var schemas *dumb-terraform.Schemas
 	if isCloudMode(b) {
 		var schemaDiags tfdiags.Diagnostics
 		schemas, schemaDiags = c.MaybeGetSchemas(state, nil)
@@ -156,7 +156,7 @@ func (c *StateRmCommand) Run(args []string) int {
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Invalid target address",
-			"No matching objects found. To view the available instances, use \"terraform state list\". Please modify the address to reference a specific instance.",
+			"No matching objects found. To view the available instances, use \"dumb-terraform state list\". Please modify the address to reference a specific instance.",
 		))
 		c.showDiagnostics(diags)
 		return 1
@@ -168,14 +168,14 @@ func (c *StateRmCommand) Run(args []string) int {
 
 func (c *StateRmCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] state rm [options] ADDRESS...
+Usage: dumb-terraform [global options] state rm [options] ADDRESS...
 
-  Remove one or more items from the Terraform state, causing Terraform to
+  Remove one or more items from the Dumb Terraform state, causing Dumb Terraform to
   "forget" those items without first destroying them in the remote system.
 
-  This command removes one or more resource instances from the Terraform state
+  This command removes one or more resource instances from the Dumb Terraform state
   based on the addresses given. You can view and list the available instances
-  with "terraform state list".
+  with "dumb-terraform state list".
 
   If you give the address of an entire module then all of the instances in
   that module and any of its child modules will be removed from the state.
@@ -188,7 +188,7 @@ Options:
   -dry-run                If set, prints out what would've been removed but
                           doesn't actually remove anything.
 
-  -backup=PATH            Path where Terraform should write the backup
+  -backup=PATH            Path where Dumb Terraform should write the backup
                           state.
 
   -lock=false             Don't hold a state lock during the operation. This is
@@ -203,7 +203,7 @@ Options:
                           the local backend's documentation for more
                           information.
 
-  -ignore-remote-version  Continue even if remote and local Terraform versions
+  -ignore-remote-version  Continue even if remote and local Dumb Terraform versions
                           are incompatible. This may result in an unusable
                           workspace, and should be used with extreme caution.
 
@@ -212,7 +212,7 @@ Options:
                           once to set more than one variable.
 
   -var-file=filename      Load variable values from the given file, in addition
-                          to the default files terraform.tfvars and *.auto.tfvars.
+                          to the default files dumb-terraform.tfvars and *.auto.tfvars.
                           Use this option more than once to include more than one
                           variables file.
 

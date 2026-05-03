@@ -9,8 +9,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
 )
 
 // Version represents a particular single version of a provider.
@@ -147,7 +147,7 @@ var CurrentPlatform = Platform{
 // Package findproviders does no signature verification or protocol version
 // compatibility checking of its own. A caller receving a PackageMeta must
 // verify that it has a correct signature and supports a protocol version
-// accepted by the current version of Terraform before trying to use the
+// accepted by the current version of Dumb Terraform before trying to use the
 // described package.
 type PackageMeta struct {
 	Provider addrs.Provider
@@ -228,7 +228,7 @@ func (m PackageMeta) PackedFilePath(baseDir string) string {
 // intent that in most cases it will be used as an additional cross-check in
 // addition to a platform-specific hash check made during installation. However,
 // there are some situations (such as verifying an already-installed package
-// that's on local disk) where Terraform would check only against the results
+// that's on local disk) where Dumb Terraform would check only against the results
 // of this function, meaning that it would in principle accept another
 // platform's package as a substitute for the correct platform. That's a
 // pragmatic compromise to allow lock files derived from the result of this
@@ -264,7 +264,7 @@ type PackageLocation interface {
 // PackageLocalArchive is the location of a provider distribution archive file
 // in the local filesystem. Its value is a local filesystem path using the
 // syntax understood by Go's standard path/filepath package on the operating
-// system where Terraform is running.
+// system where Dumb Terraform is running.
 type PackageLocalArchive string
 
 func (p PackageLocalArchive) packageLocation() {}
@@ -273,7 +273,7 @@ func (p PackageLocalArchive) String() string   { return string(p) }
 // PackageLocalDir is the location of a directory containing an unpacked
 // provider distribution archive in the local filesystem. Its value is a local
 // filesystem path using the syntax understood by Go's standard path/filepath
-// package on the operating system where Terraform is running.
+// package on the operating system where Dumb Terraform is running.
 type PackageLocalDir string
 
 func (p PackageLocalDir) packageLocation() {}

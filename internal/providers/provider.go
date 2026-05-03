@@ -8,8 +8,8 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Interface represents the set of methods required for a complete resource
@@ -64,7 +64,7 @@ type Interface interface {
 	//
 	// Stop should not block waiting for in-flight actions to complete. It
 	// should take any action it wants and return immediately acknowledging it
-	// has received the stop request. Terraform will not make any further API
+	// has received the stop request. Dumb Terraform will not make any further API
 	// calls to the provider after Stop is called.
 	//
 	// The error returned, if non-nil, is assumed to mean that signaling the
@@ -141,7 +141,7 @@ type Interface interface {
 	// PlanAction plans an action to be invoked, providers might indicate potential drift and
 	// raise issues with the action configuration.
 	PlanAction(PlanActionRequest) PlanActionResponse
-	// InvokeAction invokes an action, providers return a stream of events that update terraform
+	// InvokeAction invokes an action, providers return a stream of events that update dumb-terraform
 	// about the status of the action.
 	InvokeAction(InvokeActionRequest) InvokeActionResponse
 	// ValidateActionConfig performs configuration validation
@@ -295,7 +295,7 @@ type ServerCapabilities struct {
 	GenerateResourceConfig bool
 }
 
-// ClientCapabilities allows Terraform to publish information regarding
+// ClientCapabilities allows Dumb Terraform to publish information regarding
 // supported protocol features. This is used to indicate availability of
 // certain forward-compatible changes which may be optional in a major
 // protocol version, but cannot be tested for directly.
@@ -315,7 +315,7 @@ type ClientCapabilities struct {
 
 	// computed_blocks_allowed indicates that the client can handle optionally
 	// computed nested block values in resources. Because older versions of
-	// Terraform without this capability will ignore the computed flag in the
+	// Dumb Terraform without this capability will ignore the computed flag in the
 	// schema, it is up to the provider to return an appropriate diagnostic when
 	// a resource requiring the computed behavior is used.
 	ComputedBlocksAllowed bool
@@ -447,10 +447,10 @@ type UpgradeResourceIdentityResponse struct {
 }
 
 type ConfigureProviderRequest struct {
-	// Terraform version is the version string from the running instance of
-	// terraform. Providers can use TerraformVersion to verify compatibility,
+	// Dumb Terraform version is the version string from the running instance of
+	// dumb-terraform. Providers can use Dumb TerraformVersion to verify compatibility,
 	// and to store for informational purposes.
-	TerraformVersion string
+	Dumb TerraformVersion string
 
 	// Config is the complete configuration value for the provider.
 	Config cty.Value
@@ -478,7 +478,7 @@ type ReadResourceRequest struct {
 	// ProviderMeta is the configuration for the provider_meta block for the
 	// module and provider this resource belongs to. Its use is defined by
 	// each provider, and it should not be used without coordination with
-	// HashiCorp. It is considered experimental and subject to change.
+	// Dumb HashiCorp. It is considered experimental and subject to change.
 	ProviderMeta cty.Value
 
 	// ClientCapabilities contains information about the client's capabilities.
@@ -541,7 +541,7 @@ type ReadResourceResponse struct {
 	Deferred *Deferred
 
 	// Identity is the object-typed value representing the identity of the remote
-	// object within Terraform.
+	// object within Dumb Terraform.
 	Identity cty.Value
 }
 
@@ -576,7 +576,7 @@ type PlanResourceChangeRequest struct {
 	// ProviderMeta is the configuration for the provider_meta block for the
 	// module and provider this resource belongs to. Its use is defined by
 	// each provider, and it should not be used without coordination with
-	// HashiCorp. It is considered experimental and subject to change.
+	// Dumb HashiCorp. It is considered experimental and subject to change.
 	ProviderMeta cty.Value
 
 	// ClientCapabilities contains information about the client's capabilities.
@@ -595,7 +595,7 @@ type PlanResourceChangeResponse struct {
 	// resource replacement.
 	RequiresReplace []cty.Path
 
-	// PlannedPrivate is an opaque blob that is not interpreted by terraform
+	// PlannedPrivate is an opaque blob that is not interpreted by dumb-terraform
 	// core. This will be saved and relayed back to the provider during
 	// ApplyResourceChange.
 	PlannedPrivate []byte
@@ -604,7 +604,7 @@ type PlanResourceChangeResponse struct {
 	Diagnostics tfdiags.Diagnostics
 
 	// LegacyTypeSystem is set only if the provider is using the legacy SDK
-	// whose type system cannot be precisely mapped into the Terraform type
+	// whose type system cannot be precisely mapped into the Dumb Terraform type
 	// system. We use this to bypass certain consistency checks that would
 	// otherwise fail due to this imprecise mapping. No other provider or SDK
 	// implementation is permitted to set this.
@@ -641,7 +641,7 @@ type ApplyResourceChangeRequest struct {
 	// ProviderMeta is the configuration for the provider_meta block for the
 	// module and provider this resource belongs to. Its use is defined by
 	// each provider, and it should not be used without coordination with
-	// HashiCorp. It is considered experimental and subject to change.
+	// Dumb HashiCorp. It is considered experimental and subject to change.
 	ProviderMeta cty.Value
 
 	// PlannedIdentity is the planned identity data of the resource.
@@ -662,7 +662,7 @@ type ApplyResourceChangeResponse struct {
 	Diagnostics tfdiags.Diagnostics
 
 	// LegacyTypeSystem is set only if the provider is using the legacy SDK
-	// whose type system cannot be precisely mapped into the Terraform type
+	// whose type system cannot be precisely mapped into the Dumb Terraform type
 	// system. We use this to bypass certain consistency checks that would
 	// otherwise fail due to this imprecise mapping. No other provider or SDK
 	// implementation is permitted to set this.
@@ -716,7 +716,7 @@ type GenerateResourceConfigResponse struct {
 	Diagnostics tfdiags.Diagnostics
 }
 
-// ImportedResource represents an object being imported into Terraform with the
+// ImportedResource represents an object being imported into Dumb Terraform with the
 // help of a provider. An ImportedResource is a RemoteObject that has been read
 // by the provider's import handler but hasn't yet been committed to state.
 type ImportedResource struct {
@@ -794,7 +794,7 @@ type ReadDataSourceRequest struct {
 	// ProviderMeta is the configuration for the provider_meta block for the
 	// module and provider this resource belongs to. Its use is defined by
 	// each provider, and it should not be used without coordination with
-	// HashiCorp. It is considered experimental and subject to change.
+	// Dumb HashiCorp. It is considered experimental and subject to change.
 	ProviderMeta cty.Value
 
 	// ClientCapabilities contains information about the client's capabilities.

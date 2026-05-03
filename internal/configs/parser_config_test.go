@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 // TestParseLoadConfigFileSuccess is a simple test that just verifies that
@@ -90,42 +90,42 @@ func TestParserLoadConfigFileFailure(t *testing.T) {
 func TestParserLoadConfigFileFailureMessages(t *testing.T) {
 	tests := []struct {
 		Filename     string
-		WantSeverity hcl.DiagnosticSeverity
+		WantSeverity dumb-hcl.DiagnosticSeverity
 		WantDiag     string
 	}{
 		{
 			"invalid-files/data-resource-lifecycle.tf",
-			hcl.DiagError,
+			dumb-hcl.DiagError,
 			"Invalid data resource lifecycle argument",
 		},
 		{
 			"invalid-files/variable-type-unknown.tf",
-			hcl.DiagError,
+			dumb-hcl.DiagError,
 			"Invalid type specification",
 		},
 		{
 			"invalid-files/unexpected-attr.tf",
-			hcl.DiagError,
+			dumb-hcl.DiagError,
 			"Unsupported argument",
 		},
 		{
 			"invalid-files/unexpected-block.tf",
-			hcl.DiagError,
+			dumb-hcl.DiagError,
 			"Unsupported block type",
 		},
 		{
 			"invalid-files/resource-count-and-for_each.tf",
-			hcl.DiagError,
+			dumb-hcl.DiagError,
 			`Invalid combination of "count" and "for_each"`,
 		},
 		{
 			"invalid-files/data-count-and-for_each.tf",
-			hcl.DiagError,
+			dumb-hcl.DiagError,
 			`Invalid combination of "count" and "for_each"`,
 		},
 		{
 			"invalid-files/resource-lifecycle-badbool.tf",
-			hcl.DiagError,
+			dumb-hcl.DiagError,
 			"Unsuitable value type",
 		},
 	}
@@ -220,7 +220,7 @@ func TestParserLoadConfigFileWarning(t *testing.T) {
 
 			gotWarnings := make(map[int]string)
 			for _, diag := range diags {
-				if diag.Severity != hcl.DiagWarning || diag.Subject == nil {
+				if diag.Severity != dumb-hcl.DiagWarning || diag.Subject == nil {
 					continue
 				}
 				gotWarnings[diag.Subject.Start.Line] = diag.Summary
@@ -279,7 +279,7 @@ func TestParserLoadConfigFileError(t *testing.T) {
 
 			gotErrors := make(map[int]string)
 			for _, diag := range diags {
-				if diag.Severity != hcl.DiagError || diag.Subject == nil {
+				if diag.Severity != dumb-hcl.DiagError || diag.Subject == nil {
 					continue
 				}
 				gotErrors[diag.Subject.Start.Line] = diag.Summary

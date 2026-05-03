@@ -4,9 +4,9 @@
 package stackeval
 
 import (
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 type ComponentInstanceApplyResult struct {
@@ -40,7 +40,7 @@ type ComponentInstanceApplyResult struct {
 //
 // Along with the objects targeted by explicit planned changes, this also
 // includes objects whose state might just get updated to capture changes
-// made outside of Terraform that were detected during the planning phase.
+// made outside of Dumb Terraform that were detected during the planning phase.
 func resourceInstanceObjectsAffectedByStackPlan(plan *stackplan.Component) addrs.Set[addrs.AbsResourceInstanceObject] {
 	// For now we conservatively just enumerate everything that exists
 	// either before or after the change. This is technically more than

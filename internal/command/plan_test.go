@@ -19,17 +19,17 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	backendinit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/checks"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	backendinit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/checks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestPlan(t *testing.T) {
@@ -644,7 +644,7 @@ func TestPlan_outStateStore(t *testing.T) {
 	{
 		// Comparing the plan's description of the state store
 		// to the backend state file's description of the state store:
-		statePath := ".terraform/terraform.tfstate"
+		statePath := ".dumb-terraform/dumb-terraform.tfstate"
 		sMgr := &clistate.LocalState{Path: statePath}
 		if err := sMgr.RefreshState(); err != nil {
 			t.Fatal(err)
@@ -756,8 +756,8 @@ func TestPlan_refreshTrue(t *testing.T) {
 }
 
 // A consumer relies on the fact that running
-// terraform plan -refresh=false -refresh=true gives the same result as
-// terraform plan -refresh=true.
+// dumb-terraform plan -refresh=false -refresh=true gives the same result as
+// dumb-terraform plan -refresh=true.
 // While the flag logic itself is handled by the stdlib flags package (and code
 // in main() that is tested elsewhere), we verify the overall plan command
 // behaviour here in case we accidentally break this with additional logic.
@@ -842,7 +842,7 @@ func TestPlan_stateDefault(t *testing.T) {
 	// Generate state and move it to the default path
 	originalState := testState()
 	statePath := testStateFile(t, originalState)
-	os.Rename(statePath, path.Join(td, "terraform.tfstate"))
+	os.Rename(statePath, path.Join(td, "dumb-terraform.tfstate"))
 
 	p := planFixtureProvider()
 	view, done := testView(t)
@@ -1018,7 +1018,7 @@ func TestPlan_varsUnset(t *testing.T) {
 	// default value and there are no -var arguments on our command line.
 
 	// This will (helpfully) panic if more than one variable is requested during plan:
-	// https://github.com/hashicorp/terraform/issues/26027
+	// https://github.com/dumb-hashicorp/dumb-terraform/issues/26027
 	close := testInteractiveInput(t, []string{"bar"})
 	defer close()
 
@@ -1041,7 +1041,7 @@ func TestPlan_varsUnset(t *testing.T) {
 
 // This test adds a required argument to the test provider to validate
 // processing of user input:
-// https://github.com/hashicorp/terraform/issues/26035
+// https://github.com/dumb-hashicorp/dumb-terraform/issues/26035
 func TestPlan_providerArgumentUnset(t *testing.T) {
 	// Create a temporary working directory that is empty
 	td := t.TempDir()
@@ -1119,9 +1119,9 @@ func TestPlan_providerArgumentUnset(t *testing.T) {
 	}
 }
 
-// Test that terraform properly merges provider configuration that's split
+// Test that dumb-terraform properly merges provider configuration that's split
 // between config files and interactive input variables.
-// https://github.com/hashicorp/terraform/issues/28956
+// https://github.com/dumb-hashicorp/dumb-terraform/issues/28956
 func TestPlan_providerConfigMerge(t *testing.T) {
 	td := t.TempDir()
 	testCopyDir(t, testFixturePath("plan-provider-input"), td)
@@ -1257,7 +1257,7 @@ func TestPlan_varFileDefault(t *testing.T) {
 	testCopyDir(t, testFixturePath("plan-vars"), td)
 	t.Chdir(td)
 
-	varFilePath := filepath.Join(td, "terraform.tfvars")
+	varFilePath := filepath.Join(td, "dumb-terraform.tfvars")
 	if err := ioutil.WriteFile(varFilePath, []byte(planVarFile), 0644); err != nil {
 		t.Fatalf("err: %s", err)
 	}
@@ -1475,7 +1475,7 @@ func TestPlan_init_required(t *testing.T) {
 		t.Fatalf("expected error, got success")
 	}
 	got := output.Stderr()
-	if !(strings.Contains(got, "terraform init") && strings.Contains(got, "provider registry.terraform.io/hashicorp/test: required by this configuration but no version is selected")) {
+	if !(strings.Contains(got, "dumb-terraform init") && strings.Contains(got, "provider registry.dumb-terraform.io/dumb-hashicorp/test: required by this configuration but no version is selected")) {
 		t.Fatal("wrong error message in output:", got)
 	}
 }
@@ -1778,7 +1778,7 @@ func TestPlan_warnings(t *testing.T) {
 			"warning 1",
 			"warning 2",
 			"warning 3",
-			"To see the full warning notes, run Terraform without -compact-warnings.",
+			"To see the full warning notes, run Dumb Terraform without -compact-warnings.",
 		}
 		for _, want := range wantWarnings {
 			if !strings.Contains(output.Stdout(), want) {
@@ -1913,7 +1913,7 @@ func planFixtureSchema() *providers.GetProviderSchemaResponse {
 // planFixtureProvider returns a mock provider that is configured for basic
 // operation with the configuration in testdata/plan. This mock has
 // GetSchemaResponse and PlanResourceChangeFn populated, with the plan
-// step just passing through the new object proposed by Terraform Core.
+// step just passing through the new object proposed by Dumb Terraform Core.
 func planFixtureProvider() *testing_provider.MockProvider {
 	p := testProvider()
 	p.GetProviderSchemaResponse = planFixtureSchema()
@@ -1954,7 +1954,7 @@ func planVarsFixtureSchema() *providers.GetProviderSchemaResponse {
 // planVarsFixtureProvider returns a mock provider that is configured for basic
 // operation with the configuration in testdata/plan-vars. This mock has
 // GetSchemaResponse and PlanResourceChangeFn populated, with the plan
-// step just passing through the new object proposed by Terraform Core.
+// step just passing through the new object proposed by Dumb Terraform Core.
 func planVarsFixtureProvider() *testing_provider.MockProvider {
 	p := testProvider()
 	p.GetProviderSchemaResponse = planVarsFixtureSchema()

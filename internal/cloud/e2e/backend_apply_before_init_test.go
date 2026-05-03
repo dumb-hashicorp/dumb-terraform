@@ -10,32 +10,32 @@ import (
 func Test_backend_apply_before_init(t *testing.T) {
 	t.Parallel()
 	skipIfMissingEnvVar(t)
-	skipWithoutRemoteTerraformVersion(t)
+	skipWithoutRemoteDumb TerraformVersion(t)
 
 	cases := testCases{
-		"terraform apply with cloud block - blank state": {
+		"dumb-terraform apply with cloud block - blank state": {
 			operations: []operationSets{
 				{
 					prep: func(t *testing.T, orgName, dir string) {
 						wsName := "new-workspace"
-						tfBlock := terraformConfigCloudBackendName(orgName, wsName)
+						tfBlock := dumb-terraformConfigCloudBackendName(orgName, wsName)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"apply"},
-							expectedCmdOutput: `HCP Terraform initialization required: please run "terraform init"`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform initialization required: please run "dumb-terraform init"`,
 							expectError:       true,
 						},
 					},
 				},
 			},
 		},
-		"terraform apply with cloud block - local state": {
+		"dumb-terraform apply with cloud block - local state": {
 			operations: []operationSets{
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigLocalBackend()
+						tfBlock := dumb-terraformConfigLocalBackend()
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
@@ -52,13 +52,13 @@ func Test_backend_apply_before_init(t *testing.T) {
 				{
 					prep: func(t *testing.T, orgName, dir string) {
 						wsName := "new-workspace"
-						tfBlock := terraformConfigCloudBackendName(orgName, wsName)
+						tfBlock := dumb-terraformConfigCloudBackendName(orgName, wsName)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"apply"},
-							expectedCmdOutput: `HCP Terraform initialization required: please run "terraform init"`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform initialization required: please run "dumb-terraform init"`,
 							expectError:       true,
 						},
 					},

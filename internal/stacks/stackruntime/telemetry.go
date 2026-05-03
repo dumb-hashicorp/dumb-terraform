@@ -11,5 +11,5 @@ import (
 var tracer trace.Tracer
 
 func init() {
-	tracer = otel.Tracer("github.com/hashicorp/terraform/internal/stacks/stackruntime")
+	tracer = otel.Tracer("github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime")
 }

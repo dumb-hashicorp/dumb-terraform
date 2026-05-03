@@ -12,15 +12,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/local"
-	"github.com/hashicorp/terraform/internal/command/workdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/workdir"
 )
 
 type Meta struct {
 	// WorkingDir is an object representing the "working directory" where we're
 	// running commands. In the normal case this literally refers to the
-	// working directory of the Terraform process, though this can take on
+	// working directory of the Dumb Terraform process, though this can take on
 	// a more symbolic meaning when the user has overridden default behavior
 	// to specify a different working directory or to override the special
 	// data directory where we'll persist settings that must survive between

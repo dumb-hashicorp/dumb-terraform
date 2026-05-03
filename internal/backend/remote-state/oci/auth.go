@@ -18,7 +18,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 	"github.com/oracle/oci-go-sdk/v65/common"
 	"github.com/oracle/oci-go-sdk/v65/common/auth"
 	"github.com/oracle/oci-go-sdk/v65/objectstorage"
@@ -92,28 +92,28 @@ func (p ociAuthConfigProvider) TenancyOCID() (string, error) {
 	if p.tenancyOcid != "" {
 		return p.tenancyOcid, nil
 	}
-	return "", fmt.Errorf("can not get %s from Terraform backend configuration", TenancyOcidAttrName)
+	return "", fmt.Errorf("can not get %s from Dumb Terraform backend configuration", TenancyOcidAttrName)
 }
 
 func (p ociAuthConfigProvider) UserOCID() (string, error) {
 	if p.userOcid != "" {
 		return p.userOcid, nil
 	}
-	return "", fmt.Errorf("can not get %s from Terraform backend configuration", UserOcidAttrName)
+	return "", fmt.Errorf("can not get %s from Dumb Terraform backend configuration", UserOcidAttrName)
 }
 
 func (p ociAuthConfigProvider) KeyFingerprint() (string, error) {
 	if p.fingerprint != "" {
 		return p.fingerprint, nil
 	}
-	return "", fmt.Errorf("can not get %s from Terraform backend configuration", FingerprintAttrName)
+	return "", fmt.Errorf("can not get %s from Dumb Terraform backend configuration", FingerprintAttrName)
 }
 
 func (p ociAuthConfigProvider) Region() (string, error) {
 	if p.region != "" {
 		return p.region, nil
 	}
-	return "", fmt.Errorf("can not get %s from Terraform backend configuration", RegionAttrName)
+	return "", fmt.Errorf("can not get %s from Dumb Terraform backend configuration", RegionAttrName)
 }
 func (p ociAuthConfigProvider) KeyID() (string, error) {
 	tenancy, err := p.TenancyOCID()
@@ -149,7 +149,7 @@ func (p ociAuthConfigProvider) PrivateRSAKey() (key *rsa.PrivateKey, err error) 
 		return common.PrivateKeyFromBytesWithPassword(pemFileContent, []byte(p.privateKeyPassword))
 	}
 
-	return nil, fmt.Errorf("can not get private_key or private_key_path from Terraform configuration")
+	return nil, fmt.Errorf("can not get private_key or private_key_path from Dumb Terraform configuration")
 }
 
 func (p ociAuthConfigProvider) getConfigProviders() ([]common.ConfigurationProvider, error) {
@@ -163,7 +163,7 @@ func (p ociAuthConfigProvider) getConfigProviders() ([]common.ConfigurationProvi
 
 		logger.Info("Attempting to authenticate using instance principal credentials")
 		if p.region == "" {
-			return nil, fmt.Errorf("unable to determine region from Terraform backend configuration while using Instance Principal")
+			return nil, fmt.Errorf("unable to determine region from Dumb Terraform backend configuration while using Instance Principal")
 		}
 
 		// Used to modify InstancePrincipal auth clients so that `accept_local_certs` is honored for auth clients as well
@@ -189,7 +189,7 @@ func (p ociAuthConfigProvider) getConfigProviders() ([]common.ConfigurationProvi
 		logger.Info("Attempting to authenticate using instance principal with certificates")
 
 		if p.region == "" {
-			return nil, fmt.Errorf("unable to determine region from Terraform backend configuration while using Instance Principal with certificates")
+			return nil, fmt.Errorf("unable to determine region from Dumb Terraform backend configuration while using Instance Principal with certificates")
 		}
 
 		defaultCertsDir, err := os.Getwd()
@@ -236,7 +236,7 @@ func (p ociAuthConfigProvider) getConfigProviders() ([]common.ConfigurationProvi
 	case strings.ToLower(AuthSecurityToken):
 		logger.Info("Attempting to authenticate using security token")
 		if p.region == "" {
-			return nil, fmt.Errorf("can not get %s from Terraform configuration (SecurityToken)", RegionAttrName)
+			return nil, fmt.Errorf("can not get %s from Dumb Terraform configuration (SecurityToken)", RegionAttrName)
 		}
 		// if region is part of the provider block make sure it is part of the final configuration too, and overwrites the region in the profile. +
 		regionProvider := common.NewRawConfigurationProvider("", "", p.region, "", "", nil)
@@ -261,7 +261,7 @@ func (p ociAuthConfigProvider) getConfigProviders() ([]common.ConfigurationProvi
 		var resourcePrincipalAuthConfigProvider auth.ConfigurationProviderWithClaimAccess
 
 		if p.region == "" {
-			logger.Debug("did not get %s from Terraform configuration (ResourcePrincipal), falling back to environment variable", RegionAttrName)
+			logger.Debug("did not get %s from Dumb Terraform configuration (ResourcePrincipal), falling back to environment variable", RegionAttrName)
 			resourcePrincipalAuthConfigProvider, err = auth.ResourcePrincipalConfigurationProvider()
 		} else {
 			resourcePrincipalAuthConfigProvider, err = auth.ResourcePrincipalConfigurationProviderForRegion(common.StringToRegion(p.region))
@@ -342,7 +342,7 @@ func UserAgentFromEnv() string {
 
 	userAgentFromEnv := getEnvSettingWithBlankDefault(UserAgentSDKNameEnv)
 	if userAgentFromEnv == "" {
-		userAgentFromEnv = getEnvSettingWithBlankDefault(UserAgentTerraformNameEnv)
+		userAgentFromEnv = getEnvSettingWithBlankDefault(UserAgentDumb TerraformNameEnv)
 	}
 	if userAgentFromEnv == "" {
 		userAgentFromEnv = DefaultUserAgentBackendName

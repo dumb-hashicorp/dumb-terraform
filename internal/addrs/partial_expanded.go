@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // PartialExpandedModule represents a set of module instances which all share
@@ -42,7 +42,7 @@ type PartialExpandedModule struct {
 // It returns the parsed PartialExpandedModule, the remaining traversal steps
 // that were not consumed by this function, and any diagnostics that were
 // generated during parsing.
-func ParsePartialExpandedModule(traversal hcl.Traversal) (PartialExpandedModule, hcl.Traversal, tfdiags.Diagnostics) {
+func ParsePartialExpandedModule(traversal dumb-hcl.Traversal) (PartialExpandedModule, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	remain := traversal
@@ -57,13 +57,13 @@ LOOP:
 	for len(remain) > 0 {
 		var next string
 		switch tt := remain[0].(type) {
-		case hcl.TraverseRoot:
+		case dumb-hcl.TraverseRoot:
 			next = tt.Name
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			next = tt.Name
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address operator",
 				Detail:   "Module address prefix must be followed by dot and then a name.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -78,8 +78,8 @@ LOOP:
 		kwRange := remain[0].SourceRange()
 		remain = remain[1:]
 		if len(remain) == 0 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address operator",
 				Detail:   "Prefix \"module.\" must be followed by a module name.",
 				Subject:  &kwRange,
@@ -89,11 +89,11 @@ LOOP:
 
 		var moduleName string
 		switch tt := remain[0].(type) {
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			moduleName = tt.Name
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address operator",
 				Detail:   "Prefix \"module.\" must be followed by a module name.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -109,7 +109,7 @@ LOOP:
 			}
 
 			if len(remain) > 0 {
-				if idx, ok := remain[0].(hcl.TraverseIndex); ok {
+				if idx, ok := remain[0].(dumb-hcl.TraverseIndex); ok {
 					remain = remain[1:]
 
 					if !idx.Key.IsKnown() {
@@ -129,8 +129,8 @@ LOOP:
 						if err == nil {
 							step.InstanceKey = IntKey(idxInt)
 						} else {
-							diags = diags.Append(&hcl.Diagnostic{
-								Severity: hcl.DiagError,
+							diags = diags.Append(&dumb-hcl.Diagnostic{
+								Severity: dumb-hcl.DiagError,
 								Summary:  "Invalid address operator",
 								Detail:   fmt.Sprintf("Invalid module index: %s.", err),
 								Subject:  idx.SourceRange().Ptr(),
@@ -138,8 +138,8 @@ LOOP:
 						}
 					default:
 						// Should never happen, because no other types are allowed in traversal indices.
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Invalid address operator",
 							Detail:   "Invalid module key: must be either a string or an integer.",
 							Subject:  idx.SourceRange().Ptr(),
@@ -156,7 +156,7 @@ LOOP:
 		partial.unexpandedSuffix = append(partial.unexpandedSuffix, moduleName)
 
 		if len(remain) > 0 {
-			if _, ok := remain[0].(hcl.TraverseIndex); ok {
+			if _, ok := remain[0].(dumb-hcl.TraverseIndex); ok {
 				// Then we have a module instance key. We're now parsing the
 				// unexpanded suffix of the module address, so we'll just
 				// ignore it.
@@ -165,16 +165,16 @@ LOOP:
 		}
 	}
 
-	var retRemain hcl.Traversal
+	var retRemain dumb-hcl.Traversal
 	if len(remain) > 0 {
-		retRemain = make(hcl.Traversal, len(remain))
+		retRemain = make(dumb-hcl.Traversal, len(remain))
 		copy(retRemain, remain)
 		// The first element here might be either a TraverseRoot or a
 		// TraverseAttr, depending on whether we had a module address on the
 		// front. To make life easier for callers, we'll normalize to always
 		// start with a TraverseRoot.
-		if tt, ok := retRemain[0].(hcl.TraverseAttr); ok {
-			retRemain[0] = hcl.TraverseRoot{
+		if tt, ok := retRemain[0].(dumb-hcl.TraverseAttr); ok {
+			retRemain[0] = dumb-hcl.TraverseRoot{
 				Name:     tt.Name,
 				SrcRange: tt.SrcRange,
 			}
@@ -424,13 +424,13 @@ type PartialExpandedResource struct {
 // ParsePartialExpandedResource parses a resource address traversal and returns
 // a PartialExpandedResource representing the known and unknown parts of the
 // address.
-func ParsePartialExpandedResource(traversal hcl.Traversal) (PartialExpandedResource, hcl.Traversal, tfdiags.Diagnostics) {
+func ParsePartialExpandedResource(traversal dumb-hcl.Traversal) (PartialExpandedResource, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	pem, remain, diags := ParsePartialExpandedModule(traversal)
 	if len(remain) == 0 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Resource address must be a module address followed by a resource address.",
 			Subject:  traversal.SourceRange().Ptr(),
@@ -438,8 +438,8 @@ func ParsePartialExpandedResource(traversal hcl.Traversal) (PartialExpandedResou
 		return PartialExpandedResource{}, nil, diags
 	}
 
-	// We know that remain[0] is a hcl.TraverseRoot object as the
-	// ParsePartialExpandedModule function always returns a hcl.TraverseRoot
+	// We know that remain[0] is a dumb-hcl.TraverseRoot object as the
+	// ParsePartialExpandedModule function always returns a dumb-hcl.TraverseRoot
 	// object as the first element in the remain slice.
 
 	mode := ManagedResourceMode
@@ -453,8 +453,8 @@ func ParsePartialExpandedResource(traversal hcl.Traversal) (PartialExpandedResou
 	}
 
 	if len(remain) < 2 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Resource specification must include a resource type and name.",
 			Subject:  remain.SourceRange().Ptr(),
@@ -464,22 +464,22 @@ func ParsePartialExpandedResource(traversal hcl.Traversal) (PartialExpandedResou
 
 	var typeName, name string
 	switch tt := remain[0].(type) {
-	case hcl.TraverseRoot:
+	case dumb-hcl.TraverseRoot:
 		typeName = tt.Name
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		typeName = tt.Name
 	default:
 		switch mode {
 		case ManagedResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "A resource type name is required.",
 				Subject:  remain[0].SourceRange().Ptr(),
 			})
 		case DataResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "A data source name is required.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -491,11 +491,11 @@ func ParsePartialExpandedResource(traversal hcl.Traversal) (PartialExpandedResou
 	}
 
 	switch tt := remain[1].(type) {
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		name = tt.Name
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "A resource name is required.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -505,7 +505,7 @@ func ParsePartialExpandedResource(traversal hcl.Traversal) (PartialExpandedResou
 
 	remain = remain[2:]
 	if len(remain) > 0 {
-		if _, ok := remain[0].(hcl.TraverseIndex); ok {
+		if _, ok := remain[0].(dumb-hcl.TraverseIndex); ok {
 			// Then we have a resource instance key. Since, we're building a
 			// PartialExpandedResource, we'll just ignore it.
 			remain = remain[1:]

@@ -4,7 +4,7 @@
 package configs
 
 import (
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 // LoadConfigFile reads the file at the given path and parses it as a config
@@ -19,26 +19,26 @@ import (
 // then the map may be incomplete but should be valid enough for careful
 // static analysis.
 //
-// This method wraps LoadHCLFile, and so it inherits the syntax selection
+// This method wraps LoadDUMB_HCLFile, and so it inherits the syntax selection
 // behaviors documented for that method.
-func (p *Parser) LoadConfigFile(path string) (*File, hcl.Diagnostics) {
+func (p *Parser) LoadConfigFile(path string) (*File, dumb-hcl.Diagnostics) {
 	return p.loadConfigFile(path, false)
 }
 
 // LoadConfigFileOverride is the same as LoadConfigFile except that it relaxes
 // certain required attribute constraints in order to interpret the given
 // file as an overrides file.
-func (p *Parser) LoadConfigFileOverride(path string) (*File, hcl.Diagnostics) {
+func (p *Parser) LoadConfigFileOverride(path string) (*File, dumb-hcl.Diagnostics) {
 	return p.loadConfigFile(path, true)
 }
 
-// LoadTestFile reads the file at the given path and parses it as a Terraform
+// LoadTestFile reads the file at the given path and parses it as a Dumb Terraform
 // test file.
 //
-// It references the same LoadHCLFile as LoadConfigFile, so inherits the same
+// It references the same LoadDUMB_HCLFile as LoadConfigFile, so inherits the same
 // syntax selection behaviours.
-func (p *Parser) LoadTestFile(path string) (*TestFile, hcl.Diagnostics) {
-	body, diags := p.LoadHCLFile(path)
+func (p *Parser) LoadTestFile(path string) (*TestFile, dumb-hcl.Diagnostics) {
+	body, diags := p.LoadDUMB_HCLFile(path)
 	if body == nil {
 		return nil, diags
 	}
@@ -48,8 +48,8 @@ func (p *Parser) LoadTestFile(path string) (*TestFile, hcl.Diagnostics) {
 	return test, diags
 }
 
-func (p *Parser) LoadQueryFile(path string) (*QueryFile, hcl.Diagnostics) {
-	body, diags := p.LoadHCLFile(path)
+func (p *Parser) LoadQueryFile(path string) (*QueryFile, dumb-hcl.Diagnostics) {
+	body, diags := p.LoadDUMB_HCLFile(path)
 	if body == nil {
 		return nil, diags
 	}
@@ -60,12 +60,12 @@ func (p *Parser) LoadQueryFile(path string) (*QueryFile, hcl.Diagnostics) {
 }
 
 // LoadMockDataFile reads the file at the given path and parses it as a
-// Terraform mock data file.
+// Dumb Terraform mock data file.
 //
-// It references the same LoadHCLFile as LoadConfigFile, so inherits the same
+// It references the same LoadDUMB_HCLFile as LoadConfigFile, so inherits the same
 // syntax selection behaviours.
-func (p *Parser) LoadMockDataFile(path string, useForPlanDefault bool) (*MockData, hcl.Diagnostics) {
-	body, diags := p.LoadHCLFile(path)
+func (p *Parser) LoadMockDataFile(path string, useForPlanDefault bool) (*MockData, dumb-hcl.Diagnostics) {
+	body, diags := p.LoadDUMB_HCLFile(path)
 	if body == nil {
 		return nil, diags
 	}
@@ -75,8 +75,8 @@ func (p *Parser) LoadMockDataFile(path string, useForPlanDefault bool) (*MockDat
 	return data, diags
 }
 
-func (p *Parser) loadConfigFile(path string, override bool) (*File, hcl.Diagnostics) {
-	body, diags := p.LoadHCLFile(path)
+func (p *Parser) loadConfigFile(path string, override bool) (*File, dumb-hcl.Diagnostics) {
+	body, diags := p.LoadDUMB_HCLFile(path)
 	if body == nil {
 		return nil, diags
 	}
@@ -84,16 +84,16 @@ func (p *Parser) loadConfigFile(path string, override bool) (*File, hcl.Diagnost
 	return parseConfigFile(body, diags, override, p.allowExperiments)
 }
 
-func parseConfigFile(body hcl.Body, diags hcl.Diagnostics, override, allowExperiments bool) (*File, hcl.Diagnostics) {
+func parseConfigFile(body dumb-hcl.Body, diags dumb-hcl.Diagnostics, override, allowExperiments bool) (*File, dumb-hcl.Diagnostics) {
 	file := &File{}
 
-	var reqDiags hcl.Diagnostics
+	var reqDiags dumb-hcl.Diagnostics
 	file.CoreVersionConstraints, reqDiags = sniffCoreVersionRequirements(body)
 	diags = append(diags, reqDiags...)
 
 	// We'll load the experiments first because other decoding logic in the
 	// loop below might depend on these experiments.
-	var expDiags hcl.Diagnostics
+	var expDiags dumb-hcl.Diagnostics
 	file.ActiveExperiments, expDiags = sniffActiveExperiments(body, allowExperiments)
 	diags = append(diags, expDiags...)
 
@@ -103,11 +103,11 @@ func parseConfigFile(body hcl.Body, diags hcl.Diagnostics, override, allowExperi
 	for _, block := range content.Blocks {
 		switch block.Type {
 
-		case "terraform":
-			content, contentDiags := block.Body.Content(terraformBlockSchema)
+		case "dumb-terraform":
+			content, contentDiags := block.Body.Content(dumb-terraformBlockSchema)
 			diags = append(diags, contentDiags...)
 
-			// We ignore the "terraform_version", "language" and "experiments"
+			// We ignore the "dumb-terraform_version", "language" and "experiments"
 			// attributes here because sniffCoreVersionRequirements and
 			// sniffActiveExperiments already dealt with those above.
 
@@ -130,8 +130,8 @@ func parseConfigFile(body hcl.Body, diags hcl.Diagnostics, override, allowExperi
 						}
 					} else {
 						// Prevent parsing of state_store blocks in all commands unless experiments enabled.
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Unsupported block type",
 							Detail:   "Blocks of type \"state_store\" are not expected here.",
 							Subject:  &innerBlock.TypeRange,
@@ -167,11 +167,11 @@ func parseConfigFile(body hcl.Body, diags hcl.Diagnostics, override, allowExperi
 			}
 
 		case "required_providers":
-			// required_providers should be nested inside a "terraform" block
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			// required_providers should be nested inside a "dumb-terraform" block
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid required_providers block",
-				Detail:   "A \"required_providers\" block must be nested inside a \"terraform\" block.",
+				Detail:   "A \"required_providers\" block must be nested inside a \"dumb-terraform\" block.",
 				Subject:  block.TypeRange.Ptr(),
 			})
 
@@ -276,18 +276,18 @@ func parseConfigFile(body hcl.Body, diags hcl.Diagnostics, override, allowExperi
 }
 
 // sniffCoreVersionRequirements does minimal parsing of the given body for
-// "terraform" blocks with "required_version" attributes, returning the
+// "dumb-terraform" blocks with "required_version" attributes, returning the
 // requirements found.
 //
 // This is intended to maximize the chance that we'll be able to read the
 // requirements (syntax errors notwithstanding) even if the config file contains
-// constructs that might've been added in future Terraform versions
+// constructs that might've been added in future Dumb Terraform versions
 //
 // This is a "best effort" sort of method which will return constraints it is
 // able to find, but may return no constraints at all if the given body is
 // so invalid that it cannot be decoded at all.
-func sniffCoreVersionRequirements(body hcl.Body) ([]VersionConstraint, hcl.Diagnostics) {
-	rootContent, _, diags := body.PartialContent(configFileTerraformBlockSniffRootSchema)
+func sniffCoreVersionRequirements(body dumb-hcl.Body) ([]VersionConstraint, dumb-hcl.Diagnostics) {
+	rootContent, _, diags := body.PartialContent(configFileDumb TerraformBlockSniffRootSchema)
 
 	var constraints []VersionConstraint
 
@@ -311,17 +311,17 @@ func sniffCoreVersionRequirements(body hcl.Body) ([]VersionConstraint, hcl.Diagn
 }
 
 // configFileSchema is the schema for the top-level of a config file. We use
-// the low-level HCL API for this level so we can easily deal with each
+// the low-level DUMB_HCL API for this level so we can easily deal with each
 // block type separately with its own decoding logic.
-var configFileSchema = &hcl.BodySchema{
-	Blocks: []hcl.BlockHeaderSchema{
+var configFileSchema = &dumb-hcl.BodySchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{
-			Type: "terraform",
+			Type: "dumb-terraform",
 		},
 		{
 			// This one is not really valid, but we include it here so we
 			// can create a specialized error message hinting the user to
-			// nest it inside a "terraform" block.
+			// nest it inside a "dumb-terraform" block.
 			Type: "required_providers",
 		},
 		{
@@ -375,15 +375,15 @@ var configFileSchema = &hcl.BodySchema{
 	},
 }
 
-// terraformBlockSchema is the schema for a top-level "terraform" block in
+// dumb-terraformBlockSchema is the schema for a top-level "dumb-terraform" block in
 // a configuration file.
-var terraformBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var dumb-terraformBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "required_version"},
 		{Name: "experiments"},
 		{Name: "language"},
 	},
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{
 			Type:       "backend",
 			LabelNames: []string{"type"},
@@ -405,19 +405,19 @@ var terraformBlockSchema = &hcl.BodySchema{
 	},
 }
 
-// configFileTerraformBlockSniffRootSchema is a schema for
+// configFileDumb TerraformBlockSniffRootSchema is a schema for
 // sniffCoreVersionRequirements and sniffActiveExperiments.
-var configFileTerraformBlockSniffRootSchema = &hcl.BodySchema{
-	Blocks: []hcl.BlockHeaderSchema{
+var configFileDumb TerraformBlockSniffRootSchema = &dumb-hcl.BodySchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{
-			Type: "terraform",
+			Type: "dumb-terraform",
 		},
 	},
 }
 
 // configFileVersionSniffBlockSchema is a schema for sniffCoreVersionRequirements
-var configFileVersionSniffBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var configFileVersionSniffBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name: "required_version",
 		},
@@ -425,9 +425,9 @@ var configFileVersionSniffBlockSchema = &hcl.BodySchema{
 }
 
 // configFileExperimentsSniffBlockSchema is a schema for sniffActiveExperiments,
-// to decode a single attribute from inside a "terraform" block.
-var configFileExperimentsSniffBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+// to decode a single attribute from inside a "dumb-terraform" block.
+var configFileExperimentsSniffBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "experiments"},
 		{Name: "language"},
 	},

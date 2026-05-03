@@ -1,19 +1,19 @@
-terraform {
+dumb-terraform {
   required_providers {
-    terraform = {
-      source = "terraform.io/builtin/terraform"
+    dumb-terraform = {
+      source = "dumb-terraform.io/builtin/dumb-terraform"
     }
   }
 }
 
-resource "terraform_data" "main" {
+resource "dumb-terraform_data" "main" {
   input = "hello"
 }
 
 output "input" {
-  value = terraform_data.main.input
+  value = dumb-terraform_data.main.input
 }
 
 output "output" {
-  value = terraform_data.main.output
+  value = dumb-terraform_data.main.output
 }

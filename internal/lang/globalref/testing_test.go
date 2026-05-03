@@ -10,15 +10,15 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/initwd"
-	"github.com/hashicorp/terraform/internal/lang/globalref"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/registry"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/initwd"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/globalref"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 // testAnalyzer creates an analyzer for testing by loading a configuration
@@ -43,7 +43,7 @@ func testAnalyzer(t *testing.T, fixtureName string) *globalref.Analyzer {
 		t.Fatalf("invalid root module: %s", loadDiags.Error())
 	}
 
-	cfg, buildDiags := terraform.BuildConfigWithGraph(
+	cfg, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		nil,
@@ -103,7 +103,7 @@ func testAnalyzer(t *testing.T, fixtureName string) *globalref.Analyzer {
 		},
 	}
 	schemas := map[addrs.Provider]providers.ProviderSchema{
-		addrs.MustParseProviderSourceString("hashicorp/test"): {
+		addrs.MustParseProviderSourceString("dumb-hashicorp/test"): {
 			ResourceTypes: map[string]providers.Schema{
 				"test_thing": {
 					Body: resourceTypeSchema,

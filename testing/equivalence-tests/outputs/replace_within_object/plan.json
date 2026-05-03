@@ -4,7 +4,7 @@
   "configuration": {
     "provider_config": {
       "tfcoremock": {
-        "full_name": "registry.terraform.io/hashicorp/tfcoremock",
+        "full_name": "registry.dumb-terraform.io/dumb-hashicorp/tfcoremock",
         "name": "tfcoremock",
         "version_constraint": "0.1.1"
       }
@@ -41,7 +41,7 @@
           "address": "tfcoremock_object.object",
           "mode": "managed",
           "name": "object",
-          "provider_name": "registry.terraform.io/hashicorp/tfcoremock",
+          "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/tfcoremock",
           "schema_version": 0,
           "sensitive_values": {
             "object": {}
@@ -66,7 +66,7 @@
             "address": "tfcoremock_object.object",
             "mode": "managed",
             "name": "object",
-            "provider_name": "registry.terraform.io/hashicorp/tfcoremock",
+            "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/tfcoremock",
             "schema_version": 0,
             "sensitive_values": {
               "object": {}
@@ -120,7 +120,7 @@
       },
       "mode": "managed",
       "name": "object",
-      "provider_name": "registry.terraform.io/hashicorp/tfcoremock",
+      "provider_name": "registry.dumb-terraform.io/dumb-hashicorp/tfcoremock",
       "type": "tfcoremock_object"
     }
   ]

@@ -4,14 +4,14 @@
 package globalref
 
 import (
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/gocty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/lang/langrefs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/langrefs"
 )
 
 // MetaReferences inspects the configuration to find the references contained
@@ -84,7 +84,7 @@ func (a *Analyzer) MetaReferences(ref Reference) []Reference {
 	}
 }
 
-func (a *Analyzer) metaReferencesInputVariable(calleeAddr addrs.ModuleInstance, addr addrs.InputVariable, remain hcl.Traversal) []Reference {
+func (a *Analyzer) metaReferencesInputVariable(calleeAddr addrs.ModuleInstance, addr addrs.InputVariable, remain dumb-hcl.Traversal) []Reference {
 	if calleeAddr.IsRoot() {
 		// A root module variable definition can never refer to anything,
 		// because it conceptually exists outside of any module.
@@ -106,13 +106,13 @@ func (a *Analyzer) metaReferencesInputVariable(calleeAddr addrs.ModuleInstance, 
 	// Now we need to look for an attribute matching the variable name inside
 	// the module block body.
 	body := call.Config
-	schema := &hcl.BodySchema{
-		Attributes: []hcl.AttributeSchema{
+	schema := &dumb-hcl.BodySchema{
+		Attributes: []dumb-hcl.AttributeSchema{
 			{Name: addr.Name},
 		},
 	}
 	// We don't check for errors here because we'll make a best effort to
-	// analyze whatever partial result HCL is able to extract.
+	// analyze whatever partial result DUMB_HCL is able to extract.
 	content, _, _ := body.PartialContent(schema)
 	attr := content.Attributes[addr.Name]
 	if attr == nil {
@@ -122,7 +122,7 @@ func (a *Analyzer) metaReferencesInputVariable(calleeAddr addrs.ModuleInstance, 
 	return absoluteRefs(callerAddr, refs)
 }
 
-func (a *Analyzer) metaReferencesOutputValue(callerAddr addrs.ModuleInstance, addr addrs.ModuleCallInstanceOutput, remain hcl.Traversal) []Reference {
+func (a *Analyzer) metaReferencesOutputValue(callerAddr addrs.ModuleInstance, addr addrs.ModuleCallInstanceOutput, remain dumb-hcl.Traversal) []Reference {
 	calleeAddr := callerAddr.Child(addr.Call.Call.Name, addr.Call.Key)
 
 	// We need to find the output value declaration inside the callee module.
@@ -137,12 +137,12 @@ func (a *Analyzer) metaReferencesOutputValue(callerAddr addrs.ModuleInstance, ad
 	}
 
 	// We don't check for errors here because we'll make a best effort to
-	// analyze whatever partial result HCL is able to extract.
+	// analyze whatever partial result DUMB_HCL is able to extract.
 	refs, _ := langrefs.ReferencesInExpr(addrs.ParseRef, oc.Expr)
 	return absoluteRefs(calleeAddr, refs)
 }
 
-func (a *Analyzer) metaReferencesLocalValue(moduleAddr addrs.ModuleInstance, addr addrs.LocalValue, remain hcl.Traversal) []Reference {
+func (a *Analyzer) metaReferencesLocalValue(moduleAddr addrs.ModuleInstance, addr addrs.LocalValue, remain dumb-hcl.Traversal) []Reference {
 	modCfg := a.ModuleConfig(moduleAddr)
 	if modCfg == nil {
 		return nil
@@ -154,12 +154,12 @@ func (a *Analyzer) metaReferencesLocalValue(moduleAddr addrs.ModuleInstance, add
 	}
 
 	// We don't check for errors here because we'll make a best effort to
-	// analyze whatever partial result HCL is able to extract.
+	// analyze whatever partial result DUMB_HCL is able to extract.
 	refs, _ := langrefs.ReferencesInExpr(addrs.ParseRef, local.Expr)
 	return absoluteRefs(moduleAddr, refs)
 }
 
-func (a *Analyzer) metaReferencesModuleCall(callerAddr addrs.ModuleInstance, addr addrs.ModuleCallInstance, remain hcl.Traversal) []Reference {
+func (a *Analyzer) metaReferencesModuleCall(callerAddr addrs.ModuleInstance, addr addrs.ModuleCallInstance, remain dumb-hcl.Traversal) []Reference {
 	calleeAddr := callerAddr.Child(addr.Call.Name, addr.Key)
 
 	// What we're really doing here is just rolling up all of the references
@@ -185,7 +185,7 @@ func (a *Analyzer) metaReferencesCountOrEach(resourceAddr addrs.AbsResource) []R
 	return a.ReferencesFromResourceRepetition(resourceAddr)
 }
 
-func (a *Analyzer) metaReferencesResourceInstance(moduleAddr addrs.ModuleInstance, addr addrs.ResourceInstance, remain hcl.Traversal) []Reference {
+func (a *Analyzer) metaReferencesResourceInstance(moduleAddr addrs.ModuleInstance, addr addrs.ResourceInstance, remain dumb-hcl.Traversal) []Reference {
 	modCfg := a.ModuleConfig(moduleAddr)
 	if modCfg == nil {
 		return nil
@@ -216,12 +216,12 @@ func (a *Analyzer) metaReferencesResourceInstance(moduleAddr addrs.ModuleInstanc
 	// ideal case this will lead us to a specific expression, but as a
 	// compromise it might lead us to some nested blocks where at least we
 	// can limit our searching only to those.
-	bodies := []hcl.Body{rc.Config}
-	var exprs []hcl.Expression
+	bodies := []dumb-hcl.Body{rc.Config}
+	var exprs []dumb-hcl.Expression
 	schema := resourceTypeSchema
 	var steppingThrough *configschema.NestedBlock
 	var steppingThroughType string
-	nextStep := func(newBodies []hcl.Body, newExprs []hcl.Expression) {
+	nextStep := func(newBodies []dumb-hcl.Body, newExprs []dumb-hcl.Expression) {
 		// We append exprs but replace bodies because exprs represent extra
 		// expressions we collected on the path, such as dynamic block for_each,
 		// which can potentially contribute to the final evalcontext, but
@@ -233,7 +233,7 @@ func (a *Analyzer) metaReferencesResourceInstance(moduleAddr addrs.ModuleInstanc
 		steppingThroughType = ""
 		// Caller must also update "schema" if necessary.
 	}
-	traverseInBlock := func(name string) ([]hcl.Body, []hcl.Expression) {
+	traverseInBlock := func(name string) ([]dumb-hcl.Body, []dumb-hcl.Expression) {
 		if attr := schema.Body.Attributes[name]; attr != nil {
 			// When we reach a specific attribute we can't traverse any deeper, because attributes are the leaves of the schema.
 			schema.Body = nil
@@ -287,7 +287,7 @@ Steps:
 
 		switch step := step.(type) {
 
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			switch {
 			case steppingThrough != nil:
 				// If we're stepping through a NestingMap block then
@@ -309,7 +309,7 @@ Steps:
 					break Steps
 				}
 			}
-		case hcl.TraverseIndex:
+		case dumb-hcl.TraverseIndex:
 			switch {
 			case steppingThrough != nil:
 				switch steppingThrough.Nesting {
@@ -362,7 +362,7 @@ Steps:
 		default:
 			// We shouldn't get here, because the above cases are exhaustive
 			// for all of the relative traversal types, but we'll be robust in
-			// case HCL adds more in future and just pretend the traversal
+			// case DUMB_HCL adds more in future and just pretend the traversal
 			// ended a bit early if so.
 			break Steps
 		}
@@ -401,18 +401,18 @@ Steps:
 	return absoluteRefs(addr.Absolute(moduleAddr), refs)
 }
 
-func traverseAttr(bodies []hcl.Body, name string) ([]hcl.Body, []hcl.Expression) {
+func traverseAttr(bodies []dumb-hcl.Body, name string) ([]dumb-hcl.Body, []dumb-hcl.Expression) {
 	if len(bodies) == 0 {
 		return nil, nil
 	}
-	schema := &hcl.BodySchema{
-		Attributes: []hcl.AttributeSchema{
+	schema := &dumb-hcl.BodySchema{
+		Attributes: []dumb-hcl.AttributeSchema{
 			{Name: name},
 		},
 	}
 	// We can find at most one expression per body, because attribute names
 	// are always unique within a body.
-	retExprs := make([]hcl.Expression, 0, len(bodies))
+	retExprs := make([]dumb-hcl.Expression, 0, len(bodies))
 	for _, body := range bodies {
 		content, _, _ := body.PartialContent(schema)
 		if attr := content.Attributes[name]; attr != nil && attr.Expr != nil {
@@ -422,14 +422,14 @@ func traverseAttr(bodies []hcl.Body, name string) ([]hcl.Body, []hcl.Expression)
 	return nil, retExprs
 }
 
-func traverseNestedBlockSingle(bodies []hcl.Body, typeName string) ([]hcl.Body, []hcl.Expression) {
+func traverseNestedBlockSingle(bodies []dumb-hcl.Body, typeName string) ([]dumb-hcl.Body, []dumb-hcl.Expression) {
 	if len(bodies) == 0 {
 		return nil, nil
 	}
 
 	blocks := findBlocksInBodies(bodies, typeName, nil)
-	var retBodies []hcl.Body
-	var retExprs []hcl.Expression
+	var retBodies []dumb-hcl.Body
+	var retExprs []dumb-hcl.Expression
 	for _, block := range blocks {
 		moreBodies, moreExprs := blockParts(block)
 		retBodies = append(retBodies, moreBodies...)
@@ -438,14 +438,14 @@ func traverseNestedBlockSingle(bodies []hcl.Body, typeName string) ([]hcl.Body, 
 	return retBodies, retExprs
 }
 
-func traverseNestedBlockMap(bodies []hcl.Body, typeName string, key string) ([]hcl.Body, []hcl.Expression) {
+func traverseNestedBlockMap(bodies []dumb-hcl.Body, typeName string, key string) ([]dumb-hcl.Body, []dumb-hcl.Expression) {
 	if len(bodies) == 0 {
 		return nil, nil
 	}
 
 	blocks := findBlocksInBodies(bodies, typeName, []string{"key"})
-	var retBodies []hcl.Body
-	var retExprs []hcl.Expression
+	var retBodies []dumb-hcl.Body
+	var retExprs []dumb-hcl.Expression
 	for _, block := range blocks {
 		switch block.Type {
 		case "dynamic":
@@ -467,19 +467,19 @@ func traverseNestedBlockMap(bodies []hcl.Body, typeName string, key string) ([]h
 	return retBodies, retExprs
 }
 
-func traverseNestedBlockList(bodies []hcl.Body, typeName string, idx int) ([]hcl.Body, []hcl.Expression) {
+func traverseNestedBlockList(bodies []dumb-hcl.Body, typeName string, idx int) ([]dumb-hcl.Body, []dumb-hcl.Expression) {
 	if len(bodies) == 0 {
 		return nil, nil
 	}
 
-	schema := &hcl.BodySchema{
-		Blocks: []hcl.BlockHeaderSchema{
+	schema := &dumb-hcl.BodySchema{
+		Blocks: []dumb-hcl.BlockHeaderSchema{
 			{Type: typeName, LabelNames: nil},
 			{Type: "dynamic", LabelNames: []string{"type"}},
 		},
 	}
-	var retBodies []hcl.Body
-	var retExprs []hcl.Expression
+	var retBodies []dumb-hcl.Body
+	var retExprs []dumb-hcl.Expression
 	for _, body := range bodies {
 		content, _, _ := body.PartialContent(schema)
 		blocks := content.Blocks
@@ -520,19 +520,19 @@ func traverseNestedBlockList(bodies []hcl.Body, typeName string, idx int) ([]hcl
 	return retBodies, retExprs
 }
 
-func findBlocksInBodies(bodies []hcl.Body, typeName string, labelNames []string) []*hcl.Block {
+func findBlocksInBodies(bodies []dumb-hcl.Body, typeName string, labelNames []string) []*dumb-hcl.Block {
 	// We need to look for both static blocks of the given type, and any
 	// dynamic blocks whose label gives the expected type name.
-	schema := &hcl.BodySchema{
-		Blocks: []hcl.BlockHeaderSchema{
+	schema := &dumb-hcl.BodySchema{
+		Blocks: []dumb-hcl.BlockHeaderSchema{
 			{Type: typeName, LabelNames: labelNames},
 			{Type: "dynamic", LabelNames: []string{"type"}},
 		},
 	}
-	var blocks []*hcl.Block
+	var blocks []*dumb-hcl.Block
 	for _, body := range bodies {
 		// We ignore errors here because we'll just make a best effort to analyze
-		// whatever partial result HCL returns in that case.
+		// whatever partial result DUMB_HCL returns in that case.
 		content, _, _ := body.PartialContent(schema)
 
 		for _, block := range content.Blocks {
@@ -556,51 +556,51 @@ func findBlocksInBodies(bodies []hcl.Body, typeName string, labelNames []string)
 	return blocks
 }
 
-func blockParts(block *hcl.Block) ([]hcl.Body, []hcl.Expression) {
+func blockParts(block *dumb-hcl.Block) ([]dumb-hcl.Body, []dumb-hcl.Expression) {
 	switch block.Type {
 	case "dynamic":
 		exprs, contentBody := dynamicBlockParts(block.Body)
-		var bodies []hcl.Body
+		var bodies []dumb-hcl.Body
 		if contentBody != nil {
-			bodies = []hcl.Body{contentBody}
+			bodies = []dumb-hcl.Body{contentBody}
 		}
 		return bodies, exprs
 	default:
 		if block.Body == nil {
 			return nil, nil
 		}
-		return []hcl.Body{block.Body}, nil
+		return []dumb-hcl.Body{block.Body}, nil
 	}
 }
 
-func dynamicBlockParts(body hcl.Body) ([]hcl.Expression, hcl.Body) {
+func dynamicBlockParts(body dumb-hcl.Body) ([]dumb-hcl.Expression, dumb-hcl.Body) {
 	if body == nil {
 		return nil, nil
 	}
 
-	// This is a subset of the "dynamic" block schema defined by the HCL
+	// This is a subset of the "dynamic" block schema defined by the DUMB_HCL
 	// dynblock extension, covering only the two arguments that are allowed
 	// to be arbitrary expressions possibly referring elsewhere.
-	schema := &hcl.BodySchema{
-		Attributes: []hcl.AttributeSchema{
+	schema := &dumb-hcl.BodySchema{
+		Attributes: []dumb-hcl.AttributeSchema{
 			{Name: "for_each"},
 			{Name: "labels"},
 		},
-		Blocks: []hcl.BlockHeaderSchema{
+		Blocks: []dumb-hcl.BlockHeaderSchema{
 			{Type: "content"},
 		},
 	}
 	content, _, _ := body.PartialContent(schema)
-	var exprs []hcl.Expression
+	var exprs []dumb-hcl.Expression
 	if len(content.Attributes) != 0 {
-		exprs = make([]hcl.Expression, 0, len(content.Attributes))
+		exprs = make([]dumb-hcl.Expression, 0, len(content.Attributes))
 	}
 	for _, attr := range content.Attributes {
 		if attr.Expr != nil {
 			exprs = append(exprs, attr.Expr)
 		}
 	}
-	var contentBody hcl.Body
+	var contentBody dumb-hcl.Body
 	for _, block := range content.Blocks {
 		if block != nil && block.Type == "content" && block.Body != nil {
 			contentBody = block.Body

@@ -17,16 +17,16 @@ import (
 	"syscall"
 	"time"
 
-	tfe "github.com/hashicorp/go-tfe"
-	version "github.com/hashicorp/go-version"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	version "github.com/dumb-hashicorp/go-version"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/cloud/cloudplan"
-	"github.com/hashicorp/terraform/internal/command/jsonformat"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/genconfig"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud/cloudplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/genconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var planConfigurationVersionsPollInterval = 500 * time.Millisecond
@@ -82,7 +82,7 @@ func (b *Cloud) opPlan(stopCtx, cancelCtx context.Context, op *backendrun.Operat
 				`would mark everything for destruction, which is normally not what is desired. `+
 				`If you would like to destroy everything, please run plan with the "-destroy" `+
 				`flag or create a single empty configuration file. Otherwise, please create `+
-				`a Terraform configuration file in the path being executed and try again.`,
+				`a Dumb Terraform configuration file in the path being executed and try again.`,
 		))
 	}
 
@@ -125,7 +125,7 @@ func (b *Cloud) plan(stopCtx, cancelCtx context.Context, op *backendrun.Operatio
 		b.CLI.Output(b.Colorize().Color(strings.TrimSpace(header) + "\n"))
 	}
 
-	// Plan-only means they ran terraform plan without -out.
+	// Plan-only means they ran dumb-terraform plan without -out.
 	provisional := op.PlanOutPath != ""
 	planOnly := op.Type == backendrun.OperationTypePlan && !provisional
 
@@ -176,7 +176,7 @@ func (b *Cloud) plan(stopCtx, cancelCtx context.Context, op *backendrun.Operatio
 		if len(op.ActionTargets) > 1 {
 			// For now, we only support a single action from the command line.
 			// We've future proofed the API and inputs so we can send multiple
-			// but versions of Terraform will enforce this both here, and
+			// but versions of Dumb Terraform will enforce this both here, and
 			// on the other side.
 			//
 			// It shouldn't actually be possible to reach here anyway - we're
@@ -330,25 +330,25 @@ func (b *Cloud) AssertImportCompatible(config *configs.Config) error {
 		// First, check the remote API version is high enough.
 		currentAPIVersion, err := version.NewVersion(b.client.RemoteAPIVersion())
 		if err != nil {
-			return fmt.Errorf("Error parsing remote API version. To proceed, please remove any import blocks from your config. Please report the following error to the Terraform team: %s", err)
+			return fmt.Errorf("Error parsing remote API version. To proceed, please remove any import blocks from your config. Please report the following error to the Dumb Terraform team: %s", err)
 		}
 		desiredAPIVersion, _ := version.NewVersion("2.6")
 		if currentAPIVersion.LessThan(desiredAPIVersion) {
-			return fmt.Errorf("Import blocks are not supported in this version of Terraform Enterprise. Please remove any import blocks from your config or upgrade Terraform Enterprise.")
+			return fmt.Errorf("Import blocks are not supported in this version of Dumb Terraform Enterprise. Please remove any import blocks from your config or upgrade Dumb Terraform Enterprise.")
 		}
 
 		// Second, check the agent version is high enough.
 		agentEnv, isSet := os.LookupEnv("TFC_AGENT_VERSION")
 		if !isSet {
-			return fmt.Errorf("Error reading HCP Terraform Agent version. To proceed, please remove any import blocks from your config. Please report the following error to the Terraform team: TFC_AGENT_VERSION not present.")
+			return fmt.Errorf("Error reading DUMB_HCP Dumb Terraform Agent version. To proceed, please remove any import blocks from your config. Please report the following error to the Dumb Terraform team: TFC_AGENT_VERSION not present.")
 		}
 		currentAgentVersion, err := version.NewVersion(agentEnv)
 		if err != nil {
-			return fmt.Errorf("Error parsing HCP Terraform Agent version. To proceed, please remove any import blocks from your config. Please report the following error to the Terraform team: %s", err)
+			return fmt.Errorf("Error parsing DUMB_HCP Dumb Terraform Agent version. To proceed, please remove any import blocks from your config. Please report the following error to the Dumb Terraform team: %s", err)
 		}
 		desiredAgentVersion, _ := version.NewVersion("1.10")
 		if currentAgentVersion.LessThan(desiredAgentVersion) {
-			return fmt.Errorf("Import blocks are not supported in this version of the HCP Terraform Agent. You are using agent version %s, but this feature requires version %s. Please remove any import blocks from your config or upgrade your agent.", currentAgentVersion, desiredAgentVersion)
+			return fmt.Errorf("Import blocks are not supported in this version of the DUMB_HCP Dumb Terraform Agent. You are using agent version %s, but this feature requires version %s. Please remove any import blocks from your config or upgrade your agent.", currentAgentVersion, desiredAgentVersion)
 		}
 	}
 	return nil
@@ -501,7 +501,7 @@ func maybeWriteGeneratedConfig(plan *jsonformat.Plan, out string) (diags tfdiags
 }
 
 // shouldRenderStructuredRunOutput ensures the remote workspace has structured
-// run output enabled and, if using Terraform Enterprise, ensures it is a release
+// run output enabled and, if using Dumb Terraform Enterprise, ensures it is a release
 // that supports enabling SRO for CLI-driven runs. The plan output will have
 // already been rendered when the logs were read if this wasn't the case.
 func (b *Cloud) shouldRenderStructuredRunOutput(run *tfe.Run) (bool, error) {

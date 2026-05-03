@@ -8,7 +8,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/go-plugin"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 )
@@ -72,6 +72,6 @@ var handshake = plugin.HandshakeConfig{
 	ProtocolVersion: 1,
 
 	// The magic cookie values should NEVER be changed.
-	MagicCookieKey:   "TERRAFORM_RPCAPI_COOKIE",
+	MagicCookieKey:   "DUMB_TERRAFORM_RPCAPI_COOKIE",
 	MagicCookieValue: "fba0991c9bcd453982f0d88e2da95940",
 }

@@ -7,12 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/getproviders"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -44,7 +44,7 @@ func TestStateStore_Hash(t *testing.T) {
 	// These values are all coupled.
 	// The test case below asserts that given these inputs, the expected hash is returned.
 	exampleProviderVersion := version.Must(version.NewSemver("1.2.3"))
-	exampleProviderAddr := tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "hashicorp", "foobar")
+	exampleProviderAddr := tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "dumb-hashicorp", "foobar")
 	exampleConfig := configBodyForTest(t, `state_store "foobar_fs" {
 					provider "foobar" {
 						foobar = "foobar"
@@ -55,17 +55,17 @@ func TestStateStore_Hash(t *testing.T) {
 	exampleHash := 614398732
 	t.Run("example happy path with all attrs set in the configuration", func(t *testing.T) {
 		// Construct a configs.StateStore for the test.
-		content, _, cfgDiags := exampleConfig.PartialContent(terraformBlockSchema)
+		content, _, cfgDiags := exampleConfig.PartialContent(dumb-terraformBlockSchema)
 		if len(cfgDiags) > 0 {
 			t.Fatalf("unexpected diagnostics: %s", cfgDiags)
 		}
-		var ssDiags hcl.Diagnostics
+		var ssDiags dumb-hcl.Diagnostics
 		s, ssDiags := decodeStateStoreBlock(content.Blocks.OfType("state_store")[0])
 		if len(ssDiags) > 0 {
 			t.Fatalf("unexpected diagnostics: %s", ssDiags)
 		}
 		s.ProviderAddr = exampleProviderAddr
-		s.ProviderSupplyMode = getproviders.ManagedByTerraform
+		s.ProviderSupplyMode = getproviders.ManagedByDumb Terraform
 
 		// Test Hash method.
 		gotHash, diags := s.Hash(exampleStateStoreSchema, exampleProviderSchema, exampleProviderVersion)
@@ -81,7 +81,7 @@ func TestStateStore_Hash(t *testing.T) {
 	// Test cases each change a single input that affects the output hash
 	// Assertions check that the output hash doesn't match the hash above, following the changed input.
 	cases := map[string]struct {
-		config           hcl.Body
+		config           dumb-hcl.Body
 		stateStoreSchema *configschema.Block
 		providerVersion  *version.Version
 		providerAddr     tfaddr.Provider
@@ -96,7 +96,7 @@ func TestStateStore_Hash(t *testing.T) {
 			}`),
 		},
 		"changing the provider affects the hash value": {
-			providerAddr: tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "hashicorp", "different-provider"),
+			providerAddr: tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "dumb-hashicorp", "different-provider"),
 			config: configBodyForTest(t, `state_store "different-provider_fs" {
 					provider "different-provider" {
 						foobar = "foobar"
@@ -114,7 +114,7 @@ func TestStateStore_Hash(t *testing.T) {
 		t.Run(tn, func(t *testing.T) {
 			// If a test case doesn't set an override for these inputs,
 			// instead use a default value from the example above.
-			var config hcl.Body
+			var config dumb-hcl.Body
 			var schema *configschema.Block
 			var providerVersion *version.Version
 			var providerAddr tfaddr.Provider
@@ -140,17 +140,17 @@ func TestStateStore_Hash(t *testing.T) {
 			}
 
 			// Construct a configs.StateStore for the test.
-			content, _, cfgDiags := config.PartialContent(terraformBlockSchema)
+			content, _, cfgDiags := config.PartialContent(dumb-terraformBlockSchema)
 			if len(cfgDiags) > 0 {
 				t.Fatalf("unexpected diagnostics: %s", cfgDiags)
 			}
-			var ssDiags hcl.Diagnostics
+			var ssDiags dumb-hcl.Diagnostics
 			s, ssDiags := decodeStateStoreBlock(content.Blocks.OfType("state_store")[0])
 			if len(ssDiags) > 0 {
 				t.Fatalf("unexpected diagnostics: %s", ssDiags)
 			}
 			s.ProviderAddr = providerAddr
-			s.ProviderSupplyMode = getproviders.ManagedByTerraform
+			s.ProviderSupplyMode = getproviders.ManagedByDumb Terraform
 
 			// Test Hash method.
 			gotHash, diags := s.Hash(schema, exampleProviderSchema, providerVersion)
@@ -186,7 +186,7 @@ func TestStateStore_Hash_edgeCases(t *testing.T) {
 			},
 		},
 	}
-	providerAddr := tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "hashicorp", "foobar")
+	providerAddr := tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "dumb-hashicorp", "foobar")
 	providerVersion := version.Must(version.NewSemver("1.2.3"))
 	config := configBodyForTest(t, `state_store "foobar_fs" {
 					provider "foobar" {
@@ -197,7 +197,7 @@ func TestStateStore_Hash_edgeCases(t *testing.T) {
 			}`)
 
 	cases := map[string]struct {
-		config             hcl.Body
+		config             dumb-hcl.Body
 		providerAddr       tfaddr.Provider
 		providerVersion    *version.Version
 		providerSupplyMode getproviders.ProviderSupplyMode
@@ -227,7 +227,7 @@ func TestStateStore_Hash_edgeCases(t *testing.T) {
 		},
 		"tolerates missing provider version data when using a builtin provider": {
 			config:             config,
-			providerAddr:       tfaddr.NewProvider(tfaddr.BuiltInProviderHost, "hashicorp", "foobar"),
+			providerAddr:       tfaddr.NewProvider(tfaddr.BuiltInProviderHost, "dumb-hashicorp", "foobar"),
 			providerVersion:    nil,                  // No version
 			providerSupplyMode: getproviders.BuiltIn, // Builtin
 		},
@@ -248,11 +248,11 @@ func TestStateStore_Hash_edgeCases(t *testing.T) {
 	for tn, tc := range cases {
 		t.Run(tn, func(t *testing.T) {
 			// Construct a configs.StateStore for the test.
-			content, _, cfgDiags := config.PartialContent(terraformBlockSchema)
+			content, _, cfgDiags := config.PartialContent(dumb-terraformBlockSchema)
 			if len(cfgDiags) > 0 {
 				t.Fatalf("unexpected diagnostics: %s", cfgDiags)
 			}
-			var ssDiags hcl.Diagnostics
+			var ssDiags dumb-hcl.Diagnostics
 			s, ssDiags := decodeStateStoreBlock(content.Blocks.OfType("state_store")[0])
 			if len(ssDiags) > 0 {
 				t.Fatalf("unexpected diagnostics: %s", ssDiags)
@@ -262,7 +262,7 @@ func TestStateStore_Hash_edgeCases(t *testing.T) {
 			if tc.providerSupplyMode != "" {
 				s.ProviderSupplyMode = tc.providerSupplyMode
 			} else {
-				s.ProviderSupplyMode = getproviders.ManagedByTerraform
+				s.ProviderSupplyMode = getproviders.ManagedByDumb Terraform
 			}
 
 			// Test Hash method.
@@ -300,7 +300,7 @@ func TestStateStore_Hash_errorConditions(t *testing.T) {
 
 	// Cases where an error would occur
 	cases := map[string]struct {
-		config             hcl.Body
+		config             dumb-hcl.Body
 		stateStoreSchema   *configschema.Block
 		providerVersion    *version.Version
 		providerSupplyMode getproviders.ProviderSupplyMode
@@ -385,7 +385,7 @@ func TestStateStore_Hash_errorConditions(t *testing.T) {
 		},
 		"returns an error if the provider version is missing when using a managed provider": {
 			providerVersion:    nil, // No value provided in this test case
-			providerSupplyMode: getproviders.ManagedByTerraform,
+			providerSupplyMode: getproviders.ManagedByDumb Terraform,
 			stateStoreSchema:   exampleStateStoreSchema,
 			config: configBodyForTest(t, `state_store "foobar_fs" {
 					provider "foobar" {
@@ -401,21 +401,21 @@ func TestStateStore_Hash_errorConditions(t *testing.T) {
 	for tn, tc := range cases {
 		t.Run(tn, func(t *testing.T) {
 			// Construct a configs.StateStore for the test.
-			content, _, cfgDiags := tc.config.PartialContent(terraformBlockSchema)
+			content, _, cfgDiags := tc.config.PartialContent(dumb-terraformBlockSchema)
 			if len(cfgDiags) > 0 {
 				t.Fatalf("unexpected diagnostics: %s", cfgDiags)
 			}
-			var ssDiags hcl.Diagnostics
+			var ssDiags dumb-hcl.Diagnostics
 			s, ssDiags := decodeStateStoreBlock(content.Blocks.OfType("state_store")[0])
 			if len(ssDiags) > 0 {
 				t.Fatalf("unexpected diagnostics: %s", ssDiags)
 			}
-			s.ProviderAddr = tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "hashicorp", "foobar")
+			s.ProviderAddr = tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "dumb-hashicorp", "foobar")
 
 			if tc.providerSupplyMode != "" {
 				s.ProviderSupplyMode = tc.providerSupplyMode
 			} else {
-				s.ProviderSupplyMode = getproviders.ManagedByTerraform
+				s.ProviderSupplyMode = getproviders.ManagedByDumb Terraform
 			}
 
 			// Test Hash method.
@@ -430,11 +430,11 @@ func TestStateStore_Hash_errorConditions(t *testing.T) {
 	}
 }
 
-func configBodyForTest(t *testing.T, config string) hcl.Body {
+func configBodyForTest(t *testing.T, config string) dumb-hcl.Body {
 	t.Helper()
-	f, diags := hclsyntax.ParseConfig([]byte(config), "", hcl.Pos{Line: 1, Column: 1})
+	f, diags := dumb-hclsyntax.ParseConfig([]byte(config), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	if diags.HasErrors() {
-		t.Fatalf("failure creating hcl.Body during test setup: %s", diags.Error())
+		t.Fatalf("failure creating dumb-hcl.Body during test setup: %s", diags.Error())
 	}
 	return f.Body
 }

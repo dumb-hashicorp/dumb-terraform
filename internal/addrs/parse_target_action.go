@@ -6,10 +6,10 @@ package addrs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ParseTargetAction attempts to interpret the given traversal as a targetable
@@ -26,33 +26,33 @@ import (
 // the caller is explicit about what kind of target they want to get. We prevent
 // callers accidentally including action targets where they shouldn't be
 // accessible by keeping these methods separate.
-func ParseTargetAction(traversal hcl.Traversal) (*Target, tfdiags.Diagnostics) {
+func ParseTargetAction(traversal dumb-hcl.Traversal) (*Target, tfdiags.Diagnostics) {
 	path, remain, diags := parseModuleInstancePrefix(traversal, false)
 	if diags.HasErrors() {
 		return nil, diags
 	}
 
 	if len(remain) == 0 {
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Action addresses must contain an action reference after the module reference.",
 			Subject:  traversal.SourceRange().Ptr(),
 		})
 	}
 
-	target, moreDiags := parseActionInstanceUnderModule(path, remain, tfdiags.SourceRangeFromHCL(traversal.SourceRange()))
+	target, moreDiags := parseActionInstanceUnderModule(path, remain, tfdiags.SourceRangeFromDUMB_HCL(traversal.SourceRange()))
 	return target, diags.Append(moreDiags)
 }
 
 // ParseTargetActionStr is a helper wrapper around ParseTargetAction that takes
-// a string and parses it into HCL before interpreting it.
+// a string and parses it into DUMB_HCL before interpreting it.
 //
 // All the same cautions apply to this as with the equivalent ParseTargetStr.
 func ParseTargetActionStr(str string) (*Target, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return nil, diags
@@ -63,12 +63,12 @@ func ParseTargetActionStr(str string) (*Target, tfdiags.Diagnostics) {
 	return target, diags
 }
 
-func parseActionInstanceUnderModule(moduleAddr ModuleInstance, remain hcl.Traversal, srcRng tfdiags.SourceRange) (*Target, tfdiags.Diagnostics) {
+func parseActionInstanceUnderModule(moduleAddr ModuleInstance, remain dumb-hcl.Traversal, srcRng tfdiags.SourceRange) (*Target, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	if remain.RootName() != "action" {
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Action specification must start with `action`.",
 			Subject:  remain.SourceRange().Ptr(),
@@ -78,8 +78,8 @@ func parseActionInstanceUnderModule(moduleAddr ModuleInstance, remain hcl.Traver
 	remain = remain[1:]
 
 	if len(remain) < 2 {
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Action specification must include an action type and name.",
 			Subject:  remain.SourceRange().Ptr(),
@@ -88,13 +88,13 @@ func parseActionInstanceUnderModule(moduleAddr ModuleInstance, remain hcl.Traver
 
 	var typeName, name string
 	switch tt := remain[0].(type) {
-	case hcl.TraverseRoot:
+	case dumb-hcl.TraverseRoot:
 		typeName = tt.Name
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		typeName = tt.Name
 	default:
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Action type is required.",
 			Subject:  remain[0].SourceRange().Ptr(),
@@ -102,11 +102,11 @@ func parseActionInstanceUnderModule(moduleAddr ModuleInstance, remain hcl.Traver
 	}
 
 	switch tt := remain[1].(type) {
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		name = tt.Name
 	default:
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "An action name is required.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -122,11 +122,11 @@ func parseActionInstanceUnderModule(moduleAddr ModuleInstance, remain hcl.Traver
 		}, diags
 	case 1:
 		switch tt := remain[0].(type) {
-		case hcl.TraverseIndex:
+		case dumb-hcl.TraverseIndex:
 			key, err := ParseInstanceKey(tt.Key)
 			if err != nil {
-				return nil, diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				return nil, diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid address",
 					Detail:   fmt.Sprintf("Invalid action instance key: %s.", err),
 					Subject:  remain[0].SourceRange().Ptr(),
@@ -136,24 +136,24 @@ func parseActionInstanceUnderModule(moduleAddr ModuleInstance, remain hcl.Traver
 				Subject:     moduleAddr.ActionInstance(typeName, name, key),
 				SourceRange: srcRng,
 			}, diags
-		case hcl.TraverseSplat:
-			return nil, diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+		case dumb-hcl.TraverseSplat:
+			return nil, diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "Action instance key must be given in square brackets.",
 				Subject:  remain[0].SourceRange().Ptr(),
 			})
 		default:
-			return nil, diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			return nil, diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "Action instance key must be given in square brackets.",
 				Subject:  remain[0].SourceRange().Ptr(),
 			})
 		}
 	default:
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Unexpected extra operators after address.",
 			Subject:  remain[1].SourceRange().Ptr(),

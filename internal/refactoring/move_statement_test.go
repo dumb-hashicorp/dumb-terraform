@@ -9,10 +9,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/refactoring"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/refactoring"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestImpliedMoveStatements(t *testing.T) {
@@ -37,7 +37,7 @@ func TestImpliedMoveStatements(t *testing.T) {
 	}
 	providerAddr := addrs.AbsProviderConfig{
 		Module:   addrs.RootModule,
-		Provider: addrs.MustParseProviderSourceString("hashicorp/foo"),
+		Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/foo"),
 	}
 
 	rootCfg, _ := loadRefactoringFixture(t, "testdata/move-statement-implied")
@@ -89,7 +89,7 @@ func TestImpliedMoveStatements(t *testing.T) {
 		// this state would be to remove "count = 1" and then have the
 		// provider fail to destroy the zero-key instance even though we
 		// already created the no-key instance. Users can also get here
-		// by using "terraform state mv" in weird ways.
+		// by using "dumb-terraform state mv" in weird ways.
 		s.SetResourceInstanceCurrent(
 			resourceAddr("ambiguous").Instance(addrs.NoKey),
 			instObjState(),
@@ -122,7 +122,7 @@ func TestImpliedMoveStatements(t *testing.T) {
 			From: addrs.ImpliedMoveStatementEndpoint(resourceAddr("formerly_count").Instance(addrs.IntKey(0)), tfdiags.SourceRange{}),
 			To:   addrs.ImpliedMoveStatementEndpoint(resourceAddr("formerly_count").Instance(addrs.NoKey), tfdiags.SourceRange{}),
 			Provider: &addrs.AbsProviderConfig{
-				Provider: addrs.NewProvider("registry.terraform.io", "hashicorp", "foo"),
+				Provider: addrs.NewProvider("registry.dumb-terraform.io", "dumb-hashicorp", "foo"),
 			},
 			Implied: true,
 			DeclRange: tfdiags.SourceRange{
@@ -138,7 +138,7 @@ func TestImpliedMoveStatements(t *testing.T) {
 			To:   addrs.ImpliedMoveStatementEndpoint(nestedResourceAddr("child", "formerly_count").Instance(addrs.NoKey), tfdiags.SourceRange{}),
 			Provider: &addrs.AbsProviderConfig{
 				Module:   addrs.Module{"child"},
-				Provider: addrs.NewProvider("registry.terraform.io", "hashicorp", "foo"),
+				Provider: addrs.NewProvider("registry.dumb-terraform.io", "dumb-hashicorp", "foo"),
 			},
 			Implied: true,
 			DeclRange: tfdiags.SourceRange{
@@ -152,7 +152,7 @@ func TestImpliedMoveStatements(t *testing.T) {
 			From: addrs.ImpliedMoveStatementEndpoint(resourceAddr("now_count").Instance(addrs.NoKey), tfdiags.SourceRange{}),
 			To:   addrs.ImpliedMoveStatementEndpoint(resourceAddr("now_count").Instance(addrs.IntKey(0)), tfdiags.SourceRange{}),
 			Provider: &addrs.AbsProviderConfig{
-				Provider: addrs.NewProvider("registry.terraform.io", "hashicorp", "foo"),
+				Provider: addrs.NewProvider("registry.dumb-terraform.io", "dumb-hashicorp", "foo"),
 			},
 			Implied: true,
 			DeclRange: tfdiags.SourceRange{
@@ -168,7 +168,7 @@ func TestImpliedMoveStatements(t *testing.T) {
 			To:   addrs.ImpliedMoveStatementEndpoint(nestedResourceAddr("child", "now_count").Instance(addrs.IntKey(0)), tfdiags.SourceRange{}),
 			Provider: &addrs.AbsProviderConfig{
 				Module:   addrs.Module{"child"},
-				Provider: addrs.NewProvider("registry.terraform.io", "hashicorp", "foo"),
+				Provider: addrs.NewProvider("registry.dumb-terraform.io", "dumb-hashicorp", "foo"),
 			},
 			Implied: true,
 			DeclRange: tfdiags.SourceRange{
@@ -187,7 +187,7 @@ func TestImpliedMoveStatements(t *testing.T) {
 			From: addrs.ImpliedMoveStatementEndpoint(resourceAddr("ambiguous").Instance(addrs.IntKey(0)), tfdiags.SourceRange{}),
 			To:   addrs.ImpliedMoveStatementEndpoint(resourceAddr("ambiguous").Instance(addrs.NoKey), tfdiags.SourceRange{}),
 			Provider: &addrs.AbsProviderConfig{
-				Provider: addrs.NewProvider("registry.terraform.io", "hashicorp", "foo"),
+				Provider: addrs.NewProvider("registry.dumb-terraform.io", "dumb-hashicorp", "foo"),
 			},
 			Implied: true,
 			DeclRange: tfdiags.SourceRange{

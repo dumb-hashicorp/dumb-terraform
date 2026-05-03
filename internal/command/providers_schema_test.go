@@ -14,19 +14,19 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	backendCloud "github.com/hashicorp/terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	backendCloud "github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
 )
 
 func TestProvidersSchema_error(t *testing.T) {
@@ -83,7 +83,7 @@ func TestProvidersSchema_output(t *testing.T) {
 				t.Fatalf("init failed\n%s", done(t).Stderr())
 			}
 
-			// `terraform provider schemas` command
+			// `dumb-terraform provider schemas` command
 			pc := &ProvidersSchemaCommand{Meta: m}
 			if code := pc.Run([]string{"-json"}); code != 0 {
 				t.Fatalf("wrong exit status %d; want 0\nstderr: %s", code, ui.ErrorWriter.String())
@@ -259,7 +259,7 @@ func TestProvidersSchema_constVariable(t *testing.T) {
 
 		output := ui.OutputWriter.String()
 		wantOutput := []string{
-			`"registry.terraform.io/hashicorp/test"`,
+			`"registry.dumb-terraform.io/dumb-hashicorp/test"`,
 		}
 
 		for _, want := range wantOutput {
@@ -298,7 +298,7 @@ func TestProvidersSchema_constVariable(t *testing.T) {
 
 		output := ui.OutputWriter.String()
 		wantOutput := []string{
-			`"registry.terraform.io/hashicorp/test"`,
+			`"registry.dumb-terraform.io/dumb-hashicorp/test"`,
 		}
 
 		for _, want := range wantOutput {

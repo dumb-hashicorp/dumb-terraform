@@ -8,16 +8,16 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/go-tfe"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/jsonformat"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestTest(t *testing.T) {
@@ -45,7 +45,7 @@ func TestTest(t *testing.T) {
 	if _, err := client.RegistryModules.Create(context.Background(), "organisation", tfe.RegistryModuleCreateOptions{
 		Name:         tfe.String("name"),
 		Provider:     tfe.String("provider"),
-		RegistryName: "app.terraform.io",
+		RegistryName: "app.dumb-terraform.io",
 		Namespace:    "organisation",
 	}); err != nil {
 		t.Fatalf("failed to create registry module: %v", err)
@@ -56,7 +56,7 @@ func TestTest(t *testing.T) {
 		ConfigDirectory:  "testdata/test",
 		TestingDirectory: "tests",
 		Config:           nil, // We don't need this for this test.
-		Source:           "app.terraform.io/organisation/name/provider",
+		Source:           "app.dumb-terraform.io/organisation/name/provider",
 
 		// Cancellation controls, we won't be doing any cancellations in this
 		// test.
@@ -91,11 +91,11 @@ func TestTest(t *testing.T) {
 
 	output := done(t)
 	actual := output.All()
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   defaults... pass
   overrides... pass
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 2 passed, 0 failed.
 `
@@ -130,7 +130,7 @@ func TestTest_Parallelism(t *testing.T) {
 	if _, err := client.RegistryModules.Create(context.Background(), "organisation", tfe.RegistryModuleCreateOptions{
 		Name:         tfe.String("name"),
 		Provider:     tfe.String("provider"),
-		RegistryName: "app.terraform.io",
+		RegistryName: "app.dumb-terraform.io",
 		Namespace:    "organisation",
 	}); err != nil {
 		t.Fatalf("failed to create registry module: %v", err)
@@ -141,7 +141,7 @@ func TestTest_Parallelism(t *testing.T) {
 		ConfigDirectory:  "testdata/test",
 		TestingDirectory: "tests",
 		Config:           nil, // We don't need this for this test.
-		Source:           "app.terraform.io/organisation/name/provider",
+		Source:           "app.dumb-terraform.io/organisation/name/provider",
 
 		// Cancellation controls, we won't be doing any cancellations in this
 		// test.
@@ -205,7 +205,7 @@ func TestTest_JSON(t *testing.T) {
 	if _, err := client.RegistryModules.Create(context.Background(), "organisation", tfe.RegistryModuleCreateOptions{
 		Name:         tfe.String("name"),
 		Provider:     tfe.String("provider"),
-		RegistryName: "app.terraform.io",
+		RegistryName: "app.dumb-terraform.io",
 		Namespace:    "organisation",
 	}); err != nil {
 		t.Fatalf("failed to create registry module: %v", err)
@@ -216,7 +216,7 @@ func TestTest_JSON(t *testing.T) {
 		ConfigDirectory:  "testdata/test",
 		TestingDirectory: "tests",
 		Config:           nil, // We don't need this for this test.
-		Source:           "app.terraform.io/organisation/name/provider",
+		Source:           "app.dumb-terraform.io/organisation/name/provider",
 
 		// Cancellation controls, we won't be doing any cancellations in this
 		// test.
@@ -247,14 +247,14 @@ func TestTest_JSON(t *testing.T) {
 
 	output := done(t)
 	actual := output.All()
-	expected := `{"@level":"info","@message":"Terraform 1.6.0-dev","@module":"terraform.ui","@timestamp":"2023-09-12T08:29:27.257413+02:00","terraform":"1.6.0-dev","type":"version","ui":"1.2"}
-{"@level":"info","@message":"Found 1 file and 2 run blocks","@module":"terraform.ui","@timestamp":"2023-09-12T08:29:27.268731+02:00","test_abstract":{"main.tftest.hcl":["defaults","overrides"]},"type":"test_abstract"}
-{"@level":"info","@message":"main.tftest.hcl... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@timestamp":"2023-09-12T08:29:27.268889+02:00","test_file":{"path":"main.tftest.hcl","progress":"starting"},"type":"test_file"}
-{"@level":"info","@message":"  \"defaults\"... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"defaults","@timestamp":"2023-09-12T08:29:27.710541+02:00","test_run":{"path":"main.tftest.hcl","run":"defaults","progress":"complete","status":"pass"},"type":"test_run"}
-{"@level":"info","@message":"  \"overrides\"... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"overrides","@timestamp":"2023-09-12T08:29:27.833351+02:00","test_run":{"path":"main.tftest.hcl","run":"overrides","progress":"complete","status":"pass"},"type":"test_run"}
-{"@level":"info","@message":"main.tftest.hcl... tearing down","@module":"terraform.ui","@testfile":"main.tftest.hcl","@timestamp":"2023-09-12T08:29:27.833375+02:00","test_file":{"path":"main.tftest.hcl","progress":"teardown"},"type":"test_file"}
-{"@level":"info","@message":"main.tftest.hcl... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@timestamp":"2023-09-12T08:29:27.956488+02:00","test_file":{"path":"main.tftest.hcl","progress":"complete","status":"pass"},"type":"test_file"}
-{"@level":"info","@message":"Success! 2 passed, 0 failed.","@module":"terraform.ui","@timestamp":"2023-09-12T08:29:27.956510+02:00","test_summary":{"status":"pass","passed":2,"failed":0,"errored":0,"skipped":0},"type":"test_summary"}
+	expected := `{"@level":"info","@message":"Dumb Terraform 1.6.0-dev","@module":"dumb-terraform.ui","@timestamp":"2023-09-12T08:29:27.257413+02:00","dumb-terraform":"1.6.0-dev","type":"version","ui":"1.2"}
+{"@level":"info","@message":"Found 1 file and 2 run blocks","@module":"dumb-terraform.ui","@timestamp":"2023-09-12T08:29:27.268731+02:00","test_abstract":{"main.tftest.dumb-hcl":["defaults","overrides"]},"type":"test_abstract"}
+{"@level":"info","@message":"main.tftest.dumb-hcl... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@timestamp":"2023-09-12T08:29:27.268889+02:00","test_file":{"path":"main.tftest.dumb-hcl","progress":"starting"},"type":"test_file"}
+{"@level":"info","@message":"  \"defaults\"... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"defaults","@timestamp":"2023-09-12T08:29:27.710541+02:00","test_run":{"path":"main.tftest.dumb-hcl","run":"defaults","progress":"complete","status":"pass"},"type":"test_run"}
+{"@level":"info","@message":"  \"overrides\"... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"overrides","@timestamp":"2023-09-12T08:29:27.833351+02:00","test_run":{"path":"main.tftest.dumb-hcl","run":"overrides","progress":"complete","status":"pass"},"type":"test_run"}
+{"@level":"info","@message":"main.tftest.dumb-hcl... tearing down","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@timestamp":"2023-09-12T08:29:27.833375+02:00","test_file":{"path":"main.tftest.dumb-hcl","progress":"teardown"},"type":"test_file"}
+{"@level":"info","@message":"main.tftest.dumb-hcl... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@timestamp":"2023-09-12T08:29:27.956488+02:00","test_file":{"path":"main.tftest.dumb-hcl","progress":"complete","status":"pass"},"type":"test_file"}
+{"@level":"info","@message":"Success! 2 passed, 0 failed.","@module":"dumb-terraform.ui","@timestamp":"2023-09-12T08:29:27.956510+02:00","test_summary":{"status":"pass","passed":2,"failed":0,"errored":0,"skipped":0},"type":"test_summary"}
 `
 
 	if diff := cmp.Diff(expected, actual); len(diff) > 0 {
@@ -269,12 +269,12 @@ func TestTest_Verbose(t *testing.T) {
 	loader, close := configload.NewLoaderForTests(t)
 	defer close()
 
-	rootMod, hclDiags := loader.LoadRootModuleWithTests(directory, "tests")
-	if hclDiags.HasErrors() {
-		t.Fatalf("failed to load root module: %v", hclDiags.Error())
+	rootMod, dumb-hclDiags := loader.LoadRootModuleWithTests(directory, "tests")
+	if dumb-hclDiags.HasErrors() {
+		t.Fatalf("failed to load root module: %v", dumb-hclDiags.Error())
 	}
 
-	config, configDiags := terraform.BuildConfigWithGraph(
+	config, configDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		nil,
@@ -307,7 +307,7 @@ func TestTest_Verbose(t *testing.T) {
 	if _, err := client.RegistryModules.Create(context.Background(), "organisation", tfe.RegistryModuleCreateOptions{
 		Name:         tfe.String("name"),
 		Provider:     tfe.String("provider"),
-		RegistryName: "app.terraform.io",
+		RegistryName: "app.dumb-terraform.io",
 		Namespace:    "organisation",
 	}); err != nil {
 		t.Fatalf("failed to create registry module: %v", err)
@@ -318,7 +318,7 @@ func TestTest_Verbose(t *testing.T) {
 		ConfigDirectory:  directory,
 		TestingDirectory: "tests",
 		Config:           config,
-		Source:           "app.terraform.io/organisation/name/provider",
+		Source:           "app.dumb-terraform.io/organisation/name/provider",
 
 		// Cancellation controls, we won't be doing any cancellations in this
 		// test.
@@ -354,13 +354,13 @@ func TestTest_Verbose(t *testing.T) {
 
 	output := done(t)
 	actual := output.All()
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   defaults... pass
 
 Changes to Outputs:
   + input = "Hello, world!"
 
-You can apply this plan to save these new output values to the Terraform
+You can apply this plan to save these new output values to the Dumb Terraform
 state, without changing any real infrastructure.
 ╷
 │ Warning: Deprecated
@@ -424,8 +424,8 @@ input = "Hello, universe!"
 │ to re-use elsewhere in configuration, the same can now be achieved using
 │ locals
 ╵
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 2 passed, 0 failed.
 `
@@ -460,7 +460,7 @@ func TestTest_Cancel(t *testing.T) {
 	module, err := client.RegistryModules.Create(context.Background(), "organisation", tfe.RegistryModuleCreateOptions{
 		Name:         tfe.String("name"),
 		Provider:     tfe.String("provider"),
-		RegistryName: "app.terraform.io",
+		RegistryName: "app.dumb-terraform.io",
 		Namespace:    "organisation",
 	})
 	if err != nil {
@@ -475,7 +475,7 @@ func TestTest_Cancel(t *testing.T) {
 		ConfigDirectory:  "testdata/test-cancel",
 		TestingDirectory: "tests",
 		Config:           nil, // We don't need this for this test.
-		Source:           "app.terraform.io/organisation/name/provider",
+		Source:           "app.dumb-terraform.io/organisation/name/provider",
 
 		// Cancellation controls, we won't be doing any cancellations in this
 		// test.
@@ -524,16 +524,16 @@ func TestTest_Cancel(t *testing.T) {
 
 	output := outputFn(t)
 	actual := output.All()
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
 
 Interrupt received.
-Please wait for Terraform to exit or data loss may occur.
+Please wait for Dumb Terraform to exit or data loss may occur.
 Gracefully shutting down...
 
   defaults... pass
   overrides... skip
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 1 passed, 0 failed, 1 skipped.
 `
@@ -581,7 +581,7 @@ func TestTest_DelayedCancel(t *testing.T) {
 	module, err := client.RegistryModules.Create(context.Background(), "organisation", tfe.RegistryModuleCreateOptions{
 		Name:         tfe.String("name"),
 		Provider:     tfe.String("provider"),
-		RegistryName: "app.terraform.io",
+		RegistryName: "app.dumb-terraform.io",
 		Namespace:    "organisation",
 	})
 	if err != nil {
@@ -602,7 +602,7 @@ func TestTest_DelayedCancel(t *testing.T) {
 		ConfigDirectory:  "testdata/test-cancel",
 		TestingDirectory: "tests",
 		Config:           nil, // We don't need this for this test.
-		Source:           "app.terraform.io/organisation/name/provider",
+		Source:           "app.dumb-terraform.io/organisation/name/provider",
 
 		// Cancellation controls, we won't be doing any cancellations in this
 		// test.
@@ -645,16 +645,16 @@ func TestTest_DelayedCancel(t *testing.T) {
 
 	output := outputFn(t)
 	actual := output.All()
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
 
 Interrupt received.
-Please wait for Terraform to exit or data loss may occur.
+Please wait for Dumb Terraform to exit or data loss may occur.
 Gracefully shutting down...
 
   defaults... pass
   overrides... skip
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 1 passed, 0 failed, 1 skipped.
 `
@@ -676,12 +676,12 @@ func TestTest_ForceCancel(t *testing.T) {
 	loader, close := configload.NewLoaderForTests(t)
 	defer close()
 
-	rootMod, hclDiags := loader.LoadRootModuleWithTests("testdata/test-force-cancel", "tests")
-	if hclDiags.HasErrors() {
-		t.Fatalf("failed to load root module: %v", hclDiags.Error())
+	rootMod, dumb-hclDiags := loader.LoadRootModuleWithTests("testdata/test-force-cancel", "tests")
+	if dumb-hclDiags.HasErrors() {
+		t.Fatalf("failed to load root module: %v", dumb-hclDiags.Error())
 	}
 
-	config, configDiags := terraform.BuildConfigWithGraph(
+	config, configDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		nil,
@@ -714,7 +714,7 @@ func TestTest_ForceCancel(t *testing.T) {
 	module, err := client.RegistryModules.Create(context.Background(), "organisation", tfe.RegistryModuleCreateOptions{
 		Name:         tfe.String("name"),
 		Provider:     tfe.String("provider"),
-		RegistryName: "app.terraform.io",
+		RegistryName: "app.dumb-terraform.io",
 		Namespace:    "organisation",
 	})
 	if err != nil {
@@ -730,7 +730,7 @@ func TestTest_ForceCancel(t *testing.T) {
 		ConfigDirectory:  "testdata/test-force-cancel",
 		TestingDirectory: "tests",
 		Config:           config,
-		Source:           "app.terraform.io/organisation/name/provider",
+		Source:           "app.dumb-terraform.io/organisation/name/provider",
 
 		// Cancellation controls, we won't be doing any cancellations in this
 		// test.
@@ -780,10 +780,10 @@ func TestTest_ForceCancel(t *testing.T) {
 
 	output := outputFn(t)
 
-	expectedErr := `Terraform was interrupted during test execution, and may not have performed
+	expectedErr := `Dumb Terraform was interrupted during test execution, and may not have performed
 the expected cleanup operations.
 
-Terraform was in the process of creating the following resources for
+Dumb Terraform was in the process of creating the following resources for
 "overrides" from the module under test, and they may not have been destroyed:
   - time_sleep.wait_5_seconds
   - tfcoremock_simple_resource.resource
@@ -794,11 +794,11 @@ Terraform was in the process of creating the following resources for
 	}
 
 	actualOut := output.Stdout()
-	expectedOut := `main.tftest.hcl... in progress
+	expectedOut := `main.tftest.dumb-hcl... in progress
   defaults... pass
 
 Interrupt received.
-Please wait for Terraform to exit or data loss may occur.
+Please wait for Dumb Terraform to exit or data loss may occur.
 Gracefully shutting down...
 
 
@@ -829,8 +829,8 @@ Two interrupts received. Exiting immediately. Note that data loss may have occur
 │ Error: execution halted
 │
 ╵
-main.tftest.hcl... tearing down
-main.tftest.hcl... fail
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... fail
 
 Failure! 1 passed, 1 failed.
 `
@@ -876,7 +876,7 @@ func TestTest_LongRunningTest(t *testing.T) {
 	if _, err := client.RegistryModules.Create(context.Background(), "organisation", tfe.RegistryModuleCreateOptions{
 		Name:         tfe.String("name"),
 		Provider:     tfe.String("provider"),
-		RegistryName: "app.terraform.io",
+		RegistryName: "app.dumb-terraform.io",
 		Namespace:    "organisation",
 	}); err != nil {
 		t.Fatalf("failed to create registry module: %v", err)
@@ -887,7 +887,7 @@ func TestTest_LongRunningTest(t *testing.T) {
 		ConfigDirectory:  "testdata/test-long-running",
 		TestingDirectory: "tests",
 		Config:           nil, // We don't need this for this test.
-		Source:           "app.terraform.io/organisation/name/provider",
+		Source:           "app.dumb-terraform.io/organisation/name/provider",
 
 		// Cancellation controls, we won't be doing any cancellations in this
 		// test.
@@ -926,10 +926,10 @@ func TestTest_LongRunningTest(t *testing.T) {
 	// The long running test logs actually contain additional progress updates,
 	// but this test should ignore them and just show the usual output.
 
-	expected := `main.tftest.hcl... in progress
+	expected := `main.tftest.dumb-hcl... in progress
   just_go... pass
-main.tftest.hcl... tearing down
-main.tftest.hcl... pass
+main.tftest.dumb-hcl... tearing down
+main.tftest.dumb-hcl... pass
 
 Success! 1 passed, 0 failed.
 `
@@ -964,7 +964,7 @@ func TestTest_LongRunningTestJSON(t *testing.T) {
 	if _, err := client.RegistryModules.Create(context.Background(), "organisation", tfe.RegistryModuleCreateOptions{
 		Name:         tfe.String("name"),
 		Provider:     tfe.String("provider"),
-		RegistryName: "app.terraform.io",
+		RegistryName: "app.dumb-terraform.io",
 		Namespace:    "organisation",
 	}); err != nil {
 		t.Fatalf("failed to create registry module: %v", err)
@@ -975,7 +975,7 @@ func TestTest_LongRunningTestJSON(t *testing.T) {
 		ConfigDirectory:  "testdata/test-long-running",
 		TestingDirectory: "tests",
 		Config:           nil, // We don't need this for this test.
-		Source:           "app.terraform.io/organisation/name/provider",
+		Source:           "app.dumb-terraform.io/organisation/name/provider",
 
 		// Cancellation controls, we won't be doing any cancellations in this
 		// test.
@@ -1010,18 +1010,18 @@ func TestTest_LongRunningTestJSON(t *testing.T) {
 	// This test should still include the progress updates as we're doing the
 	// JSON output.
 
-	expected := `{"@level":"info","@message":"Terraform 1.7.0-dev","@module":"terraform.ui","@timestamp":"2023-09-28T14:57:09.175210+02:00","terraform":"1.7.0-dev","type":"version","ui":"1.2"}
-{"@level":"info","@message":"Found 1 file and 1 run block","@module":"terraform.ui","@timestamp":"2023-09-28T14:57:09.189212+02:00","test_abstract":{"main.tftest.hcl":["just_go"]},"type":"test_abstract"}
-{"@level":"info","@message":"main.tftest.hcl... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@timestamp":"2023-09-28T14:57:09.189386+02:00","test_file":{"path":"main.tftest.hcl","progress":"starting"},"type":"test_file"}
-{"@level":"info","@message":"  \"just_go\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:09.189429+02:00","test_run":{"path":"main.tftest.hcl","run":"just_go","progress":"starting","elapsed":0},"type":"test_run"}
-{"@level":"info","@message":"  \"just_go\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:11.341278+02:00","test_run":{"path":"main.tftest.hcl","run":"just_go","progress":"running","elapsed":2152},"type":"test_run"}
-{"@level":"info","@message":"  \"just_go\"... in progress","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:13.343465+02:00","test_run":{"path":"main.tftest.hcl","run":"just_go","progress":"running","elapsed":4154},"type":"test_run"}
-{"@level":"info","@message":"  \"just_go\"... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:14.381552+02:00","test_run":{"path":"main.tftest.hcl","run":"just_go","progress":"complete","status":"pass"},"type":"test_run"}
-{"@level":"info","@message":"main.tftest.hcl... tearing down","@module":"terraform.ui","@testfile":"main.tftest.hcl","@timestamp":"2023-09-28T14:57:14.381655+02:00","test_file":{"path":"main.tftest.hcl","progress":"teardown"},"type":"test_file"}
-{"@level":"info","@message":"  \"just_go\"... tearing down","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:14.381712+02:00","test_run":{"path":"main.tftest.hcl","run":"just_go","progress":"teardown","elapsed":0},"type":"test_run"}
-{"@level":"info","@message":"  \"just_go\"... tearing down","@module":"terraform.ui","@testfile":"main.tftest.hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:16.477705+02:00","test_run":{"path":"main.tftest.hcl","run":"just_go","progress":"teardown","elapsed":2096},"type":"test_run"}
-{"@level":"info","@message":"main.tftest.hcl... pass","@module":"terraform.ui","@testfile":"main.tftest.hcl","@timestamp":"2023-09-28T14:57:17.517309+02:00","test_file":{"path":"main.tftest.hcl","progress":"complete","status":"pass"},"type":"test_file"}
-{"@level":"info","@message":"Success! 1 passed, 0 failed.","@module":"terraform.ui","@timestamp":"2023-09-28T14:57:17.517494+02:00","test_summary":{"status":"pass","passed":1,"failed":0,"errored":0,"skipped":0},"type":"test_summary"}
+	expected := `{"@level":"info","@message":"Dumb Terraform 1.7.0-dev","@module":"dumb-terraform.ui","@timestamp":"2023-09-28T14:57:09.175210+02:00","dumb-terraform":"1.7.0-dev","type":"version","ui":"1.2"}
+{"@level":"info","@message":"Found 1 file and 1 run block","@module":"dumb-terraform.ui","@timestamp":"2023-09-28T14:57:09.189212+02:00","test_abstract":{"main.tftest.dumb-hcl":["just_go"]},"type":"test_abstract"}
+{"@level":"info","@message":"main.tftest.dumb-hcl... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@timestamp":"2023-09-28T14:57:09.189386+02:00","test_file":{"path":"main.tftest.dumb-hcl","progress":"starting"},"type":"test_file"}
+{"@level":"info","@message":"  \"just_go\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:09.189429+02:00","test_run":{"path":"main.tftest.dumb-hcl","run":"just_go","progress":"starting","elapsed":0},"type":"test_run"}
+{"@level":"info","@message":"  \"just_go\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:11.341278+02:00","test_run":{"path":"main.tftest.dumb-hcl","run":"just_go","progress":"running","elapsed":2152},"type":"test_run"}
+{"@level":"info","@message":"  \"just_go\"... in progress","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:13.343465+02:00","test_run":{"path":"main.tftest.dumb-hcl","run":"just_go","progress":"running","elapsed":4154},"type":"test_run"}
+{"@level":"info","@message":"  \"just_go\"... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:14.381552+02:00","test_run":{"path":"main.tftest.dumb-hcl","run":"just_go","progress":"complete","status":"pass"},"type":"test_run"}
+{"@level":"info","@message":"main.tftest.dumb-hcl... tearing down","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@timestamp":"2023-09-28T14:57:14.381655+02:00","test_file":{"path":"main.tftest.dumb-hcl","progress":"teardown"},"type":"test_file"}
+{"@level":"info","@message":"  \"just_go\"... tearing down","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:14.381712+02:00","test_run":{"path":"main.tftest.dumb-hcl","run":"just_go","progress":"teardown","elapsed":0},"type":"test_run"}
+{"@level":"info","@message":"  \"just_go\"... tearing down","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@testrun":"just_go","@timestamp":"2023-09-28T14:57:16.477705+02:00","test_run":{"path":"main.tftest.dumb-hcl","run":"just_go","progress":"teardown","elapsed":2096},"type":"test_run"}
+{"@level":"info","@message":"main.tftest.dumb-hcl... pass","@module":"dumb-terraform.ui","@testfile":"main.tftest.dumb-hcl","@timestamp":"2023-09-28T14:57:17.517309+02:00","test_file":{"path":"main.tftest.dumb-hcl","progress":"complete","status":"pass"},"type":"test_file"}
+{"@level":"info","@message":"Success! 1 passed, 0 failed.","@module":"dumb-terraform.ui","@timestamp":"2023-09-28T14:57:17.517494+02:00","test_summary":{"status":"pass","passed":1,"failed":0,"errored":0,"skipped":0},"type":"test_summary"}
 `
 
 	if diff := cmp.Diff(expected, actual); len(diff) > 0 {

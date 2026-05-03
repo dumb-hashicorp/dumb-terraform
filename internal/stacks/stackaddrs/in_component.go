@@ -6,12 +6,12 @@ package stackaddrs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // InConfigComponent represents addresses of objects that belong to the modules
@@ -66,7 +66,7 @@ func (inConfigComponentKey[T]) IsUniqueKey(InConfigComponent[T]) {}
 //
 // Although the type parameter is rather unconstrained, it doesn't make sense to
 // use this for types other than those from package addrs that represent
-// objects that can belong to Terraform modules, like
+// objects that can belong to Dumb Terraform modules, like
 // [addrs.AbsResourceInstance], etc.
 type InAbsComponentInstance[T InComponentable] struct {
 	Component AbsComponentInstance
@@ -131,7 +131,7 @@ type InComponentable interface {
 	fmt.Stringer
 }
 
-func ParseAbsResourceInstanceObject(traversal hcl.Traversal) (AbsResourceInstanceObject, tfdiags.Diagnostics) {
+func ParseAbsResourceInstanceObject(traversal dumb-hcl.Traversal) (AbsResourceInstanceObject, tfdiags.Diagnostics) {
 	stack, remain, diags := ParseAbsComponentInstanceOnly(traversal)
 	if diags.HasErrors() {
 		return AbsResourceInstanceObject{}, diags
@@ -152,8 +152,8 @@ func ParseAbsResourceInstanceObject(traversal hcl.Traversal) (AbsResourceInstanc
 
 func ParseAbsResourceInstanceObjectStr(s string) (AbsResourceInstanceObject, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	traversal, hclDiags := hclsyntax.ParseTraversalAbs([]byte(s), "", hcl.InitialPos)
-	diags = diags.Append(hclDiags)
+	traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(s), "", dumb-hcl.InitialPos)
+	diags = diags.Append(dumb-hclDiags)
 	if diags.HasErrors() {
 		return AbsResourceInstanceObject{}, diags
 	}
@@ -163,7 +163,7 @@ func ParseAbsResourceInstanceObjectStr(s string) (AbsResourceInstanceObject, tfd
 	return ret, diags
 }
 
-func ParseAbsActionInvocationInstance(traversal hcl.Traversal) (AbsActionInvocationInstance, tfdiags.Diagnostics) {
+func ParseAbsActionInvocationInstance(traversal dumb-hcl.Traversal) (AbsActionInvocationInstance, tfdiags.Diagnostics) {
 	component, remain, diags := ParseAbsComponentInstanceOnly(traversal)
 	if diags.HasErrors() {
 		return AbsActionInvocationInstance{}, diags
@@ -183,8 +183,8 @@ func ParseAbsActionInvocationInstance(traversal hcl.Traversal) (AbsActionInvocat
 
 func ParseActionInvocationInstanceStr(s string) (AbsActionInvocationInstance, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	traversal, hclDiags := hclsyntax.ParseTraversalAbs([]byte(s), "", hcl.InitialPos)
-	diags = diags.Append(hclDiags)
+	traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(s), "", dumb-hcl.InitialPos)
+	diags = diags.Append(dumb-hclDiags)
 	if diags.HasErrors() {
 		return AbsActionInvocationInstance{}, diags
 	}

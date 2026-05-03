@@ -13,23 +13,23 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/cli"
-	tfe "github.com/hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/cli"
+	tfe "github.com/dumb-hashicorp/go-tfe"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/cloud"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
-	tftesting "github.com/hashicorp/terraform/internal/terraform/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	tftesting "github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform/testing"
 )
 
 func testOperationPlan(t *testing.T, configDir string) (*backendrun.Operation, func(), func(*testing.T) *terminal.TestOutput) {
@@ -51,7 +51,7 @@ func testOperationPlanWithTimeout(t *testing.T, configDir string, timeout time.D
 	// Many of our tests use an overridden "null" provider that's just in-memory
 	// inside the test process, not a separate plugin on disk.
 	depLocks := depsfile.NewLocks()
-	depLocks.SetProviderOverridden(addrs.MustParseProviderSourceString("registry.terraform.io/hashicorp/null"))
+	depLocks.SetProviderOverridden(addrs.MustParseProviderSourceString("registry.dumb-terraform.io/dumb-hashicorp/null"))
 
 	return &backendrun.Operation{
 		ConfigDir:       configDir,
@@ -211,7 +211,7 @@ func TestRemote_planWithParallelism(t *testing.T) {
 	defer configCleanup()
 
 	if b.ContextOpts == nil {
-		b.ContextOpts = &terraform.ContextOpts{}
+		b.ContextOpts = &dumb-terraform.ContextOpts{}
 	}
 	b.ContextOpts.Parallelism = 3
 	op.Workspace = backend.DefaultStateName
@@ -616,7 +616,7 @@ func TestRemote_planWithVariables(t *testing.T) {
 	op, configCleanup, done := testOperationPlan(t, "./testdata/plan-variables")
 	defer configCleanup()
 
-	op.Variables = testVariables(terraform.ValueFromCLIArg, "foo", "bar")
+	op.Variables = testVariables(dumb-terraform.ValueFromCLIArg, "foo", "bar")
 	op.Workspace = backend.DefaultStateName
 
 	run, err := b.Operation(context.Background(), op)
@@ -952,7 +952,7 @@ func TestRemote_planWithWorkingDirectory(t *testing.T) {
 	defer bCleanup()
 
 	options := tfe.WorkspaceUpdateOptions{
-		WorkingDirectory: tfe.String("terraform"),
+		WorkingDirectory: tfe.String("dumb-terraform"),
 	}
 
 	// Configure the workspace to use a custom working directory.
@@ -961,7 +961,7 @@ func TestRemote_planWithWorkingDirectory(t *testing.T) {
 		t.Fatalf("error configuring working directory: %v", err)
 	}
 
-	op, configCleanup, done := testOperationPlan(t, "./testdata/plan-with-working-directory/terraform")
+	op, configCleanup, done := testOperationPlan(t, "./testdata/plan-with-working-directory/dumb-terraform")
 	defer configCleanup()
 	defer done(t)
 
@@ -997,7 +997,7 @@ func TestRemote_planWithWorkingDirectoryFromCurrentPath(t *testing.T) {
 	defer bCleanup()
 
 	options := tfe.WorkspaceUpdateOptions{
-		WorkingDirectory: tfe.String("terraform"),
+		WorkingDirectory: tfe.String("dumb-terraform"),
 	}
 
 	// Configure the workspace to use a custom working directory.
@@ -1013,7 +1013,7 @@ func TestRemote_planWithWorkingDirectoryFromCurrentPath(t *testing.T) {
 
 	// We need to change into the configuration directory to make sure
 	// the logic to upload the correct slug is working as expected.
-	if err := os.Chdir("./testdata/plan-with-working-directory/terraform"); err != nil {
+	if err := os.Chdir("./testdata/plan-with-working-directory/dumb-terraform"); err != nil {
 		t.Fatalf("error changing directory: %v", err)
 	}
 	defer os.Chdir(wd) // Make sure we change back again when were done.

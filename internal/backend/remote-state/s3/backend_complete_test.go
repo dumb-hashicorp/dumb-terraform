@@ -14,11 +14,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	configtesting "github.com/hashicorp/aws-sdk-go-base/v2/configtesting"
-	"github.com/hashicorp/aws-sdk-go-base/v2/mockdata"
-	"github.com/hashicorp/aws-sdk-go-base/v2/servicemocks"
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	configtesting "github.com/dumb-hashicorp/aws-sdk-go-base/v2/configtesting"
+	"github.com/dumb-hashicorp/aws-sdk-go-base/v2/mockdata"
+	"github.com/dumb-hashicorp/aws-sdk-go-base/v2/servicemocks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -1924,7 +1924,7 @@ func setSharedConfigFile(t *testing.T, filename string) {
 
 func configureBackend(t *testing.T, config map[string]any) (*Backend, tfdiags.Diagnostics) {
 	b := New().(*Backend)
-	configSchema := populateSchema(t, b.ConfigSchema(), hcl2shim.HCL2ValueFromConfigValue(config))
+	configSchema := populateSchema(t, b.ConfigSchema(), dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(config))
 
 	configSchema, diags := b.PrepareConfig(configSchema)
 

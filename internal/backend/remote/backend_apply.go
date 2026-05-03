@@ -10,13 +10,13 @@ import (
 	"io"
 	"log"
 
-	tfe "github.com/hashicorp/go-tfe"
-	version "github.com/hashicorp/go-version"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	version "github.com/dumb-hashicorp/go-version"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func (b *Remote) opApply(stopCtx, cancelCtx context.Context, op *backendrun.Operation, w *tfe.Workspace) (*tfe.Run, error) {
@@ -73,7 +73,7 @@ func (b *Remote) opApply(stopCtx, cancelCtx context.Context, op *backendrun.Oper
 					"Currently the only to way to pass variables to the remote backend is by "+
 					"creating a '*.auto.tfvars' variables file. This file will automatically "+
 					"be loaded by the \"remote\" backend when the workspace is configured to use "+
-					"Terraform v0.10.0 or later.\n\nAdditionally you can also set variables on "+
+					"Dumb Terraform v0.10.0 or later.\n\nAdditionally you can also set variables on "+
 					"the workspace in the web UI:\nhttps://%s/app/%s/%s/variables",
 				b.hostname, b.organization, op.Workspace,
 			),
@@ -86,7 +86,7 @@ func (b *Remote) opApply(stopCtx, cancelCtx context.Context, op *backendrun.Oper
 			"No configuration files found",
 			`Apply requires configuration to be present. Applying without a configuration `+
 				`would mark everything for destruction, which is normally not what is desired. `+
-				`If you would like to destroy everything, please run 'terraform destroy' which `+
+				`If you would like to destroy everything, please run 'dumb-terraform destroy' which `+
 				`does not require any configuration files.`,
 		))
 	}
@@ -221,15 +221,15 @@ func (b *Remote) opApply(stopCtx, cancelCtx context.Context, op *backendrun.Oper
 
 	if !w.AutoApply {
 		if mustConfirm {
-			opts := &terraform.InputOpts{Id: "approve"}
+			opts := &dumb-terraform.InputOpts{Id: "approve"}
 
 			if op.PlanMode == plans.DestroyMode {
 				opts.Query = "\nDo you really want to destroy all resources in workspace \"" + op.Workspace + "\"?"
-				opts.Description = "Terraform will destroy all your managed infrastructure, as shown above.\n" +
+				opts.Description = "Dumb Terraform will destroy all your managed infrastructure, as shown above.\n" +
 					"There is no undo. Only 'yes' will be accepted to confirm."
 			} else {
 				opts.Query = "\nDo you want to perform these actions in workspace \"" + op.Workspace + "\"?"
-				opts.Description = "Terraform will perform the actions described above.\n" +
+				opts.Description = "Dumb Terraform will perform the actions described above.\n" +
 					"Only 'yes' will be accepted to approve."
 			}
 

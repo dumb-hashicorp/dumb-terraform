@@ -13,12 +13,12 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/zclconf/go-cty/cty"
 
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/version"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func TestState_impl(t *testing.T) {
@@ -120,7 +120,7 @@ func TestStatePersist(t *testing.T) {
 						"version":           4.0, // encoding/json decodes this as float64 by default
 						"lineage":           "some meaningless value",
 						"serial":            1.0, // encoding/json decodes this as float64 by default
-						"terraform_version": version.Version,
+						"dumb-terraform_version": version.Version,
 						"outputs":           map[string]interface{}{},
 						"resources": []interface{}{
 							map[string]interface{}{
@@ -159,7 +159,7 @@ func TestStatePersist(t *testing.T) {
 						"version":           4.0, // encoding/json decodes this as float64 by default
 						"lineage":           "mock-lineage",
 						"serial":            2.0, // encoding/json decodes this as float64 by default
-						"terraform_version": version.Version,
+						"dumb-terraform_version": version.Version,
 						"outputs":           map[string]interface{}{},
 						"resources": []interface{}{
 							map[string]interface{}{
@@ -198,7 +198,7 @@ func TestStatePersist(t *testing.T) {
 						"version":           4.0, // encoding/json decodes this as float64 by default
 						"lineage":           "mock-lineage",
 						"serial":            3.0, // encoding/json decodes this as float64 by default
-						"terraform_version": version.Version,
+						"dumb-terraform_version": version.Version,
 						"outputs":           map[string]interface{}{},
 						"resources":         []interface{}{},
 						"check_results":     nil,
@@ -223,7 +223,7 @@ func TestStatePersist(t *testing.T) {
 						"version":           4.0, // encoding/json decodes this as float64 by default
 						"lineage":           "mock-lineage",
 						"serial":            5.0, // encoding/json decodes this as float64 by default
-						"terraform_version": version.Version,
+						"dumb-terraform_version": version.Version,
 						"outputs":           map[string]interface{}{},
 						"resources":         []interface{}{},
 						"check_results":     nil,
@@ -249,7 +249,7 @@ func TestStatePersist(t *testing.T) {
 						"version":           4.0, // encoding/json decodes this as float64 by default
 						"lineage":           "mock-lineage",
 						"serial":            4.0, // encoding/json decodes this as float64 by default
-						"terraform_version": version.Version,
+						"dumb-terraform_version": version.Version,
 						"outputs": map[string]interface{}{
 							"foo": map[string]interface{}{
 								"type":  "string",
@@ -280,7 +280,7 @@ func TestStatePersist(t *testing.T) {
 						"version":           4.0, // encoding/json decodes this as float64 by default
 						"lineage":           "mock-lineage",
 						"serial":            5.0, // encoding/json decodes this as float64 by default
-						"terraform_version": version.Version,
+						"dumb-terraform_version": version.Version,
 						"outputs": map[string]interface{}{
 							"foo": map[string]interface{}{
 								"type":  "string",
@@ -316,7 +316,7 @@ func TestStatePersist(t *testing.T) {
 						"version":           4.0, // encoding/json decodes this as float64 by default
 						"lineage":           "mock-lineage",
 						"serial":            3.0, // encoding/json decodes this as float64 by default
-						"terraform_version": version.Version,
+						"dumb-terraform_version": version.Version,
 						"outputs": map[string]interface{}{
 							"foo": map[string]interface{}{
 								"type":  "string",
@@ -338,7 +338,7 @@ func TestStatePersist(t *testing.T) {
 		Client: &mockClient{},
 	}
 
-	// In normal use (during a Terraform operation) we always refresh and read
+	// In normal use (during a Dumb Terraform operation) we always refresh and read
 	// before any writes would happen, so we'll mimic that here for realism.
 	// NB This causes a GET to be logged so the first item in the test cases
 	// must account for this
@@ -403,7 +403,7 @@ func TestState_GetRootOutputValues(t *testing.T) {
 					"version": 4,
 					"lineage": "mock-lineage",
 					"serial": 1,
-					"terraform_version":"0.0.0",
+					"dumb-terraform_version":"0.0.0",
 					"outputs": {"foo": {"value":"bar", "type": "string"}},
 					"resources": []
 				}
@@ -441,7 +441,7 @@ func TestWriteStateForMigration(t *testing.T) {
 					"version": 4,
 					"lineage": "mock-lineage",
 					"serial": 3,
-					"terraform_version":"0.0.0",
+					"dumb-terraform_version":"0.0.0",
 					"outputs": {"foo": {"value":"bar", "type": "string"}},
 					"resources": []
 				}
@@ -462,7 +462,7 @@ func TestWriteStateForMigration(t *testing.T) {
 					"version":           4.0,
 					"lineage":           "mock-lineage",
 					"serial":            3.0,
-					"terraform_version": "0.0.0",
+					"dumb-terraform_version": "0.0.0",
 					"outputs":           map[string]interface{}{"foo": map[string]interface{}{"type": string("string"), "value": string("bar")}},
 					"resources":         []interface{}{},
 				},
@@ -493,7 +493,7 @@ func TestWriteStateForMigration(t *testing.T) {
 					"version":           4.0,
 					"lineage":           "mock-lineage",
 					"serial":            2.0,
-					"terraform_version": version.Version,
+					"dumb-terraform_version": version.Version,
 					"outputs":           map[string]interface{}{"foo": map[string]interface{}{"type": string("string"), "value": string("bar")}},
 					"resources":         []interface{}{},
 					"check_results":     nil,
@@ -512,7 +512,7 @@ func TestWriteStateForMigration(t *testing.T) {
 					"version":           4.0,
 					"lineage":           "different-lineage",
 					"serial":            3.0,
-					"terraform_version": version.Version,
+					"dumb-terraform_version": version.Version,
 					"outputs":           map[string]interface{}{"foo": map[string]interface{}{"type": string("string"), "value": string("bar")}},
 					"resources":         []interface{}{},
 					"check_results":     nil,
@@ -522,7 +522,7 @@ func TestWriteStateForMigration(t *testing.T) {
 		},
 	}
 
-	// In normal use (during a Terraform operation) we always refresh and read
+	// In normal use (during a Dumb Terraform operation) we always refresh and read
 	// before any writes would happen, so we'll mimic that here for realism.
 	// NB This causes a GET to be logged so the first item in the test cases
 	// must account for this
@@ -597,7 +597,7 @@ func TestWriteStateForMigrationWithForcePushClient(t *testing.T) {
 					"version": 4,
 					"lineage": "mock-lineage",
 					"serial": 3,
-					"terraform_version":"0.0.0",
+					"dumb-terraform_version":"0.0.0",
 					"outputs": {"foo": {"value":"bar", "type": "string"}},
 					"resources": []
 				}
@@ -618,7 +618,7 @@ func TestWriteStateForMigrationWithForcePushClient(t *testing.T) {
 					"version":           4.0,
 					"lineage":           "mock-lineage",
 					"serial":            3.0,
-					"terraform_version": "0.0.0",
+					"dumb-terraform_version": "0.0.0",
 					"outputs":           map[string]interface{}{"foo": map[string]interface{}{"type": string("string"), "value": string("bar")}},
 					"resources":         []interface{}{},
 				},
@@ -649,7 +649,7 @@ func TestWriteStateForMigrationWithForcePushClient(t *testing.T) {
 					"version":           4.0,
 					"lineage":           "mock-lineage",
 					"serial":            2.0,
-					"terraform_version": version.Version,
+					"dumb-terraform_version": version.Version,
 					"outputs":           map[string]interface{}{"foo": map[string]interface{}{"type": string("string"), "value": string("bar")}},
 					"resources":         []interface{}{},
 					"check_results":     nil,
@@ -668,7 +668,7 @@ func TestWriteStateForMigrationWithForcePushClient(t *testing.T) {
 					"version":           4.0,
 					"lineage":           "different-lineage",
 					"serial":            3.0,
-					"terraform_version": version.Version,
+					"dumb-terraform_version": version.Version,
 					"outputs":           map[string]interface{}{"foo": map[string]interface{}{"type": string("string"), "value": string("bar")}},
 					"resources":         []interface{}{},
 					"check_results":     nil,
@@ -678,7 +678,7 @@ func TestWriteStateForMigrationWithForcePushClient(t *testing.T) {
 		},
 	}
 
-	// In normal use (during a Terraform operation) we always refresh and read
+	// In normal use (during a Dumb Terraform operation) we always refresh and read
 	// before any writes would happen, so we'll mimic that here for realism.
 	// NB This causes a GET to be logged so the first item in the test cases
 	// must account for this

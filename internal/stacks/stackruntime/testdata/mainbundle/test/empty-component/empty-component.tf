@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
-    terraform = {
-      source = "terraform.io/builtin/terraform"
+    dumb-terraform = {
+      source = "dumb-terraform.io/builtin/dumb-terraform"
     }
   }
 }

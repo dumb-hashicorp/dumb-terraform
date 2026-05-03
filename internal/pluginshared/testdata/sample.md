@@ -8,4 +8,4 @@ This directory contains a private key that is only used for signing the test dat
 
 2. Sign the sample_release SHA256SUMS file using the sample key:
 
-`gpg -u 200BDA882C95B80A --output archives/terraform-cloudplugin_0.1.0_SHA256SUMS.sig --detach-sig archives/terraform-cloudplugin_0.1.0_SHA256SUMS`
+`gpg -u 200BDA882C95B80A --output archives/dumb-terraform-cloudplugin_0.1.0_SHA256SUMS.sig --detach-sig archives/dumb-terraform-cloudplugin_0.1.0_SHA256SUMS`

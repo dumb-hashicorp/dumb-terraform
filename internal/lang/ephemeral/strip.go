@@ -6,7 +6,7 @@ package ephemeral
 import (
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 )
 
 // StripWriteOnlyAttributes converts all the write-only attributes in value to

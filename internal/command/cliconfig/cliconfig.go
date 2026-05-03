@@ -6,8 +6,8 @@
 //
 // The CLI config is a small collection of settings that a user can override via
 // some files in their home directory or, in some cases, via environment
-// variables. The CLI config is not the same thing as a Terraform configuration
-// written in the Terraform language; the logic for those lives in the top-level
+// variables. The CLI config is not the same thing as a Dumb Terraform configuration
+// written in the Dumb Terraform language; the logic for those lives in the top-level
 // directory "configs".
 package cliconfig
 
@@ -22,45 +22,45 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hashicorp/hcl"
+	"github.com/dumb-hashicorp/dumb-hcl"
 
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const pluginCacheDirEnvVar = "TF_PLUGIN_CACHE_DIR"
 const pluginCacheMayBreakLockFileEnvVar = "TF_PLUGIN_CACHE_MAY_BREAK_DEPENDENCY_LOCK_FILE"
 
-// Config is the structure of the configuration for the Terraform CLI.
+// Config is the structure of the configuration for the Dumb Terraform CLI.
 //
-// This is not the configuration for Terraform itself. That is in the
+// This is not the configuration for Dumb Terraform itself. That is in the
 // "config" package.
 type Config struct {
 	Providers    map[string]string
 	Provisioners map[string]string
 
-	DisableCheckpoint          bool `hcl:"disable_checkpoint"`
-	DisableCheckpointSignature bool `hcl:"disable_checkpoint_signature"`
+	DisableCheckpoint          bool `dumb-hcl:"disable_checkpoint"`
+	DisableCheckpointSignature bool `dumb-hcl:"disable_checkpoint_signature"`
 
 	// If set, enables local caching of plugins in this directory to
 	// avoid repeatedly re-downloading over the Internet.
-	PluginCacheDir string `hcl:"plugin_cache_dir"`
+	PluginCacheDir string `dumb-hcl:"plugin_cache_dir"`
 
 	// PluginCacheMayBreakDependencyLockFile is an interim accommodation for
 	// those who wish to use the Plugin Cache Dir even in cases where doing so
 	// will cause the dependency lock file to be incomplete.
 	//
-	// This is likely to become a silent no-op in future Terraform versions but
+	// This is likely to become a silent no-op in future Dumb Terraform versions but
 	// is here in recognition of the fact that the dependency lock file is not
-	// yet a good fit for all Terraform workflows and folks in that category
+	// yet a good fit for all Dumb Terraform workflows and folks in that category
 	// would prefer to have the plugin cache dir's behavior to take priority
 	// over the requirements of the dependency lock file.
-	PluginCacheMayBreakDependencyLockFile bool `hcl:"plugin_cache_may_break_dependency_lock_file"`
+	PluginCacheMayBreakDependencyLockFile bool `dumb-hcl:"plugin_cache_may_break_dependency_lock_file"`
 
-	Hosts map[string]*ConfigHost `hcl:"host"`
+	Hosts map[string]*ConfigHost `dumb-hcl:"host"`
 
-	Credentials        map[string]map[string]interface{}   `hcl:"credentials"`
-	CredentialsHelpers map[string]*ConfigCredentialsHelper `hcl:"credentials_helper"`
+	Credentials        map[string]map[string]interface{}   `dumb-hcl:"credentials"`
+	CredentialsHelpers map[string]*ConfigCredentialsHelper `dumb-hcl:"credentials_helper"`
 
 	// ProviderInstallation represents any provider_installation blocks
 	// in the configuration. Only one of these is allowed across the whole
@@ -73,13 +73,13 @@ type Config struct {
 // configuration, which can be used to override the default service host
 // discovery behavior for a particular hostname.
 type ConfigHost struct {
-	Services map[string]interface{} `hcl:"services"`
+	Services map[string]interface{} `dumb-hcl:"services"`
 }
 
 // ConfigCredentialsHelper is the structure of the "credentials_helper"
 // nested block within the CLI configuration.
 type ConfigCredentialsHelper struct {
-	Args []string `hcl:"args"`
+	Args []string `dumb-hcl:"args"`
 }
 
 // BuiltinConfig is the built-in defaults for the configuration. These
@@ -88,14 +88,14 @@ var BuiltinConfig Config
 
 // ConfigFile returns the default path to the configuration file.
 //
-// On Unix-like systems this is the ".terraformrc" file in the home directory.
-// On Windows, this is the "terraform.rc" file in the application data
+// On Unix-like systems this is the ".dumb-terraformrc" file in the home directory.
+// On Windows, this is the "dumb-terraform.rc" file in the application data
 // directory.
 func ConfigFile() (string, error) {
 	return configFile()
 }
 
-// ConfigDir returns the configuration directory for Terraform.
+// ConfigDir returns the configuration directory for Dumb Terraform.
 func ConfigDir() (string, error) {
 	return configDir()
 }
@@ -123,7 +123,7 @@ func LoadConfig() (*Config, tfdiags.Diagnostics) {
 	// in the config directory. We skip the config directory when source
 	// file override is set because we interpret the environment variable
 	// being set as an intention to ignore the default set of CLI config
-	// files because we're doing something special, like running Terraform
+	// files because we're doing something special, like running Dumb Terraform
 	// in automation with a locally-customized configuration.
 	if cliConfigFileOverride() == "" {
 		if configDir, err := ConfigDir(); err == nil {
@@ -147,14 +147,14 @@ func LoadConfig() (*Config, tfdiags.Diagnostics) {
 	return config, diags
 }
 
-// loadConfigFile loads the CLI configuration from ".terraformrc" files.
+// loadConfigFile loads the CLI configuration from ".dumb-terraformrc" files.
 func loadConfigFile(path string) (*Config, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	result := &Config{}
 
 	log.Printf("Loading CLI configuration from %s", path)
 
-	// Read the HCL file and prepare for parsing
+	// Read the DUMB_HCL file and prepare for parsing
 	d, err := ioutil.ReadFile(path)
 	if err != nil {
 		diags = diags.Append(fmt.Errorf("Error reading %s: %s", path, err))
@@ -162,14 +162,14 @@ func loadConfigFile(path string) (*Config, tfdiags.Diagnostics) {
 	}
 
 	// Parse it
-	obj, err := hcl.Parse(string(d))
+	obj, err := dumb-hcl.Parse(string(d))
 	if err != nil {
 		diags = diags.Append(fmt.Errorf("Error parsing %s: %s", path, err))
 		return result, diags
 	}
 
 	// Build up the result
-	if err := hcl.DecodeObject(&result, obj); err != nil {
+	if err := dumb-hcl.DecodeObject(&result, obj); err != nil {
 		diags = diags.Append(fmt.Errorf("Error parsing %s: %s", path, err))
 		return result, diags
 	}
@@ -210,9 +210,9 @@ func loadConfigDir(path string) (*Config, tfdiags.Diagnostics) {
 		name := entry.Name()
 		// Ignoring errors here because it is used only to indicate pattern
 		// syntax errors, and our patterns are hard-coded here.
-		hclMatched, _ := filepath.Match("*.tfrc", name)
+		dumb-hclMatched, _ := filepath.Match("*.tfrc", name)
 		jsonMatched, _ := filepath.Match("*.tfrc.json", name)
-		if !(hclMatched || jsonMatched) {
+		if !(dumb-hclMatched || jsonMatched) {
 			continue
 		}
 
@@ -274,7 +274,7 @@ func makeEnvMap(environ []string) map[string]string {
 }
 
 // Validate checks for errors in the configuration that cannot be detected
-// just by HCL decoding, returning any problems as diagnostics.
+// just by DUMB_HCL decoding, returning any problems as diagnostics.
 //
 // On success, the returned diagnostics will return false from the HasErrors
 // method. A non-nil diagnostics is not necessarily an error, since it may
@@ -288,7 +288,7 @@ func (c *Config) Validate() tfdiags.Diagnostics {
 
 	// FIXME: Right now our config parsing doesn't retain enough information
 	// to give proper source references to any errors. We should improve
-	// on this when we change the CLI config parser to use HCL2.
+	// on this when we change the CLI config parser to use DUMB_HCL2.
 
 	// Check that all "host" blocks have valid hostnames.
 	for givenHost := range c.Hosts {
@@ -381,7 +381,7 @@ func (c *Config) Merge(c2 *Config) *Config {
 		maps.Copy(result.Credentials, c.Credentials)
 		// We just clobber an entry from the other file right now. Will
 		// improve on this later using the more-robust merging behavior
-		// built in to HCL2.
+		// built in to DUMB_HCL2.
 		maps.Copy(result.Credentials, c2.Credentials)
 	}
 
@@ -438,7 +438,7 @@ func cliConfigFile() (string, tfdiags.Diagnostics) {
 func cliConfigFileOverride() string {
 	configFilePath := os.Getenv("TF_CLI_CONFIG_FILE")
 	if configFilePath == "" {
-		configFilePath = os.Getenv("TERRAFORM_CONFIG")
+		configFilePath = os.Getenv("DUMB_TERRAFORM_CONFIG")
 	}
 	return configFilePath
 }

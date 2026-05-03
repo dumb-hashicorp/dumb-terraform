@@ -6,8 +6,8 @@ package configs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -15,26 +15,26 @@ import (
 type ModuleCall struct {
 	Name string
 
-	SourceExpr hcl.Expression
+	SourceExpr dumb-hcl.Expression
 
-	Config hcl.Body
+	Config dumb-hcl.Body
 
-	VersionExpr hcl.Expression
+	VersionExpr dumb-hcl.Expression
 
-	Count   hcl.Expression
-	ForEach hcl.Expression
+	Count   dumb-hcl.Expression
+	ForEach dumb-hcl.Expression
 
 	Providers []PassedProviderConfig
 
-	DependsOn []hcl.Traversal
+	DependsOn []dumb-hcl.Traversal
 
-	DeclRange hcl.Range
+	DeclRange dumb-hcl.Range
 
 	IgnoreNestedDeprecations bool
 }
 
-func decodeModuleBlock(block *hcl.Block, override bool) (*ModuleCall, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeModuleBlock(block *dumb-hcl.Block, override bool) (*ModuleCall, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	mc := &ModuleCall{
 		Name:      block.Labels[0],
@@ -50,9 +50,9 @@ func decodeModuleBlock(block *hcl.Block, override bool) (*ModuleCall, hcl.Diagno
 	diags = append(diags, moreDiags...)
 	mc.Config = remain
 
-	if !hclsyntax.ValidIdentifier(mc.Name) {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+	if !dumb-hclsyntax.ValidIdentifier(mc.Name) {
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid module instance name",
 			Detail:   badIdentifierDetail,
 			Subject:  &block.LabelRanges[0],
@@ -73,8 +73,8 @@ func decodeModuleBlock(block *hcl.Block, override bool) (*ModuleCall, hcl.Diagno
 
 	if attr, exists := content.Attributes["for_each"]; exists {
 		if mc.Count != nil {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  `Invalid combination of "count" and "for_each"`,
 				Detail:   `The "count" and "for_each" meta-arguments are mutually-exclusive, only one should be used to be explicit about the number of resources to be created.`,
 				Subject:  &attr.NameRange,
@@ -98,10 +98,10 @@ func decodeModuleBlock(block *hcl.Block, override bool) (*ModuleCall, hcl.Diagno
 
 	if attr, exists := content.Attributes["ignore_nested_deprecations"]; exists {
 		// We only allow static boolean values for this argument.
-		val, evalDiags := attr.Expr.Value(&hcl.EvalContext{})
+		val, evalDiags := attr.Expr.Value(&dumb-hcl.EvalContext{})
 		if len(evalDiags.Errs()) > 0 {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid value for ignore_nested_deprecations",
 				Detail:   "The value for ignore_nested_deprecations must be a static boolean (true or false).",
 				Subject:  attr.Expr.Range().Ptr(),
@@ -109,8 +109,8 @@ func decodeModuleBlock(block *hcl.Block, override bool) (*ModuleCall, hcl.Diagno
 		}
 
 		if val.Type() != cty.Bool {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid type for ignore_nested_deprecations",
 				Detail:   fmt.Sprintf("The value for ignore_nested_deprecations must be a boolean (true or false), but the given value has type %s.", val.Type().FriendlyName()),
 				Subject:  attr.Expr.Range().Ptr(),
@@ -120,13 +120,13 @@ func decodeModuleBlock(block *hcl.Block, override bool) (*ModuleCall, hcl.Diagno
 		mc.IgnoreNestedDeprecations = val.True()
 	}
 
-	var seenEscapeBlock *hcl.Block
+	var seenEscapeBlock *dumb-hcl.Block
 	for _, block := range content.Blocks {
 		switch block.Type {
 		case "_":
 			if seenEscapeBlock != nil {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate escaping block",
 					Detail: fmt.Sprintf(
 						"The special block type \"_\" can be used to force particular arguments to be interpreted as module input variables rather than as meta-arguments, but each module block can have only one such block. The first escaping block was at %s.",
@@ -141,14 +141,14 @@ func decodeModuleBlock(block *hcl.Block, override bool) (*ModuleCall, hcl.Diagno
 			// When there's an escaping block its content merges with the
 			// existing config we extracted earlier, so later decoding
 			// will see a blend of both.
-			mc.Config = hcl.MergeBodies([]hcl.Body{mc.Config, block.Body})
+			mc.Config = dumb-hcl.MergeBodies([]dumb-hcl.Body{mc.Config, block.Body})
 
 		default:
 			// All of the other block types in our schema are reserved.
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Reserved block type name in module block",
-				Detail:   fmt.Sprintf("The block type name %q is reserved for use by Terraform in a future version.", block.Type),
+				Detail:   fmt.Sprintf("The block type name %q is reserved for use by Dumb Terraform in a future version.", block.Type),
 				Subject:  &block.TypeRange,
 			})
 		}
@@ -164,12 +164,12 @@ type PassedProviderConfig struct {
 	InParent *ProviderConfigRef
 }
 
-func decodePassedProviderConfigs(attr *hcl.Attribute) ([]PassedProviderConfig, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodePassedProviderConfigs(attr *dumb-hcl.Attribute) ([]PassedProviderConfig, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	var providers []PassedProviderConfig
 
-	seen := make(map[string]hcl.Range)
-	pairs, pDiags := hcl.ExprMap(attr.Expr)
+	seen := make(map[string]dumb-hcl.Range)
+	pairs, pDiags := dumb-hcl.ExprMap(attr.Expr)
 	diags = append(diags, pDiags...)
 	for _, pair := range pairs {
 		key, keyDiags := decodeProviderConfigRef(pair.Key, "providers")
@@ -182,8 +182,8 @@ func decodePassedProviderConfigs(attr *hcl.Attribute) ([]PassedProviderConfig, h
 
 		matchKey := key.String()
 		if prev, exists := seen[matchKey]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Duplicate provider address",
 				Detail:   fmt.Sprintf("A provider configuration was already passed to %s at %s. Each child provider configuration can be assigned only once.", matchKey, prev),
 				Subject:  pair.Value.Range().Ptr(),
@@ -191,7 +191,7 @@ func decodePassedProviderConfigs(attr *hcl.Attribute) ([]PassedProviderConfig, h
 			continue
 		}
 
-		rng := hcl.RangeBetween(pair.Key.Range(), pair.Value.Range())
+		rng := dumb-hcl.RangeBetween(pair.Key.Range(), pair.Value.Range())
 		seen[matchKey] = rng
 		providers = append(providers, PassedProviderConfig{
 			InChild:  key,
@@ -201,8 +201,8 @@ func decodePassedProviderConfigs(attr *hcl.Attribute) ([]PassedProviderConfig, h
 	return providers, diags
 }
 
-var moduleBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var moduleBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name:     "source",
 			Required: true,
@@ -226,7 +226,7 @@ var moduleBlockSchema = &hcl.BodySchema{
 			Name: "ignore_nested_deprecations",
 		},
 	},
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "_"}, // meta-argument escaping block
 
 		// These are all reserved for future use.

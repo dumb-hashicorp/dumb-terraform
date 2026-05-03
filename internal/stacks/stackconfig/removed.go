@@ -5,13 +5,13 @@ package stackconfig
 
 import (
 	"github.com/apparentlymart/go-versions/versions/constraints"
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Removed represents a component that was removed from the configuration.
@@ -51,7 +51,7 @@ type Removed struct {
 	// root module from a source bundle.
 	FinalSourceAddr sourceaddrs.FinalSource
 
-	ForEach hcl.Expression
+	ForEach dumb-hcl.Expression
 
 	// ProviderConfigs describes the mapping between the static provider
 	// configuration slots declared in the component's root module and the
@@ -60,7 +60,7 @@ type Removed struct {
 	//
 	// This map deals with the slight schism between the stacks language's
 	// treatment of provider configurations as regular values of a special
-	// data type vs. the main Terraform language's treatment of provider
+	// data type vs. the main Dumb Terraform language's treatment of provider
 	// configurations as something special passed out of band from the
 	// input variables. The overall structure and the map keys are fixed
 	// statically during decoding, but the final provider configuration objects
@@ -74,13 +74,13 @@ type Removed struct {
 	// provider names.
 	//
 	// This will only be populated if From points to a component.
-	ProviderConfigs map[addrs.LocalProviderConfig]hcl.Expression
+	ProviderConfigs map[addrs.LocalProviderConfig]dumb-hcl.Expression
 
 	// Inputs describes the inputs that will be used to destroy all components
 	// within the target stack.
 	//
 	// This will only be populated if From points to a stack.
-	Inputs hcl.Expression
+	Inputs dumb-hcl.Expression
 
 	// Destroy controls whether this removed block will actually destroy all
 	// instances of resources within this component, or just removed them from
@@ -90,15 +90,15 @@ type Removed struct {
 	DeclRange tfdiags.SourceRange
 }
 
-func decodeRemovedBlock(block *hcl.Block) (*Removed, tfdiags.Diagnostics) {
+func decodeRemovedBlock(block *dumb-hcl.Block) (*Removed, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	ret := &Removed{
-		DeclRange: tfdiags.SourceRangeFromHCL(block.DefRange),
+		DeclRange: tfdiags.SourceRangeFromDUMB_HCL(block.DefRange),
 	}
 
-	content, hclDiags := block.Body.Content(removedBlockSchema)
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	content, dumb-hclDiags := block.Body.Content(removedBlockSchema)
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return nil, diags
 	}
 
@@ -123,9 +123,9 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, tfdiags.Diagnostics) {
 
 	ret.SourceAddr = sourceAddr
 	ret.VersionConstraints = versionConstraints
-	ret.SourceAddrRange = tfdiags.SourceRangeFromHCL(content.Attributes["source"].Range)
+	ret.SourceAddrRange = tfdiags.SourceRangeFromDUMB_HCL(content.Attributes["source"].Range)
 	if content.Attributes["version"] != nil {
-		ret.VersionConstraintsRange = tfdiags.SourceRangeFromHCL(content.Attributes["version"].Range)
+		ret.VersionConstraintsRange = tfdiags.SourceRangeFromDUMB_HCL(content.Attributes["version"].Range)
 	}
 	// Now that we've populated the mandatory source location fields we can
 	// safely return a partial ret if we encounter any further errors, as
@@ -135,7 +135,7 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, tfdiags.Diagnostics) {
 	if attr, ok := content.Attributes["for_each"]; ok {
 		matches := false
 		for _, variable := range ret.From.Variables() {
-			if root, ok := variable[0].(hcl.TraverseRoot); ok {
+			if root, ok := variable[0].(dumb-hcl.TraverseRoot); ok {
 				if root.Name == "each" {
 					matches = true
 					break
@@ -145,8 +145,8 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, tfdiags.Diagnostics) {
 		if !matches {
 			// You have to refer to the for_each attribute somewhere in the
 			// from attribute.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid for_each expression",
 				Detail:   "A removed block with a for_each expression must reference that expression within the `from` attribute.",
 				Subject:  attr.NameRange.Ptr(),
@@ -157,8 +157,8 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, tfdiags.Diagnostics) {
 	}
 	if attr, ok := content.Attributes["providers"]; ok {
 		if ret.From.Component == nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid providers attribute",
 				Detail:   "A removed block that does not target a component should not specify any providers.",
 				Subject:  attr.NameRange.Ptr(),
@@ -172,8 +172,8 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, tfdiags.Diagnostics) {
 
 	if attr, ok := content.Attributes["inputs"]; ok {
 		if ret.From.Component != nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid inputs attribute",
 				Detail:   "A removed block that does not target an embedded stack should not specify any inputs.",
 				Subject:  attr.NameRange.Ptr(),
@@ -191,7 +191,7 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, tfdiags.Diagnostics) {
 			diags = diags.Append(lcDiags)
 
 			if attr, ok := lcContent.Attributes["destroy"]; ok {
-				valDiags := gohcl.DecodeExpression(attr.Expr, nil, &ret.Destroy)
+				valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &ret.Destroy)
 				diags = diags.Append(valDiags)
 			}
 		}
@@ -200,11 +200,11 @@ func decodeRemovedBlock(block *hcl.Block) (*Removed, tfdiags.Diagnostics) {
 	return ret, diags
 }
 
-var removedBlockSchema = &hcl.BodySchema{
-	Blocks: []hcl.BlockHeaderSchema{
+var removedBlockSchema = &dumb-hcl.BodySchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "lifecycle"},
 	},
-	Attributes: []hcl.AttributeSchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "from", Required: true},
 		{Name: "source", Required: true},
 		{Name: "version", Required: false},
@@ -214,8 +214,8 @@ var removedBlockSchema = &hcl.BodySchema{
 	},
 }
 
-var removedLifecycleBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var removedLifecycleBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "destroy"},
 	},
 }

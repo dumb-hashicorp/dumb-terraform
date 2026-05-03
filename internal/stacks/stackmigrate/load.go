@@ -10,16 +10,16 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/backend/local"
-	"github.com/hashicorp/terraform/internal/backend/remote"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/workdir"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/workdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type Loader struct {
@@ -31,7 +31,7 @@ var (
 )
 
 // LoadState loads a state from the given configPath. The configuration at configPath
-// must have been initialized via `terraform init` before calling this function.
+// must have been initialized via `dumb-terraform init` before calling this function.
 // The function returns an empty state even if there are errors.
 func (l *Loader) LoadState(configPath string) (*states.State, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
@@ -44,10 +44,10 @@ func (l *Loader) LoadState(configPath string) (*states.State, tfdiags.Diagnostic
 	backendInit.Init(l.Discovery)
 
 	// First, we'll load the "backend state". This should have been initialised
-	// by the `terraform init` command, and contains the configuration for the
+	// by the `dumb-terraform init` command, and contains the configuration for the
 	// backend that we're using.
 	var backendState *workdir.BackendStateFile
-	backendStatePath := filepath.Join(workingDirectory.DataDir(), ".terraform.tfstate")
+	backendStatePath := filepath.Join(workingDirectory.DataDir(), ".dumb-terraform.tfstate")
 	st := &clistate.LocalState{Path: backendStatePath}
 	// If the backend state file is not provided, RefreshState will
 	// return nil error and State will be empty.
@@ -59,7 +59,7 @@ func (l *Loader) LoadState(configPath string) (*states.State, tfdiags.Diagnostic
 	backendState = st.State()
 
 	// Now that we have the backend state, we can initialise the backend itself
-	// based on what we had from the `terraform init` command.
+	// based on what we had from the `dumb-terraform init` command.
 	var backend backend.Backend
 	var backendConfig cty.Value
 
@@ -67,7 +67,7 @@ func (l *Loader) LoadState(configPath string) (*states.State, tfdiags.Diagnostic
 	if backendState == nil {
 		backend = local.New()
 		backendConfig = cty.ObjectVal(map[string]cty.Value{
-			"path":          cty.StringVal(fmt.Sprintf("%s/%s", configPath, "terraform.tfstate")),
+			"path":          cty.StringVal(fmt.Sprintf("%s/%s", configPath, "dumb-terraform.tfstate")),
 			"workspace_dir": cty.StringVal(configPath),
 		})
 	} else {
@@ -84,7 +84,7 @@ func (l *Loader) LoadState(configPath string) (*states.State, tfdiags.Diagnostic
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Failed to decode current backend config",
-				fmt.Sprintf("The backend configuration created by the most recent run of \"terraform init\" could not be decoded: %s. The configuration may have been initialized by an earlier version that used an incompatible configuration structure. Run \"terraform init -reconfigure\" to force re-initialization of the backend.", err),
+				fmt.Sprintf("The backend configuration created by the most recent run of \"dumb-terraform init\" could not be decoded: %s. The configuration may have been initialized by an earlier version that used an incompatible configuration structure. Run \"dumb-terraform init -reconfigure\" to force re-initialization of the backend.", err),
 			))
 			return state, diags
 		}
@@ -96,7 +96,7 @@ func (l *Loader) LoadState(configPath string) (*states.State, tfdiags.Diagnostic
 			return state, diags
 		}
 
-		// it's safe to ignore terraform version conflict between the local and remote environments,
+		// it's safe to ignore dumb-terraform version conflict between the local and remote environments,
 		// as we are only reading the state
 		if backendR, ok := backend.(*remote.Remote); ok {
 			backendR.IgnoreVersionConflict()

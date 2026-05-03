@@ -6,10 +6,10 @@ package stackconfig
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ProviderConfig is a provider configuration declared within a [Stack].
@@ -26,19 +26,19 @@ type ProviderConfig struct {
 	// a provider configuration in the state so that we still have what
 	// we need to destroy any associated objects when a provider is removed
 	// from the configuration.
-	ForEach hcl.Expression
+	ForEach dumb-hcl.Expression
 
 	// Config is the body of the nested block containing the provider-specific
 	// configuration arguments, if specified. Some providers do not require
 	// explicit arguments and so the nested block is optional; this field
 	// will be nil if no block was included.
-	Config hcl.Body
+	Config dumb-hcl.Body
 
 	ProviderNameRange tfdiags.SourceRange
 	DeclRange         tfdiags.SourceRange
 }
 
-func decodeProviderConfigBlock(block *hcl.Block) (*ProviderConfig, tfdiags.Diagnostics) {
+func decodeProviderConfigBlock(block *dumb-hcl.Block) (*ProviderConfig, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	ret := &ProviderConfig{
 		LocalAddr: addrs.LocalProviderConfig{
@@ -46,20 +46,20 @@ func decodeProviderConfigBlock(block *hcl.Block) (*ProviderConfig, tfdiags.Diagn
 
 			// we call this "name" in the stacks configuration language,
 			// but it's "Alias" here because we're reusing an address type
-			// made for the Terraform module language.
+			// made for the Dumb Terraform module language.
 			Alias: block.Labels[1],
 		},
-		ProviderNameRange: tfdiags.SourceRangeFromHCL(block.LabelRanges[0]),
-		DeclRange:         tfdiags.SourceRangeFromHCL(block.DefRange),
+		ProviderNameRange: tfdiags.SourceRangeFromDUMB_HCL(block.LabelRanges[0]),
+		DeclRange:         tfdiags.SourceRangeFromDUMB_HCL(block.DefRange),
 	}
-	if !hclsyntax.ValidIdentifier(ret.LocalAddr.LocalName) {
+	if !dumb-hclsyntax.ValidIdentifier(ret.LocalAddr.LocalName) {
 		diags = diags.Append(invalidNameDiagnostic(
 			"Invalid provider local name",
 			block.LabelRanges[0],
 		))
 		return nil, diags
 	}
-	if !hclsyntax.ValidIdentifier(ret.LocalAddr.Alias) {
+	if !dumb-hclsyntax.ValidIdentifier(ret.LocalAddr.Alias) {
 		diags = diags.Append(invalidNameDiagnostic(
 			"Invalid provider configuration name",
 			block.LabelRanges[0],
@@ -67,8 +67,8 @@ func decodeProviderConfigBlock(block *hcl.Block) (*ProviderConfig, tfdiags.Diagn
 		return nil, diags
 	}
 
-	content, hclDiags := block.Body.Content(providerConfigBlockSchema)
-	diags = diags.Append(hclDiags)
+	content, dumb-hclDiags := block.Body.Content(providerConfigBlockSchema)
+	diags = diags.Append(dumb-hclDiags)
 
 	if attr, ok := content.Attributes["for_each"]; ok {
 		ret.ForEach = attr.Expr
@@ -78,9 +78,9 @@ func decodeProviderConfigBlock(block *hcl.Block) (*ProviderConfig, tfdiags.Diagn
 		switch block.Type {
 		case "config":
 			if ret.Config != nil {
-				if !hclsyntax.ValidIdentifier(ret.LocalAddr.LocalName) {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+				if !dumb-hclsyntax.ValidIdentifier(ret.LocalAddr.LocalName) {
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Duplicate config block",
 						Detail:   "A provider configuration block must contain only one nested \"config\" block.",
 						Subject:  block.DefRange.Ptr(),
@@ -100,11 +100,11 @@ func decodeProviderConfigBlock(block *hcl.Block) (*ProviderConfig, tfdiags.Diagn
 	return ret, diags
 }
 
-var providerConfigBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var providerConfigBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "for_each", Required: false},
 	},
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "config"},
 	},
 }

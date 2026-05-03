@@ -1,3 +1,3 @@
-terraform {
+dumb-terraform {
   backend "artifactory" {}
 }

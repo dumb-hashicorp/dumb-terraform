@@ -13,26 +13,26 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/cli"
-	tfe "github.com/hashicorp/go-tfe"
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform-svchost/auth"
-	"github.com/hashicorp/terraform-svchost/disco"
+	"github.com/dumb-hashicorp/cli"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/auth"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	backendLocal "github.com/hashicorp/terraform/internal/backend/local"
-	"github.com/hashicorp/terraform/internal/cloud"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	backendLocal "github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 const (
@@ -46,12 +46,12 @@ var (
 	})
 )
 
-// mockInput is a mock implementation of terraform.UIInput.
+// mockInput is a mock implementation of dumb-terraform.UIInput.
 type mockInput struct {
 	answers map[string]string
 }
 
-func (m *mockInput) Input(ctx context.Context, opts *terraform.InputOpts) (string, error) {
+func (m *mockInput) Input(ctx context.Context, opts *dumb-terraform.InputOpts) (string, error) {
 	v, ok := m.answers[opts.Id]
 	if !ok {
 		return "", fmt.Errorf("unexpected input request in test: %s", opts.Id)
@@ -73,7 +73,7 @@ func testInput(t *testing.T, answers map[string]string) *mockInput {
 func testBackendDefault(t *testing.T) (*Remote, func()) {
 	obj := cty.ObjectVal(map[string]cty.Value{
 		"hostname":     cty.NullVal(cty.String),
-		"organization": cty.StringVal("hashicorp"),
+		"organization": cty.StringVal("dumb-hashicorp"),
 		"token":        cty.NullVal(cty.String),
 		"workspaces": cty.ObjectVal(map[string]cty.Value{
 			"name":   cty.StringVal("prod"),
@@ -86,7 +86,7 @@ func testBackendDefault(t *testing.T) (*Remote, func()) {
 func testBackendNoDefault(t *testing.T) (*Remote, func()) {
 	obj := cty.ObjectVal(map[string]cty.Value{
 		"hostname":     cty.NullVal(cty.String),
-		"organization": cty.StringVal("hashicorp"),
+		"organization": cty.StringVal("dumb-hashicorp"),
 		"token":        cty.NullVal(cty.String),
 		"workspaces": cty.ObjectVal(map[string]cty.Value{
 			"name":   cty.NullVal(cty.String),
@@ -207,7 +207,7 @@ func testServer(t *testing.T) *httptest.Server {
 	mux := http.NewServeMux()
 
 	// Respond to service discovery calls.
-	mux.HandleFunc("/well-known/terraform.json", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/well-known/dumb-terraform.json", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, `{
   "state.v2": "/api/v2/",
@@ -221,7 +221,7 @@ func testServer(t *testing.T) *httptest.Server {
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, fmt.Sprintf(`{
   "service": "%s",
-  "product": "terraform",
+  "product": "dumb-terraform",
   "minimum": "0.1.0",
   "maximum": "10.0.0"
 }`, path.Base(r.URL.Path)))
@@ -233,8 +233,8 @@ func testServer(t *testing.T) *httptest.Server {
 		w.Header().Set("TFP-API-Version", "2.4")
 	})
 
-	// Respond to the initial query to read the hashicorp org entitlements.
-	mux.HandleFunc("/api/v2/organizations/hashicorp/entitlement-set", func(w http.ResponseWriter, r *http.Request) {
+	// Respond to the initial query to read the dumb-hashicorp org entitlements.
+	mux.HandleFunc("/api/v2/organizations/dumb-hashicorp/entitlement-set", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.api+json")
 		io.WriteString(w, `{
   "data": {
@@ -271,7 +271,7 @@ func testServer(t *testing.T) *httptest.Server {
 }`)
 	})
 
-	// All tests that are assumed to pass will use the hashicorp organization,
+	// All tests that are assumed to pass will use the dumb-hashicorp organization,
 	// so for all other organization requests we will return a 404.
 	mux.HandleFunc("/api/v2/organizations/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
@@ -288,7 +288,7 @@ func testServer(t *testing.T) *httptest.Server {
 	return httptest.NewServer(mux)
 }
 
-// testDisco returns a *disco.Disco mapping app.terraform.io and
+// testDisco returns a *disco.Disco mapping app.dumb-terraform.io and
 // localhost to a local test server.
 func testDisco(s *httptest.Server) *disco.Disco {
 	services := map[string]interface{}{
@@ -297,7 +297,7 @@ func testDisco(s *httptest.Server) *disco.Disco {
 		"versions.v1": fmt.Sprintf("%s/v1/versions/", s.URL),
 	}
 	d := disco.NewWithCredentialsSource(credsSrc)
-	d.SetUserAgent(httpclient.TerraformUserAgent(version.String()))
+	d.SetUserAgent(httpclient.Dumb TerraformUserAgent(version.String()))
 
 	d.ForceHostServices(svchost.Hostname(defaultHostname), services)
 	d.ForceHostServices(svchost.Hostname("localhost"), services)
@@ -306,18 +306,18 @@ func testDisco(s *httptest.Server) *disco.Disco {
 
 type unparsedVariableValue struct {
 	value  string
-	source terraform.ValueSourceType
+	source dumb-terraform.ValueSourceType
 }
 
-func (v *unparsedVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*terraform.InputValue, tfdiags.Diagnostics) {
-	return &terraform.InputValue{
+func (v *unparsedVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
+	return &dumb-terraform.InputValue{
 		Value:      cty.StringVal(v.value),
 		SourceType: v.source,
 	}, tfdiags.Diagnostics{}
 }
 
 // testVariable returns a arguments.UnparsedVariableValue used for testing.
-func testVariables(s terraform.ValueSourceType, vs ...string) map[string]arguments.UnparsedVariableValue {
+func testVariables(s dumb-terraform.ValueSourceType, vs ...string) map[string]arguments.UnparsedVariableValue {
 	vars := make(map[string]arguments.UnparsedVariableValue, len(vs))
 	for _, v := range vs {
 		vars[v] = &unparsedVariableValue{

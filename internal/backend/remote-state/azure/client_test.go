@@ -6,8 +6,8 @@ package azure
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
 	"github.com/jackofallops/giovanni/storage/2023-11-03/blob/blobs"
 )
 

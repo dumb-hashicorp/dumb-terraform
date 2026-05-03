@@ -8,14 +8,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
 )
 
 func TestStateFile(t *testing.T, s *states.State) string {
 	t.Helper()
 
-	path := filepath.Join(t.TempDir(), "terraform.tfstate")
+	path := filepath.Join(t.TempDir(), "dumb-terraform.tfstate")
 
 	f, err := os.Create(path)
 	if err != nil {

@@ -8,23 +8,23 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 func TestDiagnosticComparer(t *testing.T) {
 
-	baseError := hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	baseError := dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "error",
 		Detail:   "this is an error",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "foobar.tf",
-			Start: hcl.Pos{
+			Start: dumb-hcl.Pos{
 				Line:   0,
 				Column: 0,
 				Byte:   0,
 			},
-			End: hcl.Pos{
+			End: dumb-hcl.Pos{
 				Line:   1,
 				Column: 1,
 				Byte:   1,
@@ -39,40 +39,40 @@ func TestDiagnosticComparer(t *testing.T) {
 	}{
 		// Correctly identifying things that match
 		"reports that identical diagnostics match": {
-			diag1:      hclDiagnostic{&baseError},
-			diag2:      hclDiagnostic{&baseError},
+			diag1:      dumb-hclDiagnostic{&baseError},
+			diag2:      dumb-hclDiagnostic{&baseError},
 			expectDiff: false,
 		},
 		// Correctly identifies when things don't match
 		"reports that diagnostics don't match if the concrete type differs": {
-			diag1:      hclDiagnostic{&baseError},
-			diag2:      makeRPCFriendlyDiag(hclDiagnostic{&baseError}),
+			diag1:      dumb-hclDiagnostic{&baseError},
+			diag2:      makeRPCFriendlyDiag(dumb-hclDiagnostic{&baseError}),
 			expectDiff: true,
 		},
 		"reports that diagnostics don't match if severity differs": {
-			diag1: hclDiagnostic{&baseError},
+			diag1: dumb-hclDiagnostic{&baseError},
 			diag2: func() Diagnostic {
 				d := baseError
-				d.Severity = hcl.DiagWarning
-				return hclDiagnostic{&d}
+				d.Severity = dumb-hcl.DiagWarning
+				return dumb-hclDiagnostic{&d}
 			}(),
 			expectDiff: true,
 		},
 		"reports that diagnostics don't match if summary differs": {
-			diag1: hclDiagnostic{&baseError},
+			diag1: dumb-hclDiagnostic{&baseError},
 			diag2: func() Diagnostic {
 				d := baseError
 				d.Summary = "altered summary"
-				return hclDiagnostic{&d}
+				return dumb-hclDiagnostic{&d}
 			}(),
 			expectDiff: true,
 		},
 		"reports that diagnostics don't match if detail differs": {
-			diag1: hclDiagnostic{&baseError},
+			diag1: dumb-hclDiagnostic{&baseError},
 			diag2: func() Diagnostic {
 				d := baseError
 				d.Detail = "altered detail"
-				return hclDiagnostic{&d}
+				return dumb-hclDiagnostic{&d}
 			}(),
 			expectDiff: true,
 		},

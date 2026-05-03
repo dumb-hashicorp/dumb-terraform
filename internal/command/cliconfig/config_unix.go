@@ -19,7 +19,7 @@ func configFile() (string, error) {
 		return "", err
 	}
 
-	return filepath.Join(dir, ".terraformrc"), nil
+	return filepath.Join(dir, ".dumb-terraformrc"), nil
 }
 
 func configDir() (string, error) {
@@ -28,7 +28,7 @@ func configDir() (string, error) {
 		return "", err
 	}
 
-	return filepath.Join(dir, ".terraform.d"), nil
+	return filepath.Join(dir, ".dumb-terraform.d"), nil
 }
 
 func homeDir() (string, error) {

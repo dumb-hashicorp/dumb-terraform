@@ -18,19 +18,19 @@ import (
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 	ctymsgpack "github.com/zclconf/go-cty/cty/msgpack"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/initwd"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/registry"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/initwd"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestEvalContext_Evaluate(t *testing.T) {
@@ -38,8 +38,8 @@ func TestEvalContext_Evaluate(t *testing.T) {
 		configs      map[string]string
 		state        *states.State
 		plan         *plans.Plan
-		variables    terraform.InputValues
-		testOnlyVars terraform.InputValues
+		variables    dumb-terraform.InputValues
+		testOnlyVars dumb-terraform.InputValues
 		provider     *testing_provider.MockProvider
 		priorOutputs map[string]cty.Value
 
@@ -54,7 +54,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						value = "Hello, world!"
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					run "test_case" {
 						assert {
 							condition = test_resource.a.value == "Hello, world!"
@@ -114,7 +114,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						value = var.value
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					variables {
 						value = "Hello, world!"
 					}
@@ -148,7 +148,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						Provider: addrs.NewDefaultProvider("test"),
 					})
 			}),
-			variables: terraform.InputValues{
+			variables: dumb-terraform.InputValues{
 				"value": {
 					Value: cty.StringVal("Hello, world!"),
 				},
@@ -179,7 +179,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						value = "Hello, world!"
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					run "test_case" {
 						assert {
 							condition = test_resource.a.value == "incorrect!"
@@ -241,7 +241,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						value = "Hello, world!"
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					run "test_case" {
 						assert {
 							condition = test_resource.a.value == "incorrect!"
@@ -313,7 +313,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						sensitive = true
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					run "test" {
 						variables {
 							input = "Hello, world!"
@@ -330,12 +330,12 @@ func TestEvalContext_Evaluate(t *testing.T) {
 				Changes: plans.NewChangesSrc(),
 			},
 			state: states.NewState(),
-			variables: terraform.InputValues{
-				"input": &terraform.InputValue{
+			variables: dumb-terraform.InputValues{
+				"input": &dumb-terraform.InputValue{
 					Value:      cty.StringVal("Hello, world!"),
-					SourceType: terraform.ValueFromConfig,
+					SourceType: dumb-terraform.ValueFromConfig,
 					SourceRange: tfdiags.SourceRange{
-						Filename: "main.tftest.hcl",
+						Filename: "main.tftest.dumb-hcl",
 						Start:    tfdiags.SourcePos{Line: 3, Column: 13, Byte: 12},
 						End:      tfdiags.SourcePos{Line: 3, Column: 28, Byte: 27},
 					},
@@ -354,7 +354,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						sensitive = true
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					run "test" {
 						variables {
 							input = "Hello, world!"
@@ -371,12 +371,12 @@ func TestEvalContext_Evaluate(t *testing.T) {
 				Changes: plans.NewChangesSrc(),
 			},
 			state: states.NewState(),
-			variables: terraform.InputValues{
-				"input": &terraform.InputValue{
+			variables: dumb-terraform.InputValues{
+				"input": &dumb-terraform.InputValue{
 					Value:      cty.StringVal("Hello, world!"),
-					SourceType: terraform.ValueFromConfig,
+					SourceType: dumb-terraform.ValueFromConfig,
 					SourceRange: tfdiags.SourceRange{
-						Filename: "main.tftest.hcl",
+						Filename: "main.tftest.dumb-hcl",
 						Start:    tfdiags.SourcePos{Line: 3, Column: 13, Byte: 12},
 						End:      tfdiags.SourcePos{Line: 3, Column: 28, Byte: 27},
 					},
@@ -388,7 +388,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 			expectedDiags: []tfdiags.Description{
 				{
 					Summary: "Error message refers to sensitive values",
-					Detail:  "The error expression used to explain this condition refers to sensitive values, so Terraform will not display the resulting message.\n\nYou can correct this by removing references to sensitive values, or by carefully using the nonsensitive() function if the expression will not reveal the sensitive data.",
+					Detail:  "The error expression used to explain this condition refers to sensitive values, so Dumb Terraform will not display the resulting message.\n\nYou can correct this by removing references to sensitive values, or by carefully using the nonsensitive() function if the expression will not reveal the sensitive data.",
 				},
 				{
 					Summary: "Test assertion failed",
@@ -402,7 +402,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						value = "Hello, world!"
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					run "test_case" {
 						command = plan
 
@@ -481,7 +481,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						value = "Hello, world!"
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					run "test_case" {
 						command = plan
 
@@ -566,7 +566,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						value = "Hello, world!"
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					run "setup" {}
 
 					run "test_case" {
@@ -632,7 +632,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						value = "bar value"
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					run "test_case" {}
 				`,
 			},
@@ -650,10 +650,10 @@ func TestEvalContext_Evaluate(t *testing.T) {
 		"provider_functions": {
 			configs: map[string]string{
 				"main.tf": `
-				    terraform {
+				    dumb-terraform {
                       required_providers {
 						test = {
-						  source = "hashicorp/test"
+						  source = "dumb-hashicorp/test"
                         }
                       }
                     }
@@ -661,7 +661,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 						value = true
 					}
 				`,
-				"main.tftest.hcl": `
+				"main.tftest.dumb-hcl": `
 					run "test_case" {
 						assert {
 							condition = provider::test::true() == output.true
@@ -703,7 +703,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			config := testModuleInline(t, test.configs)
 
-			tfCtx, diags := terraform.NewContext(&terraform.ContextOpts{
+			tfCtx, diags := dumb-terraform.NewContext(&dumb-terraform.ContextOpts{
 				Providers: map[addrs.Provider]providers.Factory{
 					addrs.NewDefaultProvider("test"): providers.FactoryFixed(test.provider),
 				},
@@ -715,7 +715,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 			// We just need a vaguely-realistic scope here, so we'll make
 			// a plan against the given config and state and use its
 			// resulting scope.
-			_, planScope, diags := tfCtx.PlanAndEval(config, test.state, &terraform.PlanOpts{
+			_, planScope, diags := tfCtx.PlanAndEval(config, test.state, &dumb-terraform.PlanOpts{
 				Mode:         plans.NormalMode,
 				SetVariables: test.variables,
 			})
@@ -723,7 +723,7 @@ func TestEvalContext_Evaluate(t *testing.T) {
 				t.Fatalf("unexpected errors\n%s", diags.Err().Error())
 			}
 
-			file := config.Module.Tests["main.tftest.hcl"]
+			file := config.Module.Tests["main.tftest.dumb-hcl"]
 			run := &moduletest.Run{
 				Config:       file.Runs[len(file.Runs)-1], // We always simulate the last run block.
 				Name:         "test_case",                 // and it should be named test_case
@@ -847,12 +847,12 @@ func testModuleInline(t *testing.T, sources map[string]string) *configs.Config {
 		t.Fatalf("failed to refresh modules after installation: %s", err)
 	}
 
-	rootMod, hclDiags := loader.LoadRootModuleWithTests(cfgPath, "tests")
-	if hclDiags.HasErrors() {
-		t.Fatal(hclDiags.Error())
+	rootMod, dumb-hclDiags := loader.LoadRootModuleWithTests(cfgPath, "tests")
+	if dumb-hclDiags.HasErrors() {
+		t.Fatal(dumb-hclDiags.Error())
 	}
 
-	config, diags := terraform.BuildConfigWithGraph(
+	config, diags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		nil,

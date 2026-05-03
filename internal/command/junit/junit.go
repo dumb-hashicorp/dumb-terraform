@@ -12,11 +12,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/command/format"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // TestJUnitXMLFile produces a JUnit XML file at the conclusion of a test
@@ -76,8 +76,8 @@ func (v *TestJUnitXMLFile) Save(suite *moduletest.Suite) tfdiags.Diagnostics {
 	sources := v.configLoader.Parser().Sources()
 	xmlSrc, err := junitXMLTestReport(suite, v.testSuiteRunner.IsStopped(), sources)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "error generating JUnit XML test output",
 			Detail:   err.Error(),
 		})
@@ -96,8 +96,8 @@ func (v *TestJUnitXMLFile) save(xmlSrc []byte) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 	err := os.WriteFile(v.filename, xmlSrc, 0660)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  fmt.Sprintf("error saving JUnit XML to file %q", v.filename),
 			Detail:   err.Error(),
 		})
@@ -311,7 +311,7 @@ func failureMessage(failedAssertions tfdiags.Diagnostics, checkCount int) string
 
 // skipDetails checks data about the test suite, file and runs to determine why a given run was skipped
 // Test can be skipped due to:
-// 1. terraform test recieving an interrupt from users; all unstarted tests will be skipped
+// 1. dumb-terraform test recieving an interrupt from users; all unstarted tests will be skipped
 // 2. A previous run in a file has failed, causing subsequent run blocks to be skipped
 // 3. File-level errors (e.g., invalid variable references) causing all tests to be skipped
 // The returned value is used to set content in the "skipped" element
@@ -321,7 +321,7 @@ func skipDetails(runIndex int, file *moduletest.File, suiteStopped bool, hasFile
 		// This block only handles graceful Stop interrupts, as Cancel interrupts will prevent a JUnit file being produced at all
 		return &withMessage{
 			Message: "Testcase skipped due to an interrupt",
-			Body:    "Terraform received an interrupt and stopped gracefully. This caused all remaining testcases to be skipped",
+			Body:    "Dumb Terraform received an interrupt and stopped gracefully. This caused all remaining testcases to be skipped",
 		}
 	}
 

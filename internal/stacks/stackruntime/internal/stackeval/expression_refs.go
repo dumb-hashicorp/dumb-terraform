@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Referrer is implemented by types that have expressions that can refer to
@@ -25,12 +25,12 @@ type Referrer interface {
 }
 
 // ReferencesInExpr returns all of the valid references contained in the given
-// HCL expression.
+// DUMB_HCL expression.
 //
 // It ignores any invalid references, on the assumption that the expression
 // will eventually be evaluated and then those invalid references would be
 // reported as errors at that point.
-func ReferencesInExpr(expr hcl.Expression) []stackaddrs.Reference {
+func ReferencesInExpr(expr dumb-hcl.Expression) []stackaddrs.Reference {
 	if expr == nil {
 		return nil
 	}
@@ -38,19 +38,19 @@ func ReferencesInExpr(expr hcl.Expression) []stackaddrs.Reference {
 }
 
 // ReferencesInBody returns all of the valid references contained in the given
-// HCL body.
+// DUMB_HCL body.
 //
 // It ignores any invalid references, on the assumption that the body
 // will eventually be evaluated and then those invalid references would be
 // reported as errors at that point.
-func ReferencesInBody(body hcl.Body, spec hcldec.Spec) []stackaddrs.Reference {
+func ReferencesInBody(body dumb-hcl.Body, spec dumb-hcldec.Spec) []stackaddrs.Reference {
 	if body == nil {
 		return nil
 	}
-	return referencesInTraversals(hcldec.Variables(body, spec))
+	return referencesInTraversals(dumb-hcldec.Variables(body, spec))
 }
 
-func referencesInTraversals(traversals []hcl.Traversal) []stackaddrs.Reference {
+func referencesInTraversals(traversals []dumb-hcl.Traversal) []stackaddrs.Reference {
 	if len(traversals) == 0 {
 		return nil
 	}
@@ -220,7 +220,7 @@ func (m *Main) requiredComponentsForReferrer(ctx context.Context, obj Referrer, 
 //
 // The StackConfig argument should be the stack that the component or embedded
 // stack is a part of. It is used to validate any references actually exist.
-func ValidateDependsOn(source *StackConfig, traversals []hcl.Traversal) tfdiags.Diagnostics {
+func ValidateDependsOn(source *StackConfig, traversals []dumb-hcl.Traversal) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 	for _, traversal := range traversals {
 		// We don't actually care about the result here, only that it has no
@@ -235,29 +235,29 @@ func ValidateDependsOn(source *StackConfig, traversals []hcl.Traversal) tfdiags.
 		case stackaddrs.StackCall:
 			// Make sure this stack call exists.
 			if source.StackCall(addr) == nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid depends_on target",
 					Detail:   fmt.Sprintf("The depends_on reference %q does not exist.", addr),
-					Subject:  ref.SourceRange.ToHCL().Ptr(),
+					Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 				})
 			}
 		case stackaddrs.Component:
 			// Make sure this component exists.
 			if source.Component(addr) == nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid depends_on target",
 					Detail:   fmt.Sprintf("The depends_on reference %q does not exist.", addr),
-					Subject:  ref.SourceRange.ToHCL().Ptr(),
+					Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 				})
 			}
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid depends_on target",
 				Detail:   fmt.Sprintf("The depends_on argument must refer to an embedded stack or component, but this reference refers to %q.", addr),
-				Subject:  ref.SourceRange.ToHCL().Ptr(),
+				Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 			continue // don't do the rest of the checks
 		}
@@ -276,11 +276,11 @@ func ValidateDependsOn(source *StackConfig, traversals []hcl.Traversal) tfdiags.
 			//   AbsComponentInstance instead of AbsComponent. This is a
 			//   potentially large refactor, and so only worth it for good
 			//   reason and this isn't really that.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagWarning,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagWarning,
 				Summary:  "Non-valid depends_on target",
 				Detail:   fmt.Sprintf(DependsOnDeepReferenceDetail, ref.Target),
-				Subject:  ref.SourceRange.ToHCL().Ptr(),
+				Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 		}
 	}
@@ -292,6 +292,6 @@ var (
 	DependsOnDeepReferenceDetail = strings.TrimSpace(`
 The depends_on argument should refer directly to an embedded stack or component in configuration, but this reference is too deep.
 
-Terraform Stacks has simplified the reference to the nearest valid target, %q. To remove this warning, update the configuration to the same target.
+Dumb Terraform Stacks has simplified the reference to the nearest valid target, %q. To remove this warning, update the configuration to the same target.
 `)
 )

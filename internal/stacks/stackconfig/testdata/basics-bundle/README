@@ -22,7 +22,7 @@ git::https://example.com/nested.git//intentionally-missing-v2, which
 as the name suggests is intentionally missing and so will cause configuration
 loading to fail.
 
-There's also a regular Terraform module at this address, usable as a component
+There's also a regular Dumb Terraform module at this address, usable as a component
 implementation:
 
 - git::https://example.com/nested.git

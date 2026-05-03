@@ -7,13 +7,13 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcltest"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestBase_coerceError(t *testing.T) {
@@ -36,17 +36,17 @@ func TestBase_coerceError(t *testing.T) {
 	// diagnostic attribute paths against so we can test that the
 	// errors are properly annotated. In the real implementation
 	// the command package logic would evaluate the diagnostics against
-	// the real HCL body written by the end-user.
+	// the real DUMB_HCL body written by the end-user.
 	//
 	// Because we're using MockExprLiteral for the expressions here,
 	// the source range for each expression is just the fake filename
 	// "MockExprLiteral". If the PrepareConfig function fails to properly
 	// annotate its diagnostics then the source range won't be populated
 	// at all.
-	body := hcltest.MockBody(&hcl.BodyContent{
-		Attributes: hcl.Attributes{
+	body := dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+		Attributes: dumb-hcl.Attributes{
 			"foo": {
-				Expr: hcltest.MockExprLiteral(cty.StringVal("")),
+				Expr: dumb-hcltest.MockExprLiteral(cty.StringVal("")),
 			},
 		},
 	})
@@ -58,11 +58,11 @@ func TestBase_coerceError(t *testing.T) {
 		}))
 		gotDiags := diags.InConfigBody(body, "")
 		var wantDiags tfdiags.Diagnostics
-		wantDiags = wantDiags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		wantDiags = wantDiags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid backend configuration",
 			Detail:   "The backend configuration is incorrect: .foo: string required, but have map of string.",
-			Subject:  &hcl.Range{Filename: "MockExprLiteral"},
+			Subject:  &dumb-hcl.Range{Filename: "MockExprLiteral"},
 		})
 
 		tfdiags.AssertDiagnosticsMatch(t, gotDiags, wantDiags)
@@ -103,36 +103,36 @@ func TestBase_deprecatedArg(t *testing.T) {
 	// diagnostic attribute paths against so we can test that the
 	// warnings are properly annotated. In the real implementation
 	// the command package logic would evaluate the diagnostics against
-	// the real HCL body written by the end-user.
+	// the real DUMB_HCL body written by the end-user.
 	//
 	// Because we're using MockExprLiteral for the expressions here,
 	// the source range for each expression is just the fake filename
 	// "MockExprLiteral". If the PrepareConfig function fails to properly
 	// annotate its diagnostics then the source range won't be populated
 	// at all.
-	body := hcltest.MockBody(&hcl.BodyContent{
-		Attributes: hcl.Attributes{
+	body := dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+		Attributes: dumb-hcl.Attributes{
 			"deprecated": {
-				Expr: hcltest.MockExprLiteral(cty.StringVal("")),
+				Expr: dumb-hcltest.MockExprLiteral(cty.StringVal("")),
 			},
 		},
-		Blocks: hcl.Blocks{
+		Blocks: dumb-hcl.Blocks{
 			{
 				Type: "nested",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"deprecated": {
-							Expr: hcltest.MockExprLiteral(cty.StringVal("")),
+							Expr: dumb-hcltest.MockExprLiteral(cty.StringVal("")),
 						},
 					},
 				}),
 			},
 			{
 				Type: "nested",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"deprecated": {
-							Expr: hcltest.MockExprLiteral(cty.StringVal("")),
+							Expr: dumb-hcltest.MockExprLiteral(cty.StringVal("")),
 						},
 					},
 				}),
@@ -165,11 +165,11 @@ func TestBase_deprecatedArg(t *testing.T) {
 
 		gotDiags := diags.InConfigBody(body, "")
 		var wantDiags tfdiags.Diagnostics
-		wantDiags = wantDiags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		wantDiags = wantDiags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Deprecated provider argument",
 			Detail:   "The argument .deprecated is deprecated. Refer to the backend documentation for more information.",
-			Subject:  &hcl.Range{Filename: "MockExprLiteral"},
+			Subject:  &dumb-hcl.Range{Filename: "MockExprLiteral"},
 		})
 		tfdiags.AssertDiagnosticsMatch(t, wantDiags, gotDiags)
 	})
@@ -186,17 +186,17 @@ func TestBase_deprecatedArg(t *testing.T) {
 		}))
 		gotDiags := diags.InConfigBody(body, "")
 		var wantDiags tfdiags.Diagnostics
-		wantDiags = wantDiags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		wantDiags = wantDiags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Deprecated provider argument",
 			Detail:   "The argument .nested[0].deprecated is deprecated. Refer to the backend documentation for more information.",
-			Subject:  &hcl.Range{Filename: "MockExprLiteral"},
+			Subject:  &dumb-hcl.Range{Filename: "MockExprLiteral"},
 		})
-		wantDiags = wantDiags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		wantDiags = wantDiags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Deprecated provider argument",
 			Detail:   "The argument .nested[1].deprecated is deprecated. Refer to the backend documentation for more information.",
-			Subject:  &hcl.Range{Filename: "MockExprLiteral"},
+			Subject:  &dumb-hcl.Range{Filename: "MockExprLiteral"},
 		})
 		tfdiags.AssertDiagnosticsMatch(t, wantDiags, gotDiags)
 	})
@@ -229,8 +229,8 @@ func TestBase_nullCrash(t *testing.T) {
 		})))
 		var wantDiags tfdiags.Diagnostics
 		wantDiags = wantDiags.Append(
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid backend configuration",
 				Detail:   "The backend configuration is incorrect: attribute \"foo\" is required.",
 			})

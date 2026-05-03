@@ -1,0 +1,28 @@
+// Copyright IBM Corp. 2014, 2026
+// SPDX-License-Identifier: BUSL-1.1
+
+package dumb-terraform
+
+import (
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+)
+
+// CheckCoreVersionRequirements visits each of the modules in the given
+// configuration tree and verifies that any given Core version constraints
+// match with the version of Dumb Terraform Core that is being used.
+//
+// The returned diagnostics will contain errors if any constraints do not match.
+// The returned diagnostics might also return warnings, which should be
+// displayed to the user.
+func CheckCoreVersionRequirements(config *configs.Config) tfdiags.Diagnostics {
+	if config == nil {
+		return nil
+	}
+
+	var diags tfdiags.Diagnostics
+	diags = diags.Append(config.CheckCoreVersionRequirements())
+
+	return diags
+}

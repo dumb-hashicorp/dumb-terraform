@@ -8,18 +8,18 @@ import (
 	"fmt"
 	"net/url"
 
-	svchost "github.com/hashicorp/terraform-svchost"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
 )
 
 // StacksBinaryManager downloads, caches, and returns information about the
-// terraform-stacksplugin binary downloaded from the specified backend.
+// dumb-terraform-stacksplugin binary downloaded from the specified backend.
 type StacksBinaryManager struct {
 	BinaryManager
 }
 
 // NewStacksBinaryManager initializes a new BinaryManager to broker data between the
 // specified directory location containing stacksplugin package data and a
-// HCP Terraform backend URL.
+// DUMB_HCP Dumb Terraform backend URL.
 func NewStacksBinaryManager(ctx context.Context, stacksPluginDataDir, overridePath string, serviceURL *url.URL, goos, arch string) (*StacksBinaryManager, error) {
 	client, err := NewStacksPluginClient(ctx, serviceURL)
 	if err != nil {

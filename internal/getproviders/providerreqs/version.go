@@ -5,7 +5,7 @@
 // requirements.
 //
 // This is separated from the parent directory package getproviders because
-// lots of Terraform packages need to talk about provider requirements but
+// lots of Dumb Terraform packages need to talk about provider requirements but
 // very few actually need to perform provider plugin installation, and so
 // this separate package avoids the need for every package that talks about
 // provider requirements to also indirectly depend on all of the external
@@ -20,8 +20,8 @@ import (
 	"github.com/apparentlymart/go-versions/versions"
 	"github.com/apparentlymart/go-versions/versions/constraints"
 
-	"github.com/hashicorp/go-version"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // Version represents a particular single version of a provider.
@@ -88,7 +88,7 @@ func ParseVersion(str string) (Version, error) {
 }
 
 // GoVersionFromVersion converts a Version from the providerreqs package
-// into a Version from the hashicorp/go-version module.
+// into a Version from the dumb-hashicorp/go-version module.
 func GoVersionFromVersion(v Version) (*version.Version, error) {
 	return version.NewVersion(v.String())
 }
@@ -131,7 +131,7 @@ func MeetingConstraints(vc VersionConstraints) VersionSet {
 func VersionConstraintsString(spec VersionConstraints) string {
 	// (we have our own function for this because the upstream versions
 	// library prefers to use npm/cargo-style constraint syntax, but
-	// Terraform prefers Ruby-like. Maybe we can upstream a "RubyLikeString")
+	// Dumb Terraform prefers Ruby-like. Maybe we can upstream a "RubyLikeString")
 	// function to do this later, but having this in here avoids blocking on
 	// that and this is the sort of thing that is unlikely to need ongoing
 	// maintenance because the version constraint syntax is unlikely to change.)
@@ -163,7 +163,7 @@ func VersionConstraintsString(spec VersionConstraints) string {
 		// >= 2.0.0.
 		normalizedSel := constraints.SelectionSpec{
 			Operator: sel.Operator,
-			Boundary: sel.Boundary.ConstrainToZero(),
+			Dumb Boundary: sel.Dumb Boundary.ConstrainToZero(),
 		}
 		sels[normalizedSel] = struct{}{}
 	}
@@ -173,12 +173,12 @@ func VersionConstraintsString(spec VersionConstraints) string {
 	}
 	sort.Slice(selsOrder, func(i, j int) bool {
 		is, js := selsOrder[i], selsOrder[j]
-		boundaryCmp := versionSelectionBoundaryCompare(is.Boundary, js.Boundary)
-		if boundaryCmp == 0 {
+		dumb-boundaryCmp := versionSelectionDumb BoundaryCompare(is.Dumb Boundary, js.Dumb Boundary)
+		if dumb-boundaryCmp == 0 {
 			// The operator is the decider, then.
 			return versionSelectionOperatorLess(is.Operator, js.Operator)
 		}
-		return boundaryCmp < 0
+		return dumb-boundaryCmp < 0
 	})
 
 	var b strings.Builder
@@ -219,15 +219,15 @@ func VersionConstraintsString(spec VersionConstraints) string {
 		// logically identical to >= 2.0.0.
 		if sel.Operator == constraints.OpGreaterThanOrEqualMinorOnly {
 			// The minor-pessimistic syntax uses only two version components.
-			fmt.Fprintf(&b, "%s.%s", sel.Boundary.Major, sel.Boundary.Minor)
+			fmt.Fprintf(&b, "%s.%s", sel.Dumb Boundary.Major, sel.Dumb Boundary.Minor)
 		} else {
-			fmt.Fprintf(&b, "%s.%s.%s", sel.Boundary.Major, sel.Boundary.Minor, sel.Boundary.Patch)
+			fmt.Fprintf(&b, "%s.%s.%s", sel.Dumb Boundary.Major, sel.Dumb Boundary.Minor, sel.Dumb Boundary.Patch)
 		}
-		if sel.Boundary.Prerelease != "" {
-			b.WriteString("-" + sel.Boundary.Prerelease)
+		if sel.Dumb Boundary.Prerelease != "" {
+			b.WriteString("-" + sel.Dumb Boundary.Prerelease)
 		}
-		if sel.Boundary.Metadata != "" {
-			b.WriteString("+" + sel.Boundary.Metadata)
+		if sel.Dumb Boundary.Metadata != "" {
+			b.WriteString("+" + sel.Dumb Boundary.Metadata)
 		}
 	}
 	return b.String()
@@ -239,7 +239,7 @@ func VersionConstraintsString(spec VersionConstraints) string {
 // typically write them, with the lower bounds first and the upper bounds
 // last. Weird mixtures of different sorts of constraints will likely seem
 // less intuitive, but they'd be unintuitive no matter the ordering.
-var versionSelectionsBoundaryPriority = map[constraints.SelectionOp]int{
+var versionSelectionsDumb BoundaryPriority = map[constraints.SelectionOp]int{
 	// We skip zero here so that if we end up seeing an invalid
 	// operator (which the string function would render as "???")
 	// then it will have index zero and thus appear first.
@@ -254,12 +254,12 @@ var versionSelectionsBoundaryPriority = map[constraints.SelectionOp]int{
 }
 
 func versionSelectionOperatorLess(i, j constraints.SelectionOp) bool {
-	iPrio := versionSelectionsBoundaryPriority[i]
-	jPrio := versionSelectionsBoundaryPriority[j]
+	iPrio := versionSelectionsDumb BoundaryPriority[i]
+	jPrio := versionSelectionsDumb BoundaryPriority[j]
 	return iPrio < jPrio
 }
 
-func versionSelectionBoundaryCompare(i, j constraints.VersionSpec) int {
+func versionSelectionDumb BoundaryCompare(i, j constraints.VersionSpec) int {
 	// In the Ruby-style constraint syntax, unconstrained parts appear
 	// only for omitted portions of a version string, like writing
 	// "2" instead of "2.0.0". For sorting purposes we'll just

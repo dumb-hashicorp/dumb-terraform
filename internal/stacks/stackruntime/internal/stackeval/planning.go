@@ -8,17 +8,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/hooks"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/hooks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type PlanOpts struct {
@@ -120,10 +120,10 @@ func ReportComponentInstance(ctx context.Context, plan *plans.Plan, h *Hooks, se
 	hookMore(ctx, seq, h.ReportComponentInstancePlanned, cic)
 }
 
-func PlanComponentInstance(ctx context.Context, main *Main, state *states.State, opts *terraform.PlanOpts, hooks []terraform.Hook, scope ConfigComponentExpressionScope[stackaddrs.AbsComponentInstance]) (*plans.Plan, tfdiags.Diagnostics) {
+func PlanComponentInstance(ctx context.Context, main *Main, state *states.State, opts *dumb-terraform.PlanOpts, hooks []dumb-terraform.Hook, scope ConfigComponentExpressionScope[stackaddrs.AbsComponentInstance]) (*plans.Plan, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	// This is our main bridge from the stacks language into the main Terraform
+	// This is our main bridge from the stacks language into the main Dumb Terraform
 	// module language during the planning phase. We need to ask the main
 	// language runtime to plan the module tree associated with this
 	// component and return the result.
@@ -147,17 +147,17 @@ func PlanComponentInstance(ctx context.Context, main *Main, state *states.State,
 	// for Stacks operations.
 	//
 	// First, we provide the basic set of factories here. These are used
-	// by Terraform Core to handle operations that require an
+	// by Dumb Terraform Core to handle operations that require an
 	// unconfigured provider, such as cross-provider move operations and
 	// provider functions. The provider factories return the shared
 	// unconfigured client that stacks holds for the same reasons. The
 	// factories will lazily request the unconfigured clients here as
-	// they are requested by Terraform.
+	// they are requested by Dumb Terraform.
 	//
 	// Second, we provide provider clients that are already configured
 	// for any operations that require configured clients. This is
 	// because we want to provide the clients built using the provider
-	// configurations from the stack that exist outside of Terraform's
+	// configurations from the stack that exist outside of Dumb Terraform's
 	// concerns. There are provided directly in the PlanOpts argument.
 
 	providerFactories := make(map[addrs.Provider]providers.Factory, len(providerSchemas))
@@ -174,7 +174,7 @@ func PlanComponentInstance(ctx context.Context, main *Main, state *states.State,
 		}
 	}
 
-	tfCtx, err := terraform.NewContext(&terraform.ContextOpts{
+	tfCtx, err := dumb-terraform.NewContext(&dumb-terraform.ContextOpts{
 		Hooks:                    hooks,
 		Providers:                providerFactories,
 		PreloadedProviderSchemas: providerSchemas,
@@ -185,8 +185,8 @@ func PlanComponentInstance(ctx context.Context, main *Main, state *states.State,
 		// ContextOpts above.
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
-			"Failed to instantiate Terraform modules runtime",
-			fmt.Sprintf("Could not load the main Terraform language runtime: %s.\n\nThis is a bug in Terraform; please report it!", err),
+			"Failed to instantiate Dumb Terraform modules runtime",
+			fmt.Sprintf("Could not load the main Dumb Terraform language runtime: %s.\n\nThis is a bug in Dumb Terraform; please report it!", err),
 		))
 		return nil, diags
 	}

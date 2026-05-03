@@ -12,11 +12,11 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/command/jsonstate"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 type ActionInvocation struct {
@@ -94,7 +94,7 @@ func ActionInvocationCompare(a, b ActionInvocation) int {
 	return 0
 }
 
-func MarshalActionInvocations(actions []*plans.ActionInvocationInstanceSrc, schemas *terraform.Schemas) ([]ActionInvocation, error) {
+func MarshalActionInvocations(actions []*plans.ActionInvocationInstanceSrc, schemas *dumb-terraform.Schemas) ([]ActionInvocation, error) {
 	ret := make([]ActionInvocation, 0, len(actions))
 	for _, action := range actions {
 		ai, err := MarshalActionInvocation(action, schemas)
@@ -106,7 +106,7 @@ func MarshalActionInvocations(actions []*plans.ActionInvocationInstanceSrc, sche
 	return ret, nil
 }
 
-func MarshalActionInvocation(action *plans.ActionInvocationInstanceSrc, schemas *terraform.Schemas) (ActionInvocation, error) {
+func MarshalActionInvocation(action *plans.ActionInvocationInstanceSrc, schemas *dumb-terraform.Schemas) (ActionInvocation, error) {
 	ai := ActionInvocation{
 		Address:      action.Addr.String(),
 		Type:         action.Addr.Action.Action.Type,
@@ -193,7 +193,7 @@ type DeferredActionInvocation struct {
 	ActionInvocation ActionInvocation `json:"action_invocation"`
 }
 
-func MarshalDeferredActionInvocations(dais []*plans.DeferredActionInvocationSrc, schemas *terraform.Schemas) ([]DeferredActionInvocation, error) {
+func MarshalDeferredActionInvocations(dais []*plans.DeferredActionInvocationSrc, schemas *dumb-terraform.Schemas) ([]DeferredActionInvocation, error) {
 	var deferredInvocations []DeferredActionInvocation
 
 	sortedActions := append([]*plans.DeferredActionInvocationSrc{}, dais...)

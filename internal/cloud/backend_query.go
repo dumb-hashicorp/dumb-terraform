@@ -13,13 +13,13 @@ import (
 	"strings"
 	"time"
 
-	tfe "github.com/hashicorp/go-tfe"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/jsonformat"
-	viewsjson "github.com/hashicorp/terraform/internal/command/views/json"
-	"github.com/hashicorp/terraform/internal/genconfig"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat"
+	viewsjson "github.com/dumb-hashicorp/dumb-terraform/internal/command/views/json"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/genconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 )
@@ -252,7 +252,7 @@ func (b *Cloud) waitForQueryRun(stopCtx, cancelCtx context.Context, r *tfe.Query
 }
 
 func (b *Cloud) cancelQueryRun(cancelCtx context.Context, op *backendrun.Operation, r *tfe.QueryRun) error {
-	v, err := op.UIIn.Input(cancelCtx, &terraform.InputOpts{
+	v, err := op.UIIn.Input(cancelCtx, &dumb-terraform.InputOpts{
 		Id:          "cancel",
 		Query:       "\nDo you want to cancel the remote operation?",
 		Description: "Only 'yes' will be accepted to cancel.",

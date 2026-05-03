@@ -8,10 +8,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcltest"
-	"github.com/hashicorp/terraform/internal/addrs"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -35,30 +35,30 @@ var (
 		}
 		return true
 	})
-	blockRange = hcl.Range{
+	blockRange = dumb-hcl.Range{
 		Filename: "mock.tf",
-		Start:    hcl.Pos{Line: 3, Column: 12, Byte: 27},
-		End:      hcl.Pos{Line: 3, Column: 19, Byte: 34},
+		Start:    dumb-hcl.Pos{Line: 3, Column: 12, Byte: 27},
+		End:      dumb-hcl.Pos{Line: 3, Column: 19, Byte: 34},
 	}
-	mockRange = hcl.Range{
+	mockRange = dumb-hcl.Range{
 		Filename: "MockExprLiteral",
 	}
 )
 
 func TestDecodeRequiredProvidersBlock(t *testing.T) {
 	tests := map[string]struct {
-		Block *hcl.Block
+		Block *dumb-hcl.Block
 		Want  *RequiredProviders
 		Error string
 	}{
 		"legacy": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"default": {
 							Name: "default",
-							Expr: hcltest.MockExprLiteral(cty.StringVal("1.0.0")),
+							Expr: dumb-hcltest.MockExprLiteral(cty.StringVal("1.0.0")),
 						},
 					},
 				}),
@@ -77,13 +77,13 @@ func TestDecodeRequiredProvidersBlock(t *testing.T) {
 			},
 		},
 		"provider source": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"my-test": {
 							Name: "my-test",
-							Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+							Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 								"source":  cty.StringVal("mycloud/test"),
 								"version": cty.StringVal("2.0.0"),
 							})),
@@ -106,17 +106,17 @@ func TestDecodeRequiredProvidersBlock(t *testing.T) {
 			},
 		},
 		"mixed": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"legacy": {
 							Name: "legacy",
-							Expr: hcltest.MockExprLiteral(cty.StringVal("1.0.0")),
+							Expr: dumb-hcltest.MockExprLiteral(cty.StringVal("1.0.0")),
 						},
 						"my-test": {
 							Name: "my-test",
-							Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+							Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 								"source":  cty.StringVal("mycloud/test"),
 								"version": cty.StringVal("2.0.0"),
 							})),
@@ -145,13 +145,13 @@ func TestDecodeRequiredProvidersBlock(t *testing.T) {
 			},
 		},
 		"version-only block": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"test": {
 							Name: "test",
-							Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+							Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 								"version": cty.StringVal("~>2.0.0"),
 							})),
 						},
@@ -172,13 +172,13 @@ func TestDecodeRequiredProvidersBlock(t *testing.T) {
 			},
 		},
 		"invalid source": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"my-test": {
 							Name: "my-test",
-							Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+							Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 								"source":  cty.StringVal("some/invalid/provider/source/test"),
 								"version": cty.StringVal("~>2.0.0"),
 							})),
@@ -194,13 +194,13 @@ func TestDecodeRequiredProvidersBlock(t *testing.T) {
 			Error: "Invalid provider source string",
 		},
 		"invalid localname": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"my_test": {
 							Name: "my_test",
-							Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+							Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 								"version": cty.StringVal("~>2.0.0"),
 							})),
 						},
@@ -215,13 +215,13 @@ func TestDecodeRequiredProvidersBlock(t *testing.T) {
 			Error: "Invalid provider local name",
 		},
 		"invalid localname caps": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"MYTEST": {
 							Name: "MYTEST",
-							Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+							Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 								"version": cty.StringVal("~>2.0.0"),
 							})),
 						},
@@ -236,13 +236,13 @@ func TestDecodeRequiredProvidersBlock(t *testing.T) {
 			Error: "Invalid provider local name",
 		},
 		"version constraint error": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"my-test": {
 							Name: "my-test",
-							Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+							Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 								"source":  cty.StringVal("mycloud/test"),
 								"version": cty.StringVal("invalid"),
 							})),
@@ -258,13 +258,13 @@ func TestDecodeRequiredProvidersBlock(t *testing.T) {
 			Error: "Invalid version constraint",
 		},
 		"invalid required_providers attribute value": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"test": {
 							Name: "test",
-							Expr: hcltest.MockExprLiteral(cty.ListVal([]cty.Value{cty.StringVal("2.0.0")})),
+							Expr: dumb-hcltest.MockExprLiteral(cty.ListVal([]cty.Value{cty.StringVal("2.0.0")})),
 						},
 					},
 				}),
@@ -277,13 +277,13 @@ func TestDecodeRequiredProvidersBlock(t *testing.T) {
 			Error: "Invalid required_providers object",
 		},
 		"invalid source attribute type": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"my-test": {
 							Name: "my-test",
-							Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+							Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 								"source": cty.DynamicVal,
 							})),
 						},
@@ -298,13 +298,13 @@ func TestDecodeRequiredProvidersBlock(t *testing.T) {
 			Error: "Invalid source",
 		},
 		"additional attributes": {
-			Block: &hcl.Block{
+			Block: &dumb-hcl.Block{
 				Type: "required_providers",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"my-test": {
 							Name: "my-test",
-							Expr: hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
+							Expr: dumb-hcltest.MockExprLiteral(cty.ObjectVal(map[string]cty.Value{
 								"source":  cty.StringVal("mycloud/test"),
 								"version": cty.StringVal("2.0.0"),
 								"invalid": cty.BoolVal(true),
@@ -347,6 +347,6 @@ func testVC(ver string) VersionConstraint {
 	constraint, _ := version.NewConstraint(ver)
 	return VersionConstraint{
 		Required:  constraint,
-		DeclRange: hcl.Range{},
+		DeclRange: dumb-hcl.Range{},
 	}
 }

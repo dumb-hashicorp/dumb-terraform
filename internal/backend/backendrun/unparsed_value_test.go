@@ -8,13 +8,13 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestUnparsedValue(t *testing.T) {
@@ -32,10 +32,10 @@ func TestUnparsedValue(t *testing.T) {
 			Type:           cty.String,
 			ConstraintType: cty.String,
 			ParsingMode:    configs.VariableParseLiteral,
-			DeclRange: hcl.Range{
+			DeclRange: dumb-hcl.Range{
 				Filename: "fake.tf",
-				Start:    hcl.Pos{Line: 2, Column: 1, Byte: 0},
-				End:      hcl.Pos{Line: 2, Column: 1, Byte: 0},
+				Start:    dumb-hcl.Pos{Line: 2, Column: 1, Byte: 0},
+				End:      dumb-hcl.Pos{Line: 2, Column: 1, Byte: 0},
 			},
 		},
 		"missing1": {
@@ -43,10 +43,10 @@ func TestUnparsedValue(t *testing.T) {
 			Type:           cty.String,
 			ConstraintType: cty.String,
 			ParsingMode:    configs.VariableParseLiteral,
-			DeclRange: hcl.Range{
+			DeclRange: dumb-hcl.Range{
 				Filename: "fake.tf",
-				Start:    hcl.Pos{Line: 3, Column: 1, Byte: 0},
-				End:      hcl.Pos{Line: 3, Column: 1, Byte: 0},
+				Start:    dumb-hcl.Pos{Line: 3, Column: 1, Byte: 0},
+				End:      dumb-hcl.Pos{Line: 3, Column: 1, Byte: 0},
 			},
 		},
 		"missing2": {
@@ -55,10 +55,10 @@ func TestUnparsedValue(t *testing.T) {
 			ConstraintType: cty.String,
 			ParsingMode:    configs.VariableParseLiteral,
 			Default:        cty.StringVal("default for missing2"),
-			DeclRange: hcl.Range{
+			DeclRange: dumb-hcl.Range{
 				Filename: "fake.tf",
-				Start:    hcl.Pos{Line: 4, Column: 1, Byte: 0},
-				End:      hcl.Pos{Line: 4, Column: 1, Byte: 0},
+				Start:    dumb-hcl.Pos{Line: 4, Column: 1, Byte: 0},
+				End:      dumb-hcl.Pos{Line: 4, Column: 1, Byte: 0},
 			},
 		},
 	}
@@ -73,10 +73,10 @@ func TestUnparsedValue(t *testing.T) {
 			t.Fatalf("wrong number of diagnostics %d; want %d", got, want)
 		}
 
-		wantVals := terraform.InputValues{
+		wantVals := dumb-terraform.InputValues{
 			"declared1": {
 				Value:      cty.StringVal("5"),
-				SourceType: terraform.ValueFromNamedFile,
+				SourceType: dumb-terraform.ValueFromNamedFile,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tfvars",
 					Start:    tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
@@ -109,10 +109,10 @@ func TestUnparsedValue(t *testing.T) {
 			t.Errorf("wrong summary for diagnostic 2\ngot:  %s\nwant: %s", got, want)
 		}
 
-		wantVals := terraform.InputValues{
+		wantVals := dumb-terraform.InputValues{
 			"undeclared0": {
 				Value:      cty.StringVal("0"),
-				SourceType: terraform.ValueFromNamedFile,
+				SourceType: dumb-terraform.ValueFromNamedFile,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tfvars",
 					Start:    tfdiags.SourcePos{Line: 1, Column: 1},
@@ -121,7 +121,7 @@ func TestUnparsedValue(t *testing.T) {
 			},
 			"undeclared1": {
 				Value:      cty.StringVal("1"),
-				SourceType: terraform.ValueFromNamedFile,
+				SourceType: dumb-terraform.ValueFromNamedFile,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tfvars",
 					Start:    tfdiags.SourcePos{Line: 1, Column: 1},
@@ -130,7 +130,7 @@ func TestUnparsedValue(t *testing.T) {
 			},
 			"undeclared2": {
 				Value:      cty.StringVal("2"),
-				SourceType: terraform.ValueFromNamedFile,
+				SourceType: dumb-terraform.ValueFromNamedFile,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tfvars",
 					Start:    tfdiags.SourcePos{Line: 1, Column: 1},
@@ -139,7 +139,7 @@ func TestUnparsedValue(t *testing.T) {
 			},
 			"undeclared3": {
 				Value:      cty.StringVal("3"),
-				SourceType: terraform.ValueFromNamedFile,
+				SourceType: dumb-terraform.ValueFromNamedFile,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tfvars",
 					Start:    tfdiags.SourcePos{Line: 1, Column: 1},
@@ -148,7 +148,7 @@ func TestUnparsedValue(t *testing.T) {
 			},
 			"undeclared4": {
 				Value:      cty.StringVal("4"),
-				SourceType: terraform.ValueFromNamedFile,
+				SourceType: dumb-terraform.ValueFromNamedFile,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tfvars",
 					Start:    tfdiags.SourcePos{Line: 1, Column: 1},
@@ -188,10 +188,10 @@ func TestUnparsedValue(t *testing.T) {
 			t.Errorf("wrong summary for diagnostic 3\ngot:  %s\nwant: %s", got, want)
 		}
 
-		wantVals := terraform.InputValues{
+		wantVals := dumb-terraform.InputValues{
 			"declared1": {
 				Value:      cty.StringVal("5"),
-				SourceType: terraform.ValueFromNamedFile,
+				SourceType: dumb-terraform.ValueFromNamedFile,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tfvars",
 					Start:    tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
@@ -200,7 +200,7 @@ func TestUnparsedValue(t *testing.T) {
 			},
 			"missing1": {
 				Value:      cty.DynamicVal,
-				SourceType: terraform.ValueFromConfig,
+				SourceType: dumb-terraform.ValueFromConfig,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tf",
 					Start:    tfdiags.SourcePos{Line: 3, Column: 1, Byte: 0},
@@ -208,8 +208,8 @@ func TestUnparsedValue(t *testing.T) {
 				},
 			},
 			"missing2": {
-				Value:      cty.NilVal, // Terraform Core handles substituting the default
-				SourceType: terraform.ValueFromConfig,
+				Value:      cty.NilVal, // Dumb Terraform Core handles substituting the default
+				SourceType: dumb-terraform.ValueFromConfig,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tf",
 					Start:    tfdiags.SourcePos{Line: 4, Column: 1, Byte: 0},
@@ -233,10 +233,10 @@ func TestUnparsedValue(t *testing.T) {
 				Type:           cty.String,
 				ConstraintType: cty.String,
 				ParsingMode:    configs.VariableParseLiteral,
-				DeclRange: hcl.Range{
+				DeclRange: dumb-hcl.Range{
 					Filename: "fake.tf",
-					Start:    hcl.Pos{Line: 2, Column: 1, Byte: 0},
-					End:      hcl.Pos{Line: 2, Column: 1, Byte: 0},
+					Start:    dumb-hcl.Pos{Line: 2, Column: 1, Byte: 0},
+					End:      dumb-hcl.Pos{Line: 2, Column: 1, Byte: 0},
 				},
 			},
 			"missing_const_required": {
@@ -245,10 +245,10 @@ func TestUnparsedValue(t *testing.T) {
 				ConstraintType: cty.String,
 				ParsingMode:    configs.VariableParseLiteral,
 				Const:          true,
-				DeclRange: hcl.Range{
+				DeclRange: dumb-hcl.Range{
 					Filename: "fake.tf",
-					Start:    hcl.Pos{Line: 3, Column: 1, Byte: 0},
-					End:      hcl.Pos{Line: 3, Column: 1, Byte: 0},
+					Start:    dumb-hcl.Pos{Line: 3, Column: 1, Byte: 0},
+					End:      dumb-hcl.Pos{Line: 3, Column: 1, Byte: 0},
 				},
 			},
 			"missing_nonconst_required": {
@@ -257,10 +257,10 @@ func TestUnparsedValue(t *testing.T) {
 				ConstraintType: cty.String,
 				ParsingMode:    configs.VariableParseLiteral,
 				Const:          false,
-				DeclRange: hcl.Range{
+				DeclRange: dumb-hcl.Range{
 					Filename: "fake.tf",
-					Start:    hcl.Pos{Line: 4, Column: 1, Byte: 0},
-					End:      hcl.Pos{Line: 4, Column: 1, Byte: 0},
+					Start:    dumb-hcl.Pos{Line: 4, Column: 1, Byte: 0},
+					End:      dumb-hcl.Pos{Line: 4, Column: 1, Byte: 0},
 				},
 			},
 			"missing_const_optional": {
@@ -270,10 +270,10 @@ func TestUnparsedValue(t *testing.T) {
 				ParsingMode:    configs.VariableParseLiteral,
 				Const:          true,
 				Default:        cty.StringVal("default"),
-				DeclRange: hcl.Range{
+				DeclRange: dumb-hcl.Range{
 					Filename: "fake.tf",
-					Start:    hcl.Pos{Line: 5, Column: 1, Byte: 0},
-					End:      hcl.Pos{Line: 5, Column: 1, Byte: 0},
+					Start:    dumb-hcl.Pos{Line: 5, Column: 1, Byte: 0},
+					End:      dumb-hcl.Pos{Line: 5, Column: 1, Byte: 0},
 				},
 			},
 		}
@@ -294,10 +294,10 @@ func TestUnparsedValue(t *testing.T) {
 			t.Fatalf("wrong detail for diagnostic 0\ngot:  %s\nmust contain: %s", got, want)
 		}
 
-		wantVals := terraform.InputValues{
+		wantVals := dumb-terraform.InputValues{
 			"declared1": {
 				Value:      cty.StringVal("5"),
-				SourceType: terraform.ValueFromNamedFile,
+				SourceType: dumb-terraform.ValueFromNamedFile,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tfvars",
 					Start:    tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},
@@ -306,7 +306,7 @@ func TestUnparsedValue(t *testing.T) {
 			},
 			"missing_const_required": {
 				Value:      cty.DynamicVal,
-				SourceType: terraform.ValueFromConfig,
+				SourceType: dumb-terraform.ValueFromConfig,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tf",
 					Start:    tfdiags.SourcePos{Line: 3, Column: 1, Byte: 0},
@@ -315,7 +315,7 @@ func TestUnparsedValue(t *testing.T) {
 			},
 			"missing_nonconst_required": {
 				Value:      cty.DynamicVal,
-				SourceType: terraform.ValueFromConfig,
+				SourceType: dumb-terraform.ValueFromConfig,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tf",
 					Start:    tfdiags.SourcePos{Line: 4, Column: 1, Byte: 0},
@@ -324,7 +324,7 @@ func TestUnparsedValue(t *testing.T) {
 			},
 			"missing_const_optional": {
 				Value:      cty.NilVal,
-				SourceType: terraform.ValueFromConfig,
+				SourceType: dumb-terraform.ValueFromConfig,
 				SourceRange: tfdiags.SourceRange{
 					Filename: "fake.tf",
 					Start:    tfdiags.SourcePos{Line: 5, Column: 1, Byte: 0},
@@ -415,10 +415,10 @@ func TestHasUnsatisfiedConstVariables(t *testing.T) {
 
 type testUnparsedVariableValue string
 
-func (v testUnparsedVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*terraform.InputValue, tfdiags.Diagnostics) {
-	return &terraform.InputValue{
+func (v testUnparsedVariableValue) ParseVariableValue(mode configs.VariableParsingMode) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
+	return &dumb-terraform.InputValue{
 		Value:      cty.StringVal(string(v)),
-		SourceType: terraform.ValueFromNamedFile,
+		SourceType: dumb-terraform.ValueFromNamedFile,
 		SourceRange: tfdiags.SourceRange{
 			Filename: "fake.tfvars",
 			Start:    tfdiags.SourcePos{Line: 1, Column: 1, Byte: 0},

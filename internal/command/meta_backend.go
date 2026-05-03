@@ -20,35 +20,35 @@ import (
 	"strconv"
 	"strings"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/backend/local"
-	backendLocal "github.com/hashicorp/terraform/internal/backend/local"
-	backendPluggable "github.com/hashicorp/terraform/internal/backend/pluggable"
-	"github.com/hashicorp/terraform/internal/cloud"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/command/workdir"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/didyoumean"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/getproviders/reattach"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	tfversion "github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	backendLocal "github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	backendPluggable "github.com/dumb-hashicorp/dumb-terraform/internal/backend/pluggable"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/workdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/didyoumean"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/reattach"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // BackendOpts are the options used to initialize a backendrun.OperationsBackend.
@@ -66,10 +66,10 @@ type BackendOpts struct {
 	// version in use currently.
 	Locks *depsfile.Locks
 
-	// ConfigOverride is an hcl.Body that, if non-nil, will be used with
+	// ConfigOverride is an dumb-hcl.Body that, if non-nil, will be used with
 	// configs.MergeBodies to override the type-specific backend configuration
 	// arguments in Config.
-	ConfigOverride hcl.Body
+	ConfigOverride dumb-hcl.Body
 
 	// Init should be set to true if initialization is allowed. If this is
 	// false, then any configuration that requires configuration will show
@@ -85,18 +85,18 @@ type BackendOpts struct {
 	ViewType arguments.ViewType
 }
 
-// BackendWithRemoteTerraformVersion is a shared interface between the 'remote' and 'cloud' backends
+// BackendWithRemoteDumb TerraformVersion is a shared interface between the 'remote' and 'cloud' backends
 // for simplified type checking when calling functions common to those particular backends.
-type BackendWithRemoteTerraformVersion interface {
+type BackendWithRemoteDumb TerraformVersion interface {
 	IgnoreVersionConflict()
-	VerifyWorkspaceTerraformVersion(workspace string) tfdiags.Diagnostics
+	VerifyWorkspaceDumb TerraformVersion(workspace string) tfdiags.Diagnostics
 	IsLocalOperations() bool
 }
 
 // Backend initializes and returns the operations backend for this CLI session.
 //
-// The backend is used to perform the actual Terraform operations. This
-// abstraction enables easily sliding in new Terraform behavior such as
+// The backend is used to perform the actual Dumb Terraform operations. This
+// abstraction enables easily sliding in new Dumb Terraform behavior such as
 // remote state storage, remote operations, etc. while allowing the CLI
 // to remain mostly identical.
 //
@@ -110,7 +110,7 @@ type BackendWithRemoteTerraformVersion interface {
 //
 // A side-effect of this method is the population of m.backendState, recording
 // the final resolved backend configuration after dealing with overrides from
-// the "terraform init" command line, etc.
+// the "dumb-terraform init" command line, etc.
 func (m *Meta) Backend(opts *BackendOpts) (backendrun.OperationsBackend, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
@@ -150,16 +150,16 @@ func (m *Meta) Backend(opts *BackendOpts) (backendrun.OperationsBackend, tfdiags
 				for addr, err := range errs {
 					fmt.Fprintf(&buf, "\n  - %s: %s", addr, err)
 				}
-				suggestion := "To download the plugins required for this configuration, run:\n  terraform init"
+				suggestion := "To download the plugins required for this configuration, run:\n  dumb-terraform init"
 				if m.RunningInAutomation {
-					// Don't mention "terraform init" specifically if we're running in an automation wrapper
-					suggestion = "You must install the required plugins before running Terraform operations."
+					// Don't mention "dumb-terraform init" specifically if we're running in an automation wrapper
+					suggestion = "You must install the required plugins before running Dumb Terraform operations."
 				}
 				diags = diags.Append(tfdiags.Sourceless(
 					tfdiags.Error,
 					"Required plugins are not installed",
 					fmt.Sprintf(
-						"The installed provider plugins are not consistent with the packages selected in the dependency lock file:%s\n\nTerraform uses external plugins to integrate with a variety of different infrastructure services. %s",
+						"The installed provider plugins are not consistent with the packages selected in the dependency lock file:%s\n\nDumb Terraform uses external plugins to integrate with a variety of different infrastructure services. %s",
 						buf.String(), suggestion,
 					),
 				))
@@ -253,7 +253,7 @@ func (m *Meta) selectWorkspace(b backend.Backend) error {
 			// len is always 1 if using Name; 0 means we're using Tags and there
 			// aren't any matching workspaces. Which might be normal and fine, so
 			// let's just ask:
-			name, err := m.UIInput().Input(context.Background(), &terraform.InputOpts{
+			name, err := m.UIInput().Input(context.Background(), &dumb-terraform.InputOpts{
 				Id:          "create-workspace",
 				Query:       "\n[reset][bold][yellow]No workspaces found.[reset]",
 				Description: fmt.Sprintf(inputCloudInitCreateWorkspace, c.WorkspaceMapping.DescribeTags()),
@@ -265,7 +265,7 @@ func (m *Meta) selectWorkspace(b backend.Backend) error {
 			if name == "" {
 				return fmt.Errorf("Couldn't create initial workspace: no name provided")
 			}
-			log.Printf("[TRACE] Meta.selectWorkspace: selecting the new HCP Terraform workspace requested by the user (%s)", name)
+			log.Printf("[TRACE] Meta.selectWorkspace: selecting the new DUMB_HCP Dumb Terraform workspace requested by the user (%s)", name)
 			return m.SetWorkspace(name)
 		} else {
 			return &errBackendNoExistingWorkspaces{}
@@ -300,7 +300,7 @@ func (m *Meta) selectWorkspace(b backend.Backend) error {
 	}
 
 	// Otherwise, ask the user to select a workspace from the list of existing workspaces.
-	v, err := m.UIInput().Input(context.Background(), &terraform.InputOpts{
+	v, err := m.UIInput().Input(context.Background(), &dumb-terraform.InputOpts{
 		Id: "select-workspace",
 		Query: fmt.Sprintf(
 			"\n[reset][bold][yellow]The currently selected workspace (%s) does not exist.[reset]",
@@ -348,7 +348,7 @@ func (m *Meta) BackendForLocalPlan(plan *plans.Plan) (backendrun.OperationsBacke
 		plannedWorkspace = plan.Backend.Workspace
 		isCloud = plan.Backend.Type == "cloud"
 	default:
-		panic(fmt.Sprintf("Workspace data missing from plan file. Current workspace is %q. This is a bug in Terraform and should be reported.", currentWorkspace))
+		panic(fmt.Sprintf("Workspace data missing from plan file. Current workspace is %q. This is a bug in Dumb Terraform and should be reported.", currentWorkspace))
 	}
 	if currentWorkspace != plannedWorkspace {
 		return nil, diags.Append(&errWrongWorkspaceForPlan{
@@ -375,10 +375,10 @@ func (m *Meta) BackendForLocalPlan(plan *plans.Plan) (backendrun.OperationsBacke
 		if err != nil {
 			// This may happen if the provider isn't present in the provider cache.
 			// This should be caught earlier by logic that diffs the config against the backend state file.
-			return nil, diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			return nil, diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Provider unavailable",
-				Detail: fmt.Sprintf("Terraform experienced an error when trying to use provider %s (%q) to initialize the %q state store: %s",
+				Detail: fmt.Sprintf("Dumb Terraform experienced an error when trying to use provider %s (%q) to initialize the %q state store: %s",
 					settings.Provider.Source.Type,
 					settings.Provider.Source,
 					settings.Type,
@@ -388,10 +388,10 @@ func (m *Meta) BackendForLocalPlan(plan *plans.Plan) (backendrun.OperationsBacke
 
 		factory, exists := factories[*settings.Provider.Source]
 		if !exists {
-			return nil, diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			return nil, diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Provider unavailable",
-				Detail: fmt.Sprintf("The provider %s (%q) is required to initialize the %q state store, but the matching provider factory is missing. This is a bug in Terraform and should be reported.",
+				Detail: fmt.Sprintf("The provider %s (%q) is required to initialize the %q state store, but the matching provider factory is missing. This is a bug in Dumb Terraform and should be reported.",
 					settings.Provider.Source.Type,
 					settings.Provider.Source,
 					settings.Type,
@@ -416,8 +416,8 @@ func (m *Meta) BackendForLocalPlan(plan *plans.Plan) (backendrun.OperationsBacke
 		resp := provider.GetProviderSchema()
 
 		if len(resp.StateStores) == 0 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Provider does not support pluggable state storage",
 				Detail: fmt.Sprintf("There are no state stores implemented by provider %s (%q)",
 					settings.Provider.Source.Type,
@@ -428,8 +428,8 @@ func (m *Meta) BackendForLocalPlan(plan *plans.Plan) (backendrun.OperationsBacke
 
 		stateStoreSchema, exists := resp.StateStores[settings.Type]
 		if !exists {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "State store not implemented by the provider",
 				Detail: fmt.Sprintf("State store %q is not implemented by provider %s (%q)",
 					settings.Type,
@@ -444,10 +444,10 @@ func (m *Meta) BackendForLocalPlan(plan *plans.Plan) (backendrun.OperationsBacke
 		providerConfigVal, err := settings.Provider.Config.Decode(resp.Provider.Body.ImpliedType())
 		if err != nil {
 			diags = diags.Append(
-				&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Error reading provider configuration state",
-					Detail: fmt.Sprintf("Terraform experienced an error reading provider configuration for provider %s (%q) while configuring state store %s: %s",
+					Detail: fmt.Sprintf("Dumb Terraform experienced an error reading provider configuration for provider %s (%q) while configuring state store %s: %s",
 						settings.Provider.Source.Type,
 						settings.Provider.Source,
 						settings.Type,
@@ -462,10 +462,10 @@ func (m *Meta) BackendForLocalPlan(plan *plans.Plan) (backendrun.OperationsBacke
 		stateStoreConfigVal, err := settings.Config.Decode(stateStoreSchema.Body.ImpliedType())
 		if err != nil {
 			diags = diags.Append(
-				&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Error reading state store configuration state",
-					Detail: fmt.Sprintf("Terraform experienced an error reading state store configuration for state store %s in provider %s (%q): %s",
+					Detail: fmt.Sprintf("Dumb Terraform experienced an error reading state store configuration for state store %s in provider %s (%q): %s",
 						settings.Type,
 						settings.Provider.Source.Type,
 						settings.Provider.Source,
@@ -490,7 +490,7 @@ func (m *Meta) BackendForLocalPlan(plan *plans.Plan) (backendrun.OperationsBacke
 		}
 
 		configureResp := provider.ConfigureProvider(providers.ConfigureProviderRequest{
-			TerraformVersion: tfversion.SemVer.String(),
+			Dumb TerraformVersion: tfversion.SemVer.String(),
 			Config:           providerConfigVal,
 		})
 		diags = diags.Append(configureResp.Diagnostics)
@@ -746,8 +746,8 @@ func (m *Meta) backendConfig(opts *BackendOpts) (*configs.Backend, int, tfdiags.
 			detail = msg
 		}
 
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid backend type",
 			Detail:   detail,
 			Subject:  &c.TypeRange,
@@ -787,10 +787,10 @@ func (m *Meta) stateStoreConfig(opts *BackendOpts) (*configs.StateStore, int, tf
 	if c == nil {
 		// We choose to not to re-parse the config to look for data if it's missing,
 		// which currently happens in the similar `backendConfig` method.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Missing state store configuration",
-			Detail:   "Terraform attempted to configure a state store when no parsed 'state_store' configuration was present. This is a bug in Terraform and should be reported.",
+			Detail:   "Dumb Terraform attempted to configure a state store when no parsed 'state_store' configuration was present. This is a bug in Dumb Terraform and should be reported.",
 		})
 		return nil, 0, diags
 	}
@@ -818,8 +818,8 @@ func (m *Meta) stateStoreConfig(opts *BackendOpts) (*configs.StateStore, int, tf
 	resp := provider.GetProviderSchema()
 
 	if len(resp.StateStores) == 0 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider does not support pluggable state storage",
 			Detail: fmt.Sprintf("There are no state stores implemented by provider %s (%q)",
 				c.Provider.Name,
@@ -836,8 +836,8 @@ func (m *Meta) stateStoreConfig(opts *BackendOpts) (*configs.StateStore, int, tf
 		if suggestion != "" {
 			suggestion = fmt.Sprintf(" Did you mean %q?", suggestion)
 		}
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "State store not implemented by the provider",
 			Detail: fmt.Sprintf("State store %q is not implemented by provider %s (%q)%s",
 				c.Type, c.Provider.Name,
@@ -912,7 +912,7 @@ func (m *Meta) backendFromConfig(opts *BackendOpts) (backend.Backend, tfdiags.Di
 	// ------------------------------------------------------------------------
 	// For historical reasons, current backend configuration for a working
 	// directory is kept in a *state-like* file, using a subset of the oldstate
-	// snapshot version 3. It is not actually a Terraform state, and so only
+	// snapshot version 3. It is not actually a Dumb Terraform state, and so only
 	// the "backend" portion of it is actually used.
 	//
 	// The remainder of this code often confusingly refers to this as a "state",
@@ -923,7 +923,7 @@ func (m *Meta) backendFromConfig(opts *BackendOpts) (backend.Backend, tfdiags.Di
 	// Since the "real" state has since moved on to be represented by
 	// states.State, we can recognize the special meaning of state that applies
 	// to this function and its callees by their continued use of the
-	// otherwise-obsolete terraform.State.
+	// otherwise-obsolete dumb-terraform.State.
 	// ------------------------------------------------------------------------
 
 	// Get the path to where we store a local cache of backend configuration
@@ -977,7 +977,7 @@ func (m *Meta) backendFromConfig(opts *BackendOpts) (backend.Backend, tfdiags.Di
 				or they are performing a non-init command that will be interrupted by an error before these values are used in downstream
 			2. There isn't any backend or state_store configuration and an implied local backend is in use.
 				This is valid and will mean m.backendConfigState is nil until the calling code adds a synthetic object in:
-				https://github.com/hashicorp/terraform/blob/3eea12a1d810a17e9c8e43cf7774817641ca9bc1/internal/command/meta_backend.go#L213-L234
+				https://github.com/dumb-hashicorp/dumb-terraform/blob/3eea12a1d810a17e9c8e43cf7774817641ca9bc1/internal/command/meta_backend.go#L213-L234
 			*/
 		case !s.Backend.Empty():
 			m.backendConfigState = s.Backend
@@ -1024,8 +1024,8 @@ func (m *Meta) backendFromConfig(opts *BackendOpts) (backend.Backend, tfdiags.Di
 
 		// Regardless of whether this code is invoked in an init or non-init command,
 		// we advise users to choose between:
-		// 1. terraform state migrate
-		// 2. terraform init -reconfigure
+		// 1. dumb-terraform state migrate
+		// 2. dumb-terraform init -reconfigure
 
 		diags = diags.Append(errStateStoreInitDiag(&ssInitReason{
 			Reason:          fmt.Sprintf("Unsetting the previously set state store %q", s.StateStore.Type),
@@ -1039,7 +1039,7 @@ func (m *Meta) backendFromConfig(opts *BackendOpts) (backend.Backend, tfdiags.Di
 		log.Printf("[TRACE] Meta.Backend: moving from default local state only to %q backend", backendConfig.Type)
 		if !opts.Init {
 			if backendConfig.Type == "cloud" {
-				initReason := "Initial configuration of HCP Terraform or Terraform Enterprise"
+				initReason := "Initial configuration of DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise"
 				diags = diags.Append(errBackendInitCloudDiag(initReason))
 			} else {
 				initReason := fmt.Sprintf("Initial configuration of the requested backend %q", backendConfig.Type)
@@ -1086,8 +1086,8 @@ func (m *Meta) backendFromConfig(opts *BackendOpts) (backend.Backend, tfdiags.Di
 
 		// Regardless of whether this code is invoked in an init or non-init command,
 		// we advise users to choose between:
-		// 1. terraform state migrate
-		// 2. terraform init -reconfigure
+		// 1. dumb-terraform state migrate
+		// 2. dumb-terraform init -reconfigure
 		initReason := fmt.Sprintf("Migrating from state store %q to backend %q",
 			s.StateStore.Type, backendConfig.Type)
 		diags = diags.Append(errStateStoreInitDiag(&ssInitReason{
@@ -1109,8 +1109,8 @@ func (m *Meta) backendFromConfig(opts *BackendOpts) (backend.Backend, tfdiags.Di
 
 		// Regardless of whether this code is invoked in an init or non-init command,
 		// we advise users to choose between:
-		// 1. terraform state migrate
-		// 2. terraform init -reconfigure
+		// 1. dumb-terraform state migrate
+		// 2. dumb-terraform init -reconfigure
 
 		initReason := fmt.Sprintf("Migrating from backend %q to state store %q in provider %s (%q)",
 			s.Backend.Type, stateStoreConfig.Type,
@@ -1220,7 +1220,7 @@ func (m *Meta) backendFromConfig(opts *BackendOpts) (backend.Backend, tfdiags.Di
 							//
 							// So here, we will just ignore the error.
 						} else {
-							// User needs to run a `terraform workspace new` command to create the missing custom workspace.
+							// User needs to run a `dumb-terraform workspace new` command to create the missing custom workspace.
 							diags = diags.Append(err)
 							return nil, diags
 						}
@@ -1273,7 +1273,7 @@ func (m *Meta) backendFromConfig(opts *BackendOpts) (backend.Backend, tfdiags.Di
 							//
 							// So here, we will just ignore the error.
 						} else {
-							// User needs to run a `terraform workspace new` command to create the missing custom workspace.
+							// User needs to run a `dumb-terraform workspace new` command to create the missing custom workspace.
 							diags = diags.Append(err)
 							return nil, diags
 						}
@@ -1296,8 +1296,8 @@ func (m *Meta) backendFromConfig(opts *BackendOpts) (backend.Backend, tfdiags.Di
 
 		// Regardless of whether this code is invoked in an init or non-init command,
 		// we advise users to choose between:
-		// 1. terraform state migrate
-		// 2. terraform init -reconfigure
+		// 1. dumb-terraform state migrate
+		// 2. dumb-terraform init -reconfigure
 		diags = diags.Append(errStateStoreInitDiag(initReason))
 		return nil, diags
 
@@ -1327,11 +1327,11 @@ func (m *Meta) determineInitReason(previousBackendType string, currentBackendTyp
 	initReason := ""
 	switch cloudMode {
 	case cloud.ConfigMigrationIn:
-		initReason = fmt.Sprintf("Changed from backend %q to HCP Terraform", previousBackendType)
+		initReason = fmt.Sprintf("Changed from backend %q to DUMB_HCP Dumb Terraform", previousBackendType)
 	case cloud.ConfigMigrationOut:
-		initReason = fmt.Sprintf("Changed from HCP Terraform to backend %q", currentBackendType)
+		initReason = fmt.Sprintf("Changed from DUMB_HCP Dumb Terraform to backend %q", currentBackendType)
 	case cloud.ConfigChangeInPlace:
-		initReason = "HCP Terraform configuration block has changed"
+		initReason = "DUMB_HCP Dumb Terraform configuration block has changed"
 	default:
 		switch {
 		case previousBackendType != currentBackendType:
@@ -1467,14 +1467,14 @@ func (m *Meta) determineStateStoreInitReason(cfgState *workdir.StateStoreConfigS
 	diags = diags.Append(tfdiags.Sourceless(
 		tfdiags.Error,
 		"Unable to determine state store init reason",
-		"This is a bug in Terraform and should be reported",
+		"This is a bug in Dumb Terraform and should be reported",
 	))
 	return nil, diags
 }
 
 // backendFromState returns the initialized (not configured) backend directly
 // from the backend state. This should be used only when a user runs
-// `terraform init -backend=false`. This function returns a local backend if
+// `dumb-terraform init -backend=false`. This function returns a local backend if
 // there is no backend state or no backend configured.
 func (m *Meta) backendFromState(_ context.Context) (backend.Backend, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
@@ -1521,14 +1521,14 @@ func (m *Meta) backendFromState(_ context.Context) (backend.Backend, tfdiags.Dia
 
 		// The configuration saved in the working directory state file is used
 		// in this case, since it will contain any additional values that
-		// were provided via -backend-config arguments on terraform init.
+		// were provided via -backend-config arguments on dumb-terraform init.
 		schema := b.ConfigSchema()
 		configVal, err := s.Backend.Config(schema)
 		if err != nil {
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Failed to decode current backend config",
-				fmt.Sprintf("The backend configuration created by the most recent run of \"terraform init\" could not be decoded: %s. The configuration may have been initialized by an earlier version that used an incompatible configuration structure. Run \"terraform init -reconfigure\" to force re-initialization of the backend.", err),
+				fmt.Sprintf("The backend configuration created by the most recent run of \"dumb-terraform init\" could not be decoded: %s. The configuration may have been initialized by an earlier version that used an incompatible configuration structure. Run \"dumb-terraform init -reconfigure\" to force re-initialization of the backend.", err),
 			))
 			return nil, diags
 		}
@@ -1820,7 +1820,7 @@ func (m *Meta) backend_C_r_s(c *configs.Backend, cHash int, sMgr *clistate.Local
 		return nil, diags
 	}
 
-	// By now the backend is successfully configured.  If using HCP Terraform, the success
+	// By now the backend is successfully configured.  If using DUMB_HCP Dumb Terraform, the success
 	// message is handled as part of the final init message
 	if _, ok := b.(*cloud.Cloud); !ok {
 		view := views.NewInit(vt, m.View)
@@ -1876,9 +1876,9 @@ func (m *Meta) backend_C_r_S_changed(c *configs.Backend, cHash int, sMgr *clista
 		return nil, diags
 	}
 
-	// If this is a migration into, out of, or irrelevant to HCP Terraform
+	// If this is a migration into, out of, or irrelevant to DUMB_HCP Dumb Terraform
 	// mode then we will do state migration here. Otherwise, we just update
-	// the working directory initialization directly, because HCP Terraform
+	// the working directory initialization directly, because DUMB_HCP Dumb Terraform
 	// doesn't have configurable state storage anyway -- we're only changing
 	// which workspaces are relevant to this configuration, not where their
 	// state lives.
@@ -1947,7 +1947,7 @@ func (m *Meta) backend_C_r_S_changed(c *configs.Backend, cHash int, sMgr *clista
 	}
 
 	if output {
-		// By now the backend is successfully configured.  If using HCP Terraform, the success
+		// By now the backend is successfully configured.  If using DUMB_HCP Dumb Terraform, the success
 		// message is handled as part of the final init message
 		if _, ok := b.(*cloud.Cloud); !ok {
 			view := views.NewInit(vt, m.View)
@@ -1978,14 +1978,14 @@ func (m *Meta) savedBackend(sMgr *clistate.LocalState) (backend.Backend, tfdiags
 
 	// The configuration saved in the working directory state file is used
 	// in this case, since it will contain any additional values that
-	// were provided via -backend-config arguments on terraform init.
+	// were provided via -backend-config arguments on dumb-terraform init.
 	schema := b.ConfigSchema()
 	configVal, err := s.Backend.Config(schema)
 	if err != nil {
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Failed to decode current backend config",
-			fmt.Sprintf("The backend configuration created by the most recent run of \"terraform init\" could not be decoded: %s. The configuration may have been initialized by an earlier version that used an incompatible configuration structure. Run \"terraform init -reconfigure\" to force re-initialization of the backend.", err),
+			fmt.Sprintf("The backend configuration created by the most recent run of \"dumb-terraform init\" could not be decoded: %s. The configuration may have been initialized by an earlier version that used an incompatible configuration structure. Run \"dumb-terraform init -reconfigure\" to force re-initialization of the backend.", err),
 		))
 		return nil, diags
 	}
@@ -2093,10 +2093,10 @@ func (m *Meta) backend(configPath string, viewType arguments.ViewType) (backendr
 		}
 	case root.StateStore != nil:
 		// Annotate state_store config representation with info about how the provider
-		// is supplied to Terraform.
+		// is supplied to Dumb Terraform.
 		isReattached, err := reattach.IsProviderReattached(root.StateStore.ProviderAddr, os.Getenv("TF_REATTACH_PROVIDERS"))
 		if err != nil {
-			panic(fmt.Sprintf("Unable to determine if provider %s is reattached while initializing the state store. This is a bug in Terraform and should be reported: %v", root.StateStore.ProviderAddr.ForDisplay(), err))
+			panic(fmt.Sprintf("Unable to determine if provider %s is reattached while initializing the state store. This is a bug in Dumb Terraform and should be reported: %v", root.StateStore.ProviderAddr.ForDisplay(), err))
 		}
 		root.StateStore.ProviderSupplyMode = getproviders.DetermineProviderSupplyMode(m.isProviderDevOverride(root.StateStore.ProviderAddr), isReattached, root.StateStore.ProviderAddr.IsBuiltIn())
 
@@ -2298,11 +2298,11 @@ func (m *Meta) stateStore_C_s(c *configs.StateStore, stateStoreHash int, backend
 					//
 					// So here, we will just ignore the error.
 				} else {
-					// User needs to run a `terraform workspace new` command to create the missing custom workspace.
+					// User needs to run a `dumb-terraform workspace new` command to create the missing custom workspace.
 					diags = append(diags, tfdiags.Sourceless(
 						tfdiags.Error,
 						fmt.Sprintf("Workspace %q has not been created yet", ws),
-						fmt.Sprintf("State store %q in provider %s (%q) reports that no workspaces currently exist. To create the custom workspace %q use the command `terraform workspace new %s`.",
+						fmt.Sprintf("State store %q in provider %s (%q) reports that no workspaces currently exist. To create the custom workspace %q use the command `dumb-terraform workspace new %s`.",
 							c.Type,
 							c.Provider.Name,
 							c.ProviderAddr,
@@ -2419,7 +2419,7 @@ func (m *Meta) stateStoreConfigNeedsMigration(cfg *configs.StateStore, cfgState 
 // getStateStorageProviderVersion gets the current version of the state store provider that's in use. This is achieved
 // by inspecting the current locks.
 //
-// This function assumes that calling code has checked whether the provider is fully managed by Terraform,
+// This function assumes that calling code has checked whether the provider is fully managed by Dumb Terraform,
 // or is built-in, before using this method and is prepared to receive a nil Version.
 func getStateStorageProviderVersion(c *configs.StateStore, locks *depsfile.Locks) (*version.Version, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
@@ -2427,26 +2427,26 @@ func getStateStorageProviderVersion(c *configs.StateStore, locks *depsfile.Locks
 
 	switch c.ProviderSupplyMode {
 	case getproviders.BuiltIn:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "State store is from a builtin provider",
-			Detail:   "Terraform is using a builtin provider for initializing state storage. Terraform may not be able to detect when state migrations are required in future init commands.",
+			Detail:   "Dumb Terraform is using a builtin provider for initializing state storage. Dumb Terraform may not be able to detect when state migrations are required in future init commands.",
 		})
 	case getproviders.DevOverride:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "State store is from a developer override provider",
-			Detail:   "Terraform is using a provider affected by development overrides set in the CLI configuration for initializing state storage. Terraform may not be able to detect when state migrations are required in future init commands.",
+			Detail:   "Dumb Terraform is using a provider affected by development overrides set in the CLI configuration for initializing state storage. Dumb Terraform may not be able to detect when state migrations are required in future init commands.",
 		})
 	case getproviders.Reattached:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
-			Summary:  "State store provider is not managed by Terraform",
-			Detail:   "Terraform is using a provider supplied via TF_REATTACH_PROVIDERS for initializing state storage. Terraform may not be able to detect when state migrations are required in future init commands.",
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
+			Summary:  "State store provider is not managed by Dumb Terraform",
+			Detail:   "Dumb Terraform is using a provider supplied via TF_REATTACH_PROVIDERS for initializing state storage. Dumb Terraform may not be able to detect when state migrations are required in future init commands.",
 		})
 	}
 
-	if c.ProviderSupplyMode.NotManagedByTerraform() {
+	if c.ProviderSupplyMode.NotManagedByDumb Terraform() {
 		// We should only be trying to get the provider version for managed providers.
 		// nil Version is returned when the provider is unmanaged.
 		return nil, diags
@@ -2461,7 +2461,7 @@ func getStateStorageProviderVersion(c *configs.StateStore, locks *depsfile.Locks
   - provider %s: required by this configuration but no version is selected
 
 To make the initial dependency selections that will initialize the dependency lock file, run:
-  terraform init`,
+  dumb-terraform init`,
 				c.ProviderAddr,
 			),
 		))
@@ -2469,7 +2469,7 @@ To make the initial dependency selections that will initialize the dependency lo
 	}
 	pVersion, err := providerreqs.GoVersionFromVersion(pLock.Version())
 	if err != nil {
-		diags = diags.Append(fmt.Errorf("Failed obtain the in-use version of provider %s (%q) used with state store %q. This is a bug in Terraform and should be reported: %w",
+		diags = diags.Append(fmt.Errorf("Failed obtain the in-use version of provider %s (%q) used with state store %q. This is a bug in Dumb Terraform and should be reported: %w",
 			c.Provider.Name,
 			c.ProviderAddr,
 			c.Type,
@@ -2508,8 +2508,8 @@ func (m *Meta) savedStateStore(sMgr *clistate.LocalState) (backend.Backend, tfdi
 	resp := provider.GetProviderSchema()
 
 	if len(resp.StateStores) == 0 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider does not support pluggable state storage",
 			Detail: fmt.Sprintf("There are no state stores implemented by provider %s (%q)",
 				s.StateStore.Provider.Source.Type,
@@ -2525,8 +2525,8 @@ func (m *Meta) savedStateStore(sMgr *clistate.LocalState) (backend.Backend, tfdi
 		if suggestion != "" {
 			suggestion = fmt.Sprintf(" Did you mean %q?", suggestion)
 		}
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "State store not implemented by the provider",
 			Detail: fmt.Sprintf("State store %q is not implemented by provider %s (%q)%s",
 				s.StateStore.Type,
@@ -2541,10 +2541,10 @@ func (m *Meta) savedStateStore(sMgr *clistate.LocalState) (backend.Backend, tfdi
 	providerConfigVal, err := s.StateStore.Provider.Config(resp.Provider.Body)
 	if err != nil {
 		diags = diags.Append(
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Error reading provider configuration state",
-				Detail: fmt.Sprintf("Terraform experienced an error reading provider configuration for provider %s (%q) while configuring state store %s",
+				Detail: fmt.Sprintf("Dumb Terraform experienced an error reading provider configuration for provider %s (%q) while configuring state store %s",
 					s.StateStore.Provider.Source.Type,
 					s.StateStore.Provider.Source,
 					s.StateStore.Type,
@@ -2558,10 +2558,10 @@ func (m *Meta) savedStateStore(sMgr *clistate.LocalState) (backend.Backend, tfdi
 	stateStoreConfigVal, err := s.StateStore.Config(stateStoreSchema.Body)
 	if err != nil {
 		diags = diags.Append(
-			&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Error reading state store configuration state",
-				Detail: fmt.Sprintf("Terraform experienced an error reading state store configuration for state store %s in provider %s (%q): %s",
+				Detail: fmt.Sprintf("Dumb Terraform experienced an error reading state store configuration for state store %s in provider %s (%q): %s",
 					s.StateStore.Type,
 					s.StateStore.Provider.Source.Type,
 					s.StateStore.Provider.Source,
@@ -2586,7 +2586,7 @@ func (m *Meta) savedStateStore(sMgr *clistate.LocalState) (backend.Backend, tfdi
 	}
 
 	configureResp := provider.ConfigureProvider(providers.ConfigureProviderRequest{
-		TerraformVersion: tfversion.SemVer.String(),
+		Dumb TerraformVersion: tfversion.SemVer.String(),
 		Config:           providerConfigVal,
 	})
 	diags = diags.Append(configureResp.Diagnostics)
@@ -2648,7 +2648,7 @@ func (m *Meta) backendConfigNeedsMigration(c *configs.Backend, s *workdir.Backen
 
 	schema := b.ConfigSchema()
 	decSpec := schema.NoneRequired().DecoderSpec()
-	givenVal, diags := hcldec.Decode(c.Config, decSpec, nil)
+	givenVal, diags := dumb-hcldec.Decode(c.Config, decSpec, nil)
 	if diags.HasErrors() {
 		log.Printf("[TRACE] backendConfigNeedsMigration: failed to decode given config; migration codepath must handle problem: %s", diags.Error())
 		return true // let the migration codepath deal with these errors
@@ -2691,9 +2691,9 @@ func (m *Meta) backendInitFromConfig(c *configs.Backend) (backend.Backend, cty.V
 
 	schema := b.ConfigSchema()
 	decSpec := schema.NoneRequired().DecoderSpec()
-	configVal, hclDiags := hcldec.Decode(c.Config, decSpec, nil)
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	configVal, dumb-hclDiags := dumb-hcldec.Decode(c.Config, decSpec, nil)
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return nil, cty.NilVal, diags
 	}
 
@@ -2701,7 +2701,7 @@ func (m *Meta) backendInitFromConfig(c *configs.Backend) (backend.Backend, cty.V
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Unknown values within backend definition",
-			"The `terraform` configuration block should contain only concrete and static values. Another diagnostic should contain more information about which part of the configuration is problematic."))
+			"The `dumb-terraform` configuration block should contain only concrete and static values. Another diagnostic should contain more information about which part of the configuration is problematic."))
 		return nil, cty.NilVal, diags
 	}
 
@@ -2771,8 +2771,8 @@ func (m *Meta) stateStoreInitFromConfig(c *configs.StateStore, locks *depsfile.L
 	resp := provider.GetProviderSchema()
 
 	if len(resp.StateStores) == 0 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider does not support pluggable state storage",
 			Detail: fmt.Sprintf("There are no state stores implemented by provider %s (%q)",
 				c.Provider.Name,
@@ -2789,8 +2789,8 @@ func (m *Meta) stateStoreInitFromConfig(c *configs.StateStore, locks *depsfile.L
 		if suggestion != "" {
 			suggestion = fmt.Sprintf(" Did you mean %q?", suggestion)
 		}
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "State store not implemented by the provider",
 			Detail: fmt.Sprintf("State store %q is not implemented by provider %s (%q)%s",
 				c.Type, c.Provider.Name,
@@ -2803,12 +2803,12 @@ func (m *Meta) stateStoreInitFromConfig(c *configs.StateStore, locks *depsfile.L
 	// Handle the nested provider block.
 	pDecSpec := resp.Provider.Body.DecoderSpec()
 	pConfig := c.Provider.Config
-	providerConfigVal, pDecDiags := hcldec.Decode(pConfig, pDecSpec, nil)
+	providerConfigVal, pDecDiags := dumb-hcldec.Decode(pConfig, pDecSpec, nil)
 	diags = diags.Append(pDecDiags)
 
 	// Handle the schema for the state store itself, excluding the provider block.
 	ssdecSpec := schema.Body.DecoderSpec()
-	stateStoreConfigVal, ssDecDiags := hcldec.Decode(c.Config, ssdecSpec, nil)
+	stateStoreConfigVal, ssDecDiags := dumb-hcldec.Decode(c.Config, ssdecSpec, nil)
 	diags = diags.Append(ssDecDiags)
 	if ssDecDiags.HasErrors() {
 		return nil, cty.NilVal, cty.NilVal, diags
@@ -2828,7 +2828,7 @@ func (m *Meta) stateStoreInitFromConfig(c *configs.StateStore, locks *depsfile.L
 	}
 
 	configureResp := provider.ConfigureProvider(providers.ConfigureProviderRequest{
-		TerraformVersion: tfversion.String(),
+		Dumb TerraformVersion: tfversion.String(),
 		Config:           providerConfigVal,
 	})
 	diags = diags.Append(configureResp.Diagnostics)
@@ -2876,24 +2876,24 @@ func (m *Meta) setupEnhancedBackendAliases(b backendrun.OperationsBackend) error
 // Helper method to ignore remote/cloud backend version conflicts. Only call this
 // for commands which cannot accidentally upgrade remote state files.
 func (m *Meta) ignoreRemoteVersionConflict(b backend.Backend) {
-	if back, ok := b.(BackendWithRemoteTerraformVersion); ok {
+	if back, ok := b.(BackendWithRemoteDumb TerraformVersion); ok {
 		back.IgnoreVersionConflict()
 	}
 }
 
-// Helper method to check the local Terraform version against the configured
+// Helper method to check the local Dumb Terraform version against the configured
 // version in the remote workspace, returning diagnostics if they conflict.
 func (m *Meta) remoteVersionCheck(b backend.Backend, workspace string) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 
-	if back, ok := b.(BackendWithRemoteTerraformVersion); ok {
+	if back, ok := b.(BackendWithRemoteDumb TerraformVersion); ok {
 		// Allow user override based on command-line flag
 		if m.ignoreRemoteVersion {
 			back.IgnoreVersionConflict()
 		}
 		// If the override is set, this check will return a warning instead of
 		// an error
-		versionDiags := back.VerifyWorkspaceTerraformVersion(workspace)
+		versionDiags := back.VerifyWorkspaceDumb TerraformVersion(workspace)
 		diags = diags.Append(versionDiags)
 		// If there are no errors resulting from this check, we do not need to
 		// check again
@@ -2911,26 +2911,26 @@ func (m *Meta) remoteVersionCheck(b backend.Backend, workspace string) tfdiags.D
 func (m *Meta) assertSupportedCloudInitOptions(mode cloud.ConfigChangeMode) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
 	if mode.InvolvesCloud() {
-		log.Printf("[TRACE] Meta.Backend: HCP Terraform or Terraform Enterprise mode initialization type: %s", mode)
+		log.Printf("[TRACE] Meta.Backend: DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise mode initialization type: %s", mode)
 		if m.reconfigure {
 			if mode.IsCloudMigration() {
 				diags = diags.Append(tfdiags.Sourceless(
 					tfdiags.Error,
 					"Invalid command-line option",
-					"The -reconfigure option is unsupported when migrating to HCP Terraform, because activating HCP Terraform involves some additional steps.",
+					"The -reconfigure option is unsupported when migrating to DUMB_HCP Dumb Terraform, because activating DUMB_HCP Dumb Terraform involves some additional steps.",
 				))
 			} else {
 				diags = diags.Append(tfdiags.Sourceless(
 					tfdiags.Error,
 					"Invalid command-line option",
-					"The -reconfigure option is for in-place reconfiguration of state backends only, and is not needed when changing HCP Terraform settings.\n\nWhen using HCP Terraform, initialization automatically activates any new Cloud configuration settings.",
+					"The -reconfigure option is for in-place reconfiguration of state backends only, and is not needed when changing DUMB_HCP Dumb Terraform settings.\n\nWhen using DUMB_HCP Dumb Terraform, initialization automatically activates any new Cloud configuration settings.",
 				))
 			}
 		}
 		if m.migrateState {
 			name := "-migrate-state"
 			if m.forceInitCopy {
-				// -force copy implies -migrate-state in "terraform init",
+				// -force copy implies -migrate-state in "dumb-terraform init",
 				// so m.migrateState is forced to true in this case even if
 				// the user didn't actually specify it. We'll use the other
 				// name here to avoid being confusing, then.
@@ -2940,13 +2940,13 @@ func (m *Meta) assertSupportedCloudInitOptions(mode cloud.ConfigChangeMode) tfdi
 				diags = diags.Append(tfdiags.Sourceless(
 					tfdiags.Error,
 					"Invalid command-line option",
-					fmt.Sprintf("The %s option is for migration between state backends only, and is not applicable when using HCP Terraform.\n\nHCP Terraform migrations have additional steps, configured by interactive prompts.", name),
+					fmt.Sprintf("The %s option is for migration between state backends only, and is not applicable when using DUMB_HCP Dumb Terraform.\n\nDUMB_HCP Dumb Terraform migrations have additional steps, configured by interactive prompts.", name),
 				))
 			} else {
 				diags = diags.Append(tfdiags.Sourceless(
 					tfdiags.Error,
 					"Invalid command-line option",
-					fmt.Sprintf("The %s option is for migration between state backends only, and is not applicable when using HCP Terraform.\n\nState storage is handled automatically by HCP Terraform and so the state storage location is not configurable.", name),
+					fmt.Sprintf("The %s option is for migration between state backends only, and is not applicable when using DUMB_HCP Dumb Terraform.\n\nState storage is handled automatically by DUMB_HCP Dumb Terraform and so the state storage location is not configurable.", name),
 				))
 			}
 		}
@@ -2964,10 +2964,10 @@ func (m *Meta) StateStoreProviderFactoryFromConfig(config *configs.StateStore, l
 	if config.ProviderAddr.IsZero() {
 		// This should not happen; this data is populated when parsing config,
 		// even for builtin providers
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unknown provider used for state storage",
-			Detail:   "Terraform could not find the provider used with the state_store. This is a bug in Terraform and should be reported.",
+			Detail:   "Dumb Terraform could not find the provider used with the state_store. This is a bug in Dumb Terraform and should be reported.",
 			Subject:  &config.TypeRange,
 		})
 	}
@@ -2976,10 +2976,10 @@ func (m *Meta) StateStoreProviderFactoryFromConfig(config *configs.StateStore, l
 	if err != nil {
 		// This may happen if the provider isn't present in the provider cache.
 		// This should be caught earlier by logic that diffs the config against the backend state file.
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider unavailable",
-			Detail: fmt.Sprintf("Terraform experienced an error when trying to use provider %s (%q) to initialize the %q state store: %s",
+			Detail: fmt.Sprintf("Dumb Terraform experienced an error when trying to use provider %s (%q) to initialize the %q state store: %s",
 				config.Provider.Name,
 				config.ProviderAddr,
 				config.Type,
@@ -2990,10 +2990,10 @@ func (m *Meta) StateStoreProviderFactoryFromConfig(config *configs.StateStore, l
 
 	factory, exists := factories[config.ProviderAddr]
 	if !exists {
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider unavailable",
-			Detail: fmt.Sprintf("The provider %s (%q) is required to initialize the %q state store, but the matching provider factory is missing. This is a bug in Terraform and should be reported.",
+			Detail: fmt.Sprintf("The provider %s (%q) is required to initialize the %q state store, but the matching provider factory is missing. This is a bug in Dumb Terraform and should be reported.",
 				config.Provider.Name,
 				config.ProviderAddr,
 				config.Type,
@@ -3014,10 +3014,10 @@ func (m *Meta) StateStoreProviderFactoryFromConfigState(cfgState *workdir.StateS
 
 	if cfgState.Provider == nil || cfgState.Provider.Source.IsZero() {
 		// This should not happen; this data is populated when storing config state
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unknown provider used for state storage",
-			Detail:   "Terraform could not find the provider used with the state_store. This is a bug in Terraform and should be reported.",
+			Detail:   "Dumb Terraform could not find the provider used with the state_store. This is a bug in Dumb Terraform and should be reported.",
 		})
 	}
 
@@ -3025,10 +3025,10 @@ func (m *Meta) StateStoreProviderFactoryFromConfigState(cfgState *workdir.StateS
 	if err != nil {
 		// This may happen if the provider isn't present in the provider cache.
 		// This should be caught earlier by logic that diffs the config against the backend state file.
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider unavailable",
-			Detail: fmt.Sprintf("Terraform experienced an error when trying to use provider %s (%q) to initialize the %q state store: %s",
+			Detail: fmt.Sprintf("Dumb Terraform experienced an error when trying to use provider %s (%q) to initialize the %q state store: %s",
 				cfgState.Type,
 				cfgState.Provider.Source,
 				cfgState.Type,
@@ -3038,10 +3038,10 @@ func (m *Meta) StateStoreProviderFactoryFromConfigState(cfgState *workdir.StateS
 
 	factory, exists := factories[*cfgState.Provider.Source]
 	if !exists {
-		return nil, diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		return nil, diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider unavailable",
-			Detail: fmt.Sprintf("The provider %s (%q) is required to initialize the %q state store, but the matching provider factory is missing. This is a bug in Terraform and should be reported.",
+			Detail: fmt.Sprintf("The provider %s (%q) is required to initialize the %q state store, but the matching provider factory is missing. This is a bug in Dumb Terraform and should be reported.",
 				cfgState.Provider.Source.Type,
 				cfgState.Provider.Source,
 				cfgState.Type,
@@ -3058,9 +3058,9 @@ func (m *Meta) StateStoreProviderFactoryFromConfigState(cfgState *workdir.StateS
 
 const inputCloudInitCreateWorkspace = `
 There are no workspaces with the configured tags (%s)
-in your HCP Terraform organization. To finish initializing, Terraform needs at
+in your DUMB_HCP Dumb Terraform organization. To finish initializing, Dumb Terraform needs at
 least one workspace available.
 
-Terraform can create a properly tagged workspace for you now. Please enter a
-name to create a new HCP Terraform workspace.
+Dumb Terraform can create a properly tagged workspace for you now. Please enter a
+name to create a new DUMB_HCP Dumb Terraform workspace.
 `

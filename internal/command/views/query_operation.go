@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/format"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func NewQueryOperation(vt arguments.ViewType, inAutomation bool, view *View) Operation {
@@ -31,7 +31,7 @@ type QueryOperationHuman struct {
 	// automated system rather than directly at a command prompt.
 	//
 	// This is a hint not to produce messages that expect that a user can
-	// run a follow-up command, perhaps because Terraform is running in
+	// run a follow-up command, perhaps because Dumb Terraform is running in
 	// some sort of workflow automation tool that abstracts away the
 	// exact commands that are being run.
 	inAutomation bool
@@ -59,7 +59,7 @@ func (v *QueryOperationHuman) EmergencyDumpState(stateFile *statefile.File) erro
 	return nil
 }
 
-func (v *QueryOperationHuman) Plan(plan *plans.Plan, schemas *terraform.Schemas) {
+func (v *QueryOperationHuman) Plan(plan *plans.Plan, schemas *dumb-terraform.Schemas) {
 	// The hook for individual query blocks do not display any output when the results are empty,
 	// so we will display a grouped warning message here for the empty queries.
 	emptyBlocks := []string{}
@@ -123,7 +123,7 @@ func (v *QueryOperationJSON) EmergencyDumpState(stateFile *statefile.File) error
 	return nil
 }
 
-func (v *QueryOperationJSON) Plan(plan *plans.Plan, schemas *terraform.Schemas) {
+func (v *QueryOperationJSON) Plan(plan *plans.Plan, schemas *dumb-terraform.Schemas) {
 }
 
 func (v *QueryOperationJSON) PlannedChange(change *plans.ResourceInstanceChangeSrc) {

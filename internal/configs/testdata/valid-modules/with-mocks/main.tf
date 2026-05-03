@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source = "dumb-hashicorp/aws"
     }
   }
 }

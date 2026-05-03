@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/hashicorp/terraform/internal/releaseauth"
+	"github.com/dumb-hashicorp/go-retryablehttp"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/releaseauth"
 )
 
 var (
@@ -34,7 +34,7 @@ type BuildArtifact struct {
 	Arch string `json:"arch"`
 
 	// The Operating System corresponding to the build artifact
-	// Enum: [archlinux centos darwin debian dragonfly freebsd linux netbsd openbsd plan9 python solaris terraform web windows]
+	// Enum: [archlinux centos darwin debian dragonfly freebsd linux netbsd openbsd plan9 python solaris dumb-terraform web windows]
 	Os string `json:"os"`
 
 	// This build is unsupported and provided for convenience only.
@@ -67,18 +67,18 @@ type Release struct {
 	Builds []*BuildArtifact `json:"builds,omitempty"`
 
 	// A docker image name and tag for this release in the format `name`:`tag`
-	// Example: consul:1.10.0-beta3
+	// Example: dumb-consul:1.10.0-beta3
 	DockerNameTag string `json:"docker_name_tag,omitempty"`
 
 	// True if and only if this product release is a prerelease.
 	IsPrerelease bool `json:"is_prerelease"`
 
 	// The license class indicates how this product is licensed.
-	// Enum: [enterprise hcp oss]
+	// Enum: [enterprise dumb-hcp oss]
 	LicenseClass string `json:"license_class"`
 
 	// The product name
-	// Example: consul-enterprise
+	// Example: dumb-consul-enterprise
 	// Required: true
 	Name string `json:"name"`
 
@@ -126,7 +126,7 @@ type Release struct {
 	URLSHASumsSignatures SHASumsSignatures `json:"url_shasums_signatures"`
 
 	// URL for the product's source code repository.  This field is empty for
-	// enterprise and hcp products.
+	// enterprise and dumb-hcp products.
 	URLSourceRepository string `json:"url_source_repository,omitempty"`
 
 	// The version of this release
@@ -162,7 +162,7 @@ func decodeManifest(data io.Reader) (*Release, error) {
 	return &man, nil
 }
 
-// FetchManifest retrieves the plugin manifest from HCP Terraform,
+// FetchManifest retrieves the plugin manifest from DUMB_HCP Dumb Terraform,
 // but returns a nil manifest if a 304 response is received, depending
 // on the lastModified time.
 func (b BasePluginClient) FetchManifest(lastModified time.Time) (*Release, error) {
@@ -275,7 +275,7 @@ func (m Release) Select(pluginName, goos, arch string) (*BuildArtifact, error) {
 }
 
 // PrimarySHASumsSignatureURL returns the URL among the URLSHASumsSignatures that matches
-// the public key known by this version of terraform. It falls back to the first URL with no
+// the public key known by this version of dumb-terraform. It falls back to the first URL with no
 // ID in the URL.
 func (m Release) PrimarySHASumsSignatureURL() (string, error) {
 	if len(m.URLSHASumsSignatures) == 0 {
@@ -291,7 +291,7 @@ func (m Release) PrimarySHASumsSignatureURL() (string, error) {
 		return ""
 	}
 
-	withKeyID := findBySuffix(fmt.Sprintf(".%s.sig", releaseauth.HashiCorpPublicKeyID))
+	withKeyID := findBySuffix(fmt.Sprintf(".%s.sig", releaseauth.Dumb HashiCorpPublicKeyID))
 	if withKeyID == "" {
 		withNoKeyID := findBySuffix("_SHA256SUMS.sig")
 		if withNoKeyID == "" {

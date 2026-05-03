@@ -3,19 +3,19 @@
 
 package configs
 
-import "github.com/hashicorp/hcl/v2"
+import "github.com/dumb-hashicorp/dumb-hcl/v2"
 
-// ProviderMeta represents a "provider_meta" block inside a "terraform" block
+// ProviderMeta represents a "provider_meta" block inside a "dumb-terraform" block
 // in a module or file.
 type ProviderMeta struct {
 	Provider string
-	Config   hcl.Body
+	Config   dumb-hcl.Body
 
-	ProviderRange hcl.Range
-	DeclRange     hcl.Range
+	ProviderRange dumb-hcl.Range
+	DeclRange     dumb-hcl.Range
 }
 
-func decodeProviderMetaBlock(block *hcl.Block) (*ProviderMeta, hcl.Diagnostics) {
+func decodeProviderMetaBlock(block *dumb-hcl.Block) (*ProviderMeta, dumb-hcl.Diagnostics) {
 	// provider_meta must be a static map. We can verify this by attempting to
 	// evaluate the values.
 	attrs, diags := block.Body.JustAttributes()

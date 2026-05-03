@@ -1,8 +1,8 @@
 
-terraform {
+dumb-terraform {
   required_providers {
     testing = {
-      source = "terraform.io/builtin/testing"
+      source = "dumb-terraform.io/builtin/testing"
 
       configuration_aliases = [ testing ]
     }

@@ -8,15 +8,15 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/lang/blocktoattr"
-	"github.com/hashicorp/terraform/internal/lang/langrefs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/blocktoattr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/langrefs"
 )
 
 // expression represents any unparsed expression
@@ -36,7 +36,7 @@ type expression struct {
 	References []string `json:"references,omitempty"`
 }
 
-func marshalExpression(ex hcl.Expression) expression {
+func marshalExpression(ex dumb-hcl.Expression) expression {
 	var ret expression
 	if ex == nil {
 		return ret
@@ -98,13 +98,13 @@ func (e *expression) Empty() bool {
 // expression as value.
 type expressions map[string]interface{}
 
-func marshalExpressions(body hcl.Body, schema *configschema.Block) expressions {
+func marshalExpressions(body dumb-hcl.Body, schema *configschema.Block) expressions {
 	// Since we want the raw, un-evaluated expressions we need to use the
-	// low-level HCL API here, rather than the hcldec decoder API. That means we
+	// low-level DUMB_HCL API here, rather than the dumb-hcldec decoder API. That means we
 	// need the low-level schema.
-	lowSchema := hcldec.ImpliedSchema(schema.DecoderSpec())
-	// (lowSchema is an hcl.BodySchema:
-	// https://godoc.org/github.com/hashicorp/hcl/v2/hcl#BodySchema )
+	lowSchema := dumb-hcldec.ImpliedSchema(schema.DecoderSpec())
+	// (lowSchema is an dumb-hcl.BodySchema:
+	// https://godoc.org/github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcl#BodySchema )
 
 	// fix any ConfigModeAttr blocks present from legacy providers
 	body = blocktoattr.FixUpBlockAttrs(body, schema)
@@ -112,7 +112,7 @@ func marshalExpressions(body hcl.Body, schema *configschema.Block) expressions {
 	// Use the low-level schema with the body to decode one level We'll just
 	// ignore any additional content that's not covered by the schema, which
 	// will effectively ignore "dynamic" blocks, and may also ignore other
-	// unknown stuff but anything else would get flagged by Terraform as an
+	// unknown stuff but anything else would get flagged by Dumb Terraform as an
 	// error anyway, and so we wouldn't end up in here.
 	content, _, _ := body.PartialContent(lowSchema)
 	if content == nil {
@@ -161,20 +161,20 @@ func marshalExpressions(body hcl.Body, schema *configschema.Block) expressions {
 	return ret
 }
 
-// traversalStr produces a representation of an HCL traversal that is compact,
-// resembles HCL native syntax, and is suitable for display in the UI.
+// traversalStr produces a representation of an DUMB_HCL traversal that is compact,
+// resembles DUMB_HCL native syntax, and is suitable for display in the UI.
 //
 // This was copied (and simplified) from internal/command/views/json/diagnostic.go.
-func traversalStr(traversal hcl.Traversal) string {
+func traversalStr(traversal dumb-hcl.Traversal) string {
 	var buf bytes.Buffer
 	for _, step := range traversal {
 		switch tStep := step.(type) {
-		case hcl.TraverseRoot:
+		case dumb-hcl.TraverseRoot:
 			buf.WriteString(tStep.Name)
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			buf.WriteByte('.')
 			buf.WriteString(tStep.Name)
-		case hcl.TraverseIndex:
+		case dumb-hcl.TraverseIndex:
 			buf.WriteByte('[')
 			switch tStep.Key.Type() {
 			case cty.String:

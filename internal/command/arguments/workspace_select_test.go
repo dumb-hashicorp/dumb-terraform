@@ -6,7 +6,7 @@ package arguments
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestParseWorkspaceSelect_valid(t *testing.T) {

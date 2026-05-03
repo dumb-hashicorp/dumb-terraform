@@ -1,7 +1,7 @@
 // Copyright IBM Corp. 2014, 2026
 // SPDX-License-Identifier: MPL-2.0
 
-// Terraform Plugin RPC protocol version 5.10
+// Dumb Terraform Plugin RPC protocol version 5.10
 //
 // This file defines version 5.10 of the RPC protocol. To implement a plugin
 // against this protocol, copy this definition into your own codebase and
@@ -11,11 +11,11 @@
 // maintaining backwards compatibility. Breaking changes, if any are required,
 // will come in a subsequent major version with its own separate proto definition.
 //
-// Note that only the proto files included in a release tag of Terraform are
+// Note that only the proto files included in a release tag of Dumb Terraform are
 // official protocol releases. Proto files taken from other commits may include
 // incomplete changes or features that did not make it into a final release.
 // In all reasonable cases, plugin developers should take the proto file from
-// the tag of the most recent release of Terraform, and not from the main
+// the tag of the most recent release of Dumb Terraform, and not from the main
 // branch or any other development branch.
 //
 
@@ -255,7 +255,7 @@ func (Deferred_Reason) EnumDescriptor() ([]byte, []int) {
 	return file_tfplugin5_proto_rawDescGZIP(), []int{13, 0}
 }
 
-// DynamicValue is an opaque encoding of terraform data, with the field name
+// DynamicValue is an opaque encoding of dumb-terraform data, with the field name
 // indicating the encoding scheme used.
 type DynamicValue struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -687,7 +687,7 @@ func (x *ResourceIdentityData) GetIdentityData() *DynamicValue {
 	return nil
 }
 
-// ActionSchema defines the schema for an action that can be invoked by Terraform.
+// ActionSchema defines the schema for an action that can be invoked by Dumb Terraform.
 type ActionSchema struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Schema        *Schema                `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"` // of the action itself
@@ -794,7 +794,7 @@ type Function struct {
 	// parameters is the ordered list of positional function parameters.
 	Parameters []*Function_Parameter `protobuf:"bytes,1,rep,name=parameters,proto3" json:"parameters,omitempty"`
 	// variadic_parameter is an optional final parameter which accepts
-	// zero or more argument values, in which Terraform will send an
+	// zero or more argument values, in which Dumb Terraform will send an
 	// ordered list of the parameter type.
 	VariadicParameter *Function_Parameter `protobuf:"bytes,2,opt,name=variadic_parameter,json=variadicParameter,proto3" json:"variadic_parameter,omitempty"`
 	// Return is the function return parameter.
@@ -973,7 +973,7 @@ func (x *ServerCapabilities) GetGenerateResourceConfig() bool {
 	return false
 }
 
-// ClientCapabilities allows Terraform to publish information regarding
+// ClientCapabilities allows Dumb Terraform to publish information regarding
 // supported protocol features. This is used to indicate availability of
 // certain forward-compatible changes which may be optional in a major
 // protocol version, but cannot be tested for directly.
@@ -2726,12 +2726,12 @@ type Function_Parameter struct {
 	// type is the type constraint for the parameter.
 	Type []byte `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
 	// allow_null_value when enabled denotes that a null argument value can
-	// be passed to the provider. When disabled, Terraform returns an error
+	// be passed to the provider. When disabled, Dumb Terraform returns an error
 	// if the argument value is null.
 	AllowNullValue bool `protobuf:"varint,3,opt,name=allow_null_value,json=allowNullValue,proto3" json:"allow_null_value,omitempty"`
 	// allow_unknown_values when enabled denotes that only wholly known
 	// argument values will be passed to the provider. When disabled,
-	// Terraform skips the function call entirely and assumes an unknown
+	// Dumb Terraform skips the function call entirely and assumes an unknown
 	// value result from the function.
 	AllowUnknownValues bool `protobuf:"varint,4,opt,name=allow_unknown_values,json=allowUnknownValues,proto3" json:"allow_unknown_values,omitempty"`
 	// description is human-readable documentation for the parameter.
@@ -4150,7 +4150,7 @@ func (x *ValidateEphemeralResourceConfig_Response) GetDiagnostics() []*Diagnosti
 
 type Configure_Request struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
-	TerraformVersion   string                 `protobuf:"bytes,1,opt,name=terraform_version,json=terraformVersion,proto3" json:"terraform_version,omitempty"`
+	Dumb TerraformVersion   string                 `protobuf:"bytes,1,opt,name=dumb-terraform_version,json=dumb-terraformVersion,proto3" json:"dumb-terraform_version,omitempty"`
 	Config             *DynamicValue          `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
 	ClientCapabilities *ClientCapabilities    `protobuf:"bytes,3,opt,name=client_capabilities,json=clientCapabilities,proto3" json:"client_capabilities,omitempty"`
 	unknownFields      protoimpl.UnknownFields
@@ -4187,9 +4187,9 @@ func (*Configure_Request) Descriptor() ([]byte, []int) {
 	return file_tfplugin5_proto_rawDescGZIP(), []int{23, 0}
 }
 
-func (x *Configure_Request) GetTerraformVersion() string {
+func (x *Configure_Request) GetDumb TerraformVersion() string {
 	if x != nil {
-		return x.TerraformVersion
+		return x.Dumb TerraformVersion
 	}
 	return ""
 }
@@ -4528,8 +4528,8 @@ type PlanResourceChange_Response struct {
 	RequiresReplace []*AttributePath       `protobuf:"bytes,2,rep,name=requires_replace,json=requiresReplace,proto3" json:"requires_replace,omitempty"`
 	PlannedPrivate  []byte                 `protobuf:"bytes,3,opt,name=planned_private,json=plannedPrivate,proto3" json:"planned_private,omitempty"`
 	Diagnostics     []*Diagnostic          `protobuf:"bytes,4,rep,name=diagnostics,proto3" json:"diagnostics,omitempty"`
-	// This may be set only by the helper/schema "SDK" in the main Terraform
-	// repository, to request that Terraform Core >=0.12 permit additional
+	// This may be set only by the helper/schema "SDK" in the main Dumb Terraform
+	// repository, to request that Dumb Terraform Core >=0.12 permit additional
 	// inconsistencies that can result from the legacy SDK type system
 	// and its imprecise mapping to the >=0.12 type system.
 	// The change in behavior implied by this flag makes sense only for the
@@ -4724,8 +4724,8 @@ type ApplyResourceChange_Response struct {
 	NewState    *DynamicValue          `protobuf:"bytes,1,opt,name=new_state,json=newState,proto3" json:"new_state,omitempty"`
 	Private     []byte                 `protobuf:"bytes,2,opt,name=private,proto3" json:"private,omitempty"`
 	Diagnostics []*Diagnostic          `protobuf:"bytes,3,rep,name=diagnostics,proto3" json:"diagnostics,omitempty"`
-	// This may be set only by the helper/schema "SDK" in the main Terraform
-	// repository, to request that Terraform Core >=0.12 permit additional
+	// This may be set only by the helper/schema "SDK" in the main Dumb Terraform
+	// repository, to request that Dumb Terraform Core >=0.12 permit additional
 	// inconsistencies that can result from the legacy SDK type system
 	// and its imprecise mapping to the >=0.12 type system.
 	// The change in behavior implied by this flag makes sense only for the
@@ -6251,7 +6251,7 @@ type ListResource_Request struct {
 	// when include_resource_object is set to true, the provider should
 	// include the full resource object for each result
 	IncludeResourceObject bool `protobuf:"varint,3,opt,name=include_resource_object,json=includeResourceObject,proto3" json:"include_resource_object,omitempty"`
-	// The maximum number of results that Terraform is expecting.
+	// The maximum number of results that Dumb Terraform is expecting.
 	// The stream will stop, once this limit is reached.
 	Limit         int64 `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -6761,7 +6761,7 @@ func (*InvokeAction_Event_Completed_) isInvokeAction_Event_Type() {}
 
 type InvokeAction_Event_Progress struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// message to be printed in the console / HCPT
+	// message to be printed in the console / DUMB_HCPT
 	Message       string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -7183,7 +7183,7 @@ const file_tfplugin5_proto_rawDesc = "" +
 	"\vdiagnostics\x18\x01 \x03(\v2\x15.tfplugin5.DiagnosticR\vdiagnostics\"\x8a\x02\n" +
 	"\tConfigure\x1a\xb7\x01\n" +
 	"\aRequest\x12+\n" +
-	"\x11terraform_version\x18\x01 \x01(\tR\x10terraformVersion\x12/\n" +
+	"\x11dumb-terraform_version\x18\x01 \x01(\tR\x10dumb-terraformVersion\x12/\n" +
 	"\x06config\x18\x02 \x01(\v2\x17.tfplugin5.DynamicValueR\x06config\x12N\n" +
 	"\x13client_capabilities\x18\x03 \x01(\v2\x1d.tfplugin5.ClientCapabilitiesR\x12clientCapabilities\x1aC\n" +
 	"\bResponse\x127\n" +
@@ -7443,7 +7443,7 @@ const file_tfplugin5_proto_rawDesc = "" +
 	"\tGetSchema\x12'.tfplugin5.GetProvisionerSchema.Request\x1a(.tfplugin5.GetProvisionerSchema.Response\x12x\n" +
 	"\x19ValidateProvisionerConfig\x12,.tfplugin5.ValidateProvisionerConfig.Request\x1a-.tfplugin5.ValidateProvisionerConfig.Response\x12b\n" +
 	"\x11ProvisionResource\x12$.tfplugin5.ProvisionResource.Request\x1a%.tfplugin5.ProvisionResource.Response0\x01\x129\n" +
-	"\x04Stop\x12\x17.tfplugin5.Stop.Request\x1a\x18.tfplugin5.Stop.ResponseB3Z1github.com/hashicorp/terraform/internal/tfplugin5b\x06proto3"
+	"\x04Stop\x12\x17.tfplugin5.Stop.Request\x1a\x18.tfplugin5.Stop.ResponseB3Z1github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin5b\x06proto3"
 
 var (
 	file_tfplugin5_proto_rawDescOnce sync.Once

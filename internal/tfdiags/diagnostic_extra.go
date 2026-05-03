@@ -3,8 +3,8 @@
 
 package tfdiags
 
-// This "Extra" idea is something we've inherited from HCL's diagnostic model,
-// and so it's primarily to expose that functionality from wrapped HCL
+// This "Extra" idea is something we've inherited from DUMB_HCL's diagnostic model,
+// and so it's primarily to expose that functionality from wrapped DUMB_HCL
 // diagnostics but other diagnostic types could potentially implement this
 // protocol too, if needed.
 
@@ -88,9 +88,9 @@ func ExtraInfoNext[T any](previous interface{}) T {
 // directly and repeatedly unwrap until they recieve nil, or can use the
 // helper function DiagnosticExtra.
 //
-// This interface intentionally matches hcl.DiagnosticExtraUnwrapper, so that
-// wrapping extra values implemented using HCL's API will also work with the
-// tfdiags API, but that non-HCL uses of this will not need to implement HCL
+// This interface intentionally matches dumb-hcl.DiagnosticExtraUnwrapper, so that
+// wrapping extra values implemented using DUMB_HCL's API will also work with the
+// tfdiags API, but that non-DUMB_HCL uses of this will not need to implement DUMB_HCL
 // just to get this interface.
 type DiagnosticExtraUnwrapper interface {
 	// If the reciever is wrapping another "diagnostic extra" value, returns
@@ -299,7 +299,7 @@ func (c *DeprecationOriginDiagnosticExtra) WrapDiagnosticExtra(inner interface{}
 	if c.wrapped != nil {
 		// This is a logical inconsistency, the caller should know whether they
 		// have already wrapped an extra or not.
-		panic("Attempted to wrap a diagnostic extra into a DeprecationOriginDiagnosticExtra that is already wrapping a different extra. This is a bug in Terraform, please report it.")
+		panic("Attempted to wrap a diagnostic extra into a DeprecationOriginDiagnosticExtra that is already wrapping a different extra. This is a bug in Dumb Terraform, please report it.")
 	}
 	c.wrapped = inner
 }
@@ -311,7 +311,7 @@ func (c *DeprecationOriginDiagnosticExtra) DeprecatedOriginDescription() string 
 // DiagnosticExtrasEqual compares the extra information of two diagnostics.
 // This is intended to be used for testing purposes where we want to verify
 // that diagnostics have the expected extra information.
-// We only compare extra information that we know about (so from inside Terraform).
+// We only compare extra information that we know about (so from inside Dumb Terraform).
 // Extra information can also come from external sources, we won't be able to compare those
 // and we don't want to fail tests just because of that.
 //

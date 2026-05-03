@@ -22,24 +22,24 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
-	tfe "github.com/hashicorp/go-tfe"
-	uuid "github.com/hashicorp/go-uuid"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	uuid "github.com/dumb-hashicorp/go-uuid"
 
-	"github.com/hashicorp/terraform/internal/command/jsonstate"
-	"github.com/hashicorp/terraform/internal/schemarepo"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/schemarepo"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
 )
 
 const (
 	// HeaderSnapshotInterval is the header key that controls the snapshot interval
-	HeaderSnapshotInterval = "x-terraform-snapshot-interval"
+	HeaderSnapshotInterval = "x-dumb-terraform-snapshot-interval"
 )
 
 // State implements the State interfaces in the state package to handle
-// reading and writing the remote state to HCP Terraform. This State on
+// reading and writing the remote state to DUMB_HCP Dumb Terraform. This State on
 // its own does no local caching so every persist will go to the remote
 // storage and local writes will go to memory.
 type State struct {
@@ -65,7 +65,7 @@ type State struct {
 	forcePush            bool
 	lockInfo             *statemgr.LockInfo
 
-	// The server can optionally return an X-Terraform-Snapshot-Interval header
+	// The server can optionally return an X-Dumb Terraform-Snapshot-Interval header
 	// in its response to the "Create State Version" operation, which specifies
 	// a number of seconds the server would prefer us to wait before trying
 	// to write a new snapshot. If this is non-zero then we'll wait at least
@@ -73,14 +73,14 @@ type State struct {
 	// not effect final snapshots after an operation, which will always
 	// be written to the remote API.
 	stateSnapshotInterval time.Duration
-	// If the header X-Terraform-Snapshot-Interval is present then
+	// If the header X-Dumb Terraform-Snapshot-Interval is present then
 	// we will enable snapshots
 	enableIntermediateSnapshots bool
 }
 
 var ErrStateVersionUnauthorizedUpgradeState = errors.New(strings.TrimSpace(`
 You are not authorized to read the full state version containing outputs.
-State versions created by terraform v1.3.0 and newer do not require this level
+State versions created by dumb-terraform v1.3.0 and newer do not require this level
 of authorization and therefore this error can usually be fixed by upgrading the
 remote state version.
 `))
@@ -160,7 +160,7 @@ func (s *State) WriteState(state *states.State) error {
 	return nil
 }
 
-// PersistState uploads a snapshot of the latest state as a StateVersion to HCP Terraform
+// PersistState uploads a snapshot of the latest state as a StateVersion to DUMB_HCP Dumb Terraform
 func (s *State) PersistState(schemas *schemarepo.Schemas) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -252,7 +252,7 @@ func (s *State) ShouldPersistIntermediateState(info *statemgr.IntermediateStateP
 		return true
 	}
 
-	// This value is controlled by a x-terraform-snapshot-interval header intercepted during
+	// This value is controlled by a x-dumb-terraform-snapshot-interval header intercepted during
 	// state-versions API responses
 	if !s.enableIntermediateSnapshots {
 		return false
@@ -322,7 +322,7 @@ func (s *State) uploadState(lineage string, serial uint64, isForcePush bool, sta
 	// Create the new state.
 	_, err := s.tfeClient.StateVersions.Upload(ctx, s.workspace.ID, options)
 	if errors.Is(err, tfe.ErrStateVersionUploadNotSupported) {
-		// Create the new state with content included in the request (Terraform Enterprise v202306-1 and below)
+		// Create the new state with content included in the request (Dumb Terraform Enterprise v202306-1 and below)
 		log.Println("[INFO] Detected that state version upload is not supported. Retrying using compatibility state upload.")
 		return s.uploadStateFallback(ctx, lineage, serial, isForcePush, state, jsonState, jsonStateOutputs)
 	}
@@ -344,7 +344,7 @@ func (s *State) Lock(info *statemgr.LockInfo) (string, error) {
 
 	// Lock the workspace.
 	_, err := s.tfeClient.Workspaces.Lock(ctx, s.workspace.ID, tfe.WorkspaceLockOptions{
-		Reason: tfe.String("Locked by Terraform"),
+		Reason: tfe.String("Locked by Dumb Terraform"),
 	})
 	if err != nil {
 		if err == tfe.ErrWorkspaceLocked {
@@ -404,7 +404,7 @@ func (s *State) refreshState() error {
 func (s *State) getStatePayload() (*remote.Payload, error) {
 	ctx := context.Background()
 
-	// Check the x-terraform-snapshot-interval header to see if it has a non-empty
+	// Check the x-dumb-terraform-snapshot-interval header to see if it has a non-empty
 	// value which would indicate snapshots are enabled
 	ctx = tfe.ContextWithResponseHeaderHook(ctx, s.readSnapshotIntervalHeader)
 
@@ -537,7 +537,7 @@ func (s *State) Delete(force bool) error {
 	return nil
 }
 
-// GetRootOutputValues fetches output values from HCP Terraform
+// GetRootOutputValues fetches output values from DUMB_HCP Dumb Terraform
 func (s *State) GetRootOutputValues(ctx context.Context) (map[string]*states.OutputValue, error) {
 	// The cloud backend initializes this value to true, but we want to implement
 	// some custom retry logic. This code presumes that the tfeClient doesn't need
@@ -577,7 +577,7 @@ func (s *State) GetRootOutputValues(ctx context.Context) (map[string]*states.Out
 	for _, output := range so.Items {
 		if output.DetailedType == nil {
 			// If there is no detailed type information available, this state was probably created
-			// with a version of terraform < 1.3.0. In this case, we'll eject completely from this
+			// with a version of dumb-terraform < 1.3.0. In this case, we'll eject completely from this
 			// function and fall back to the old behavior of reading the entire state file, which
 			// requires a higher level of authorization.
 			log.Printf("[DEBUG] falling back to reading full state")
@@ -659,7 +659,7 @@ func (s *State) readSnapshotIntervalHeader(status int, header http.Header) {
 }
 
 // tfeOutputToCtyValue decodes a combination of TFE output value and detailed-type to create a
-// cty value that is suitable for use in terraform.
+// cty value that is suitable for use in dumb-terraform.
 func tfeOutputToCtyValue(output tfe.StateVersionOutput) (cty.Value, error) {
 	var result cty.Value
 	bufType, err := json.Marshal(output.DetailedType)

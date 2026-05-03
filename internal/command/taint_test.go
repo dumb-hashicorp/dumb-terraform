@@ -8,14 +8,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 func TestTaint(t *testing.T) {
@@ -310,12 +310,12 @@ func TestTaint_constVariable(t *testing.T) {
 			t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter.String())
 		}
 
-		actual := strings.TrimSpace(testStateRead(t, "terraform.tfstate").String())
+		actual := strings.TrimSpace(testStateRead(t, "dumb-terraform.tfstate").String())
 		expected := strings.TrimSpace(`<no state>
 module.child:
   test_instance.test: (tainted)
     ID = 
-    provider = provider["registry.terraform.io/hashicorp/test"]`)
+    provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]`)
 		if diff := cmp.Diff(expected, actual); diff != "" {
 			t.Fatalf("unexpected state output\n%s", diff)
 		}
@@ -347,12 +347,12 @@ module.child:
 			t.Fatalf("bad: %d\n\n%s", code, ui.ErrorWriter.String())
 		}
 
-		actual := strings.TrimSpace(testStateRead(t, "terraform.tfstate").String())
+		actual := strings.TrimSpace(testStateRead(t, "dumb-terraform.tfstate").String())
 		expected := strings.TrimSpace(`<no state>
 module.child:
   test_instance.test: (tainted)
     ID = 
-    provider = provider["registry.terraform.io/hashicorp/test"]`)
+    provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]`)
 		if diff := cmp.Diff(expected, actual); diff != "" {
 			t.Fatalf("unexpected state output\n%s", diff)
 		}
@@ -650,22 +650,22 @@ func TestTaint_checkRequiredVersion(t *testing.T) {
 const testTaintStr = `
 test_instance.foo: (tainted)
   ID = bar
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
 `
 
 const testTaintDefaultStr = `
 test_instance.foo:
   ID = bar
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
 `
 
 const testTaintModuleStr = `
 test_instance.foo:
   ID = bar
-  provider = provider["registry.terraform.io/hashicorp/test"]
+  provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
 
 module.child:
   test_instance.blah: (tainted)
     ID = blah
-    provider = provider["registry.terraform.io/hashicorp/test"]
+    provider = provider["registry.dumb-terraform.io/dumb-hashicorp/test"]
 `

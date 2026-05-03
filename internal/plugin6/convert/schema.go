@@ -10,9 +10,9 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	proto "github.com/hashicorp/terraform/internal/tfplugin6"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	proto "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin6"
 )
 
 // ConfigSchemaToProto takes a *configschema.Block and converts it to a
@@ -185,7 +185,7 @@ func ProtoToIdentitySchema(attributes []*proto.ResourceIdentitySchema_IdentityAt
 }
 
 // ProtoToConfigSchema takes the GetSchcema_Block from a grpc response and converts it
-// to a terraform *configschema.Block.
+// to a dumb-terraform *configschema.Block.
 func ProtoToConfigSchema(b *proto.Schema_Block) *configschema.Block {
 	block := &configschema.Block{
 		Attributes: make(map[string]*configschema.Attribute),

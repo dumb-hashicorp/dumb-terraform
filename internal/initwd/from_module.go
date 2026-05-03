@@ -12,18 +12,18 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/copy"
-	"github.com/hashicorp/terraform/internal/getmodules"
-	"github.com/hashicorp/terraform/internal/getmodules/moduleaddrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/copy"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getmodules"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getmodules/moduleaddrs"
 	"github.com/zclconf/go-cty/cty"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/terraform/internal/modsdir"
-	"github.com/hashicorp/terraform/internal/registry"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/modsdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const initFromModuleRootCallName = "root"
@@ -78,7 +78,7 @@ func DirFromModule(ctx context.Context, loader *configload.Loader, rootDir, modu
 		}
 		haveEntries := false
 		for _, entry := range entries {
-			if entry.Name() == "." || entry.Name() == ".." || entry.Name() == ".terraform" {
+			if entry.Name() == "." || entry.Name() == ".." || entry.Name() == ".dumb-terraform" {
 				continue
 			}
 			haveEntries = true
@@ -93,7 +93,7 @@ func DirFromModule(ctx context.Context, loader *configload.Loader, rootDir, modu
 		}
 	}
 
-	instDir := filepath.Join(rootDir, ".terraform/init-from-module")
+	instDir := filepath.Join(rootDir, ".dumb-terraform/init-from-module")
 	inst := NewModuleInstaller(instDir, loader, reg, nil)
 	log.Printf("[DEBUG] installing modules in %s to initialize working directory from %q", instDir, sourceAddrStr)
 	os.RemoveAll(instDir) // if this fails then we'll fail on MkdirAll below too
@@ -129,16 +129,16 @@ func DirFromModule(ctx context.Context, loader *configload.Loader, rootDir, modu
 
 	// Now we need to create an artificial root module that will seed our
 	// installation process.
-	fakeRange := hcl.Range{
+	fakeRange := dumb-hcl.Range{
 		Filename: initFromModuleRootFilename,
-		Start:    hcl.InitialPos,
-		End:      hcl.InitialPos,
+		Start:    dumb-hcl.InitialPos,
+		End:      dumb-hcl.InitialPos,
 	}
 	fakeRootModule := &configs.Module{
 		ModuleCalls: map[string]*configs.ModuleCall{
 			initFromModuleRootCallName: {
 				Name:       initFromModuleRootCallName,
-				SourceExpr: hcl.StaticExpr(cty.StringVal(sourceAddrStr), fakeRange),
+				SourceExpr: dumb-hcl.StaticExpr(cty.StringVal(sourceAddrStr), fakeRange),
 				DeclRange:  fakeRange,
 			},
 		},
@@ -221,8 +221,8 @@ func DirFromModule(ctx context.Context, loader *configload.Loader, rootDir, modu
 					sourceVal, _ := mc.SourceExpr.Value(nil)
 
 					if !sourceVal.IsKnown() {
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Unknown module source",
 							Detail:   "Dynamic module sources cannot be used in conjunction with -from-module",
 							Subject:  mc.SourceExpr.Range().Ptr(),

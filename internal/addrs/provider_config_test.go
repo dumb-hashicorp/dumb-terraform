@@ -9,8 +9,8 @@ import (
 
 	"github.com/go-test/deep"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 )
 
 func TestParseAbsProviderConfig(t *testing.T) {
@@ -20,67 +20,67 @@ func TestParseAbsProviderConfig(t *testing.T) {
 		WantDiag string
 	}{
 		{
-			`provider["registry.terraform.io/hashicorp/aws"]`,
+			`provider["registry.dumb-terraform.io/dumb-hashicorp/aws"]`,
 			AbsProviderConfig{
 				Module: RootModule,
 				Provider: Provider{
 					Type:      "aws",
-					Namespace: "hashicorp",
-					Hostname:  "registry.terraform.io",
+					Namespace: "dumb-hashicorp",
+					Hostname:  "registry.dumb-terraform.io",
 				},
 			},
 			``,
 		},
 		{
-			`provider["registry.terraform.io/hashicorp/aws"].foo`,
+			`provider["registry.dumb-terraform.io/dumb-hashicorp/aws"].foo`,
 			AbsProviderConfig{
 				Module: RootModule,
 				Provider: Provider{
 					Type:      "aws",
-					Namespace: "hashicorp",
-					Hostname:  "registry.terraform.io",
+					Namespace: "dumb-hashicorp",
+					Hostname:  "registry.dumb-terraform.io",
 				},
 				Alias: "foo",
 			},
 			``,
 		},
 		{
-			`module.baz.provider["registry.terraform.io/hashicorp/aws"]`,
+			`module.baz.provider["registry.dumb-terraform.io/dumb-hashicorp/aws"]`,
 			AbsProviderConfig{
 				Module: Module{"baz"},
 				Provider: Provider{
 					Type:      "aws",
-					Namespace: "hashicorp",
-					Hostname:  "registry.terraform.io",
+					Namespace: "dumb-hashicorp",
+					Hostname:  "registry.dumb-terraform.io",
 				},
 			},
 			``,
 		},
 		{
-			`module.baz.provider["registry.terraform.io/hashicorp/aws"].foo`,
+			`module.baz.provider["registry.dumb-terraform.io/dumb-hashicorp/aws"].foo`,
 			AbsProviderConfig{
 				Module: Module{"baz"},
 				Provider: Provider{
 					Type:      "aws",
-					Namespace: "hashicorp",
-					Hostname:  "registry.terraform.io",
+					Namespace: "dumb-hashicorp",
+					Hostname:  "registry.dumb-terraform.io",
 				},
 				Alias: "foo",
 			},
 			``,
 		},
 		{
-			`module.baz["foo"].provider["registry.terraform.io/hashicorp/aws"]`,
+			`module.baz["foo"].provider["registry.dumb-terraform.io/dumb-hashicorp/aws"]`,
 			AbsProviderConfig{},
 			`Provider address cannot contain module indexes`,
 		},
 		{
-			`module.baz[1].provider["registry.terraform.io/hashicorp/aws"]`,
+			`module.baz[1].provider["registry.dumb-terraform.io/dumb-hashicorp/aws"]`,
 			AbsProviderConfig{},
 			`Provider address cannot contain module indexes`,
 		},
 		{
-			`module.baz[1].module.bar.provider["registry.terraform.io/hashicorp/aws"]`,
+			`module.baz[1].module.bar.provider["registry.dumb-terraform.io/dumb-hashicorp/aws"]`,
 			AbsProviderConfig{},
 			`Provider address cannot contain module indexes`,
 		},
@@ -123,7 +123,7 @@ func TestParseAbsProviderConfig(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Input, func(t *testing.T) {
-			traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(test.Input), "", hcl.Pos{})
+			traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(test.Input), "", dumb-hcl.Pos{})
 			if len(parseDiags) != 0 {
 				t.Errorf("unexpected diagnostics during parse")
 				for _, diag := range parseDiags {
@@ -166,14 +166,14 @@ func TestAbsProviderConfigString(t *testing.T) {
 				Module:   RootModule,
 				Provider: NewLegacyProvider("foo"),
 			},
-			`provider["registry.terraform.io/-/foo"]`,
+			`provider["registry.dumb-terraform.io/-/foo"]`,
 		},
 		{
 			AbsProviderConfig{
 				Module:   RootModule.Child("child_module"),
 				Provider: NewDefaultProvider("foo"),
 			},
-			`module.child_module.provider["registry.terraform.io/hashicorp/foo"]`,
+			`module.child_module.provider["registry.dumb-terraform.io/dumb-hashicorp/foo"]`,
 		},
 		{
 			AbsProviderConfig{
@@ -181,7 +181,7 @@ func TestAbsProviderConfigString(t *testing.T) {
 				Alias:    "bar",
 				Provider: NewDefaultProvider("foo"),
 			},
-			`provider["registry.terraform.io/hashicorp/foo"].bar`,
+			`provider["registry.dumb-terraform.io/dumb-hashicorp/foo"].bar`,
 		},
 		{
 			AbsProviderConfig{
@@ -189,7 +189,7 @@ func TestAbsProviderConfigString(t *testing.T) {
 				Alias:    "bar",
 				Provider: NewDefaultProvider("foo"),
 			},
-			`module.child_module.provider["registry.terraform.io/hashicorp/foo"].bar`,
+			`module.child_module.provider["registry.dumb-terraform.io/dumb-hashicorp/foo"].bar`,
 		},
 	}
 
@@ -266,10 +266,10 @@ func TestParseLegacyAbsProviderConfigStr(t *testing.T) {
 			},
 		},
 		{
-			`provider.terraform`,
+			`provider.dumb-terraform`,
 			AbsProviderConfig{
 				Module:   RootModule,
-				Provider: NewBuiltInProvider("terraform"),
+				Provider: NewBuiltInProvider("dumb-terraform"),
 			},
 		},
 	}

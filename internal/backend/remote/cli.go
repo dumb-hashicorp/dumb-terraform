@@ -4,7 +4,7 @@
 package remote
 
 import (
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
 )
 
 // CLIInit implements backendrun.CLI

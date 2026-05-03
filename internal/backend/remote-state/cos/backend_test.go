@@ -10,13 +10,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
 )
 
 const (
 	defaultPrefix = ""
-	defaultKey    = "terraform.tfstate"
+	defaultKey    = "dumb-terraform.tfstate"
 )
 
 // Testing Thanks to GCS
@@ -34,9 +34,9 @@ func TestStateFile(t *testing.T) {
 		{"", "default", "default.tfstate", "default.tfstate", "default.tfstate.tflock"},
 		{"", "default", "test.tfstate", "test.tfstate", "test.tfstate.tflock"},
 		{"", "dev", "test.tfstate", "dev/test.tfstate", "dev/test.tfstate.tflock"},
-		{"terraform/test", "default", "default.tfstate", "terraform/test/default.tfstate", "terraform/test/default.tfstate.tflock"},
-		{"terraform/test", "default", "test.tfstate", "terraform/test/test.tfstate", "terraform/test/test.tfstate.tflock"},
-		{"terraform/test", "dev", "test.tfstate", "terraform/test/dev/test.tfstate", "terraform/test/dev/test.tfstate.tflock"},
+		{"dumb-terraform/test", "default", "default.tfstate", "dumb-terraform/test/default.tfstate", "dumb-terraform/test/default.tfstate.tflock"},
+		{"dumb-terraform/test", "default", "test.tfstate", "dumb-terraform/test/test.tfstate", "dumb-terraform/test/test.tfstate.tflock"},
+		{"dumb-terraform/test", "dev", "test.tfstate", "dumb-terraform/test/dev/test.tfstate", "dumb-terraform/test/dev/test.tfstate.tflock"},
 	}
 
 	for _, c := range cases {
@@ -318,5 +318,5 @@ func teardownBackend(t *testing.T, b backend.Backend) {
 
 func bucketName(t *testing.T) string {
 	unique := fmt.Sprintf("%s-%x", t.Name(), time.Now().UnixNano())
-	return fmt.Sprintf("terraform-test-%s-%s", fmt.Sprintf("%x", md5.Sum([]byte(unique)))[:10], "")
+	return fmt.Sprintf("dumb-terraform-test-%s-%s", fmt.Sprintf("%x", md5.Sum([]byte(unique)))[:10], "")
 }

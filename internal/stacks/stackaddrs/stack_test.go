@@ -6,7 +6,7 @@ package stackaddrs
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func TestStackInstance_Contains(t *testing.T) {

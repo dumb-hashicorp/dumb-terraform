@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	tfe "github.com/hashicorp/go-tfe"
+	tfe "github.com/dumb-hashicorp/go-tfe"
 )
 
 const (

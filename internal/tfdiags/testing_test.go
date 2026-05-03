@@ -5,7 +5,7 @@ package tfdiags
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 // testDiagWithExtra is a test helper that creates a diagnostic with extra info
@@ -60,8 +60,8 @@ func (d testDiagWithExtra) Equals(other ComparableDiagnostic) bool {
 // DiagnosticComparerWithSource are in compare_test.go
 
 func Test_assertDiagnosticMatch_differentConcreteTypes(t *testing.T) {
-	baseError := hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	baseError := dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "error",
 		Detail:   "this is an error",
 	}
@@ -73,16 +73,16 @@ func Test_assertDiagnosticMatch_differentConcreteTypes(t *testing.T) {
 	}{
 		"diagnostics match but are different concrete types": {
 			expectDiff: false,
-			diag1:      hclDiagnostic{&baseError},
-			diag2:      makeRPCFriendlyDiag(hclDiagnostic{&baseError}),
+			diag1:      dumb-hclDiagnostic{&baseError},
+			diag2:      makeRPCFriendlyDiag(dumb-hclDiagnostic{&baseError}),
 		},
 		"diagnostics don't match and are different concrete types": {
 			expectDiff: true,
-			diag1:      hclDiagnostic{&baseError},
+			diag1:      dumb-hclDiagnostic{&baseError},
 			diag2: func() Diagnostic {
 				d := baseError
-				d.Severity = hcl.DiagWarning // Altered severity level
-				return makeRPCFriendlyDiag(hclDiagnostic{&d})
+				d.Severity = dumb-hcl.DiagWarning // Altered severity level
+				return makeRPCFriendlyDiag(dumb-hclDiagnostic{&d})
 			}(),
 		},
 	}
@@ -103,8 +103,8 @@ func Test_assertDiagnosticMatch_differentConcreteTypes(t *testing.T) {
 }
 
 func Test_assertDiagnosticsAndExtrasMatch(t *testing.T) {
-	baseError := hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	baseError := dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "error",
 		Detail:   "this is an error",
 	}
@@ -121,8 +121,8 @@ func Test_assertDiagnosticsAndExtrasMatch(t *testing.T) {
 		},
 		"diagnostics match with no extras": {
 			expectDiff: false,
-			diags1:     Diagnostics{hclDiagnostic{&baseError}},
-			diags2:     Diagnostics{makeRPCFriendlyDiag(hclDiagnostic{&baseError})},
+			diags1:     Diagnostics{dumb-hclDiagnostic{&baseError}},
+			diags2:     Diagnostics{makeRPCFriendlyDiag(dumb-hclDiagnostic{&baseError})},
 		},
 		"diagnostics match with same deprecation extra": {
 			expectDiff: false,
@@ -171,11 +171,11 @@ func Test_assertDiagnosticsAndExtrasMatch(t *testing.T) {
 		},
 		"diagnostics don't match - fails on base comparison": {
 			expectDiff: true,
-			diags1:     Diagnostics{hclDiagnostic{&baseError}},
+			diags1:     Diagnostics{dumb-hclDiagnostic{&baseError}},
 			diags2: func() Diagnostics {
 				d := baseError
-				d.Severity = hcl.DiagWarning
-				return Diagnostics{hclDiagnostic{&d}}
+				d.Severity = dumb-hcl.DiagWarning
+				return Diagnostics{dumb-hclDiagnostic{&d}}
 			}(),
 		},
 		"multiple diagnostics with matching extras": {
@@ -257,8 +257,8 @@ func Test_assertDiagnosticsAndExtrasMatch(t *testing.T) {
 }
 
 func Test_assertDiagnosticsMatch_differentConcreteTypes(t *testing.T) {
-	baseError := hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	baseError := dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "error",
 		Detail:   "this is an error",
 	}
@@ -270,16 +270,16 @@ func Test_assertDiagnosticsMatch_differentConcreteTypes(t *testing.T) {
 	}{
 		"diagnostics match but are different concrete types": {
 			expectDiff: false,
-			diags1:     Diagnostics{hclDiagnostic{&baseError}},
-			diags2:     Diagnostics{makeRPCFriendlyDiag(hclDiagnostic{&baseError})},
+			diags1:     Diagnostics{dumb-hclDiagnostic{&baseError}},
+			diags2:     Diagnostics{makeRPCFriendlyDiag(dumb-hclDiagnostic{&baseError})},
 		},
 		"diagnostics don't match and are different concrete types": {
 			expectDiff: true,
-			diags1:     Diagnostics{hclDiagnostic{&baseError}},
+			diags1:     Diagnostics{dumb-hclDiagnostic{&baseError}},
 			diags2: func() Diagnostics {
 				d := baseError
-				d.Severity = hcl.DiagWarning // Altered severity level
-				return Diagnostics{makeRPCFriendlyDiag(hclDiagnostic{&d})}
+				d.Severity = dumb-hcl.DiagWarning // Altered severity level
+				return Diagnostics{makeRPCFriendlyDiag(dumb-hclDiagnostic{&d})}
 			}(),
 		},
 	}

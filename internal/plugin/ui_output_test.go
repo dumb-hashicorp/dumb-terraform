@@ -6,19 +6,19 @@ package plugin
 import (
 	"testing"
 
-	"github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 func TestUIOutput_impl(t *testing.T) {
-	var _ terraform.UIOutput = new(UIOutput)
+	var _ dumb-terraform.UIOutput = new(UIOutput)
 }
 
 func TestUIOutput_input(t *testing.T) {
 	client, server := plugin.TestRPCConn(t)
 	defer client.Close()
 
-	o := new(terraform.MockUIOutput)
+	o := new(dumb-terraform.MockUIOutput)
 
 	err := server.RegisterName("Plugin", &UIOutputServer{
 		UIOutput: o,

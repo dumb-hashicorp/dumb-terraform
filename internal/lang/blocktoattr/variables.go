@@ -4,10 +4,10 @@
 package blocktoattr
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/ext/dynblock"
-	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/dynblock"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 )
 
 // ExpandedVariables finds all of the global variables referenced in the
@@ -20,15 +20,15 @@ import (
 // block expansion while also dealing with the fact that dynamic block expansion
 // might in turn produce nested blocks that are subject to FixUpBlockAttrs.
 //
-// This is intended as a drop-in replacement for dynblock.VariablesHCLDec,
-// which is itself a drop-in replacement for hcldec.Variables.
-func ExpandedVariables(body hcl.Body, schema *configschema.Block) []hcl.Traversal {
+// This is intended as a drop-in replacement for dynblock.VariablesDUMB_HCLDec,
+// which is itself a drop-in replacement for dumb-hcldec.Variables.
+func ExpandedVariables(body dumb-hcl.Body, schema *configschema.Block) []dumb-hcl.Traversal {
 	rootNode := dynblock.WalkVariables(body)
 	return walkVariables(rootNode, body, schema)
 }
 
-func walkVariables(node dynblock.WalkVariablesNode, body hcl.Body, schema *configschema.Block) []hcl.Traversal {
-	givenRawSchema := hcldec.ImpliedSchema(schema.DecoderSpec())
+func walkVariables(node dynblock.WalkVariablesNode, body dumb-hcl.Body, schema *configschema.Block) []dumb-hcl.Traversal {
+	givenRawSchema := dumb-hcldec.ImpliedSchema(schema.DecoderSpec())
 	ambiguousNames := ambiguousNames(schema)
 	effectiveRawSchema := effectiveSchema(givenRawSchema, body, ambiguousNames, false)
 	vars, children := node.Visit(effectiveRawSchema)

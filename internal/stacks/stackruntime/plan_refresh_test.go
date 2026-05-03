@@ -11,17 +11,17 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	stacks_testing_provider "github.com/hashicorp/terraform/internal/stacks/stackruntime/testing"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	stacks_testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func TestRefreshPlan(t *testing.T) {
@@ -98,7 +98,7 @@ func TestRefreshPlan(t *testing.T) {
 						Schema:             stacks_testing_provider.TestingResourceSchema,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -178,7 +178,7 @@ func TestRefreshPlan(t *testing.T) {
 						Schema:             stacks_testing_provider.TestingResourceSchema,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,
@@ -220,7 +220,7 @@ func TestRefreshPlan(t *testing.T) {
 						Applyable: true,
 					},
 					&stackplan.PlannedChangeHeader{
-						TerraformVersion: version.SemVer,
+						Dumb TerraformVersion: version.SemVer,
 					},
 					&stackplan.PlannedChangePlannedTimestamp{
 						PlannedTimestamp: fakePlanTimestamp,

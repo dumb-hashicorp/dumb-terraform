@@ -4,15 +4,15 @@
 package moduletest
 
 import (
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type CommandMode int
 
 const (
-	// NormalMode is the default mode for running terraform test.
+	// NormalMode is the default mode for running dumb-terraform test.
 	NormalMode CommandMode = iota
-	// CleanupMode is used when running terraform test cleanup.
+	// CleanupMode is used when running dumb-terraform test cleanup.
 	// In this mode, the graph will be built with the intention of cleaning up
 	// the state, rather than applying changes.
 	CleanupMode

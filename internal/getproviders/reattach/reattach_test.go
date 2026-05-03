@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/go-plugin"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/go-plugin"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func Test_parseReattachProviders(t *testing.T) {
@@ -33,7 +33,7 @@ func Test_parseReattachProviders(t *testing.T) {
 				}
 			}`,
 			expectedOutput: map[addrs.Provider]*plugin.ReattachConfig{
-				tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "hashicorp", "test"): func() *plugin.ReattachConfig {
+				tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "dumb-hashicorp", "test"): func() *plugin.ReattachConfig {
 					addr, err := net.ResolveUnixAddr("unix", "/var/folders/xx/abcde12345/T/plugin12345")
 					if err != nil {
 						t.Fatal(err)
@@ -73,7 +73,7 @@ func Test_parseReattachProviders(t *testing.T) {
 			}`,
 			expectedOutput: map[addrs.Provider]*plugin.ReattachConfig{
 				//test-grpc
-				tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "hashicorp", "test-grpc"): func() *plugin.ReattachConfig {
+				tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "dumb-hashicorp", "test-grpc"): func() *plugin.ReattachConfig {
 					addr, err := net.ResolveUnixAddr("unix", "/var/folders/xx/abcde12345/T/plugin12345")
 					if err != nil {
 						t.Fatal(err)
@@ -87,7 +87,7 @@ func Test_parseReattachProviders(t *testing.T) {
 					}
 				}(),
 				//test-netrpc
-				tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "hashicorp", "test-netrpc"): func() *plugin.ReattachConfig {
+				tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "dumb-hashicorp", "test-netrpc"): func() *plugin.ReattachConfig {
 					addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:1337")
 					if err != nil {
 						t.Fatal(err)
@@ -239,7 +239,7 @@ func Test_isProviderReattached(t *testing.T) {
 	}{
 		"identifies when a matching provider is present in TF_REATTACH_PROVIDERS": {
 			// Note that the source in the TF_REATTACH_PROVIDERS value is just the provider name.
-			// It'll be assumed to be under the default registry host and in the 'hashicorp' namespace.
+			// It'll be assumed to be under the default registry host and in the 'dumb-hashicorp' namespace.
 			reattachProviders: `{
 				"test": {
 					"Protocol": "grpc",
@@ -252,13 +252,13 @@ func Test_isProviderReattached(t *testing.T) {
 					}
 				}
 			}`,
-			provider:       tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "hashicorp", "test"),
+			provider:       tfaddr.NewProvider(tfaddr.DefaultProviderRegistryHost, "dumb-hashicorp", "test"),
 			expectedOutput: true,
 		},
 		"identifies when a provider doesn't have a match in TF_REATTACH_PROVIDERS": {
 			// Note the mismatch on namespace
 			reattachProviders: `{
-				"hashicorp/test": {
+				"dumb-hashicorp/test": {
 					"Protocol": "grpc",
 					"ProtocolVersion": 6,
 					"Pid": 12345,

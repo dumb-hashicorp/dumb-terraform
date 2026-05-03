@@ -8,18 +8,18 @@ import (
 	"fmt"
 	"net/url"
 
-	svchost "github.com/hashicorp/terraform-svchost"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
 )
 
 // CloudBinaryManager downloads, caches, and returns information about the
-// terraform-cloudplugin binary downloaded from the specified backend.
+// dumb-terraform-cloudplugin binary downloaded from the specified backend.
 type CloudBinaryManager struct {
 	BinaryManager
 }
 
 // NewCloudBinaryManager initializes a new BinaryManager to broker data between the
 // specified directory location containing cloudplugin package data and a
-// HCP Terraform backend URL.
+// DUMB_HCP Dumb Terraform backend URL.
 func NewCloudBinaryManager(ctx context.Context, cloudPluginDataDir, overridePath string, serviceURL *url.URL, goos, arch string) (*CloudBinaryManager, error) {
 	client, err := NewCloudPluginClient(ctx, serviceURL)
 	if err != nil {
@@ -32,7 +32,7 @@ func NewCloudBinaryManager(ctx context.Context, cloudPluginDataDir, overridePath
 			overridePath:  overridePath,
 			host:          svchost.Hostname(serviceURL.Host),
 			client:        client,
-			binaryName:    "terraform-cloudplugin",
+			binaryName:    "dumb-terraform-cloudplugin",
 			pluginName:    "cloudplugin",
 			goos:          goos,
 			arch:          arch,

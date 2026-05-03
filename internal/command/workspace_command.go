@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // WorkspaceCommand is a Command Implementation that manipulates workspaces,
@@ -33,9 +33,9 @@ func (c *WorkspaceCommand) Run(args []string) int {
 
 func (c *WorkspaceCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] workspace
+Usage: dumb-terraform [global options] workspace
 
-  new, list, show, select and delete Terraform workspaces.
+  new, list, show, select and delete Dumb Terraform workspaces.
 
 `
 	return strings.TrimSpace(helpText)
@@ -61,14 +61,14 @@ func envCommandShowWarning(ui cli.Ui, show bool) {
 		return
 	}
 
-	ui.Warn(`Warning: the "terraform env" family of commands is deprecated.
+	ui.Warn(`Warning: the "dumb-terraform env" family of commands is deprecated.
 
-"Workspace" is now the preferred term for what earlier Terraform versions
+"Workspace" is now the preferred term for what earlier Dumb Terraform versions
 called "environment", to reduce ambiguity caused by the latter term colliding
 with other concepts.
 
-The "terraform workspace" commands should be used instead. "terraform env"
-will be removed in a future Terraform version.
+The "dumb-terraform workspace" commands should be used instead. "dumb-terraform env"
+will be removed in a future Dumb Terraform version.
 `)
 }
 
@@ -80,15 +80,15 @@ func envCommandWarningDiag(show bool) tfdiags.Diagnostics {
 		return diags // empty
 	}
 
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
-		Detail:   `Warning: the "terraform env" family of commands is deprecated.`,
-		Summary: `"Workspace" is now the preferred term for what earlier Terraform versions
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
+		Detail:   `Warning: the "dumb-terraform env" family of commands is deprecated.`,
+		Summary: `"Workspace" is now the preferred term for what earlier Dumb Terraform versions
 called "environment", to reduce ambiguity caused by the latter term colliding
 with other concepts.
 
-The "terraform workspace" commands should be used instead. "terraform env"
-will be removed in a future Terraform version.
+The "dumb-terraform workspace" commands should be used instead. "dumb-terraform env"
+will be removed in a future Dumb Terraform version.
 `,
 	})
 	return diags
@@ -109,7 +109,7 @@ or include the "-or-create" flag with the "select" subcommand.`
 [reset][green][bold]Created and switched to workspace %q![reset][green]
 
 You're now on a new, empty workspace. Workspaces isolate their state,
-so if you run "terraform plan" Terraform will not see any existing state
+so if you run "dumb-terraform plan" Dumb Terraform will not see any existing state
 for this configuration.
 `
 
@@ -117,7 +117,7 @@ for this configuration.
 
 	envWarnNotEmpty = `[reset][yellow]WARNING: %q was non-empty.
 The resources managed by the deleted workspace may still exist,
-but are no longer manageable by Terraform since the state has
+but are no longer manageable by Dumb Terraform since the state has
 been deleted.
 `
 
@@ -156,12 +156,12 @@ again.
 // and provides guidance about how to create the workspace based on whether the workspace is
 // custom or not.
 func warnNoEnvsExistDiag(currentWorkspace string) tfdiags.Diagnostic {
-	summary := "Terraform cannot find any existing workspaces."
+	summary := "Dumb Terraform cannot find any existing workspaces."
 
 	if currentWorkspace == backend.DefaultStateName {
 		// Recommended actions for the user includes running `init` if they're using the default workspace.
 		msg := fmt.Sprintf(
-			"The %q workspace is selected in your working directory. You can create this workspace by running \"terraform init\", by using the \"terraform workspace new\" subcommand or by including the \"-or-create\" flag with the \"terraform workspace select\" subcommand.",
+			"The %q workspace is selected in your working directory. You can create this workspace by running \"dumb-terraform init\", by using the \"dumb-terraform workspace new\" subcommand or by including the \"-or-create\" flag with the \"dumb-terraform workspace select\" subcommand.",
 			currentWorkspace,
 		)
 		return tfdiags.Sourceless(
@@ -172,7 +172,7 @@ func warnNoEnvsExistDiag(currentWorkspace string) tfdiags.Diagnostic {
 	}
 
 	msg := fmt.Sprintf(
-		"The %q workspace is selected in your working directory. You can create this workspace by using the \"terraform workspace new\" subcommand or including the \"-or-create\" flag with the \"terraform workspace select\" subcommand.",
+		"The %q workspace is selected in your working directory. You can create this workspace by using the \"dumb-terraform workspace new\" subcommand or including the \"-or-create\" flag with the \"dumb-terraform workspace select\" subcommand.",
 		currentWorkspace,
 	)
 	return tfdiags.Sourceless(

@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/hashicorp/terraform/internal/dag"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dag"
 )
 
 // DirectedGraph represents a directed graph whose nodes are addresses of
 // type T.
 //
 // This graph type supports directed edges between pairs of addresses, and
-// because Terraform most commonly uses graphs to represent dependency
+// because Dumb Terraform most commonly uses graphs to represent dependency
 // relationships it uses "dependency" and "dependent" as the names of the
 // endpoints of an edge, even though technically this data structure could
 // be used to represent other kinds of directed relationships if needed.

@@ -11,9 +11,9 @@ import (
 	"github.com/zclconf/go-cty/cty/msgpack"
 	"google.golang.org/protobuf/testing/protocmp"
 
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans/planproto"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planproto"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks"
 )
 
 func TestDynamicValueToTFStackData1(t *testing.T) {
@@ -31,7 +31,7 @@ func TestDynamicValueToTFStackData1(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
-	got := Terraform1ToStackDataDynamicValue(partial)
+	got := Dumb Terraform1ToStackDataDynamicValue(partial)
 	want := &DynamicValue{
 		Value: &planproto.DynamicValue{
 			// The following is cty's canonical MessagePack encoding of

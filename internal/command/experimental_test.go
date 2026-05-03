@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 )
 
 func TestInit_stateStoreBlockIsExperimental(t *testing.T) {

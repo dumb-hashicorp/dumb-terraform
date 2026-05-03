@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestParseTest_Vars(t *testing.T) {
@@ -82,9 +82,9 @@ func TestParseTest(t *testing.T) {
 			wantDiags: nil,
 		},
 		"with-filters": {
-			args: []string{"-filter=one.tftest.hcl", "-filter=two.tftest.hcl"},
+			args: []string{"-filter=one.tftest.dumb-hcl", "-filter=two.tftest.dumb-hcl"},
 			want: &Test{
-				Filter:               []string{"one.tftest.hcl", "two.tftest.hcl"},
+				Filter:               []string{"one.tftest.dumb-hcl", "two.tftest.dumb-hcl"},
 				TestDirectory:        "tests",
 				ViewType:             ViewHuman,
 				Vars:                 &Vars{},

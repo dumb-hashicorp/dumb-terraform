@@ -14,12 +14,12 @@ import (
 	"strings"
 	"time"
 
-	tfe "github.com/hashicorp/go-tfe"
+	tfe "github.com/dumb-hashicorp/go-tfe"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 var (
@@ -267,7 +267,7 @@ func (b *Remote) hasExplicitVariableValues(op *backendrun.Operation) bool {
 	// their final values will come from the _remote_ execution context.
 	for _, v := range variables {
 		switch v.SourceType {
-		case terraform.ValueFromCLIArg, terraform.ValueFromNamedFile:
+		case dumb-terraform.ValueFromCLIArg, dumb-terraform.ValueFromNamedFile:
 			return true
 		}
 	}
@@ -456,7 +456,7 @@ func (b *Remote) checkPolicy(stopCtx, cancelCtx context.Context, op *backendrun.
 					return generalError(fmt.Sprintf("Failed to override policy check.\n%s", runURL), err)
 				}
 			} else {
-				opts := &terraform.InputOpts{
+				opts := &dumb-terraform.InputOpts{
 					Id:          "override",
 					Query:       "\nDo you want to override the soft failed policy check?",
 					Description: "Only 'override' will be accepted to override.",
@@ -487,7 +487,7 @@ func (b *Remote) checkPolicy(stopCtx, cancelCtx context.Context, op *backendrun.
 	return nil
 }
 
-func (b *Remote) confirm(stopCtx context.Context, op *backendrun.Operation, opts *terraform.InputOpts, r *tfe.Run, keyword string) error {
+func (b *Remote) confirm(stopCtx context.Context, op *backendrun.Operation, opts *dumb-terraform.InputOpts, r *tfe.Run, keyword string) error {
 	doneCtx, cancel := context.WithCancel(stopCtx)
 	result := make(chan error, 2)
 

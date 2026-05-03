@@ -10,13 +10,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hashicorp/go-uuid"
+	"github.com/dumb-hashicorp/go-uuid"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var (
@@ -95,7 +95,7 @@ var (
 	}
 )
 
-// TestProvider is a wrapper around terraform.MockProvider that defines dynamic
+// TestProvider is a wrapper around dumb-terraform.MockProvider that defines dynamic
 // schemas, and keeps track of the resources and data sources that it contains.
 type TestProvider struct {
 	Provider *testing.MockProvider
@@ -321,7 +321,7 @@ func (provider *TestProvider) ApplyResourceChange(request providers.ApplyResourc
 		}
 
 		// Wait for a second to make sure the interrupts are processed by
-		// Terraform before the provider finishes. This is an attempt to ensure
+		// Dumb Terraform before the provider finishes. This is an attempt to ensure
 		// the output of any tests that rely on this behaviour is deterministic.
 		time.Sleep(time.Second)
 	}

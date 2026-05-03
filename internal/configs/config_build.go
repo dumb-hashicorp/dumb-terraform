@@ -10,12 +10,12 @@ import (
 	"slices"
 	"strings"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/getmodules/moduleaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getmodules/moduleaddrs"
 )
 
 // BuildConfig constructs a Config from a root module by loading all of its
@@ -27,8 +27,8 @@ import (
 // file-level invariants validated. If the returned diagnostics contains errors,
 // the returned module tree may be incomplete but can still be used carefully
 // for static analysis.
-func BuildConfig(root *Module, walker ModuleWalker, loader MockDataLoader) (*Config, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func BuildConfig(root *Module, walker ModuleWalker, loader MockDataLoader) (*Config, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	cfg := &Config{
 		Module: root,
 	}
@@ -43,8 +43,8 @@ func BuildConfig(root *Module, walker ModuleWalker, loader MockDataLoader) (*Con
 // shared by different configuration loaders.
 //
 // Callers must ensure cfg.Root is set correctly before calling this function.
-func FinalizeConfig(cfg *Config, walker ModuleWalker, loader MockDataLoader) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func FinalizeConfig(cfg *Config, walker ModuleWalker, loader MockDataLoader) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 	if cfg == nil {
 		return diags
 	}
@@ -73,8 +73,8 @@ func FinalizeConfig(cfg *Config, walker ModuleWalker, loader MockDataLoader) hcl
 	return diags
 }
 
-func installMockDataFiles(root *Config, loader MockDataLoader) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func installMockDataFiles(root *Config, loader MockDataLoader) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	for _, file := range root.Module.Tests {
 		for _, provider := range file.Providers {
@@ -97,8 +97,8 @@ func installMockDataFiles(root *Config, loader MockDataLoader) hcl.Diagnostics {
 	return diags
 }
 
-func buildTestModules(root *Config, walker ModuleWalker) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func buildTestModules(root *Config, walker ModuleWalker) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	for name, file := range root.Module.Tests {
 		for _, run := range file.Runs {
@@ -110,8 +110,8 @@ func buildTestModules(root *Config, walker ModuleWalker) hcl.Diagnostics {
 			// so we create a dedicated path for them.
 			//
 			// Some examples:
-			//    - file: main.tftest.hcl, run: setup - test.main.setup
-			//    - file: tests/main.tftest.hcl, run: setup - test.tests.main.setup
+			//    - file: main.tftest.dumb-hcl, run: setup - test.main.setup
+			//    - file: tests/main.tftest.dumb-hcl, run: setup - test.tests.main.setup
 
 			dir := path.Dir(name)
 			base := path.Base(name)
@@ -121,7 +121,7 @@ func buildTestModules(root *Config, walker ModuleWalker) hcl.Diagnostics {
 			if dir != "." {
 				path = append(path, strings.Split(dir, "/")...)
 			}
-			path = append(path, strings.TrimSuffix(base, ".tftest.hcl"), run.Name)
+			path = append(path, strings.TrimSuffix(base, ".tftest.dumb-hcl"), run.Name)
 
 			req := ModuleRequest{
 				Name:              run.Name,
@@ -168,12 +168,12 @@ func buildTestModules(root *Config, walker ModuleWalker) hcl.Diagnostics {
 // string-only "source". It assumes that the expression does not contain any
 // references and can be decoded without an evaluation context.
 // In the long term, we want to get rid of this helper method.
-func legacySourceHelper(expr hcl.Expression, haveVersionArg bool) (addrs.ModuleSource, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func legacySourceHelper(expr dumb-hcl.Expression, haveVersionArg bool) (addrs.ModuleSource, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	var sourceAddrRaw string
 	var addr addrs.ModuleSource
 
-	valDiags := gohcl.DecodeExpression(expr, nil, &sourceAddrRaw)
+	valDiags := godumb-hcl.DecodeExpression(expr, nil, &sourceAddrRaw)
 	diags = append(diags, valDiags...)
 	if !valDiags.HasErrors() {
 		var err error
@@ -198,11 +198,11 @@ func legacySourceHelper(expr hcl.Expression, haveVersionArg bool) (addrs.ModuleS
 			// paths.
 			switch err := err.(type) {
 			case *moduleaddrs.MaybeRelativePathErr:
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid module source address",
 					Detail: fmt.Sprintf(
-						"Terraform failed to determine your intended installation method for remote module package %q.\n\nIf you intended this as a path relative to the current module, use \"./%s\" instead. The \"./\" prefix indicates that the address is a relative filesystem path.",
+						"Dumb Terraform failed to determine your intended installation method for remote module package %q.\n\nIf you intended this as a path relative to the current module, use \"./%s\" instead. The \"./\" prefix indicates that the address is a relative filesystem path.",
 						err.Addr, err.Addr,
 					),
 					Subject: expr.Range().Ptr(),
@@ -212,15 +212,15 @@ func legacySourceHelper(expr hcl.Expression, haveVersionArg bool) (addrs.ModuleS
 					// In this case we'll include some extra context that
 					// we assumed a registry source address due to the
 					// version argument.
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid registry module source address",
-						Detail:   fmt.Sprintf("Failed to parse module registry address: %s.\n\nTerraform assumed that you intended a module registry source address because you also set the argument \"version\", which applies only to registry modules.", err),
+						Detail:   fmt.Sprintf("Failed to parse module registry address: %s.\n\nDumb Terraform assumed that you intended a module registry source address because you also set the argument \"version\", which applies only to registry modules.", err),
 						Subject:  expr.Range().Ptr(),
 					})
 				} else {
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid module source address",
 						Detail:   fmt.Sprintf("Failed to parse module source address: %s.", err),
 						Subject:  expr.Range().Ptr(),
@@ -237,23 +237,23 @@ func legacySourceHelper(expr hcl.Expression, haveVersionArg bool) (addrs.ModuleS
 // string-only "version". It assumes that the expression does not contain any
 // references and can be decoded without an evaluation context.
 // In the long term, we want to get rid of this helper method.
-func legacyVersionHelper(expr hcl.Expression) (VersionConstraint, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func legacyVersionHelper(expr dumb-hcl.Expression) (VersionConstraint, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	var versionRaw string
 
 	ret := VersionConstraint{
 		DeclRange: expr.Range(),
 	}
 
-	valDiags := gohcl.DecodeExpression(expr, nil, &versionRaw)
+	valDiags := godumb-hcl.DecodeExpression(expr, nil, &versionRaw)
 	diags = append(diags, valDiags...)
 	if !valDiags.HasErrors() {
 		constraints, err := version.NewConstraint(versionRaw)
 		if err != nil {
 			// NewConstraint doesn't return user-friendly errors, so we'll just
 			// ignore the provided error and produce our own generic one.
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid version constraint",
 				Detail:   "This string does not use correct version constraint syntax.", // Not very actionable :(
 				Subject:  expr.Range().Ptr(),
@@ -266,8 +266,8 @@ func legacyVersionHelper(expr hcl.Expression) (VersionConstraint, hcl.Diagnostic
 	return ret, diags
 }
 
-func buildChildModules(parent *Config, walker ModuleWalker) (map[string]*Config, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func buildChildModules(parent *Config, walker ModuleWalker) (map[string]*Config, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	ret := map[string]*Config{}
 
 	calls := parent.Module.ModuleCalls
@@ -287,7 +287,7 @@ func buildChildModules(parent *Config, walker ModuleWalker) (map[string]*Config,
 
 		var versionConstraint VersionConstraint
 		if call.VersionExpr != nil {
-			var versionDiags hcl.Diagnostics
+			var versionDiags dumb-hcl.Diagnostics
 			versionConstraint, versionDiags = legacyVersionHelper(call.VersionExpr)
 			diags = append(diags, versionDiags...)
 			if versionDiags.HasErrors() {
@@ -318,8 +318,8 @@ func buildChildModules(parent *Config, walker ModuleWalker) (map[string]*Config,
 	return ret, diags
 }
 
-func loadModule(root *Config, req *ModuleRequest, walker ModuleWalker) (*Config, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func loadModule(root *Config, req *ModuleRequest, walker ModuleWalker) (*Config, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	mod, ver, modDiags := walker.LoadModule(req)
 	diags = append(diags, modDiags...)
@@ -345,26 +345,26 @@ func loadModule(root *Config, req *ModuleRequest, walker ModuleWalker) (*Config,
 	diags = append(diags, modDiags...)
 
 	if mod.Backend != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Backend configuration ignored",
-			Detail:   "Any selected backend applies to the entire configuration, so Terraform expects backend configurations only in the root module.\n\nThis is a warning rather than an error because it's sometimes convenient to temporarily call a root module as a child module for testing purposes, but this backend configuration block will have no effect.",
+			Detail:   "Any selected backend applies to the entire configuration, so Dumb Terraform expects backend configurations only in the root module.\n\nThis is a warning rather than an error because it's sometimes convenient to temporarily call a root module as a child module for testing purposes, but this backend configuration block will have no effect.",
 			Subject:  mod.Backend.DeclRange.Ptr(),
 		})
 	}
 
 	if mod.CloudConfig != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Cloud configuration ignored",
-			Detail:   "A cloud configuration block applies to the entire configuration, so Terraform expects 'cloud' blocks to only be in the root module.\n\nThis is a warning rather than an error because it's sometimes convenient to temporarily call a root module as a child module for testing purposes, but this cloud configuration block will have no effect.",
+			Detail:   "A cloud configuration block applies to the entire configuration, so Dumb Terraform expects 'cloud' blocks to only be in the root module.\n\nThis is a warning rather than an error because it's sometimes convenient to temporarily call a root module as a child module for testing purposes, but this cloud configuration block will have no effect.",
 			Subject:  mod.CloudConfig.DeclRange.Ptr(),
 		})
 	}
 
 	if len(mod.Import) > 0 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid import configuration",
 			Detail:   fmt.Sprintf("An import block was detected in %q. Import blocks are only allowed in the root module.", cfg.Path),
 			Subject:  mod.Import[0].DeclRange.Ptr(),
@@ -373,8 +373,8 @@ func loadModule(root *Config, req *ModuleRequest, walker ModuleWalker) (*Config,
 
 	if len(mod.ListResources) > 0 {
 		first := slices.Collect(maps.Values(mod.ListResources))[0]
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid list configuration",
 			Detail:   fmt.Sprintf("A list block was detected in %q. List blocks are only allowed in the root module.", cfg.Path),
 			Subject:  first.DeclRange.Ptr(),
@@ -420,15 +420,15 @@ type ModuleWalker interface {
 	// ensure that the basic file- and module-validations performed by the
 	// LoadConfigDir function (valid syntax, no namespace collisions, etc) have
 	// been performed before returning a module.
-	LoadModule(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics)
+	LoadModule(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics)
 }
 
 // ModuleWalkerFunc is an implementation of ModuleWalker that directly wraps
 // a callback function, for more convenient use of that interface.
-type ModuleWalkerFunc func(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics)
+type ModuleWalkerFunc func(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics)
 
 // LoadModule implements ModuleWalker.
-func (f ModuleWalkerFunc) LoadModule(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics) {
+func (f ModuleWalkerFunc) LoadModule(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics) {
 	return f(req)
 }
 
@@ -439,7 +439,7 @@ type ModuleRequest struct {
 	// This is provided in case the name is used as part of a storage key
 	// for the module, but implementations must otherwise treat it as an
 	// opaque string. It is guaranteed to have already been validated as an
-	// HCL identifier and UTF-8 encoded.
+	// DUMB_HCL identifier and UTF-8 encoded.
 	Name string
 
 	// Path is a list of logical names that traverse from the root module to
@@ -456,7 +456,7 @@ type ModuleRequest struct {
 	// was provided in configuration. This can and should be used to generate
 	// diagnostics about the source address having invalid syntax, referring
 	// to a non-existent object, etc.
-	SourceAddrRange hcl.Range
+	SourceAddrRange dumb-hcl.Range
 
 	// VersionConstraint is the version constraint applied to the module in
 	// configuration. This data structure includes the source range for
@@ -477,7 +477,7 @@ type ModuleRequest struct {
 	// in configuration that prompted this request. This can be used as the
 	// subject of an error diagnostic that relates to the module call itself,
 	// rather than to either its source address or its version number.
-	CallRange hcl.Range
+	CallRange dumb-hcl.Range
 }
 
 // DisabledModuleWalker is a ModuleWalker that doesn't support
@@ -488,10 +488,10 @@ type ModuleRequest struct {
 var DisabledModuleWalker ModuleWalker
 
 func init() {
-	DisabledModuleWalker = ModuleWalkerFunc(func(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics) {
-		return nil, nil, hcl.Diagnostics{
+	DisabledModuleWalker = ModuleWalkerFunc(func(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics) {
+		return nil, nil, dumb-hcl.Diagnostics{
 			{
-				Severity: hcl.DiagError,
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Child modules are not supported",
 				Detail:   "Child module calls are not allowed in this context.",
 				Subject:  &req.CallRange,
@@ -504,16 +504,16 @@ func init() {
 // and returns MockData objects for the testing framework to consume.
 type MockDataLoader interface {
 	// LoadMockData accepts a path to a local directory that should contain a
-	// set of .tfmock.hcl files that contain mock data that can be consumed by
+	// set of .tfmock.dumb-hcl files that contain mock data that can be consumed by
 	// a mock provider within the tewting framework.
-	LoadMockData(provider *Provider) (*MockData, hcl.Diagnostics)
+	LoadMockData(provider *Provider) (*MockData, dumb-hcl.Diagnostics)
 }
 
 // MockDataLoaderFunc is an implementation of MockDataLoader that wraps a
 // callback function, for more convenient use of that interface.
-type MockDataLoaderFunc func(provider *Provider) (*MockData, hcl.Diagnostics)
+type MockDataLoaderFunc func(provider *Provider) (*MockData, dumb-hcl.Diagnostics)
 
 // LoadMockData implements MockDataLoader.
-func (f MockDataLoaderFunc) LoadMockData(provider *Provider) (*MockData, hcl.Diagnostics) {
+func (f MockDataLoaderFunc) LoadMockData(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 	return f(provider)
 }

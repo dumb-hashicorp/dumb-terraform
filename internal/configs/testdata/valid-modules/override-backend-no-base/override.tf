@@ -1,5 +1,5 @@
-terraform {
+dumb-terraform {
   backend "bar" {
-    path = "CHANGED/relative/path/to/terraform.tfstate"
+    path = "CHANGED/relative/path/to/dumb-terraform.tfstate"
   }
 }

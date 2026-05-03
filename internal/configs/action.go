@@ -7,17 +7,17 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/lang/langrefs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/langrefs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-func invalidActionDiag(subj *hcl.Range) *hcl.Diagnostic {
-	return &hcl.Diagnostic{
-		Severity: hcl.DiagError,
+func invalidActionDiag(subj *dumb-hcl.Range) *dumb-hcl.Diagnostic {
+	return &dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  `Invalid action argument inside action_triggers`,
 		Detail:   `action_triggers.actions must only refer to actions in the current module.`,
 		Subject:  subj,
@@ -28,25 +28,25 @@ func invalidActionDiag(subj *hcl.Range) *hcl.Diagnostic {
 type Action struct {
 	Name    string
 	Type    string
-	Config  hcl.Body
-	Count   hcl.Expression
-	ForEach hcl.Expression
+	Config  dumb-hcl.Body
+	Count   dumb-hcl.Expression
+	ForEach dumb-hcl.Expression
 
 	ProviderConfigRef *ProviderConfigRef
 	Provider          addrs.Provider
 
-	DeclRange hcl.Range
-	TypeRange hcl.Range
+	DeclRange dumb-hcl.Range
+	TypeRange dumb-hcl.Range
 }
 
 // ActionTrigger represents a configured "action_trigger" inside the lifecycle
 // block of a managed resource.
 type ActionTrigger struct {
-	Condition hcl.Expression
+	Condition dumb-hcl.Expression
 	Events    []ActionTriggerEvent
 	Actions   []ActionRef // References to actions
 
-	DeclRange hcl.Range
+	DeclRange dumb-hcl.Range
 }
 
 // ActionTriggerEvent is an enum for valid values for events for action
@@ -68,12 +68,12 @@ const (
 
 // ActionRef represents a reference to a configured Action
 type ActionRef struct {
-	Expr  hcl.Expression
-	Range hcl.Range
+	Expr  dumb-hcl.Expression
+	Range dumb-hcl.Range
 }
 
-func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeActionTriggerBlock(block *dumb-hcl.Block) (*ActionTrigger, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	a := &ActionTrigger{
 		Events:    []ActionTriggerEvent{},
 		Actions:   []ActionRef{},
@@ -89,12 +89,12 @@ func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics
 		a.Condition = attr.Expr
 
 		refs, refDiags = langrefs.ReferencesInExpr(addrs.ParseRef, attr.Expr)
-		diags = append(diags, refDiags.ToHCL()...)
+		diags = append(diags, refDiags.ToDUMB_HCL()...)
 
 		for _, ref := range refs {
 			if ref.Subject == addrs.Self {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Self reference not allowed",
 					Detail:   `The condition expression cannot reference "self".`,
 					Subject:  attr.Expr.Range().Ptr(),
@@ -104,7 +104,7 @@ func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics
 	}
 
 	if attr, exists := content.Attributes["events"]; exists {
-		exprs, ediags := hcl.ExprList(attr.Expr)
+		exprs, ediags := dumb-hcl.ExprList(attr.Expr)
 		diags = append(diags, ediags...)
 
 		events := []ActionTriggerEvent{}
@@ -112,7 +112,7 @@ func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics
 
 		for _, expr := range exprs {
 			var event ActionTriggerEvent
-			switch hcl.ExprAsKeyword(expr) {
+			switch dumb-hcl.ExprAsKeyword(expr) {
 			case "before_create":
 				event = BeforeCreate
 				containsBefore = true
@@ -124,9 +124,9 @@ func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics
 			case "after_update":
 				event = AfterUpdate
 			default:
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
-					Summary:  fmt.Sprintf("Invalid \"event\" value %s", hcl.ExprAsKeyword(expr)),
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
+					Summary:  fmt.Sprintf("Invalid \"event\" value %s", dumb-hcl.ExprAsKeyword(expr)),
 					Detail:   "The \"event\" argument supports the following values: before_create, after_create, before_update, after_update.",
 					Subject:  expr.Range().Ptr(),
 				})
@@ -135,9 +135,9 @@ func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics
 
 			// Check for duplicate events
 			if slices.Contains(events, event) {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
-					Summary:  fmt.Sprintf("Duplicate %q event", hcl.ExprAsKeyword(expr)),
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
+					Summary:  fmt.Sprintf("Duplicate %q event", dumb-hcl.ExprAsKeyword(expr)),
 					Detail:   "The event is already defined in this action_trigger block.",
 					Subject:  expr.Range().Ptr(),
 				})
@@ -148,8 +148,8 @@ func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics
 			if containsBefore && refs != nil { // if refs isn't empty, there was a condition
 				for _, ref := range refs {
 					if _, ok := ref.Subject.(addrs.CountAttr); ok {
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Count reference not allowed",
 							Detail:   `The condition expression cannot reference "count" if the action is run before the resource is applied.`,
 							Subject:  a.Condition.Range().Ptr(),
@@ -157,8 +157,8 @@ func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics
 					}
 
 					if _, ok := ref.Subject.(addrs.ForEachAttr); ok {
-						diags = diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "Each reference not allowed",
 							Detail:   `The condition expression cannot reference "each" if the action is run before the resource is applied.`,
 							Subject:  a.Condition.Range().Ptr(),
@@ -180,8 +180,8 @@ func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics
 	}
 
 	if len(a.Actions) == 0 {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "No actions specified",
 			Detail:   "At least one action must be specified for an action_trigger.",
 			Subject:  block.DefRange.Ptr(),
@@ -189,8 +189,8 @@ func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics
 	}
 
 	if len(a.Events) == 0 {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "No events specified",
 			Detail:   "At least one event must be specified for an action_trigger.",
 			Subject:  block.DefRange.Ptr(),
@@ -199,8 +199,8 @@ func decodeActionTriggerBlock(block *hcl.Block) (*ActionTrigger, hcl.Diagnostics
 	return a, diags
 }
 
-func decodeActionBlock(block *hcl.Block) (*Action, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeActionBlock(block *dumb-hcl.Block) (*Action, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 	a := &Action{
 		Type:      block.Labels[0],
 		Name:      block.Labels[1],
@@ -208,17 +208,17 @@ func decodeActionBlock(block *hcl.Block) (*Action, hcl.Diagnostics) {
 		TypeRange: block.LabelRanges[0],
 	}
 
-	if !hclsyntax.ValidIdentifier(a.Type) {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+	if !dumb-hclsyntax.ValidIdentifier(a.Type) {
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid action type name",
 			Detail:   badIdentifierDetail,
 			Subject:  &block.LabelRanges[0],
 		})
 	}
-	if !hclsyntax.ValidIdentifier(a.Name) {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+	if !dumb-hclsyntax.ValidIdentifier(a.Name) {
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid action name",
 			Detail:   badIdentifierDetail,
 			Subject:  &block.LabelRanges[1],
@@ -236,8 +236,8 @@ func decodeActionBlock(block *hcl.Block) (*Action, hcl.Diagnostics) {
 		a.ForEach = attr.Expr
 		// Cannot have count and for_each on the same action block
 		if a.Count != nil {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  `Invalid combination of "count" and "for_each"`,
 				Detail:   `The "count" and "for_each" meta-arguments are mutually-exclusive, only one should be used.`,
 				Subject:  &attr.NameRange,
@@ -249,8 +249,8 @@ func decodeActionBlock(block *hcl.Block) (*Action, hcl.Diagnostics) {
 		switch block.Type {
 		case "config":
 			if a.Config != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate config block",
 					Detail:   "An action must contain only one nested \"config\" block.",
 					Subject:  block.DefRange.Ptr(),
@@ -266,7 +266,7 @@ func decodeActionBlock(block *hcl.Block) (*Action, hcl.Diagnostics) {
 	}
 
 	if attr, exists := content.Attributes["provider"]; exists {
-		var providerDiags hcl.Diagnostics
+		var providerDiags dumb-hcl.Diagnostics
 		a.ProviderConfigRef, providerDiags = decodeProviderConfigRef(attr.Expr, "provider")
 		diags = append(diags, providerDiags...)
 	}
@@ -274,15 +274,15 @@ func decodeActionBlock(block *hcl.Block) (*Action, hcl.Diagnostics) {
 	return a, diags
 }
 
-// actionBlockSchema is the schema for an action type within terraform.
-var actionBlockSchema = &hcl.BodySchema{
+// actionBlockSchema is the schema for an action type within dumb-terraform.
+var actionBlockSchema = &dumb-hcl.BodySchema{
 	Attributes: commonActionAttributes,
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "config"},
 	},
 }
 
-var commonActionAttributes = []hcl.AttributeSchema{
+var commonActionAttributes = []dumb-hcl.AttributeSchema{
 	{
 		Name: "count",
 	},
@@ -294,8 +294,8 @@ var commonActionAttributes = []hcl.AttributeSchema{
 	},
 }
 
-var actionTriggerSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var actionTriggerSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name:     "events",
 			Required: true,
@@ -349,8 +349,8 @@ func (a *Action) ProviderConfigAddr() addrs.LocalProviderConfig {
 // reference a single action. This function was largely copied from
 // decodeReplaceTriggeredBy, but is much more permissive in what References are
 // allowed.
-func decodeActionTriggerRef(expr hcl.Expression) ([]ActionRef, hcl.Diagnostics) {
-	exprs, diags := hcl.ExprList(expr)
+func decodeActionTriggerRef(expr dumb-hcl.Expression) ([]ActionRef, dumb-hcl.Diagnostics) {
+	exprs, diags := dumb-hcl.ExprList(expr)
 	if diags.HasErrors() {
 		return nil, diags
 	}
@@ -359,10 +359,10 @@ func decodeActionTriggerRef(expr hcl.Expression) ([]ActionRef, hcl.Diagnostics) 
 	for i, expr := range exprs {
 		// Since we are manually parsing the action_trigger.Actions argument, we
 		// need to specially handle json configs, in which case the values will
-		// be json strings rather than hcl. To simplify parsing however we will
+		// be json strings rather than dumb-hcl. To simplify parsing however we will
 		// decode the individual list elements, rather than the entire
 		// expression.
-		var jsDiags hcl.Diagnostics
+		var jsDiags dumb-hcl.Diagnostics
 		expr, jsDiags = unwrapJSONRefExpr(expr)
 		diags = diags.Extend(jsDiags)
 		if diags.HasErrors() {
@@ -375,12 +375,12 @@ func decodeActionTriggerRef(expr hcl.Expression) ([]ActionRef, hcl.Diagnostics) 
 
 		refs, refDiags := langrefs.ReferencesInExpr(addrs.ParseRef, expr)
 		for _, diag := range refDiags {
-			severity := hcl.DiagError
+			severity := dumb-hcl.DiagError
 			if diag.Severity() == tfdiags.Warning {
-				severity = hcl.DiagWarning
+				severity = dumb-hcl.DiagWarning
 			}
 
-			diags = append(diags, &hcl.Diagnostic{
+			diags = append(diags, &dumb-hcl.Diagnostic{
 				Severity: severity,
 				Summary:  diag.Description().Summary,
 				Detail:   diag.Description().Detail,
@@ -398,8 +398,8 @@ func decodeActionTriggerRef(expr hcl.Expression) ([]ActionRef, hcl.Diagnostics) 
 			case addrs.Action, addrs.ActionInstance:
 				actionCount++
 			case addrs.ModuleCall, addrs.ModuleCallInstance, addrs.ModuleCallInstanceOutput:
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid reference to action outside this module",
 					Detail:   "Actions can only be referenced in the module they are declared in.",
 					Subject:  expr.Range().Ptr(),
@@ -416,15 +416,15 @@ func decodeActionTriggerRef(expr hcl.Expression) ([]ActionRef, hcl.Diagnostics) 
 
 		switch {
 		case actionCount == 0:
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "No actions specified",
 				Detail:   "At least one action must be specified for an action_trigger.",
 				Subject:  expr.Range().Ptr(),
 			})
 		case actionCount > 1:
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid action expression",
 				Detail:   "Multiple action references in actions expression.",
 				Subject:  expr.Range().Ptr(),

@@ -1,0 +1,9 @@
+# This file is maintained automatically by "dumb-terraform init".
+# Manual edits may be lost in future updates.
+
+provider "registry.dumb-terraform.io/dumb-hashicorp/test" {
+  version = "1.0.0"
+  hashes = [
+    "h1:invalid",
+  ]
+}

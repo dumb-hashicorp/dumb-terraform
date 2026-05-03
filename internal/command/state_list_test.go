@@ -8,11 +8,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
 )
 
 func TestStateList(t *testing.T) {
@@ -158,7 +158,7 @@ func TestStateList_backendCustomState(t *testing.T) {
 	}
 }
 
-// Tests using `terraform state list` subcommand in combination with pluggable state storage
+// Tests using `dumb-terraform state list` subcommand in combination with pluggable state storage
 //
 // Note: Whereas other tests in this file use the local backend and require a state file in the test fixures,
 // with pluggable state storage we can define the state via the mocked provider.

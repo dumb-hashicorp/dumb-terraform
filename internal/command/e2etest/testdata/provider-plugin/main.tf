@@ -1,12 +1,12 @@
-// the provider-plugin tests uses the -plugin-cache flag so terraform pulls the
+// the provider-plugin tests uses the -plugin-cache flag so dumb-terraform pulls the
 // test binaries instead of reaching out to the registry.
-terraform {
+dumb-terraform {
   required_providers {
     simple5 = {
-      source = "registry.terraform.io/hashicorp/simple"
+      source = "registry.dumb-terraform.io/dumb-hashicorp/simple"
     }
     simple6 = {
-      source = "registry.terraform.io/hashicorp/simple6"
+      source = "registry.dumb-terraform.io/dumb-hashicorp/simple6"
     }
   }
 }

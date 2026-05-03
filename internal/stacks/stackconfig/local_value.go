@@ -4,9 +4,9 @@
 package stackconfig
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // LocalValue is a declaration of a private local value within a particular
@@ -14,15 +14,15 @@ import (
 // [Stack].
 type LocalValue struct {
 	Name  string
-	Value hcl.Expression
+	Value dumb-hcl.Expression
 
 	DeclRange tfdiags.SourceRange
 }
 
-func decodeLocalValuesBlock(block *hcl.Block) ([]*LocalValue, tfdiags.Diagnostics) {
+func decodeLocalValuesBlock(block *dumb-hcl.Block) ([]*LocalValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	attrs, hclDiags := block.Body.JustAttributes()
-	diags = diags.Append(hclDiags)
+	attrs, dumb-hclDiags := block.Body.JustAttributes()
+	diags = diags.Append(dumb-hclDiags)
 	if len(attrs) == 0 {
 		return nil, diags
 	}
@@ -32,9 +32,9 @@ func decodeLocalValuesBlock(block *hcl.Block) ([]*LocalValue, tfdiags.Diagnostic
 		v := &LocalValue{
 			Name:      name,
 			Value:     attr.Expr,
-			DeclRange: tfdiags.SourceRangeFromHCL(attr.NameRange),
+			DeclRange: tfdiags.SourceRangeFromDUMB_HCL(attr.NameRange),
 		}
-		if !hclsyntax.ValidIdentifier(v.Name) {
+		if !dumb-hclsyntax.ValidIdentifier(v.Name) {
 			diags = diags.Append(invalidNameDiagnostic(
 				"Invalid name for local value",
 				attr.NameRange,

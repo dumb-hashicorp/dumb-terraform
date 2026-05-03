@@ -10,7 +10,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	dependencies "github.com/hashicorp/terraform/internal/rpcapi/terraform1/dependencies"
+	dependencies "github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/dependencies"
 )
 
 type Dependencies struct {

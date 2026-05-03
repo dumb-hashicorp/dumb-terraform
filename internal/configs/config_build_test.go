@@ -15,8 +15,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
-	version "github.com/hashicorp/go-version"
-	"github.com/hashicorp/hcl/v2"
+	version "github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 func TestBuildConfig(t *testing.T) {
@@ -29,11 +29,11 @@ func TestBuildConfig(t *testing.T) {
 
 	versionI := 0
 	cfg, diags := BuildConfig(mod, ModuleWalkerFunc(
-		func(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics) {
+		func(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics) {
 			// For the sake of this test we're going to just treat our
 			// SourceAddr as a path relative to our fixture directory.
 			// A "real" implementation of ModuleWalker should accept the
-			// various different source address syntaxes Terraform supports.
+			// various different source address syntaxes Dumb Terraform supports.
 			sourcePath := filepath.Join("testdata/config-build", req.SourceAddr.String())
 
 			mod, diags := parser.LoadConfigDir(sourcePath)
@@ -41,7 +41,7 @@ func TestBuildConfig(t *testing.T) {
 			versionI++
 			return mod, version, diags
 		}),
-		MockDataLoaderFunc(func(provider *Provider) (*MockData, hcl.Diagnostics) {
+		MockDataLoaderFunc(func(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 			return nil, nil
 		}),
 	)
@@ -88,11 +88,11 @@ func TestBuildConfigDiags(t *testing.T) {
 
 	versionI := 0
 	cfg, diags := BuildConfig(mod, ModuleWalkerFunc(
-		func(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics) {
+		func(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics) {
 			// For the sake of this test we're going to just treat our
 			// SourceAddr as a path relative to our fixture directory.
 			// A "real" implementation of ModuleWalker should accept the
-			// various different source address syntaxes Terraform supports.
+			// various different source address syntaxes Dumb Terraform supports.
 			sourcePath := filepath.Join("testdata/nested-errors", req.SourceAddr.String())
 
 			mod, diags := parser.LoadConfigDir(sourcePath)
@@ -100,7 +100,7 @@ func TestBuildConfigDiags(t *testing.T) {
 			versionI++
 			return mod, version, diags
 		}),
-		MockDataLoaderFunc(func(provider *Provider) (*MockData, hcl.Diagnostics) {
+		MockDataLoaderFunc(func(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 			return nil, nil
 		}),
 	)
@@ -135,18 +135,18 @@ func TestBuildConfigChildModule_Backend(t *testing.T) {
 	}
 
 	cfg, diags := BuildConfig(mod, ModuleWalkerFunc(
-		func(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics) {
+		func(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics) {
 			// For the sake of this test we're going to just treat our
 			// SourceAddr as a path relative to our fixture directory.
 			// A "real" implementation of ModuleWalker should accept the
-			// various different source address syntaxes Terraform supports.
+			// various different source address syntaxes Dumb Terraform supports.
 			sourcePath := filepath.Join("testdata/nested-backend-warning", req.SourceAddr.String())
 
 			mod, diags := parser.LoadConfigDir(sourcePath)
 			version, _ := version.NewVersion("1.0.0")
 			return mod, version, diags
 		}),
-		MockDataLoaderFunc(func(provider *Provider) (*MockData, hcl.Diagnostics) {
+		MockDataLoaderFunc(func(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 			return nil, nil
 		}),
 	)
@@ -178,18 +178,18 @@ func TestBuildConfigChildModule_CloudBlock(t *testing.T) {
 	}
 
 	cfg, diags := BuildConfig(mod, ModuleWalkerFunc(
-		func(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics) {
+		func(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics) {
 			// For the sake of this test we're going to just treat our
 			// SourceAddr as a path relative to our fixture directory.
 			// A "real" implementation of ModuleWalker should accept the
-			// various different source address syntaxes Terraform supports.
+			// various different source address syntaxes Dumb Terraform supports.
 			sourcePath := filepath.Join("testdata/nested-cloud-warning", req.SourceAddr.String())
 
 			mod, diags := parser.LoadConfigDir(sourcePath)
 			version, _ := version.NewVersion("1.0.0")
 			return mod, version, diags
 		}),
-		MockDataLoaderFunc(func(provider *Provider) (*MockData, hcl.Diagnostics) {
+		MockDataLoaderFunc(func(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 			return nil, nil
 		}),
 	)
@@ -265,7 +265,7 @@ func TestBuildConfigInvalidModules(t *testing.T) {
 			expectedWarnings := readDiags(ioutil.ReadFile(filepath.Join(testDir, name, "warnings")))
 
 			_, buildDiags := BuildConfig(mod, ModuleWalkerFunc(
-				func(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics) {
+				func(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics) {
 					// for simplicity, these tests will treat all source
 					// addresses as relative to the root module
 					sourcePath := filepath.Join(path, req.SourceAddr.String())
@@ -273,7 +273,7 @@ func TestBuildConfigInvalidModules(t *testing.T) {
 					version, _ := version.NewVersion("1.0.0")
 					return mod, version, diags
 				}),
-				MockDataLoaderFunc(func(provider *Provider) (*MockData, hcl.Diagnostics) {
+				MockDataLoaderFunc(func(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 					return nil, nil
 				}),
 			)
@@ -282,7 +282,7 @@ func TestBuildConfigInvalidModules(t *testing.T) {
 			for _, msg := range expectedErrs {
 				found := false
 				for _, diag := range buildDiags {
-					if diag.Severity == hcl.DiagError && strings.Contains(diag.Error(), msg) {
+					if diag.Severity == dumb-hcl.DiagError && strings.Contains(diag.Error(), msg) {
 						found = true
 						break
 					}
@@ -294,7 +294,7 @@ func TestBuildConfigInvalidModules(t *testing.T) {
 			}
 
 			for _, diag := range buildDiags {
-				if diag.Severity != hcl.DiagError {
+				if diag.Severity != dumb-hcl.DiagError {
 					continue
 				}
 				found := false
@@ -313,7 +313,7 @@ func TestBuildConfigInvalidModules(t *testing.T) {
 			for _, msg := range expectedWarnings {
 				found := false
 				for _, diag := range buildDiags {
-					if diag.Severity == hcl.DiagWarning && strings.Contains(diag.Error(), msg) {
+					if diag.Severity == dumb-hcl.DiagWarning && strings.Contains(diag.Error(), msg) {
 						found = true
 						break
 					}
@@ -325,7 +325,7 @@ func TestBuildConfigInvalidModules(t *testing.T) {
 			}
 
 			for _, diag := range buildDiags {
-				if diag.Severity != hcl.DiagWarning {
+				if diag.Severity != dumb-hcl.DiagWarning {
 					continue
 				}
 				found := false
@@ -354,16 +354,16 @@ func TestBuildConfig_WithMockDataSources(t *testing.T) {
 		t.Fatal("got nil root module; want non-nil")
 	}
 
-	cfg, diags := BuildConfig(mod, nil, MockDataLoaderFunc(func(provider *Provider) (*MockData, hcl.Diagnostics) {
+	cfg, diags := BuildConfig(mod, nil, MockDataLoaderFunc(func(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 		sourcePath := filepath.Join("testdata/valid-modules/with-mock-sources", provider.MockDataExternalSource)
-		return parser.LoadMockDataDir(sourcePath, provider.MockDataDuringPlan, hcl.Range{})
+		return parser.LoadMockDataDir(sourcePath, provider.MockDataDuringPlan, dumb-hcl.Range{})
 	}))
 	assertNoDiagnostics(t, diags)
 	if cfg == nil {
 		t.Fatal("got nil config; want non-nil")
 	}
 
-	provider := cfg.Module.Tests["main.tftest.hcl"].Providers["aws"]
+	provider := cfg.Module.Tests["main.tftest.dumb-hcl"].Providers["aws"]
 
 	if len(provider.MockData.MockDataSources) != 1 {
 		t.Errorf("expected to load 1 mock data source but loaded %d", len(provider.MockData.MockDataSources))
@@ -385,9 +385,9 @@ func TestBuildConfig_WithMockDataSourcesInline(t *testing.T) {
 		t.Fatal("got nil root module; want non-nil")
 	}
 
-	cfg, diags := BuildConfig(mod, nil, MockDataLoaderFunc(func(provider *Provider) (*MockData, hcl.Diagnostics) {
+	cfg, diags := BuildConfig(mod, nil, MockDataLoaderFunc(func(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 		sourcePath := filepath.Join("testdata/valid-modules/with-mock-sources-inline", provider.MockDataExternalSource)
-		return parser.LoadMockDataDir(sourcePath, provider.MockDataDuringPlan, hcl.Range{})
+		return parser.LoadMockDataDir(sourcePath, provider.MockDataDuringPlan, dumb-hcl.Range{})
 	}))
 	assertNoDiagnostics(t, diags)
 	if cfg == nil {
@@ -404,7 +404,7 @@ func TestBuildConfig_WithNestedTestModules(t *testing.T) {
 	}
 
 	cfg, diags := BuildConfig(mod, ModuleWalkerFunc(
-		func(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics) {
+		func(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics) {
 
 			// Bit of a hack to get the test working, but we know all the source
 			// addresses in this test are locals, so we can just treat them as
@@ -422,7 +422,7 @@ func TestBuildConfig_WithNestedTestModules(t *testing.T) {
 			version, _ := version.NewVersion("1.0.0")
 			return mod, version, diags
 		}),
-		MockDataLoaderFunc(func(provider *Provider) (*MockData, hcl.Diagnostics) {
+		MockDataLoaderFunc(func(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 			return nil, nil
 		}),
 	)
@@ -438,7 +438,7 @@ func TestBuildConfig_WithNestedTestModules(t *testing.T) {
 		t.Fatalf("expected exactly one test case but found %d", len(cfg.Module.Tests))
 	}
 
-	test := cfg.Module.Tests["main.tftest.hcl"]
+	test := cfg.Module.Tests["main.tftest.dumb-hcl"]
 	if len(test.Runs) != 1 {
 		t.Fatalf("expected two test runs but found %d", len(test.Runs))
 	}
@@ -487,18 +487,18 @@ func TestBuildConfig_WithTestModule(t *testing.T) {
 	}
 
 	cfg, diags := BuildConfig(mod, ModuleWalkerFunc(
-		func(req *ModuleRequest) (*Module, *version.Version, hcl.Diagnostics) {
+		func(req *ModuleRequest) (*Module, *version.Version, dumb-hcl.Diagnostics) {
 			// For the sake of this test we're going to just treat our
 			// SourceAddr as a path relative to our fixture directory.
 			// A "real" implementation of ModuleWalker should accept the
-			// various different source address syntaxes Terraform supports.
+			// various different source address syntaxes Dumb Terraform supports.
 			sourcePath := filepath.Join("testdata/valid-modules/with-tests-module", req.SourceAddr.String())
 
 			mod, diags := parser.LoadConfigDir(sourcePath)
 			version, _ := version.NewVersion("1.0.0")
 			return mod, version, diags
 		}),
-		MockDataLoaderFunc(func(provider *Provider) (*MockData, hcl.Diagnostics) {
+		MockDataLoaderFunc(func(provider *Provider) (*MockData, dumb-hcl.Diagnostics) {
 			return nil, nil
 		}),
 	)
@@ -514,7 +514,7 @@ func TestBuildConfig_WithTestModule(t *testing.T) {
 		t.Fatalf("expected exactly one test case but found %d", len(cfg.Module.Tests))
 	}
 
-	test := cfg.Module.Tests["main.tftest.hcl"]
+	test := cfg.Module.Tests["main.tftest.dumb-hcl"]
 	if len(test.Runs) != 2 {
 		t.Fatalf("expected two test runs but found %d", len(test.Runs))
 	}

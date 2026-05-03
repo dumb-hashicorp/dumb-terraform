@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
 	"github.com/oracle/oci-go-sdk/v65/common"
 	"github.com/oracle/oci-go-sdk/v65/objectstorage"
 )
@@ -25,7 +25,7 @@ func TestBackendBasic(t *testing.T) {
 
 	ctx := context.Background()
 
-	bucketName := fmt.Sprintf("terraform-remote-oci-test-%x", time.Now().Unix())
+	bucketName := fmt.Sprintf("dumb-terraform-remote-oci-test-%x", time.Now().Unix())
 	keyName := "testState.json"
 	namespace := getEnvSettingWithBlankDefault(NamespaceAttrName)
 	compartmentId := getEnvSettingWithBlankDefault("compartment_id")
@@ -44,7 +44,7 @@ func TestBackendBasic(t *testing.T) {
 func TestBackendLocked_ForceUnlock(t *testing.T) {
 	testACC(t)
 	ctx := context.Background()
-	bucketName := fmt.Sprintf("terraform-remote-oci-test-%x", time.Now().Unix())
+	bucketName := fmt.Sprintf("dumb-terraform-remote-oci-test-%x", time.Now().Unix())
 	keyName := "testState.json"
 	namespace := getEnvSettingWithBlankDefault(NamespaceAttrName)
 	compartmentId := getEnvSettingWithBlankDefault("compartment_id")
@@ -71,7 +71,7 @@ func TestBackendBasic_multipart_Upload(t *testing.T) {
 
 	ctx := context.Background()
 	DefaultFilePartSize = 100 //	100 Bytes
-	bucketName := fmt.Sprintf("terraform-remote-oci-test-%x", time.Now().Unix())
+	bucketName := fmt.Sprintf("dumb-terraform-remote-oci-test-%x", time.Now().Unix())
 	keyName := "testState.json"
 	namespace := getEnvSettingWithBlankDefault(NamespaceAttrName)
 	compartmentId := getEnvSettingWithBlankDefault("compartment_id")

@@ -6,15 +6,15 @@ package addrs
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestCheckRuleDiagnosticExtra_WrapsExtra(t *testing.T) {
 	var originals tfdiags.Diagnostics
-	originals = originals.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	originals = originals.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "original error",
 		Detail:   "this is an error",
 		Extra:    "extra",
@@ -31,8 +31,8 @@ func TestCheckRuleDiagnosticExtra_WrapsExtra(t *testing.T) {
 
 func TestCheckRuleDiagnosticExtra_Unwraps(t *testing.T) {
 	var originals tfdiags.Diagnostics
-	originals = originals.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	originals = originals.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "original error",
 		Detail:   "this is an error",
 		Extra:    "extra",
@@ -50,8 +50,8 @@ func TestCheckRuleDiagnosticExtra_Unwraps(t *testing.T) {
 
 func TestCheckRuleDiagnosticExtra_DoNotConsolidate(t *testing.T) {
 	var diags tfdiags.Diagnostics
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "original error",
 		Detail:   "this is an error",
 		Extra: &CheckRuleDiagnosticExtra{
@@ -63,8 +63,8 @@ func TestCheckRuleDiagnosticExtra_DoNotConsolidate(t *testing.T) {
 			}, OutputPrecondition, 0),
 		},
 	})
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "original error",
 		Detail:   "this is an error",
 		Extra: &CheckRuleDiagnosticExtra{
@@ -89,13 +89,13 @@ func TestCheckRuleDiagnosticExtra_DoNotConsolidate(t *testing.T) {
 
 func TestDiagnosticOriginatesFromCheckRule_Passes(t *testing.T) {
 	var diags tfdiags.Diagnostics
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "original error",
 		Detail:   "this is an error",
 	})
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "original error",
 		Detail:   "this is an error",
 		Extra:    &CheckRuleDiagnosticExtra{},

@@ -10,7 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 )
 
 var (
@@ -809,7 +809,7 @@ func TestComputedValuesForDataSource(t *testing.T) {
 				}),
 			}),
 			expectedFailures: []string{
-				"Terraform expected an object type for attribute \".nested_object[...]\" defined within the mocked data at :0,0-0, but found string.",
+				"Dumb Terraform expected an object type for attribute \".nested_object[...]\" defined within the mocked data at :0,0-0, but found string.",
 			},
 		},
 		"invalid_replacement_path_nested_block": {
@@ -846,7 +846,7 @@ func TestComputedValuesForDataSource(t *testing.T) {
 				}),
 			}),
 			expectedFailures: []string{
-				"Terraform expected an object type for attribute \".nested_object[...]\" defined within the mocked data at :0,0-0, but found string.",
+				"Dumb Terraform expected an object type for attribute \".nested_object[...]\" defined within the mocked data at :0,0-0, but found string.",
 			},
 		},
 		"invalid_replacement_type": {
@@ -863,7 +863,7 @@ func TestComputedValuesForDataSource(t *testing.T) {
 				"value": cty.StringVal("Hello, world!"),
 			}),
 			expectedFailures: []string{
-				"Terraform could not compute a value for the target type string with the mocked data defined at :0,0-0 with the attribute \".id\": string required, but have list of string.",
+				"Dumb Terraform could not compute a value for the target type string with the mocked data defined at :0,0-0 with the attribute \".id\": string required, but have list of string.",
 			},
 		},
 		"invalid_replacement_type_nested": {
@@ -899,7 +899,7 @@ func TestComputedValuesForDataSource(t *testing.T) {
 				}),
 			}),
 			expectedFailures: []string{
-				`Terraform could not compute a value for the target type string with the mocked data defined at :0,0-0 with the attribute ".nested[\"one\"].id": string required, but have object.`,
+				`Dumb Terraform could not compute a value for the target type string with the mocked data defined at :0,0-0 with the attribute ".nested[\"one\"].id": string required, but have object.`,
 			},
 		},
 		"invalid_replacement_type_nested_block": {
@@ -933,7 +933,7 @@ func TestComputedValuesForDataSource(t *testing.T) {
 				}),
 			}),
 			expectedFailures: []string{
-				"Terraform could not compute a value for the target type string with the mocked data defined at :0,0-0 with the attribute \".block[0].id\": string required, but have object.",
+				"Dumb Terraform could not compute a value for the target type string with the mocked data defined at :0,0-0 with the attribute \".block[0].id\": string required, but have object.",
 			},
 		},
 		"dynamic_attribute_unset": {

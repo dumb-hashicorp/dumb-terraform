@@ -6,7 +6,7 @@ package arguments
 import (
 	"time"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StateMv represents the command-line arguments for the state mv command.
@@ -18,10 +18,10 @@ type StateMv struct {
 	// moving anything.
 	DryRun bool
 
-	// BackupPath is the path where Terraform should write the backup state.
+	// BackupPath is the path where Dumb Terraform should write the backup state.
 	BackupPath string
 
-	// BackupOutPath is the path where Terraform should write the backup of
+	// BackupOutPath is the path where Dumb Terraform should write the backup of
 	// the destination state.
 	BackupOutPath string
 
@@ -39,7 +39,7 @@ type StateMv struct {
 	StateOutPath string
 
 	// IgnoreRemoteVersion, if true, continues even if remote and local
-	// Terraform versions are incompatible.
+	// Dumb Terraform versions are incompatible.
 	IgnoreRemoteVersion bool
 
 	// SourceAddr is the source resource address.
@@ -66,7 +66,7 @@ func ParseStateMv(args []string) (*StateMv, tfdiags.Diagnostics) {
 	cmdFlags.DurationVar(&mv.StateLockTimeout, "lock-timeout", 0, "lock timeout")
 	cmdFlags.StringVar(&mv.StatePath, "state", "", "path")
 	cmdFlags.StringVar(&mv.StateOutPath, "state-out", "", "path")
-	cmdFlags.BoolVar(&mv.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Terraform versions are incompatible")
+	cmdFlags.BoolVar(&mv.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Dumb Terraform versions are incompatible")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		diags = diags.Append(tfdiags.Sourceless(

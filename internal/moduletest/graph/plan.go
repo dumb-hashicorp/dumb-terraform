@@ -8,22 +8,22 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // testPlan defines how to execute a run block representing a plan command
 //
 // See also: (n *NodeTestRun).testApply
-func (n *NodeTestRun) testPlan(ctx *EvalContext, variables terraform.InputValues, providers map[addrs.RootProviderConfig]providers.Interface, waiter *operationWaiter) {
+func (n *NodeTestRun) testPlan(ctx *EvalContext, variables dumb-terraform.InputValues, providers map[addrs.RootProviderConfig]providers.Interface, waiter *operationWaiter) {
 	file, run := n.File(), n.run
 	config := run.ModuleConfig
 
@@ -33,9 +33,9 @@ func (n *NodeTestRun) testPlan(ctx *EvalContext, variables terraform.InputValues
 	run.Diagnostics = run.Diagnostics.Append(setVariableDiags)
 
 	// ignore diags because validate has covered it
-	tfCtx, _ := terraform.NewContext(n.opts.ContextOpts)
+	tfCtx, _ := dumb-terraform.NewContext(n.opts.ContextOpts)
 
-	// execute the terraform plan operation
+	// execute the dumb-terraform plan operation
 	planScope, plan, originalDiags := plan(ctx, tfCtx, file.Config, run.Config, run.ModuleConfig, setVariables, providers, waiter)
 	// We exclude the diagnostics that are expected to fail from the plan
 	// diagnostics, and if an expected failure is not found, we add a new error diagnostic.
@@ -65,7 +65,7 @@ func (n *NodeTestRun) testPlan(ctx *EvalContext, variables terraform.InputValues
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Warning,
 				"Failed to print verbose output",
-				fmt.Sprintf("Terraform failed to print the verbose output for %s, other diagnostics will contain more details as to why.", filepath.Join(file.Name, run.Name))))
+				fmt.Sprintf("Dumb Terraform failed to print the verbose output for %s, other diagnostics will contain more details as to why.", filepath.Join(file.Name, run.Name))))
 		} else {
 			run.Verbose = &moduletest.Verbose{
 				Plan:         plan,
@@ -89,7 +89,7 @@ func (n *NodeTestRun) testPlan(ctx *EvalContext, variables terraform.InputValues
 	run.Outputs = outputVals
 }
 
-func plan(ctx *EvalContext, tfCtx *terraform.Context, file *configs.TestFile, run *configs.TestRun, module *configs.Config, variables terraform.InputValues, providers map[addrs.RootProviderConfig]providers.Interface, waiter *operationWaiter) (*lang.Scope, *plans.Plan, tfdiags.Diagnostics) {
+func plan(ctx *EvalContext, tfCtx *dumb-terraform.Context, file *configs.TestFile, run *configs.TestRun, module *configs.Config, variables dumb-terraform.InputValues, providers map[addrs.RootProviderConfig]providers.Interface, waiter *operationWaiter) (*lang.Scope, *plans.Plan, tfdiags.Diagnostics) {
 	log.Printf("[TRACE] TestFileRunner: called plan for %s", run.Name)
 
 	var diags tfdiags.Diagnostics
@@ -105,8 +105,8 @@ func plan(ctx *EvalContext, tfCtx *terraform.Context, file *configs.TestFile, ru
 
 	state, err := ctx.LoadState(run)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Failed to load state",
 			Detail:   fmt.Sprintf("Could not retrieve state for run %s: %s.", run.Name, err),
 			Subject:  run.Backend.DeclRange.Ptr(),
@@ -117,7 +117,7 @@ func plan(ctx *EvalContext, tfCtx *terraform.Context, file *configs.TestFile, ru
 		return nil, nil, diags
 	}
 
-	planOpts := &terraform.PlanOpts{
+	planOpts := &dumb-terraform.PlanOpts{
 		Mode: func() plans.Mode {
 			switch run.Options.Mode {
 			case configs.RefreshOnlyTestMode:

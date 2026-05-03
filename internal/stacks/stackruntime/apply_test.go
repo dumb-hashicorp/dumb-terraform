@@ -16,28 +16,28 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	terraformProvider "github.com/hashicorp/terraform/internal/builtin/providers/terraform"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/hooks"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval"
-	stacks_testing_provider "github.com/hashicorp/terraform/internal/stacks/stackruntime/testing"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	dumb-terraformProvider "github.com/dumb-hashicorp/dumb-terraform/internal/builtin/providers/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/hooks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval"
+	stacks_testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 var changesCmpOpts = cmp.Options{
@@ -93,7 +93,7 @@ func TestApply(t *testing.T) {
 							Applyable: true,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangeOutputValue{
 							Addr:   mustStackOutputValue("value"),
@@ -141,7 +141,7 @@ func TestApply(t *testing.T) {
 							Applyable: true,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangeOutputValue{
 							Addr:   mustStackOutputValue("value"),
@@ -189,7 +189,7 @@ func TestApply(t *testing.T) {
 							Applyable: true,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangeOutputValue{
 							Addr:   mustStackOutputValue("value"),
@@ -236,7 +236,7 @@ func TestApply(t *testing.T) {
 							Applyable: true,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangeOutputValue{
 							Addr:   mustStackOutputValue("removed"),
@@ -294,14 +294,14 @@ func TestApply(t *testing.T) {
 						"foo": cty.StringVal("bar"),
 					},
 					wantPlannedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-						return diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagWarning,
+						return diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagWarning,
 							Summary:  "Check block assertion failed",
 							Detail:   `value must be 'baz'`,
-							Subject: &hcl.Range{
+							Subject: &dumb-hcl.Range{
 								Filename: mainBundleSourceAddrStr("checkable-objects/checkable-objects.tf"),
-								Start:    hcl.Pos{Line: 41, Column: 21, Byte: 716},
-								End:      hcl.Pos{Line: 41, Column: 57, Byte: 752},
+								Start:    dumb-hcl.Pos{Line: 41, Column: 21, Byte: 716},
+								End:      dumb-hcl.Pos{Line: 41, Column: 57, Byte: 752},
 							},
 						})
 					}),
@@ -333,14 +333,14 @@ func TestApply(t *testing.T) {
 						},
 					},
 					wantAppliedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-						return diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagWarning,
+						return diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagWarning,
 							Summary:  "Check block assertion failed",
 							Detail:   `value must be 'baz'`,
-							Subject: &hcl.Range{
+							Subject: &dumb-hcl.Range{
 								Filename: mainBundleSourceAddrStr("checkable-objects/checkable-objects.tf"),
-								Start:    hcl.Pos{Line: 41, Column: 21, Byte: 716},
-								End:      hcl.Pos{Line: 41, Column: 57, Byte: 752},
+								Start:    dumb-hcl.Pos{Line: 41, Column: 21, Byte: 716},
+								End:      dumb-hcl.Pos{Line: 41, Column: 57, Byte: 752},
 							},
 						})
 					}),
@@ -441,7 +441,7 @@ func TestApply(t *testing.T) {
 							Schema:             stacks_testing_provider.TestingResourceSchema,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -586,7 +586,7 @@ func TestApply(t *testing.T) {
 							Schema:             stacks_testing_provider.TestingResourceSchema,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -808,7 +808,7 @@ func TestApply(t *testing.T) {
 							Schema:             stacks_testing_provider.TestingResourceSchema,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -998,7 +998,7 @@ func TestApply(t *testing.T) {
 							Schema:             stacks_testing_provider.TestingResourceSchema,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -1261,7 +1261,7 @@ func TestApply(t *testing.T) {
 							Applyable: true,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -1359,7 +1359,7 @@ func TestApply(t *testing.T) {
 							Applyable: true,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -1507,7 +1507,7 @@ func TestApply(t *testing.T) {
 							Schema:             stacks_testing_provider.TestingResourceSchema,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -1516,11 +1516,11 @@ func TestApply(t *testing.T) {
 					wantPlannedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
 						return diags.Append(tfdiags.Sourceless(
 							tfdiags.Warning,
-							"Some objects will no longer be managed by Terraform",
-							`If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
+							"Some objects will no longer be managed by Dumb Terraform",
+							`If you apply this plan, Dumb Terraform will discard its tracking information for the following objects, but it will not delete them:
  - testing_resource.data
 
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.`,
+After applying this plan, Dumb Terraform will no longer manage these objects. You will need to import them into Dumb Terraform to manage them again.`,
 						))
 					}),
 					wantAppliedChanges: []stackstate.AppliedChange{
@@ -1593,7 +1593,7 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 							Schema:             stacks_testing_provider.TestingResourceSchema,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -1701,10 +1701,10 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 				{
 					planMode: plans.NormalMode,
 					wantPlannedDiags: tfdiags.Diagnostics{
-						tfdiags.Sourceless(tfdiags.Warning, "Some objects will no longer be managed by Terraform", `If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
+						tfdiags.Sourceless(tfdiags.Warning, "Some objects will no longer be managed by Dumb Terraform", `If you apply this plan, Dumb Terraform will discard its tracking information for the following objects, but it will not delete them:
  - testing_resource.resource
 
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.`),
+After applying this plan, Dumb Terraform will no longer manage these objects. You will need to import them into Dumb Terraform to manage them again.`),
 					},
 					wantAppliedChanges: []stackstate.AppliedChange{
 						&stackstate.AppliedChangeComponentInstance{
@@ -1729,7 +1729,7 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 								AttrSensitivePaths: make([]cty.Path, 0),
 							},
 							ProviderConfigAddr: addrs.AbsProviderConfig{
-								Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+								Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 							},
 							Schema: stacks_testing_provider.TestingResourceSchema,
 						},
@@ -1741,7 +1741,7 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 							ResourceInstanceObjectAddr: mustAbsResourceInstanceObject("component.two.testing_resource.resource"),
 							NewStateSrc:                nil, // Resource is forgotten
 							ProviderConfigAddr: addrs.AbsProviderConfig{
-								Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+								Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 							},
 						},
 					},
@@ -1794,14 +1794,14 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 				{
 					planMode: plans.NormalMode,
 					wantPlannedDiags: tfdiags.Diagnostics{
-						tfdiags.Sourceless(tfdiags.Warning, "Some objects will no longer be managed by Terraform", `If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
+						tfdiags.Sourceless(tfdiags.Warning, "Some objects will no longer be managed by Dumb Terraform", `If you apply this plan, Dumb Terraform will discard its tracking information for the following objects, but it will not delete them:
  - testing_resource.resource
 
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.`),
-						tfdiags.Sourceless(tfdiags.Warning, "Some objects will no longer be managed by Terraform", `If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:
+After applying this plan, Dumb Terraform will no longer manage these objects. You will need to import them into Dumb Terraform to manage them again.`),
+						tfdiags.Sourceless(tfdiags.Warning, "Some objects will no longer be managed by Dumb Terraform", `If you apply this plan, Dumb Terraform will discard its tracking information for the following objects, but it will not delete them:
  - testing_resource.resource
 
-After applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.`),
+After applying this plan, Dumb Terraform will no longer manage these objects. You will need to import them into Dumb Terraform to manage them again.`),
 					},
 					wantAppliedChanges: []stackstate.AppliedChange{
 						&stackstate.AppliedChangeComponentInstanceRemoved{
@@ -1812,7 +1812,7 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 							ResourceInstanceObjectAddr: mustAbsResourceInstanceObject("component.one.testing_resource.resource"),
 							NewStateSrc:                nil, // Resource is forgotten
 							ProviderConfigAddr: addrs.AbsProviderConfig{
-								Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+								Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 							},
 						},
 						&stackstate.AppliedChangeComponentInstanceRemoved{
@@ -1823,7 +1823,7 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 							ResourceInstanceObjectAddr: mustAbsResourceInstanceObject("component.two.testing_resource.resource"),
 							NewStateSrc:                nil, // Resource is forgotten
 							ProviderConfigAddr: addrs.AbsProviderConfig{
-								Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+								Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 							},
 						},
 					},
@@ -1980,18 +1980,18 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 						},
 					},
 					wantAppliedDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-						return diags.Append(&hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						return diags.Append(&dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  "No value for required variable",
 							Detail:   "The root input variable \"var.ephemeral\" is not set, and has no default value.",
-							Subject: &hcl.Range{
-								Filename: "git::https://example.com/test.git//with-single-input/ephemeral/ephemeral.tfcomponent.hcl",
-								Start: hcl.Pos{
+							Subject: &dumb-hcl.Range{
+								Filename: "git::https://example.com/test.git//with-single-input/ephemeral/ephemeral.tfcomponent.dumb-hcl",
+								Start: dumb-hcl.Pos{
 									Line:   14,
 									Column: 1,
 									Byte:   175,
 								},
-								End: hcl.Pos{
+								End: dumb-hcl.Pos{
 									Line:   14,
 									Column: 21,
 									Byte:   195,
@@ -2263,7 +2263,7 @@ After applying this plan, Terraform will no longer manage these objects. You wil
 							PlanTimestamp:       fakePlanTimestamp,
 						},
 						&stackplan.PlannedChangeHeader{
-							TerraformVersion: version.SemVer,
+							Dumb TerraformVersion: version.SemVer,
 						},
 						&stackplan.PlannedChangePlannedTimestamp{
 							PlannedTimestamp: fakePlanTimestamp,
@@ -2358,8 +2358,8 @@ func TestApplyWithRemovedResource(t *testing.T) {
 	planReq := PlanRequest{
 		Config: cfg,
 		ProviderFactories: map[addrs.Provider]providers.Factory{
-			addrs.NewBuiltInProvider("terraform"): func() (providers.Interface, error) {
-				return terraformProvider.NewProvider(), nil
+			addrs.NewBuiltInProvider("dumb-terraform"): func() (providers.Interface, error) {
+				return dumb-terraformProvider.NewProvider(), nil
 			},
 		},
 		DependencyLocks: *lock,
@@ -2387,7 +2387,7 @@ func TestApplyWithRemovedResource(t *testing.T) {
 							Resource: addrs.ResourceInstance{
 								Resource: addrs.Resource{
 									Mode: addrs.ManagedResourceMode,
-									Type: "terraform_data",
+									Type: "dumb-terraform_data",
 									Name: "main",
 								},
 								Key: addrs.NoKey,
@@ -2414,7 +2414,7 @@ func TestApplyWithRemovedResource(t *testing.T) {
 				}).
 				SetProviderAddr(addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("terraform.io/builtin/terraform"),
+					Provider: addrs.MustParseProviderSourceString("dumb-terraform.io/builtin/dumb-terraform"),
 				})).
 			Build(),
 	}
@@ -2455,8 +2455,8 @@ func TestApplyWithRemovedResource(t *testing.T) {
 		Config: cfg,
 		Plan:   plan,
 		ProviderFactories: map[addrs.Provider]providers.Factory{
-			addrs.NewBuiltInProvider("terraform"): func() (providers.Interface, error) {
-				return terraformProvider.NewProvider(), nil
+			addrs.NewBuiltInProvider("dumb-terraform"): func() (providers.Interface, error) {
+				return dumb-terraformProvider.NewProvider(), nil
 			},
 		},
 	}
@@ -2483,13 +2483,13 @@ func TestApplyWithRemovedResource(t *testing.T) {
 			InputVariables:        make(map[addrs.InputVariable]cty.Value),
 		},
 		&stackstate.AppliedChangeResourceInstanceObject{
-			ResourceInstanceObjectAddr: mustAbsResourceInstanceObject("component.self.terraform_data.main"),
+			ResourceInstanceObjectAddr: mustAbsResourceInstanceObject("component.self.dumb-terraform_data.main"),
 			NewStateSrc:                nil, // Deleted, so is nil.
 			ProviderConfigAddr: addrs.AbsProviderConfig{
 				Provider: addrs.Provider{
-					Type:      "terraform",
+					Type:      "dumb-terraform",
 					Namespace: "builtin",
-					Hostname:  "terraform.io",
+					Hostname:  "dumb-terraform.io",
 				},
 			},
 		},
@@ -2577,7 +2577,7 @@ func TestApplyWithMovedResource(t *testing.T) {
 				}).
 				SetProviderAddr(addrs.AbsProviderConfig{
 					Module:   addrs.RootModule,
-					Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+					Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 				})).
 			Build(),
 	}
@@ -2665,7 +2665,7 @@ func TestApplyWithMovedResource(t *testing.T) {
 				AttrSensitivePaths: make([]cty.Path, 0),
 			},
 			ProviderConfigAddr: addrs.AbsProviderConfig{
-				Provider: addrs.MustParseProviderSourceString("hashicorp/testing"),
+				Provider: addrs.MustParseProviderSourceString("dumb-hashicorp/testing"),
 			},
 			Schema: stacks_testing_provider.TestingResourceSchema,
 		},
@@ -3598,7 +3598,7 @@ func TestApplyWithStateManipulation(t *testing.T) {
 					},
 				}),
 			planDiags: []expectedDiagnostic{
-				expectDiagnostic(tfdiags.Warning, "Some objects will no longer be managed by Terraform", "If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:\n - testing_resource.resource\n\nAfter applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again."),
+				expectDiagnostic(tfdiags.Warning, "Some objects will no longer be managed by Dumb Terraform", "If you apply this plan, Dumb Terraform will discard its tracking information for the following objects, but it will not delete them:\n - testing_resource.resource\n\nAfter applying this plan, Dumb Terraform will no longer manage these objects. You will need to import them into Dumb Terraform to manage them again."),
 			},
 		},
 		"removed-failed-dep": {
@@ -3646,7 +3646,7 @@ func TestApplyWithStateManipulation(t *testing.T) {
 					},
 				}),
 			planDiags: []expectedDiagnostic{
-				expectDiagnostic(tfdiags.Warning, "Some objects will no longer be managed by Terraform", "If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:\n - testing_resource.resource\n\nAfter applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again."),
+				expectDiagnostic(tfdiags.Warning, "Some objects will no longer be managed by Dumb Terraform", "If you apply this plan, Dumb Terraform will discard its tracking information for the following objects, but it will not delete them:\n - testing_resource.resource\n\nAfter applying this plan, Dumb Terraform will no longer manage these objects. You will need to import them into Dumb Terraform to manage them again."),
 			},
 			applyDiags: []expectedDiagnostic{
 				// This error comes from the testing_failed_resource
@@ -3988,7 +3988,7 @@ func TestApplyAutomaticInputConversion(t *testing.T) {
 		InputValues: map[stackaddrs.InputVariable]ExternalInputValue{
 			stackaddrs.InputVariable{Name: "input"}: {
 				// The stack expects a map of strings, but we're giving it
-				// an object. Terraform should automatically convert this to
+				// an object. Dumb Terraform should automatically convert this to
 				// the expected type.
 				Value: cty.ObjectVal(map[string]cty.Value{
 					"hello": cty.StringVal("hello"),
@@ -4040,7 +4040,7 @@ func TestApplyAutomaticInputConversion(t *testing.T) {
 		InputValues: map[stackaddrs.InputVariable]ExternalInputValue{
 			stackaddrs.InputVariable{Name: "input"}: {
 				// The stack expects a map of strings, but we're giving it
-				// an object. Terraform should automatically convert this to
+				// an object. Dumb Terraform should automatically convert this to
 				// the expected type.
 				Value: cty.ObjectVal(map[string]cty.Value{
 					"hello": cty.StringVal("hello"),
@@ -4336,7 +4336,7 @@ func TestApply_WithProviderFunctions(t *testing.T) {
 			},
 		},
 		&stackplan.PlannedChangeHeader{
-			TerraformVersion: version.SemVer,
+			Dumb TerraformVersion: version.SemVer,
 		},
 		&stackplan.PlannedChangeOutputValue{
 			Addr:   stackaddrs.OutputValue{Name: "value"},
@@ -4668,7 +4668,7 @@ func TestApplyManuallyRemovedResource(t *testing.T) {
 
 		// We have in the previous state a resource that is not in our
 		// underlying data store. This simulates the case where someone went
-		// in and manually deleted a resource that Terraform is managing.
+		// in and manually deleted a resource that Dumb Terraform is managing.
 		//
 		// Some providers will return an error in this case, but some will
 		// not. We need to ensure that we handle the second case gracefully.

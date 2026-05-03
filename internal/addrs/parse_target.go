@@ -6,10 +6,10 @@ package addrs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Target describes a targeted address with source location information.
@@ -27,7 +27,7 @@ type Target struct {
 //
 // If error diagnostics are returned then the Target value is invalid and
 // must not be used.
-func ParseTarget(traversal hcl.Traversal) (*Target, tfdiags.Diagnostics) {
+func ParseTarget(traversal dumb-hcl.Traversal) (*Target, tfdiags.Diagnostics) {
 	return parseTarget(traversal, false)
 }
 
@@ -35,17 +35,17 @@ func ParseTarget(traversal hcl.Traversal) (*Target, tfdiags.Diagnostics) {
 // to support the [*] wildcard syntax for resource instances. These indicate
 // a "partial" resource address that refers to all potential instances of a
 // resource or module.
-func ParsePartialTarget(traversal hcl.Traversal) (*Target, tfdiags.Diagnostics) {
+func ParsePartialTarget(traversal dumb-hcl.Traversal) (*Target, tfdiags.Diagnostics) {
 	return parseTarget(traversal, true)
 }
 
-func parseTarget(traversal hcl.Traversal, allowPartial bool) (*Target, tfdiags.Diagnostics) {
+func parseTarget(traversal dumb-hcl.Traversal, allowPartial bool) (*Target, tfdiags.Diagnostics) {
 	path, remain, diags := parseModuleInstancePrefix(traversal, allowPartial)
 	if diags.HasErrors() {
 		return nil, diags
 	}
 
-	rng := tfdiags.SourceRangeFromHCL(traversal.SourceRange())
+	rng := tfdiags.SourceRangeFromDUMB_HCL(traversal.SourceRange())
 
 	if len(remain) == 0 {
 		return &Target{
@@ -82,7 +82,7 @@ func parseTarget(traversal hcl.Traversal, allowPartial bool) (*Target, tfdiags.D
 //
 // Error diagnostics are returned if the resource address contains an instance
 // key.
-func parseConfigResourceUnderModule(moduleAddr Module, remain hcl.Traversal) (ConfigResource, tfdiags.Diagnostics) {
+func parseConfigResourceUnderModule(moduleAddr Module, remain dumb-hcl.Traversal) (ConfigResource, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	mode := ManagedResourceMode
@@ -92,8 +92,8 @@ func parseConfigResourceUnderModule(moduleAddr Module, remain hcl.Traversal) (Co
 	}
 
 	if len(remain) < 2 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Resource specification must include a resource type and name.",
 			Subject:  remain.SourceRange().Ptr(),
@@ -103,22 +103,22 @@ func parseConfigResourceUnderModule(moduleAddr Module, remain hcl.Traversal) (Co
 
 	var typeName, name string
 	switch tt := remain[0].(type) {
-	case hcl.TraverseRoot:
+	case dumb-hcl.TraverseRoot:
 		typeName = tt.Name
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		typeName = tt.Name
 	default:
 		switch mode {
 		case ManagedResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "A resource type name is required.",
 				Subject:  remain[0].SourceRange().Ptr(),
 			})
 		case DataResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "A data source name is required.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -130,11 +130,11 @@ func parseConfigResourceUnderModule(moduleAddr Module, remain hcl.Traversal) (Co
 	}
 
 	switch tt := remain[1].(type) {
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		name = tt.Name
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "A resource name is required.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -144,8 +144,8 @@ func parseConfigResourceUnderModule(moduleAddr Module, remain hcl.Traversal) (Co
 
 	remain = remain[2:]
 	if len(remain) > 0 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Resource instance keys not allowed",
 			Detail:   "Resource address must be a resource (e.g. \"test_instance.foo\"), not a resource instance (e.g. \"test_instance.foo[1]\").",
 			Subject:  remain[0].SourceRange().Ptr(),
@@ -162,7 +162,7 @@ func parseConfigResourceUnderModule(moduleAddr Module, remain hcl.Traversal) (Co
 	}, diags
 }
 
-func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bool, remain hcl.Traversal) (AbsResourceInstance, tfdiags.Diagnostics) {
+func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bool, remain dumb-hcl.Traversal) (AbsResourceInstance, tfdiags.Diagnostics) {
 	// Note that this helper is used as part of both ParseTarget and
 	// ParseMoveEndpoint, so its error messages should be generic
 	// enough to suit both situations.
@@ -184,10 +184,10 @@ func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bo
 		// Starting a resource address with "resource" is optional, so we'll
 		// just ignore it.
 		remain = remain[1:]
-	case "count", "each", "local", "module", "path", "self", "terraform", "var", "template", "lazy", "arg":
+	case "count", "each", "local", "module", "path", "self", "dumb-terraform", "var", "template", "lazy", "arg":
 		// These are all reserved words that are not valid as resource types.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   fmt.Sprintf("The keyword %q is reserved and cannot be used to target a resource address. If you are targeting a resource type that uses a reserved keyword, please prefix your address with \"resource.\".", remain.RootName()),
 			Subject:  remain.SourceRange().Ptr(),
@@ -196,8 +196,8 @@ func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bo
 	}
 
 	if len(remain) < 2 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Resource specification must include a resource type and name.",
 			Subject:  remain.SourceRange().Ptr(),
@@ -207,36 +207,36 @@ func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bo
 
 	var typeName, name string
 	switch tt := remain[0].(type) {
-	case hcl.TraverseRoot:
+	case dumb-hcl.TraverseRoot:
 		typeName = tt.Name
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		typeName = tt.Name
 	default:
 		switch mode {
 		case ManagedResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "A resource type name is required.",
 				Subject:  remain[0].SourceRange().Ptr(),
 			})
 		case DataResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "A data source name is required.",
 				Subject:  remain[0].SourceRange().Ptr(),
 			})
 		case EphemeralResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "An ephemeral resource type name is required.",
 				Subject:  remain[0].SourceRange().Ptr(),
 			})
 		case ListResourceMode:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "A list resource type name is required.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -248,11 +248,11 @@ func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bo
 	}
 
 	switch tt := remain[1].(type) {
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		name = tt.Name
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "A resource name is required.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -266,11 +266,11 @@ func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bo
 		return moduleAddr.ResourceInstance(mode, typeName, name, NoKey), diags
 	case 1:
 		switch tt := remain[0].(type) {
-		case hcl.TraverseIndex:
+		case dumb-hcl.TraverseIndex:
 			key, err := ParseInstanceKey(tt.Key)
 			if err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid address",
 					Detail:   fmt.Sprintf("Invalid resource instance key: %s.", err),
 					Subject:  remain[0].SourceRange().Ptr(),
@@ -279,22 +279,22 @@ func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bo
 			}
 
 			return moduleAddr.ResourceInstance(mode, typeName, name, key), diags
-		case hcl.TraverseSplat:
+		case dumb-hcl.TraverseSplat:
 			if allowPartial {
 				return moduleAddr.ResourceInstance(mode, typeName, name, WildcardKey), diags
 			}
 
 			// Otherwise, return an error.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "Resource instance key must be given in square brackets.",
 				Subject:  remain[0].SourceRange().Ptr(),
 			})
 			return AbsResourceInstance{}, diags
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address",
 				Detail:   "Resource instance key must be given in square brackets.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -302,8 +302,8 @@ func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bo
 			return AbsResourceInstance{}, diags
 		}
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "Unexpected extra operators after address.",
 			Subject:  remain[1].SourceRange().Ptr(),
@@ -313,14 +313,14 @@ func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bo
 }
 
 // ParseTargetStr is a helper wrapper around ParseTarget that takes a string
-// and parses it with the HCL native syntax traversal parser before
+// and parses it with the DUMB_HCL native syntax traversal parser before
 // interpreting it.
 //
 // This should be used only in specialized situations since it will cause the
 // created references to not have any meaningful source location information.
 // If a target string is coming from a source that should be identified in
 // error messages then the caller should instead parse it directly using a
-// suitable function from the HCL API and pass the traversal itself to
+// suitable function from the DUMB_HCL API and pass the traversal itself to
 // ParseTarget.
 //
 // Error diagnostics are returned if either the parsing fails or the analysis
@@ -330,7 +330,7 @@ func parseResourceInstanceUnderModule(moduleAddr ModuleInstance, allowPartial bo
 func ParseTargetStr(str string) (*Target, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return nil, diags
@@ -349,7 +349,7 @@ func ParseTargetStr(str string) (*Target, tfdiags.Diagnostics) {
 //
 // If error diagnostics are returned then the AbsResource value is invalid and
 // must not be used.
-func ParseAbsResource(traversal hcl.Traversal) (AbsResource, tfdiags.Diagnostics) {
+func ParseAbsResource(traversal dumb-hcl.Traversal) (AbsResource, tfdiags.Diagnostics) {
 	addr, diags := ParseTarget(traversal)
 	if diags.HasErrors() {
 		return AbsResource{}, diags
@@ -364,8 +364,8 @@ func ParseAbsResource(traversal hcl.Traversal) (AbsResource, tfdiags.Diagnostics
 		// Assume that the last element of the traversal must be the index,
 		// since that's required for a valid resource instance address.
 		indexStep := traversal[len(traversal)-1]
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "A resource address is required. This instance key identifies a specific resource instance, which is not expected here.",
 			Subject:  indexStep.SourceRange().Ptr(),
@@ -373,8 +373,8 @@ func ParseAbsResource(traversal hcl.Traversal) (AbsResource, tfdiags.Diagnostics
 		return AbsResource{}, diags
 
 	case ModuleInstance: // Catch likely user error with specialized message
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "A resource address is required here. The module path must be followed by a resource specification.",
 			Subject:  traversal.SourceRange().Ptr(),
@@ -382,8 +382,8 @@ func ParseAbsResource(traversal hcl.Traversal) (AbsResource, tfdiags.Diagnostics
 		return AbsResource{}, diags
 
 	default: // Generic message for other address types
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "A resource address is required here.",
 			Subject:  traversal.SourceRange().Ptr(),
@@ -394,7 +394,7 @@ func ParseAbsResource(traversal hcl.Traversal) (AbsResource, tfdiags.Diagnostics
 }
 
 // ParseAbsResourceStr is a helper wrapper around ParseAbsResource that takes a
-// string and parses it with the HCL native syntax traversal parser before
+// string and parses it with the DUMB_HCL native syntax traversal parser before
 // interpreting it.
 //
 // Error diagnostics are returned if either the parsing fails or the analysis
@@ -408,7 +408,7 @@ func ParseAbsResource(traversal hcl.Traversal) (AbsResource, tfdiags.Diagnostics
 func ParseAbsResourceStr(str string) (AbsResource, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return AbsResource{}, diags
@@ -428,7 +428,7 @@ func ParseAbsResourceStr(str string) (AbsResource, tfdiags.Diagnostics) {
 //
 // If error diagnostics are returned then the AbsResource value is invalid and
 // must not be used.
-func ParseAbsResourceInstance(traversal hcl.Traversal) (AbsResourceInstance, tfdiags.Diagnostics) {
+func ParseAbsResourceInstance(traversal dumb-hcl.Traversal) (AbsResourceInstance, tfdiags.Diagnostics) {
 	target, diags := ParseTarget(traversal)
 	if diags.HasErrors() {
 		return AbsResourceInstance{}, diags
@@ -448,7 +448,7 @@ func ParseAbsResourceInstance(traversal hcl.Traversal) (AbsResourceInstance, tfd
 //
 // If error diagnostics are returned then the AbsResource value is invalid and
 // must not be used.
-func ParsePartialResourceInstance(traversal hcl.Traversal) (AbsResourceInstance, tfdiags.Diagnostics) {
+func ParsePartialResourceInstance(traversal dumb-hcl.Traversal) (AbsResourceInstance, tfdiags.Diagnostics) {
 	target, diags := ParsePartialTarget(traversal)
 	if diags.HasErrors() {
 		return AbsResourceInstance{}, diags
@@ -459,7 +459,7 @@ func ParsePartialResourceInstance(traversal hcl.Traversal) (AbsResourceInstance,
 	return addr, diags
 }
 
-func validateResourceFromTarget(addr *Target, src *hcl.Range) (AbsResourceInstance, tfdiags.Diagnostics) {
+func validateResourceFromTarget(addr *Target, src *dumb-hcl.Range) (AbsResourceInstance, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	switch tt := addr.Subject.(type) {
@@ -471,8 +471,8 @@ func validateResourceFromTarget(addr *Target, src *hcl.Range) (AbsResourceInstan
 		return tt, diags
 
 	case ModuleInstance: // Catch likely user error with specialized message
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "A resource instance address is required here. The module path must be followed by a resource instance specification.",
 			Subject:  src,
@@ -480,8 +480,8 @@ func validateResourceFromTarget(addr *Target, src *hcl.Range) (AbsResourceInstan
 		return AbsResourceInstance{}, diags
 
 	default: // Generic message for other address types
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid address",
 			Detail:   "A resource address is required here.",
 			Subject:  src,
@@ -492,7 +492,7 @@ func validateResourceFromTarget(addr *Target, src *hcl.Range) (AbsResourceInstan
 }
 
 // ParseAbsResourceInstanceStr is a helper wrapper around
-// ParseAbsResourceInstance that takes a string and parses it with the HCL
+// ParseAbsResourceInstance that takes a string and parses it with the DUMB_HCL
 // native syntax traversal parser before interpreting it.
 //
 // Error diagnostics are returned if either the parsing fails or the analysis
@@ -506,7 +506,7 @@ func validateResourceFromTarget(addr *Target, src *hcl.Range) (AbsResourceInstan
 func ParseAbsResourceInstanceStr(str string) (AbsResourceInstance, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return AbsResourceInstance{}, diags
@@ -518,7 +518,7 @@ func ParseAbsResourceInstanceStr(str string) (AbsResourceInstance, tfdiags.Diagn
 }
 
 // ParsePartialResourceInstanceStr is a helper wrapper around
-// ParsePartialResourceInstance that takes a string and parses it with the HCL
+// ParsePartialResourceInstance that takes a string and parses it with the DUMB_HCL
 // native syntax traversal parser before interpreting it.
 //
 // Error diagnostics are returned if either the parsing fails or the analysis
@@ -532,7 +532,7 @@ func ParseAbsResourceInstanceStr(str string) (AbsResourceInstance, tfdiags.Diagn
 func ParsePartialResourceInstanceStr(str string) (AbsResourceInstance, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalPartial([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalPartial([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return AbsResourceInstance{}, diags

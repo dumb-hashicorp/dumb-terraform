@@ -10,20 +10,20 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/cloud"
-	"github.com/hashicorp/terraform/internal/cloud/cloudplan"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud/cloudplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Many of the methods we get data from can emit special error types if they're
@@ -45,7 +45,7 @@ func (e *errUnusableDataMisc) Unwrap() error {
 }
 
 // ShowCommand is a Command implementation that reads and outputs the
-// contents of a Terraform plan or state file.
+// contents of a Dumb Terraform plan or state file.
 type ShowCommand struct {
 	Meta
 	viewType arguments.ViewType
@@ -102,15 +102,15 @@ func (c *ShowCommand) Run(rawArgs []string) int {
 
 func (c *ShowCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] show [options] [path]
+Usage: dumb-terraform [global options] show [options] [path]
 
-  Reads and outputs a Terraform state or plan file in a human-readable
+  Reads and outputs a Dumb Terraform state or plan file in a human-readable
   form. If no path is specified, the current state will be shown.
 
 Options:
 
   -no-color           If specified, output won't contain any color.
-  -json               If specified, output the Terraform plan or state in
+  -json               If specified, output the Dumb Terraform plan or state in
                       a machine-readable form.
 
 `
@@ -121,13 +121,13 @@ func (c *ShowCommand) Synopsis() string {
 	return "Show the current state or a saved plan"
 }
 
-func (c *ShowCommand) show(path string) (*plans.Plan, *cloudplan.RemotePlanJSON, *statefile.File, *configs.Config, *terraform.Schemas, tfdiags.Diagnostics) {
+func (c *ShowCommand) show(path string) (*plans.Plan, *cloudplan.RemotePlanJSON, *statefile.File, *configs.Config, *dumb-terraform.Schemas, tfdiags.Diagnostics) {
 	var diags, showDiags tfdiags.Diagnostics
 	var plan *plans.Plan
 	var jsonPlan *cloudplan.RemotePlanJSON
 	var stateFile *statefile.File
 	var config *configs.Config
-	var schemas *terraform.Schemas
+	var schemas *dumb-terraform.Schemas
 
 	// No plan file or state file argument provided,
 	// so get the latest state snapshot
@@ -360,7 +360,7 @@ func readConfig(r *planfile.Reader, allowLanguageExperiments bool, variableValue
 		return nil, diags
 	}
 
-	config, buildDiags := terraform.BuildConfigWithGraph(
+	config, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		loader.ModuleWalker(),
 		variables,

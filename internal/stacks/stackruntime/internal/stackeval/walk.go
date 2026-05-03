@@ -7,15 +7,15 @@ import (
 	"context"
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // walkState is a helper for codepaths that intend to visit various different
 // interdependent objects and evaluate them all concurrently, waiting for any
 // dependencies to be resolved and accumulating diagnostics along the way.
 //
-// Unlike in traditional Terraform Core, there isn't any special inversion of
+// Unlike in traditional Dumb Terraform Core, there isn't any special inversion of
 // control technique to sequence the work, and instead callers are expected
 // to use normal control flow in conjunction with the "promising" package's
 // async tasks and promises to drive the evaluation forward. Therefore this

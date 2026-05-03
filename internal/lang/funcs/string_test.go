@@ -8,13 +8,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/ext/customdecode"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/customdecode"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 
-	"github.com/hashicorp/terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
 )
 
 func TestReplace(t *testing.T) {
@@ -263,7 +263,7 @@ func TestStartsWith(t *testing.T) {
 
 func TestTemplateString(t *testing.T) {
 	// This function has some special restrictions on what syntax is valid
-	// in its first argument, so we'll test this one using HCL expressions
+	// in its first argument, so we'll test this one using DUMB_HCL expressions
 	// as the inputs, rather than direct cty values as we do for most other
 	// functions in this package.
 	tests := []struct {
@@ -456,7 +456,7 @@ func TestTemplateString(t *testing.T) {
 			map[string]cty.Value{},
 			cty.ObjectVal(map[string]cty.Value{}),
 			cty.NilVal,
-			`invalid template expression: must be a direct reference to a single string from elsewhere, containing valid Terraform template syntax`,
+			`invalid template expression: must be a direct reference to a single string from elsewhere, containing valid Dumb Terraform template syntax`,
 		},
 		{
 			`not_a_string`,
@@ -597,18 +597,18 @@ func TestTemplateString(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.templateExpr, func(t *testing.T) {
-			// The following mimics what HCL itself would do when preparing
+			// The following mimics what DUMB_HCL itself would do when preparing
 			// the first argument to this function, since the parameter
 			// uses the special "expression closure type" which causes
-			// HCL to delay evaluation of the expression and let the
+			// DUMB_HCL to delay evaluation of the expression and let the
 			// function handle it directly itself.
-			expr, diags := hclsyntax.ParseExpression([]byte(test.templateExpr), "", hcl.InitialPos)
+			expr, diags := dumb-hclsyntax.ParseExpression([]byte(test.templateExpr), "", dumb-hcl.InitialPos)
 			if diags.HasErrors() {
 				t.Fatalf("unexpected errors: %s", diags.Error())
 			}
 			exprClosure := &customdecode.ExpressionClosure{
 				Expression: expr,
-				EvalContext: &hcl.EvalContext{
+				EvalContext: &dumb-hcl.EvalContext{
 					Variables: test.exprScope,
 				},
 			}

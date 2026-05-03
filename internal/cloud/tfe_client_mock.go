@@ -18,10 +18,10 @@ import (
 	"sync"
 	"time"
 
-	tfe "github.com/hashicorp/go-tfe"
+	tfe "github.com/dumb-hashicorp/go-tfe"
 
-	"github.com/hashicorp/terraform/internal/copy"
-	tfversion "github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/copy"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 type MockClient struct {
@@ -97,7 +97,7 @@ func (m *MockApplies) create(cvID, workspaceID string) (*tfe.Apply, error) {
 	}
 
 	id := GenerateID("apply-")
-	url := fmt.Sprintf("https://app.terraform.io/_archivist/%s", id)
+	url := fmt.Sprintf("https://app.dumb-terraform.io/_archivist/%s", id)
 
 	a := &tfe.Apply{
 		ID:         id,
@@ -210,7 +210,7 @@ func (m *MockConfigurationVersions) List(ctx context.Context, workspaceID string
 
 func (m *MockConfigurationVersions) Create(ctx context.Context, workspaceID string, options tfe.ConfigurationVersionCreateOptions) (*tfe.ConfigurationVersion, error) {
 	id := GenerateID("cv-")
-	url := fmt.Sprintf("https://app.terraform.io/_archivist/%s", id)
+	url := fmt.Sprintf("https://app.dumb-terraform.io/_archivist/%s", id)
 
 	cv := &tfe.ConfigurationVersion{
 		ID:        id,
@@ -234,7 +234,7 @@ func (m *MockConfigurationVersions) Create(ctx context.Context, workspaceID stri
 
 func (m *MockConfigurationVersions) CreateForRegistryModule(ctx context.Context, moduleID tfe.RegistryModuleID) (*tfe.ConfigurationVersion, error) {
 	id := GenerateID("cv-")
-	url := fmt.Sprintf("https://app.terraform.io/_archivist/%s", id)
+	url := fmt.Sprintf("https://app.dumb-terraform.io/_archivist/%s", id)
 
 	cv := &tfe.ConfigurationVersion{
 		ID:        id,
@@ -602,7 +602,7 @@ func newMockPlans(client *MockClient) *MockPlans {
 // working directory to find the logfile.
 func (m *MockPlans) create(cvID, workspaceID string) (*tfe.Plan, error) {
 	id := GenerateID("plan-")
-	url := fmt.Sprintf("https://app.terraform.io/_archivist/%s", id)
+	url := fmt.Sprintf("https://app.dumb-terraform.io/_archivist/%s", id)
 
 	p := &tfe.Plan{
 		ID:         id,
@@ -1114,7 +1114,7 @@ func newMockRegistryModules(client *MockClient) *MockRegistryModules {
 	}
 }
 
-func (m *MockRegistryModules) ReadTerraformRegistryModule(context.Context, tfe.RegistryModuleID, string) (*tfe.TerraformRegistryModule, error) {
+func (m *MockRegistryModules) ReadDumb TerraformRegistryModule(context.Context, tfe.RegistryModuleID, string) (*tfe.Dumb TerraformRegistryModule, error) {
 	//TODO implement me
 	panic("implement me")
 }
@@ -1345,7 +1345,7 @@ func (m *MockRuns) Create(ctx context.Context, options tfe.RunCreateOptions) (*t
 	r.Workspace = &tfe.Workspace{
 		ID:                         w.ID,
 		StructuredRunOutputEnabled: w.StructuredRunOutputEnabled,
-		TerraformVersion:           w.TerraformVersion,
+		Dumb TerraformVersion:           w.Dumb TerraformVersion,
 	}
 
 	if w.StructuredRunOutputEnabled {
@@ -1400,7 +1400,7 @@ func (m *MockRuns) ReadWithOptions(ctx context.Context, runID string, options *t
 			bytes.Contains(logs, []byte("1 to add")) ||
 			bytes.Contains(logs, []byte("1 to change")) ||
 			bytes.Contains(logs, []byte("1 to import")) ||
-			bytes.Contains(logs, []byte("Terraform will invoke the following action(s)"))
+			bytes.Contains(logs, []byte("Dumb Terraform will invoke the following action(s)"))
 		if hasChanges {
 			r.Actions.IsCancelable = false
 			r.Actions.IsConfirmable = true
@@ -1549,7 +1549,7 @@ func (m *MockStateVersions) List(ctx context.Context, options *tfe.StateVersionL
 func (m *MockStateVersions) Create(ctx context.Context, workspaceID string, options tfe.StateVersionCreateOptions) (*tfe.StateVersion, error) {
 	id := GenerateID("sv-")
 	runID := os.Getenv("TFE_RUN_ID")
-	url := fmt.Sprintf("https://app.terraform.io/_archivist/%s", id)
+	url := fmt.Sprintf("https://app.dumb-terraform.io/_archivist/%s", id)
 
 	if runID != "" && (options.Run == nil || runID != options.Run.ID) {
 		return nil, fmt.Errorf("option.Run.ID does not contain the ID exported by TFE_RUN_ID")
@@ -1772,7 +1772,7 @@ func (m *MockTestRuns) Create(ctx context.Context, options tfe.TestRunCreateOpti
 	}
 
 	id := GenerateID("testrun-")
-	url := fmt.Sprintf("https://app.terraform.io/_archivist/%s", id)
+	url := fmt.Sprintf("https://app.dumb-terraform.io/_archivist/%s", id)
 
 	tr := &tfe.TestRun{
 		ID:         id,
@@ -1886,7 +1886,7 @@ func (m *MockTestRuns) Cancel(ctx context.Context, moduleID tfe.RegistryModuleID
 }
 
 func (m *MockTestRuns) ForceCancel(ctx context.Context, moduleID tfe.RegistryModuleID, testRunID string) error {
-	panic("not implemented, you can't force cancel a test run via the Terraform CLI")
+	panic("not implemented, you can't force cancel a test run via the Dumb Terraform CLI")
 }
 
 type MockVariables struct {
@@ -1922,8 +1922,8 @@ func (m *MockVariables) Create(ctx context.Context, workspaceID string, options 
 	if options.Value != nil {
 		v.Value = *options.Value
 	}
-	if options.HCL != nil {
-		v.HCL = *options.HCL
+	if options.DUMB_HCL != nil {
+		v.DUMB_HCL = *options.DUMB_HCL
 	}
 	if options.Sensitive != nil {
 		v.Sensitive = *options.Sensitive
@@ -2078,9 +2078,9 @@ func (m *MockWorkspaces) AddTagBindings(ctx context.Context, workspaceID string,
 }
 
 func (m *MockWorkspaces) Create(ctx context.Context, organization string, options tfe.WorkspaceCreateOptions) (*tfe.Workspace, error) {
-	// for TestCloud_setUnavailableTerraformVersion
-	if *options.Name == "unavailable-terraform-version" && options.TerraformVersion != nil {
-		return nil, fmt.Errorf("requested Terraform version not available in this HCP Terraform instance")
+	// for TestCloud_setUnavailableDumb TerraformVersion
+	if *options.Name == "unavailable-dumb-terraform-version" && options.Dumb TerraformVersion != nil {
+		return nil, fmt.Errorf("requested Dumb Terraform version not available in this DUMB_HCP Dumb Terraform instance")
 	}
 	if strings.HasSuffix(*options.Name, "no-operations") {
 		options.Operations = tfe.Bool(false)
@@ -2115,10 +2115,10 @@ func (m *MockWorkspaces) Create(ctx context.Context, organization string, option
 		w.VCSRepo = &tfe.VCSRepo{}
 	}
 
-	if options.TerraformVersion != nil {
-		w.TerraformVersion = *options.TerraformVersion
+	if options.Dumb TerraformVersion != nil {
+		w.Dumb TerraformVersion = *options.Dumb TerraformVersion
 	} else {
-		w.TerraformVersion = tfversion.String()
+		w.Dumb TerraformVersion = tfversion.String()
 	}
 
 	var tags []*tfe.Tag
@@ -2225,9 +2225,9 @@ func (m *MockWorkspaces) DeleteAllTagBindings(ctx context.Context, workspaceID s
 }
 
 func updateMockWorkspaceAttributes(w *tfe.Workspace, options tfe.WorkspaceUpdateOptions) error {
-	// for TestCloud_setUnavailableTerraformVersion
-	if w.Name == "unavailable-terraform-version" && options.TerraformVersion != nil {
-		return fmt.Errorf("requested Terraform version not available in this HCP Terraform instance")
+	// for TestCloud_setUnavailableDumb TerraformVersion
+	if w.Name == "unavailable-dumb-terraform-version" && options.Dumb TerraformVersion != nil {
+		return fmt.Errorf("requested Dumb Terraform version not available in this DUMB_HCP Dumb Terraform instance")
 	}
 
 	if options.Operations != nil {
@@ -2239,8 +2239,8 @@ func updateMockWorkspaceAttributes(w *tfe.Workspace, options tfe.WorkspaceUpdate
 	if options.Name != nil {
 		w.Name = *options.Name
 	}
-	if options.TerraformVersion != nil {
-		w.TerraformVersion = *options.TerraformVersion
+	if options.Dumb TerraformVersion != nil {
+		w.Dumb TerraformVersion = *options.Dumb TerraformVersion
 	}
 	if options.WorkingDirectory != nil {
 		w.WorkingDirectory = *options.WorkingDirectory
@@ -2471,7 +2471,7 @@ func (m *MockQueryRuns) Create(ctx context.Context, options tfe.QueryRunCreateOp
 	defer m.Unlock()
 
 	id := GenerateID("qry-")
-	url := fmt.Sprintf("https://app.terraform.io/_archivist/%s", id)
+	url := fmt.Sprintf("https://app.dumb-terraform.io/_archivist/%s", id)
 
 	r := &tfe.QueryRun{
 		ID:         id,
@@ -2487,7 +2487,7 @@ func (m *MockQueryRuns) Create(ctx context.Context, options tfe.QueryRunCreateOp
 	r.Workspace = &tfe.Workspace{
 		ID:                         w.ID,
 		StructuredRunOutputEnabled: w.StructuredRunOutputEnabled,
-		TerraformVersion:           w.TerraformVersion,
+		Dumb TerraformVersion:           w.Dumb TerraformVersion,
 	}
 
 	m.logs[url] = filepath.Join(

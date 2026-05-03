@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 )
 
 func TestTestRun_Validate(t *testing.T) {
@@ -86,10 +86,10 @@ func TestTestRun_Validate(t *testing.T) {
 	}
 }
 
-func parseTraversal(t *testing.T, addr string) hcl.Traversal {
+func parseTraversal(t *testing.T, addr string) dumb-hcl.Traversal {
 	t.Helper()
 
-	traversal, diags := hclsyntax.ParseTraversalAbs([]byte(addr), "", hcl.InitialPos)
+	traversal, diags := dumb-hclsyntax.ParseTraversalAbs([]byte(addr), "", dumb-hcl.InitialPos)
 	if diags.HasErrors() {
 		t.Fatalf("invalid address: %s", diags.Error())
 	}

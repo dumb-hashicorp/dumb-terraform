@@ -6,7 +6,7 @@ package inmem
 import (
 	"testing"
 
-	statespkg "github.com/hashicorp/terraform/internal/states"
+	statespkg "github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 func ReadState(t *testing.T, wsName string) *statespkg.State {

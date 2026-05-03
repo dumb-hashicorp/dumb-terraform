@@ -1,7 +1,7 @@
 // Copyright IBM Corp. 2014, 2026
 // SPDX-License-Identifier: MPL-2.0
 
-// Terraform Plugin RPC protocol version 6.11
+// Dumb Terraform Plugin RPC protocol version 6.11
 //
 // This file defines version 6.11 of the RPC protocol. To implement a plugin
 // against this protocol, copy this definition into your own codebase and
@@ -11,21 +11,21 @@
 // maintaining backwards compatibility. Breaking changes, if any are required,
 // will come in a subsequent major version with its own separate proto definition.
 //
-// Note that only the proto files included in a release tag of Terraform are
+// Note that only the proto files included in a release tag of Dumb Terraform are
 // official protocol releases. Proto files taken from other commits may include
 // incomplete changes or features that did not make it into a final release.
 // In all reasonable cases, plugin developers should take the proto file from
-// the tag of the most recent release of Terraform, and not from the main
+// the tag of the most recent release of Dumb Terraform, and not from the main
 // branch or any other development branch.
 //
 syntax = "proto3";
-option go_package = "github.com/hashicorp/terraform/internal/tfplugin6";
+option go_package = "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin6";
 
 import "google/protobuf/timestamp.proto";
 
 package tfplugin6;
 
-// DynamicValue is an opaque encoding of terraform data, with the field name
+// DynamicValue is an opaque encoding of dumb-terraform data, with the field name
 // indicating the encoding scheme used.
 message DynamicValue {
     bytes msgpack = 1;
@@ -144,7 +144,7 @@ message ResourceIdentityData {
     DynamicValue identity_data = 1;
 }
 
-// ActionSchema defines the schema for an action that can be invoked by Terraform.
+// ActionSchema defines the schema for an action that can be invoked by Dumb Terraform.
 message ActionSchema {
     Schema schema = 1; // of the action itself
 }
@@ -226,7 +226,7 @@ message Function {
     repeated Parameter parameters = 1;
 
     // variadic_parameter is an optional final parameter which accepts
-    // zero or more argument values, in which Terraform will send an
+    // zero or more argument values, in which Dumb Terraform will send an
     // ordered list of the parameter type.
     Parameter variadic_parameter = 2;
 
@@ -254,13 +254,13 @@ message Function {
         bytes type = 2;
 
         // allow_null_value when enabled denotes that a null argument value can
-        // be passed to the provider. When disabled, Terraform returns an error
+        // be passed to the provider. When disabled, Dumb Terraform returns an error
         // if the argument value is null.
         bool allow_null_value = 3;
 
         // allow_unknown_values when enabled denotes that only wholly known
         // argument values will be passed to the provider. When disabled,
-        // Terraform skips the function call entirely and assumes an unknown
+        // Dumb Terraform skips the function call entirely and assumes an unknown
         // value result from the function.
         bool allow_unknown_values = 4;
 
@@ -301,7 +301,7 @@ message ServerCapabilities {
     bool generate_resource_config = 4;
 }
 
-// ClientCapabilities allows Terraform to publish information regarding
+// ClientCapabilities allows Dumb Terraform to publish information regarding
 // supported protocol features. This is used to indicate availability of
 // certain forward-compatible changes which may be optional in a major
 // protocol version, but cannot be tested for directly.
@@ -321,7 +321,7 @@ message ClientCapabilities {
 
     // computed_blocks_allowed indicates that the client can handle optionally
     // computed nested block values in resources. Because older versions of
-    // Terraform without this capability will ignore the computed flag in the
+    // Dumb Terraform without this capability will ignore the computed flag in the
     // schema, it is up to the provider to return an appropriate diagnostic when
     // a resource requiring the computed behavior is used.
     bool computed_blocks_allowed = 4;
@@ -354,7 +354,7 @@ service Provider {
     // supported resource types without requiring the server to instantiate all
     // schema information, which may be memory intensive.
     // This method is CURRENTLY UNUSED and it serves mostly for convenience
-    // of code generation inside of terraform-plugin-mux.
+    // of code generation inside of dumb-terraform-plugin-mux.
     rpc GetMetadata(GetMetadata.Request) returns (GetMetadata.Response);
 
     // GetSchema returns schema information for the provider, data resources,
@@ -609,7 +609,7 @@ message ValidateEphemeralResourceConfig {
 
 message ConfigureProvider {
     message Request {
-        string terraform_version = 1;
+        string dumb-terraform_version = 1;
         DynamicValue config = 2;
         ClientCapabilities client_capabilities = 3;
     }
@@ -665,8 +665,8 @@ message PlanResourceChange {
         bytes planned_private = 3;
         repeated Diagnostic diagnostics = 4;
 
-        // This may be set only by the helper/schema "SDK" in the main Terraform
-        // repository, to request that Terraform Core >=0.12 permit additional
+        // This may be set only by the helper/schema "SDK" in the main Dumb Terraform
+        // repository, to request that Dumb Terraform Core >=0.12 permit additional
         // inconsistencies that can result from the legacy SDK type system
         // and its imprecise mapping to the >=0.12 type system.
         // The change in behavior implied by this flag makes sense only for the
@@ -701,8 +701,8 @@ message ApplyResourceChange {
         bytes private = 2;
         repeated Diagnostic diagnostics = 3;
 
-        // This may be set only by the helper/schema "SDK" in the main Terraform
-        // repository, to request that Terraform Core >=0.12 permit additional
+        // This may be set only by the helper/schema "SDK" in the main Dumb Terraform
+        // repository, to request that Dumb Terraform Core >=0.12 permit additional
         // inconsistencies that can result from the legacy SDK type system
         // and its imprecise mapping to the >=0.12 type system.
         // The change in behavior implied by this flag makes sense only for the
@@ -890,7 +890,7 @@ message ListResource {
         // include the full resource object for each result
         bool include_resource_object = 3;
 
-        // The maximum number of results that Terraform is expecting.
+        // The maximum number of results that Dumb Terraform is expecting.
         // The stream will stop, once this limit is reached.
         int64 limit = 4;
     }
@@ -1066,7 +1066,7 @@ message InvokeAction {
 
     message Event {
       message Progress {
-        // message to be printed in the console / HCPT
+        // message to be printed in the console / DUMB_HCPT
         string message = 1;
       }
 

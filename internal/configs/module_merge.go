@@ -6,9 +6,9 @@ package configs
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 )
@@ -26,8 +26,8 @@ import (
 // features, if it is possible to unambiguously correlate the nested elements
 // and their behaviors are orthogonal to each other.
 
-func (p *Provider) merge(op *Provider) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (p *Provider) merge(op *Provider) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	if op.Version.Required != nil {
 		p.Version = op.Version
@@ -38,8 +38,8 @@ func (p *Provider) merge(op *Provider) hcl.Diagnostics {
 	return diags
 }
 
-func (v *Variable) merge(ov *Variable) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (v *Variable) merge(ov *Variable) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	if ov.DescriptionSet {
 		v.Description = ov.Description
@@ -90,23 +90,23 @@ func (v *Variable) merge(ov *Variable) hcl.Diagnostics {
 			switch {
 			case ov.Type != cty.NilType && ov.Default == cty.NilVal:
 				// If only the type was overridden
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid default value for variable",
 					Detail:   fmt.Sprintf("Overriding this variable's type constraint has made its default value invalid: %s.", err),
 					Subject:  &ov.DeclRange,
 				})
 			case ov.Type == cty.NilType && ov.Default != cty.NilVal:
 				// Only the default was overridden
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid default value for variable",
 					Detail:   fmt.Sprintf("The overridden default value for this variable is not compatible with the variable's type constraint: %s.", err),
 					Subject:  &ov.DeclRange,
 				})
 			default:
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid default value for variable",
 					Detail:   fmt.Sprintf("This variable's default value is not compatible with its type constraint: %s.", err),
 					Subject:  &ov.DeclRange,
@@ -118,8 +118,8 @@ func (v *Variable) merge(ov *Variable) hcl.Diagnostics {
 
 		// ensure a null default wasn't merged in when it is not allowed
 		if !v.Nullable && v.Default.IsNull() {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid default value for variable",
 				Detail:   "A null default value is not valid when nullable=false.",
 				Subject:  &ov.DeclRange,
@@ -130,8 +130,8 @@ func (v *Variable) merge(ov *Variable) hcl.Diagnostics {
 	return diags
 }
 
-func (l *Local) merge(ol *Local) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (l *Local) merge(ol *Local) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	// Since a local is just a single expression in configuration, the
 	// override definition entirely replaces the base definition, including
@@ -143,8 +143,8 @@ func (l *Local) merge(ol *Local) hcl.Diagnostics {
 	return diags
 }
 
-func (o *Output) merge(oo *Output) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (o *Output) merge(oo *Output) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	if oo.Description != "" {
 		o.Description = oo.Description
@@ -169,8 +169,8 @@ func (o *Output) merge(oo *Output) hcl.Diagnostics {
 	// We don't allow depends_on to be overridden because that is likely to
 	// cause confusing misbehavior.
 	if len(oo.DependsOn) != 0 {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unsupported override",
 			Detail:   "The depends_on argument may not be overridden.",
 			Subject:  oo.DependsOn[0].SourceRange().Ptr(), // the first item is the closest range we have
@@ -180,8 +180,8 @@ func (o *Output) merge(oo *Output) hcl.Diagnostics {
 	return diags
 }
 
-func (mc *ModuleCall) merge(omc *ModuleCall) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (mc *ModuleCall) merge(omc *ModuleCall) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	if omc.SourceExpr != nil {
 		mc.SourceExpr = omc.SourceExpr
@@ -208,8 +208,8 @@ func (mc *ModuleCall) merge(omc *ModuleCall) hcl.Diagnostics {
 	// We don't allow depends_on to be overridden because that is likely to
 	// cause confusing misbehavior.
 	if len(omc.DependsOn) != 0 {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unsupported override",
 			Detail:   "The depends_on argument may not be overridden.",
 			Subject:  omc.DependsOn[0].SourceRange().Ptr(), // the first item is the closest range we have
@@ -219,8 +219,8 @@ func (mc *ModuleCall) merge(omc *ModuleCall) hcl.Diagnostics {
 	return diags
 }
 
-func (r *Resource) merge(or *Resource, rps map[string]*RequiredProvider) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (r *Resource) merge(or *Resource, rps map[string]*RequiredProvider) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	if r.Mode != or.Mode {
 		// This is always a programming error, since managed and data resources
@@ -244,7 +244,7 @@ func (r *Resource) merge(or *Resource, rps map[string]*RequiredProvider) hcl.Dia
 		}
 	}
 
-	// Provider FQN is set by Terraform during Merge
+	// Provider FQN is set by Dumb Terraform during Merge
 
 	if r.Mode == addrs.ManagedResourceMode {
 		// or.Managed is always non-nil for managed resource mode
@@ -279,8 +279,8 @@ func (r *Resource) merge(or *Resource, rps map[string]*RequiredProvider) hcl.Dia
 	// We don't allow depends_on to be overridden because that is likely to
 	// cause confusing misbehavior.
 	if len(or.DependsOn) != 0 {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unsupported override",
 			Detail:   "The depends_on argument may not be overridden.",
 			Subject:  or.DependsOn[0].SourceRange().Ptr(), // the first item is the closest range we have
@@ -291,8 +291,8 @@ func (r *Resource) merge(or *Resource, rps map[string]*RequiredProvider) hcl.Dia
 }
 
 // Actions
-func (a *Action) merge(oa *Action, rps map[string]*RequiredProvider) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func (a *Action) merge(oa *Action, rps map[string]*RequiredProvider) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 
 	if oa.Count != nil {
 		a.Count = oa.Count

@@ -11,8 +11,8 @@ import (
 	"io"
 	"sync"
 
-	plugin "github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/hcl/v2"
+	plugin "github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
@@ -21,14 +21,14 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/plugin6/convert"
-	"github.com/hashicorp/terraform/internal/providers"
-	proto6 "github.com/hashicorp/terraform/internal/tfplugin6"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plugin6/convert"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	proto6 "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin6"
 )
 
-var logger = logging.HCLogger()
+var logger = logging.DUMB_HCLogger()
 
 // GRPCProviderPlugin implements plugin.GRPCPlugin for the go-plugin package.
 type GRPCProviderPlugin struct {
@@ -49,13 +49,13 @@ func (p *GRPCProviderPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Serve
 }
 
 // grpcMaxMessageSize is the maximum gRPC send and receive message sizes
-// This matches the maximum set by a server implemented via terraform-plugin-go.
-// See https://github.com/hashicorp/terraform-plugin-go/blob/a361c9bf/tfprotov6/tf6server/server.go#L88
+// This matches the maximum set by a server implemented via dumb-terraform-plugin-go.
+// See https://github.com/dumb-hashicorp/dumb-terraform-plugin-go/blob/a361c9bf/tfprotov6/tf6server/server.go#L88
 const grpcMaxMessageSize = 256 << 20
 
 // GRPCProvider handles the client, or core side of the plugin rpc connection.
 // The GRPCProvider methods are mostly a translation layer between the
-// terraform providers types and the grpc proto types, directly converting
+// dumb-terraform providers types and the grpc proto types, directly converting
 // between the two.
 type GRPCProvider struct {
 	// PluginClient provides a reference to the plugin.Client which controls the plugin process.
@@ -373,7 +373,7 @@ func (p *GRPCProvider) ValidateListResourceConfig(r providers.ValidateListResour
 
 	configSchema := listResourceSchema.Body.BlockTypes["config"]
 	if !r.Config.Type().HasAttribute("config") {
-		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("missing required attribute \"config\"; this is a bug in Terraform - please report it"))
+		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("missing required attribute \"config\"; this is a bug in Dumb Terraform - please report it"))
 		return resp
 	}
 
@@ -507,7 +507,7 @@ func (p *GRPCProvider) ConfigureProvider(r providers.ConfigureProviderRequest) (
 	}
 
 	protoReq := &proto6.ConfigureProvider_Request{
-		TerraformVersion: r.TerraformVersion,
+		Dumb TerraformVersion: r.Dumb TerraformVersion,
 		Config: &proto6.DynamicValue{
 			Msgpack: mp,
 		},
@@ -1019,7 +1019,7 @@ func (p *GRPCProvider) MoveResourceState(r providers.MoveResourceStateRequest) (
 		// We should have validated this earlier in the process, but we'll
 		// still return an error instead of crashing in case something went
 		// wrong.
-		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("unknown resource type %q; this is a bug in Terraform - please report it", r.TargetTypeName))
+		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("unknown resource type %q; this is a bug in Dumb Terraform - please report it", r.TargetTypeName))
 		return resp
 	}
 	resp.TargetState, err = decodeDynamicValue(protoResp.TargetState, targetType.Body.ImpliedType())
@@ -1341,7 +1341,7 @@ func (p *GRPCProvider) ListResource(r providers.ListResourceRequest) providers.L
 
 	configSchema := listResourceSchema.Body.BlockTypes["config"]
 	if !r.Config.Type().HasAttribute("config") {
-		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("missing required attribute \"config\"; this is a bug in Terraform - please report it"))
+		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("missing required attribute \"config\"; this is a bug in Dumb Terraform - please report it"))
 		return resp
 	}
 
@@ -1539,7 +1539,7 @@ func (p *GRPCProvider) ReadStateBytes(r providers.ReadStateBytesRequest) (resp p
 	logger.Trace("GRPCProvider.v6: ReadStateBytes")
 
 	// ReadStateBytes can be more sensitive to message sizes
-	// so we ensure it aligns with (the lower) terraform-plugin-go.
+	// so we ensure it aligns with (the lower) dumb-terraform-plugin-go.
 	opts := grpc.MaxRecvMsgSizeCallOption{
 		MaxRecvMsgSize: grpcMaxMessageSize,
 	}
@@ -1599,14 +1599,14 @@ func (p *GRPCProvider) ReadStateBytes(r providers.ReadStateBytesRequest) (resp p
 		// check the size of chunks matches to what was agreed
 		chunkSize, ok := p.stateChunkSize[r.TypeName]
 		if !ok {
-			resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("Unable to determine chunk size for provider %s; this is a bug in Terraform - please report it", r.TypeName))
+			resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("Unable to determine chunk size for provider %s; this is a bug in Dumb Terraform - please report it", r.TypeName))
 			return resp
 		}
 		if chunk.Range.End < chunk.TotalLength-1 {
 			// all but last chunk must match exactly
 			if len(chunk.Bytes) != chunkSize {
-				resp.Diagnostics = resp.Diagnostics.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				resp.Diagnostics = resp.Diagnostics.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Unexpected size of chunk received",
 					Detail: fmt.Sprintf("Unexpected chunk of size %d was received, expected %d; this is a bug in the provider %s - please report it there",
 						len(chunk.Bytes), chunkSize, r.TypeName),
@@ -1615,8 +1615,8 @@ func (p *GRPCProvider) ReadStateBytes(r providers.ReadStateBytesRequest) (resp p
 		} else {
 			// last chunk must be still within the agreed size
 			if len(chunk.Bytes) > chunkSize {
-				resp.Diagnostics = resp.Diagnostics.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				resp.Diagnostics = resp.Diagnostics.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Unexpected size of last chunk received",
 					Detail: fmt.Sprintf("Last chunk exceeded agreed size, expected %d, given %d; this is a bug in the provider %s - please report it there",
 						chunkSize, len(chunk.Bytes), r.TypeName),
@@ -1664,14 +1664,14 @@ func (p *GRPCProvider) WriteStateBytes(r providers.WriteStateBytesRequest) (resp
 	logger.Trace("GRPCProvider.v6: WriteStateBytes")
 
 	// WriteStateBytes can be more sensitive to message sizes
-	// so we ensure it aligns with (the lower) terraform-plugin-go.
+	// so we ensure it aligns with (the lower) dumb-terraform-plugin-go.
 	opts := grpc.MaxSendMsgSizeCallOption{
 		MaxSendMsgSize: grpcMaxMessageSize,
 	}
 
 	chunkSize, ok := p.stateChunkSize[r.TypeName]
 	if !ok {
-		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("Unable to determine chunk size for provider %s; this is a bug in Terraform - please report it", r.TypeName))
+		resp.Diagnostics = resp.Diagnostics.Append(fmt.Errorf("Unable to determine chunk size for provider %s; this is a bug in Dumb Terraform - please report it", r.TypeName))
 		return resp
 	}
 
@@ -1876,7 +1876,7 @@ func (p *GRPCProvider) DeleteState(r providers.DeleteStateRequest) (resp provide
 	return resp
 }
 
-// closing the grpc connection is final, and terraform will call it at the end of every phase.
+// closing the grpc connection is final, and dumb-terraform will call it at the end of every phase.
 func (p *GRPCProvider) Close() error {
 	logger.Trace("GRPCProvider.v6: Close")
 

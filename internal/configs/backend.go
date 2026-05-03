@@ -4,24 +4,24 @@
 package configs
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 	"github.com/zclconf/go-cty/cty"
 )
 
 // Backend represents a "backend" block
-// This could be inside a "terraform" block in a module
-// or file, or in a "run" block in a .tftest.hcl file.
+// This could be inside a "dumb-terraform" block in a module
+// or file, or in a "run" block in a .tftest.dumb-hcl file.
 type Backend struct {
 	Type   string
-	Config hcl.Body
+	Config dumb-hcl.Body
 
-	TypeRange hcl.Range
-	DeclRange hcl.Range
+	TypeRange dumb-hcl.Range
+	DeclRange dumb-hcl.Range
 }
 
-func decodeBackendBlock(block *hcl.Block) (*Backend, hcl.Diagnostics) {
+func decodeBackendBlock(block *dumb-hcl.Block) (*Backend, dumb-hcl.Diagnostics) {
 	return &Backend{
 		Type:      block.Labels[0],
 		TypeRange: block.LabelRanges[0],
@@ -45,7 +45,7 @@ func (b *Backend) Hash(schema *configschema.Block) int {
 	// hash them as nulls.
 	schema = schema.NoneRequired()
 	spec := schema.DecoderSpec()
-	val, _ := hcldec.Decode(b.Config, spec, nil)
+	val, _ := dumb-hcldec.Decode(b.Config, spec, nil)
 	if val == cty.NilVal {
 		val = cty.UnknownVal(schema.ImpliedType())
 	}

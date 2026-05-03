@@ -10,10 +10,10 @@ import (
 
 	"github.com/xlab/treeprint"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ProvidersCommand is a Command implementation that prints out information
@@ -65,7 +65,7 @@ func (c *ProvidersCommand) Run(args []string) int {
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Error validating configuration directory",
-			fmt.Sprintf("Terraform encountered an unexpected error while verifying that the given configuration directory is valid: %s.", err),
+			fmt.Sprintf("Dumb Terraform encountered an unexpected error while verifying that the given configuration directory is valid: %s.", err),
 		))
 		c.showDiagnostics(diags)
 		return 1
@@ -78,7 +78,7 @@ func (c *ProvidersCommand) Run(args []string) int {
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"No configuration files",
-			fmt.Sprintf("The directory %s contains no Terraform configuration files.", absPath),
+			fmt.Sprintf("The directory %s contains no Dumb Terraform configuration files.", absPath),
 		))
 		c.showDiagnostics(diags)
 		return 1
@@ -166,7 +166,7 @@ func (c *ProvidersCommand) populateTreeNode(tree treeprint.Tree, node *configs.M
 		tree.AddNode(fmt.Sprintf("provider[%s]%s", fqn.String(), versionsStr))
 	}
 	for name, testNode := range node.Tests {
-		name = strings.TrimSuffix(name, ".tftest.hcl")
+		name = strings.TrimSuffix(name, ".tftest.dumb-hcl")
 		name = strings.ReplaceAll(name, "/", ".")
 		branch := tree.AddBranch(fmt.Sprintf("test.%s", name))
 
@@ -190,7 +190,7 @@ func (c *ProvidersCommand) populateTreeNode(tree treeprint.Tree, node *configs.M
 }
 
 const providersCommandHelp = `
-Usage: terraform [global options] providers [options] [DIR]
+Usage: dumb-terraform [global options] providers [options] [DIR]
 
   Prints out a tree of modules in the referenced configuration annotated with
   their provider requirements.
@@ -201,14 +201,14 @@ Usage: terraform [global options] providers [options] [DIR]
 
 Options:
 
-  -test-directory=path  Set the Terraform test directory, defaults to "tests".
+  -test-directory=path  Set the Dumb Terraform test directory, defaults to "tests".
 
   -var 'foo=bar'        Set a value for one of the input variables in the root
                         module of the configuration. Use this option more than
                         once to set more than one variable.
 
   -var-file=filename    Load variable values from the given file, in addition
-                        to the default files terraform.tfvars and *.auto.tfvars.
+                        to the default files dumb-terraform.tfvars and *.auto.tfvars.
                         Use this option more than once to include more than one
                         variables file.
 `

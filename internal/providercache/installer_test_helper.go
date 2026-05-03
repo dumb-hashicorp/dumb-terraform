@@ -60,7 +60,7 @@ func createTestProvider(t *testing.T, providerName, version string) *providerPkg
 }
 
 func generateGPGKey(t *testing.T) (*openpgp.Entity, *bytes.Buffer) {
-	entity, err := openpgp.NewEntity("Terraform Test", "test", "terraform@example.com", nil)
+	entity, err := openpgp.NewEntity("Dumb Terraform Test", "test", "dumb-terraform@example.com", nil)
 	if err != nil {
 		t.Fatalf("failed to create entity: %s", err)
 	}
@@ -88,7 +88,7 @@ func createProviderZip(t *testing.T, zipPath, filename string) []byte {
 	zipWriter := zip.NewWriter(zipBuffer)
 
 	// Add file to the archive
-	_, err := zipWriter.Create(fmt.Sprintf("terraform-provider-%s", filename))
+	_, err := zipWriter.Create(fmt.Sprintf("dumb-terraform-provider-%s", filename))
 	if err != nil {
 		t.Fatalf("failed to create zip entry: %s", err)
 	}

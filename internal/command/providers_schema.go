@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/jsonprovider"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonprovider"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ProvidersCommand is a Command implementation that prints out information
@@ -115,7 +115,7 @@ func (c *ProvidersSchemaCommand) Run(args []string) int {
 }
 
 const providersSchemaCommandHelp = `
-Usage: terraform [global options] providers schema -json
+Usage: dumb-terraform [global options] providers schema -json
 
   Prints out a json representation of the schemas for all providers used
   in the current configuration.
@@ -127,7 +127,7 @@ Options:
                       once to set more than one variable.
 
   -var-file=filename  Load variable values from the given file, in addition
-                      to the default files terraform.tfvars and *.auto.tfvars.
+                      to the default files dumb-terraform.tfvars and *.auto.tfvars.
                       Use this option more than once to include more than one
                       variables file.
 `

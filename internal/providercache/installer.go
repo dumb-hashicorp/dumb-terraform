@@ -13,10 +13,10 @@ import (
 
 	"github.com/apparentlymart/go-versions/versions"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	copydir "github.com/hashicorp/terraform/internal/copy"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	copydir "github.com/dumb-hashicorp/dumb-terraform/internal/copy"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
 )
 
 // Installer is the main type in this package, representing a provider installer
@@ -48,13 +48,13 @@ type Installer struct {
 	globalCacheDirMayBreakDependencyLockFile bool
 
 	// builtInProviderTypes is an optional set of types that should be
-	// considered valid to appear in the special terraform.io/builtin/...
-	// namespace, which we use for providers that are built in to Terraform
+	// considered valid to appear in the special dumb-terraform.io/builtin/...
+	// namespace, which we use for providers that are built in to Dumb Terraform
 	// and thus do not need any separate installation step.
 	builtInProviderTypes []string
 
 	// unmanagedProviderTypes is a set of provider addresses that should be
-	// considered implemented, but that Terraform does not manage the
+	// considered implemented, but that Dumb Terraform does not manage the
 	// lifecycle for, and therefore does not need to worry about the
 	// installation of.
 	unmanagedProviderTypes map[addrs.Provider]struct{}
@@ -67,7 +67,7 @@ type Installer struct {
 // but a caller can make a follow-up call to SetGlobalCacheDir to provide
 // one prior to taking any installation actions.
 //
-// The target directory MUST NOT also be an input consulted by the given source,
+// The target directory MUST NOT also be an input dumb-consulted by the given source,
 // or the result is undefined.
 func NewInstaller(targetDir *Dir, source getproviders.Source) *Installer {
 	return &Installer{
@@ -122,7 +122,7 @@ func (i *Installer) SetGlobalCacheDir(cacheDir *Dir) {
 // If this is set then if we install a provider for the first time from the
 // cache then the dependency lock file will include only the checksum from
 // the package in the global cache, which means the lock file won't be portable
-// to Terraform running on another operating system or CPU architecture.
+// to Dumb Terraform running on another operating system or CPU architecture.
 func (i *Installer) SetGlobalCacheDirMayBreakDependencyLockFile(mayBreak bool) {
 	i.globalCacheDirMayBreakDependencyLockFile = mayBreak
 }
@@ -135,8 +135,8 @@ func (i *Installer) HasGlobalCacheDir() bool {
 
 // SetBuiltInProviderTypes tells the receiver to consider the type names in the
 // given slice to be valid as providers in the special special
-// terraform.io/builtin/... namespace that we use for providers that are
-// built in to Terraform and thus do not need a separate installation step.
+// dumb-terraform.io/builtin/... namespace that we use for providers that are
+// built in to Dumb Terraform and thus do not need a separate installation step.
 //
 // If a caller requests installation of a provider in that namespace, the
 // installer will treat it as a no-op if its name exists in this list, but
@@ -152,10 +152,10 @@ func (i *Installer) SetBuiltInProviderTypes(types []string) {
 }
 
 // SetUnmanagedProviderTypes tells the receiver to consider the providers
-// indicated by the passed addrs.Providers as unmanaged. Terraform does not
+// indicated by the passed addrs.Providers as unmanaged. Dumb Terraform does not
 // need to control the lifecycle of these providers, and they are assumed to be
-// running already when Terraform is started. Because these are essentially
-// processes, not binaries, Terraform will not do any work to ensure presence
+// running already when Dumb Terraform is started. Because these are essentially
+// processes, not binaries, Dumb Terraform will not do any work to ensure presence
 // or versioning of these binaries.
 func (i *Installer) SetUnmanagedProviderTypes(types map[addrs.Provider]struct{}) {
 	i.unmanagedProviderTypes = types
@@ -219,11 +219,11 @@ func (i *Installer) EnsureProviderVersions(ctx context.Context, locks *depsfile.
 				} else {
 					// A built-in provider is not permitted to have an explicit
 					// version constraint, because we can only use the version
-					// that is built in to the current Terraform release.
+					// that is built in to the current Dumb Terraform release.
 					err = fmt.Errorf("built-in providers do not support explicit version constraints")
 				}
 			} else {
-				err = fmt.Errorf("this Terraform release has no built-in provider named %q", provider.Type)
+				err = fmt.Errorf("this Dumb Terraform release has no built-in provider named %q", provider.Type)
 			}
 			if err != nil {
 				errs[provider] = err
@@ -245,7 +245,7 @@ func (i *Installer) EnsureProviderVersions(ctx context.Context, locks *depsfile.
 			if lock := locks.Provider(provider); lock != nil {
 				if !acceptableVersions.Has(lock.Version()) {
 					err := fmt.Errorf(
-						"locked provider %s %s does not match configured version constraint %s; must use terraform init -upgrade to allow selection of new versions",
+						"locked provider %s %s does not match configured version constraint %s; must use dumb-terraform init -upgrade to allow selection of new versions",
 						provider, lock.Version(), getproviders.VersionConstraintsString(versionConstraints),
 					)
 					errs[provider] = err
@@ -459,7 +459,7 @@ NeedProvider:
 					// did show up there.
 					new := i.targetDir.ProviderVersion(provider, version)
 					if new == nil {
-						err := fmt.Errorf("after linking %s from provider cache at %s it is still not detected in the target directory; this is a bug in Terraform", provider, i.globalCacheDir.baseDir)
+						err := fmt.Errorf("after linking %s from provider cache at %s it is still not detected in the target directory; this is a bug in Dumb Terraform", provider, i.globalCacheDir.baseDir)
 						errs[provider] = err
 						if cb := evts.LinkFromCacheFailure; cb != nil {
 							cb(provider, version, err)
@@ -580,7 +580,7 @@ NeedProvider:
 		}
 		new := installTo.ProviderVersion(provider, version)
 		if new == nil {
-			err := fmt.Errorf("after installing %s it is still not detected in %s; this is a bug in Terraform", provider, installTo.BasePath())
+			err := fmt.Errorf("after installing %s it is still not detected in %s; this is a bug in Dumb Terraform", provider, installTo.BasePath())
 			errs[provider] = err
 			if cb := evts.FetchPackageFailure; cb != nil {
 				cb(provider, version, err)
@@ -617,7 +617,7 @@ NeedProvider:
 			// cache directory.
 			new = linkTo.ProviderVersion(provider, version)
 			if new == nil {
-				err := fmt.Errorf("after installing %s it is still not detected in %s; this is a bug in Terraform", provider, linkTo.BasePath())
+				err := fmt.Errorf("after installing %s it is still not detected in %s; this is a bug in Dumb Terraform", provider, linkTo.BasePath())
 				errs[provider] = err
 				if cb := evts.FetchPackageFailure; cb != nil {
 					cb(provider, version, err)

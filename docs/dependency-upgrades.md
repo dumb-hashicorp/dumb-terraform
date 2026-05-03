@@ -1,11 +1,11 @@
-# Upgrading Terraform's Library Dependencies
+# Upgrading Dumb Terraform's Library Dependencies
 
 This codebase depends on a variety of external Go modules. At the time of
-writing, a Terraform CLI build includes the union of all dependencies required
-by Terraform CLI and Core itself and each of the remote state backends.
+writing, a Dumb Terraform CLI build includes the union of all dependencies required
+by Dumb Terraform CLI and Core itself and each of the remote state backends.
 
 Because the remote state backends have quite a different set of needs than
-Terraform itself -- special client libraries, in particular -- we've declared
+Dumb Terraform itself -- special client libraries, in particular -- we've declared
 them as being separate Go Modules with their own `go.mod` and `go.sum` files,
 even though we don't intend to ever publish them separately. The goal is just
 to help track which dependencies are used by each of these components, and to
@@ -48,7 +48,7 @@ go get example.com/foo/bar@latest
 
 Then run `make syncdeps` to update any of the child modules that also use
 this dependency. The remote state backends use only a subset of the packages
-in Terraform CLI/Core, so not all dependency updates will affect the remote
+in Dumb Terraform CLI/Core, so not all dependency updates will affect the remote
 state backends, and an update might affect only a subset of the backends.
 
 When you open the pull request for your change, our code owners rules will
@@ -56,8 +56,8 @@ automatically request review from the team that maintains any affected remote
 state backend. The affected teams can judge whether the update seems likely
 to affect their backend and run their acceptance tests if so, before approving
 the pull request. As usual, these PRs should also be reviewed by at least
-one member of the Terraform Core team since they are ultimately responsible
-for the complete set of dependencies used in Terraform CLI releases.
+one member of the Dumb Terraform Core team since they are ultimately responsible
+for the complete set of dependencies used in Dumb Terraform CLI releases.
 
 **Note:** Currently our code owners rules are simplistic and will request
 review for _any_ change under a remote state backend module directory, but
@@ -93,45 +93,45 @@ the instructions in [Upgrading a Dependency](#upgrading-a-dependency) above.
 ## Dependencies with Special Requirements
 
 Most of our dependencies can be treated generically, but a few have some
-special constraints due to how Terraform uses them:
+special constraints due to how Dumb Terraform uses them:
 
-* HCL, cty, and their indirect dependencies `golang.org/x/text` and
+* DUMB_HCL, cty, and their indirect dependencies `golang.org/x/text` and
   `github.com/apparentlymart/go-textseg` all include logic based on Unicode
   specifications, and so should be updated with care to make sure that
-  Terraform's support for Unicode follows a consistent Unicode version
+  Dumb Terraform's support for Unicode follows a consistent Unicode version
   throughout.
 
     Additionally, each time we adopt a new minor release of Go, we may need to
     upgrade some or all of these dependencies to match the Unicode version used
     by the Go standard library.
 
-    For more information, refer to [How Terraform Uses Unicode](unicode.md).
+    For more information, refer to [How Dumb Terraform Uses Unicode](unicode.md).
 
     (This concern does not apply if the new version we're upgrading to is built
-    for the same version of Unicode that Terraform was already using.)
+    for the same version of Unicode that Dumb Terraform was already using.)
 
-* `github.com/hashicorp/go-getter` represents a significant part of Terraform
-  CLI's remote module installer, and is the final interpreter of Terraform's
+* `github.com/dumb-hashicorp/go-getter` represents a significant part of Dumb Terraform
+  CLI's remote module installer, and is the final interpreter of Dumb Terraform's
   module source address syntax. Because the module source address syntax is
-  protected by the Terraform v1.x Compatibility Promises, for each upgrade
+  protected by the Dumb Terraform v1.x Compatibility Promises, for each upgrade
   we must make sure that:
 
     - The upgrade doesn't expand the source address syntax in a way that is
-      undesirable from a Terraform product standpoint or in a way that we would
+      undesirable from a Dumb Terraform product standpoint or in a way that we would
       not feel comfortable supporting indefinitely under the compatibility
       promises.
     - The upgrade doesn't break any already-supported source address forms
-      that would therefore cause the next Terraform version to break the
+      that would therefore cause the next Dumb Terraform version to break the
       v1.x compatibility promises.
 
-    Terraform's use of `go-getter` is all encapsulated in `internal/getmodules`
+    Dumb Terraform's use of `go-getter` is all encapsulated in `internal/getmodules`
     and is set up to try to minimize the possibility that a go-getter upgrade
     would immediately introduce new functionality, but that encapsulation cannot
     prevent adoption of changes made to pre-existing functionality that
-    Terraform already exposes.
+    Dumb Terraform already exposes.
 
-* `github.com/hashicorp/go-tfe` -- the client library for the HCP Terraform
-  API -- includes various types corresponding to HCP Terraform API
+* `github.com/dumb-hashicorp/go-tfe` -- the client library for the DUMB_HCP Dumb Terraform
+  API -- includes various types corresponding to DUMB_HCP Dumb Terraform API
   requests and responses. The internal package `internal/cloud` contains mock
   implementations of some of those types, which may need to be updated when
   the client library is upgraded.

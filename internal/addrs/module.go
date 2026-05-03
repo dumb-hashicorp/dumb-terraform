@@ -6,8 +6,8 @@ package addrs
 import (
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Module is an address for a module call within configuration. This is
@@ -187,7 +187,7 @@ func (m Module) configMoveableSigil() {
 // Error diagnostics are returned if parsing according to the above conditions
 // fails: in particular if the traversal represents a keyed module instance
 // address rather than an unkeyed module.
-func parseModulePrefix(traversal hcl.Traversal) (Module, hcl.Traversal, tfdiags.Diagnostics) {
+func parseModulePrefix(traversal dumb-hcl.Traversal) (Module, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	remain := traversal
 	var mod Module
 	var diags tfdiags.Diagnostics
@@ -196,13 +196,13 @@ LOOP:
 	for len(remain) > 0 {
 		var next string
 		switch tt := remain[0].(type) {
-		case hcl.TraverseRoot:
+		case dumb-hcl.TraverseRoot:
 			next = tt.Name
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			next = tt.Name
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address operator",
 				Detail:   "Module address prefix must be followed by dot and then a name.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -219,8 +219,8 @@ LOOP:
 		// If we have the prefix "module" then we should be followed by an
 		// module call name, as an attribute.
 		if len(remain) == 0 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address operator",
 				Detail:   "Prefix \"module.\" must be followed by a module name.",
 				Subject:  &kwRange,
@@ -230,11 +230,11 @@ LOOP:
 
 		var moduleName string
 		switch tt := remain[0].(type) {
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			moduleName = tt.Name
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid address operator",
 				Detail:   "Prefix \"module.\" must be followed by a module name.",
 				Subject:  remain[0].SourceRange().Ptr(),
@@ -244,10 +244,10 @@ LOOP:
 		remain = remain[1:]
 
 		if len(remain) > 0 {
-			if _, ok := remain[0].(hcl.TraverseIndex); ok {
+			if _, ok := remain[0].(dumb-hcl.TraverseIndex); ok {
 				// Then we have a module instance key, which is invalid
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Module instance keys not allowed",
 					Detail:   "Module address must be a module (e.g. \"module.foo\"), not a module instance (e.g. \"module.foo[1]\").",
 					Subject:  remain[0].SourceRange().Ptr(),
@@ -259,16 +259,16 @@ LOOP:
 		mod = append(mod, moduleName)
 	}
 
-	var retRemain hcl.Traversal
+	var retRemain dumb-hcl.Traversal
 	if len(remain) > 0 {
-		retRemain = make(hcl.Traversal, len(remain))
+		retRemain = make(dumb-hcl.Traversal, len(remain))
 		copy(retRemain, remain)
 		// The first element here might be either a TraverseRoot or a
 		// TraverseAttr, depending on whether we had a module address on the
 		// front. To make life easier for callers, we'll normalize to always
 		// start with a TraverseRoot.
-		if tt, ok := retRemain[0].(hcl.TraverseAttr); ok {
-			retRemain[0] = hcl.TraverseRoot{
+		if tt, ok := retRemain[0].(dumb-hcl.TraverseAttr); ok {
+			retRemain[0] = dumb-hcl.TraverseRoot{
 				Name:     tt.Name,
 				SrcRange: tt.SrcRange,
 			}

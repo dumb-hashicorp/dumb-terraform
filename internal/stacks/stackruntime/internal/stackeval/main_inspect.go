@@ -7,12 +7,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type InspectOpts struct {
@@ -54,7 +54,7 @@ type InspectOpts struct {
 // that supports dynamic expression evaluation in principle, but in that case
 // evaluation might cause relatively-expensive effects such as creating
 // plans for components.
-func (m *Main) EvalExpr(ctx context.Context, expr hcl.Expression, scopeStackInst stackaddrs.StackInstance, phase EvalPhase) (cty.Value, tfdiags.Diagnostics) {
+func (m *Main) EvalExpr(ctx context.Context, expr dumb-hcl.Expression, scopeStackInst stackaddrs.StackInstance, phase EvalPhase) (cty.Value, tfdiags.Diagnostics) {
 	ret, err := promising.MainTask(ctx, func(ctx context.Context) (withDiagnostics[cty.Value], error) {
 		var diags tfdiags.Diagnostics
 

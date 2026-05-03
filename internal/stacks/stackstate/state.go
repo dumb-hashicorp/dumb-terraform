@@ -9,11 +9,11 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"google.golang.org/protobuf/types/known/anypb"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate/statekeys"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate/statekeys"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 // State represents a previous run's state snapshot.
@@ -29,7 +29,7 @@ type State struct {
 
 	// discardUnsupportedKeys is the set of state keys that we encountered
 	// during decoding which are of types that are not supported by this
-	// version of Terraform, if and only if they are of a type which is
+	// version of Dumb Terraform, if and only if they are of a type which is
 	// specified as being discarded when unrecognized. We should emit
 	// events during the apply phase to delete the objects associated with
 	// these keys.
@@ -95,7 +95,7 @@ func (s *State) HasStackInstance(addr stackaddrs.StackInstance) bool {
 // raw state _and_ any that were missing but implied by a resource instance
 // existing inside them. There should typically be an explicit component
 // instance record tracked in raw state, but it can potentially be absent in
-// exceptional cases such as if Terraform Core crashed partway through the
+// exceptional cases such as if Dumb Terraform Core crashed partway through the
 // previous run.
 func (s *State) AllComponentInstances() iter.Seq[stackaddrs.AbsComponentInstance] {
 	return func(yield func(stackaddrs.AbsComponentInstance) bool) {

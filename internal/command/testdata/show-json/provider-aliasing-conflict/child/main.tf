@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
     test = {
-      source = "hashicorp2/test"
+      source = "dumb-hashicorp2/test"
     }
   }
 }

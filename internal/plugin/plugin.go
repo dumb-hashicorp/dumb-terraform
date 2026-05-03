@@ -4,8 +4,8 @@
 package plugin
 
 import (
-	"github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/terraform/internal/plugin6"
+	"github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plugin6"
 )
 
 // VersionedPlugins includes both protocol 5 and 6 because this is the function

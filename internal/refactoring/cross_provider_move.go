@@ -6,14 +6,14 @@ package refactoring
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/lang/ephemeral"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/ephemeral"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // crossTypeMover is a collection of data that is needed to calculate the
@@ -49,9 +49,9 @@ func (m *crossTypeMover) getProvider(providers addrs.Provider) (providers.Interf
 	}
 
 	// Then we don't have a provider in the cache - this represents a bug in
-	// Terraform since we should have already loaded all the providers in the
+	// Dumb Terraform since we should have already loaded all the providers in the
 	// configuration and the state.
-	return nil, fmt.Errorf("provider %s implementation not found; this is a bug in Terraform - please report it", providers)
+	return nil, fmt.Errorf("provider %s implementation not found; this is a bug in Dumb Terraform - please report it", providers)
 }
 
 // prepareCrossTypeMove checks if the provided MoveStatement is a cross-type
@@ -91,11 +91,11 @@ func (m *crossTypeMover) prepareCrossTypeMove(stmt *MoveStatement, source, targe
 	}
 
 	if !targetSchema.ServerCapabilities.MoveResourceState {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Unsupported `moved` across resource types",
 			Detail:   fmt.Sprintf("The provider %q does not support moved operations across resource types and providers.", targetProviderAddr.Provider),
-			Subject:  stmt.DeclRange.ToHCL().Ptr(),
+			Subject:  stmt.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return nil, diags
 	}
@@ -200,21 +200,21 @@ func (move *crossTypeMove) applyCrossTypeMove(stmt *MoveStatement, source, targe
 	}
 
 	if resp.TargetState == cty.NilVal {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider returned invalid value",
 			Detail:   fmt.Sprintf("The provider returned an invalid value during an across type move operation to %s. This is a bug in the relevant provider; Please report it.", target),
-			Subject:  stmt.DeclRange.ToHCL().Ptr(),
+			Subject:  stmt.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return diags
 	}
 	if !resp.TargetState.IsWhollyKnown() {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Provider returned invalid value",
 			Detail: fmt.Sprintf("The provider %s returned an invalid value during an across type move operation: The returned state contains unknown values. This is a bug in the relevant provider; Please report it.",
 				move.targetProviderAddr),
-			Subject: stmt.DeclRange.ToHCL().Ptr(),
+			Subject: stmt.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 	}
 
@@ -231,11 +231,11 @@ func (move *crossTypeMove) applyCrossTypeMove(stmt *MoveStatement, source, targe
 
 	data, err := newValue.Encode(move.targetResourceSchema)
 	if err != nil {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Failed to encode source value",
-			Detail:   fmt.Sprintf("Terraform failed to encode the value in state for %s: %v. This is a bug in Terraform; Please report it.", source.String(), err),
-			Subject:  stmt.DeclRange.ToHCL().Ptr(),
+			Detail:   fmt.Sprintf("Dumb Terraform failed to encode the value in state for %s: %v. This is a bug in Dumb Terraform; Please report it.", source.String(), err),
+			Subject:  stmt.DeclRange.ToDUMB_HCL().Ptr(),
 		})
 		return diags
 	}

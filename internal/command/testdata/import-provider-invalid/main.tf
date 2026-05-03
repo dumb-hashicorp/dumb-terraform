@@ -1,4 +1,4 @@
-terraform {
+dumb-terraform {
 	backend "local" {
 		path = "imported.tfstate"
 	}

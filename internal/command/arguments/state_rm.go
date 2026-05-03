@@ -6,7 +6,7 @@ package arguments
 import (
 	"time"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StateRm represents the command-line arguments for the state rm command.
@@ -18,7 +18,7 @@ type StateRm struct {
 	// removing anything.
 	DryRun bool
 
-	// BackupPath is the path where Terraform should write the backup state.
+	// BackupPath is the path where Dumb Terraform should write the backup state.
 	BackupPath string
 
 	// StateLock, if true, requests that the backend lock the state for this
@@ -32,7 +32,7 @@ type StateRm struct {
 	StatePath string
 
 	// IgnoreRemoteVersion, if true, continues even if remote and local
-	// Terraform versions are incompatible.
+	// Dumb Terraform versions are incompatible.
 	IgnoreRemoteVersion bool
 
 	// Addrs are the resource instance addresses to remove.
@@ -54,7 +54,7 @@ func ParseStateRm(args []string) (*StateRm, tfdiags.Diagnostics) {
 	cmdFlags.BoolVar(&rm.StateLock, "lock", true, "lock state")
 	cmdFlags.DurationVar(&rm.StateLockTimeout, "lock-timeout", 0, "lock timeout")
 	cmdFlags.StringVar(&rm.StatePath, "state", "", "path")
-	cmdFlags.BoolVar(&rm.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Terraform versions are incompatible")
+	cmdFlags.BoolVar(&rm.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Dumb Terraform versions are incompatible")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		diags = diags.Append(tfdiags.Sourceless(

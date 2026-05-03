@@ -9,13 +9,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
 )
 
 func TestProviders(t *testing.T) {
@@ -41,9 +41,9 @@ func TestProviders(t *testing.T) {
 	}
 
 	wantOutput := []string{
-		"provider[registry.terraform.io/hashicorp/foo]",
-		"provider[registry.terraform.io/hashicorp/bar]",
-		"provider[registry.terraform.io/hashicorp/baz]",
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/foo]",
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/bar]",
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/baz]",
 	}
 
 	output := ui.OutputWriter.String()
@@ -124,10 +124,10 @@ func TestProviders_modules(t *testing.T) {
 	}
 
 	wantOutput := []string{
-		"provider[registry.terraform.io/hashicorp/foo] 1.0.0", // from required_providers
-		"provider[registry.terraform.io/hashicorp/bar] 2.0.0", // from provider config
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/foo] 1.0.0", // from required_providers
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/bar] 2.0.0", // from provider config
 		"── module.kiddo",                               // tree node for child module
-		"provider[registry.terraform.io/hashicorp/baz]", // implied by a resource in the child module
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/baz]", // implied by a resource in the child module
 	}
 
 	output := ui.OutputWriter.String()
@@ -161,10 +161,10 @@ func TestProviders_state(t *testing.T) {
 	}
 
 	wantOutput := []string{
-		"provider[registry.terraform.io/hashicorp/foo] 1.0.0", // from required_providers
-		"provider[registry.terraform.io/hashicorp/bar] 2.0.0", // from a provider config block
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/foo] 1.0.0", // from required_providers
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/bar] 2.0.0", // from a provider config block
 		"Providers required by state",                         // header for state providers
-		"provider[registry.terraform.io/hashicorp/baz]",       // from a resouce in state (only)
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/baz]",       // from a resouce in state (only)
 	}
 
 	output := ui.OutputWriter.String()
@@ -199,7 +199,7 @@ func TestProviders_tests(t *testing.T) {
 
 	wantOutput := []string{
 		"test.main",
-		"provider[registry.terraform.io/hashicorp/bar]",
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/bar]",
 	}
 
 	output := ui.OutputWriter.String()
@@ -268,9 +268,9 @@ func TestProviders_state_withStateStore(t *testing.T) {
 
 	wantOutput := []string{
 		"Providers required by configuration:",
-		"└── provider[registry.terraform.io/hashicorp/test] 1.2.3",
+		"└── provider[registry.dumb-terraform.io/dumb-hashicorp/test] 1.2.3",
 		"Providers required by state:",
-		"provider[registry.terraform.io/hashicorp/baz]",
+		"provider[registry.dumb-terraform.io/dumb-hashicorp/baz]",
 	}
 
 	output := ui.OutputWriter.String()
@@ -328,7 +328,7 @@ func TestProviders_constVariable(t *testing.T) {
 		wantOutput := []string{
 			"Providers required by configuration:",
 			"module.child",
-			"provider[registry.terraform.io/hashicorp/test]",
+			"provider[registry.dumb-terraform.io/dumb-hashicorp/test]",
 		}
 
 		for _, want := range wantOutput {
@@ -366,7 +366,7 @@ func TestProviders_constVariable(t *testing.T) {
 		wantOutput := []string{
 			"Providers required by configuration:",
 			"module.child",
-			"provider[registry.terraform.io/hashicorp/test]",
+			"provider[registry.dumb-terraform.io/dumb-hashicorp/test]",
 		}
 
 		for _, want := range wantOutput {

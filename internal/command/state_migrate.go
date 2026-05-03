@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StateMigrateCommand is a Command implementation that migrates
@@ -62,9 +62,9 @@ func (c *StateMigrateCommand) Run(rawArgs []string) int {
 
 func (c *StateMigrateCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] state migrate [options]
+Usage: dumb-terraform [global options] state migrate [options]
 
-  Migrate state from source declared in the migration configuration (*.tfmigrate.hcl)
+  Migrate state from source declared in the migration configuration (*.tfmigrate.dumb-hcl)
   to the destination declared in the root module (*.tf).
 
   An error will be returned if the migration fails, e.g. if the state

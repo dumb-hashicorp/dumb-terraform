@@ -13,9 +13,9 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/go-slug/sourceaddrs"
-	"github.com/hashicorp/go-slug/sourcebundle"
-	"github.com/hashicorp/terraform-svchost/disco"
+	"github.com/dumb-hashicorp/go-slug/sourceaddrs"
+	"github.com/dumb-hashicorp/go-slug/sourcebundle"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
 	"github.com/zclconf/go-cty/cty"
 	ctymsgpack "github.com/zclconf/go-cty/cty/msgpack"
 	"google.golang.org/grpc"
@@ -25,23 +25,23 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 	"google.golang.org/protobuf/types/known/anypb"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/dependencies"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackmigrate"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	stacks_testing_provider "github.com/hashicorp/terraform/internal/stacks/stackruntime/testing"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/stacks/tfstackdata1"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/dependencies"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackmigrate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	stacks_testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/tfstackdata1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func TestStacksOpenCloseStackConfiguration(t *testing.T) {
@@ -64,7 +64,7 @@ func TestStacksOpenCloseStackConfiguration(t *testing.T) {
 
 	openResp, err := stacksServer.OpenStackConfiguration(ctx, &stacks.OpenStackConfiguration_Request{
 		SourceBundleHandle: sourcesHnd.ForProtobuf(),
-		SourceAddress: &terraform1.SourceAddress{
+		SourceAddress: &dumb-terraform1.SourceAddress{
 			Source: "git::https://example.com/foo.git",
 		},
 	})
@@ -147,7 +147,7 @@ func TestStacksFindStackConfigurationComponents(t *testing.T) {
 	t.Run("empty config", func(t *testing.T) {
 		openResp, err := stacksServer.OpenStackConfiguration(ctx, &stacks.OpenStackConfiguration_Request{
 			SourceBundleHandle: sourcesHnd.ForProtobuf(),
-			SourceAddress: &terraform1.SourceAddress{
+			SourceAddress: &dumb-terraform1.SourceAddress{
 				Source: "git::https://example.com/foo.git",
 			},
 		})
@@ -180,7 +180,7 @@ func TestStacksFindStackConfigurationComponents(t *testing.T) {
 	t.Run("non-empty config", func(t *testing.T) {
 		openResp, err := stacksServer.OpenStackConfiguration(ctx, &stacks.OpenStackConfiguration_Request{
 			SourceBundleHandle: sourcesHnd.ForProtobuf(),
-			SourceAddress: &terraform1.SourceAddress{
+			SourceAddress: &dumb-terraform1.SourceAddress{
 				Source: "git::https://example.com/foo.git//non-empty-stack",
 			},
 		})
@@ -352,7 +352,7 @@ func TestStacksOpenPlan(t *testing.T) {
 		}
 	}
 	send(t, &tfstackdata1.PlanHeader{
-		TerraformVersion: version.SemVer.String(),
+		Dumb TerraformVersion: version.SemVer.String(),
 	})
 	send(t, &tfstackdata1.PlanPriorStateElem{
 		// We don't actually analyze or validate these items while
@@ -434,7 +434,7 @@ func TestStacksPlanStackChanges(t *testing.T) {
 				PlannedChange: &stacks.PlannedChange{
 					Raw: []*anypb.Any{
 						mustMarshalAnyPb(&tfstackdata1.PlanHeader{
-							TerraformVersion: version.SemVer.String(),
+							Dumb TerraformVersion: version.SemVer.String(),
 						}),
 					},
 				},
@@ -495,7 +495,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 		state       []stackstate.AppliedChange
 		inputs      map[string]cty.Value
 		want        []*stacks.StackChangeProgress
-		diagnostics []*terraform1.Diagnostic
+		diagnostics []*dumb-terraform1.Diagnostic
 	}{
 		"deferred_changes": {
 			source: "git::https://example.com/bar.git",
@@ -524,7 +524,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 									ResourceInstanceAddr:  "testing_deferred_resource.resource",
 								},
 								Actions:      []stacks.ChangeType{stacks.ChangeType_CREATE},
-								ProviderAddr: "registry.terraform.io/hashicorp/testing",
+								ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 							},
 						},
 					},
@@ -537,7 +537,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 								ResourceInstanceAddr:  "testing_deferred_resource.resource",
 							},
 							Status:       stacks.StackChangeProgress_ResourceInstanceStatus_PLANNING,
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -549,7 +549,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 								ResourceInstanceAddr:  "testing_deferred_resource.resource",
 							},
 							Status:       stacks.StackChangeProgress_ResourceInstanceStatus_PLANNED,
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -609,7 +609,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 									ResourceInstanceAddr:  "testing_resource.before",
 								},
 							},
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -666,7 +666,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 								Imported: &stacks.StackChangeProgress_ResourceInstancePlannedChange_Imported{
 									Unknown: true,
 								},
-								ProviderAddr: "registry.terraform.io/hashicorp/testing",
+								ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 							},
 						},
 					},
@@ -679,7 +679,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 								ResourceInstanceAddr:  "testing_resource.resource",
 							},
 							Status:       stacks.StackChangeProgress_ResourceInstanceStatus_PLANNING,
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -691,7 +691,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 								ResourceInstanceAddr:  "testing_resource.resource",
 							},
 							Status:       stacks.StackChangeProgress_ResourceInstanceStatus_PLANNED,
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -718,7 +718,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 							Imported: &stacks.StackChangeProgress_ResourceInstancePlannedChange_Imported{
 								ImportId: "self",
 							},
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -730,7 +730,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 								ResourceInstanceAddr:  "testing_resource.resource",
 							},
 							Status:       stacks.StackChangeProgress_ResourceInstanceStatus_PLANNING,
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -742,7 +742,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 								ResourceInstanceAddr:  "testing_resource.resource",
 							},
 							Status:       stacks.StackChangeProgress_ResourceInstanceStatus_PLANNED,
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -785,7 +785,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 							Actions: []stacks.ChangeType{
 								stacks.ChangeType_FORGET,
 							},
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -802,11 +802,11 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 					},
 				},
 			},
-			diagnostics: []*terraform1.Diagnostic{
+			diagnostics: []*dumb-terraform1.Diagnostic{
 				{
-					Severity: terraform1.Diagnostic_WARNING,
-					Summary:  "Some objects will no longer be managed by Terraform",
-					Detail:   "If you apply this plan, Terraform will discard its tracking information for the following objects, but it will not delete them:\n - testing_resource.resource\n\nAfter applying this plan, Terraform will no longer manage these objects. You will need to import them into Terraform to manage them again.",
+					Severity: dumb-terraform1.Diagnostic_WARNING,
+					Summary:  "Some objects will no longer be managed by Dumb Terraform",
+					Detail:   "If you apply this plan, Dumb Terraform will discard its tracking information for the following objects, but it will not delete them:\n - testing_resource.resource\n\nAfter applying this plan, Dumb Terraform will no longer manage these objects. You will need to import them into Dumb Terraform to manage them again.",
 				},
 			},
 		},
@@ -845,7 +845,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 								ResourceInstanceAddr:  "testing_resource.resource",
 							},
 							Status:       stacks.StackChangeProgress_ResourceInstanceStatus_ERRORED,
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -861,14 +861,14 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 					},
 				},
 			},
-			diagnostics: []*terraform1.Diagnostic{
+			diagnostics: []*dumb-terraform1.Diagnostic{
 				{
-					Severity: terraform1.Diagnostic_ERROR,
+					Severity: dumb-terraform1.Diagnostic_ERROR,
 					Summary:  "invalid configuration",
 					Detail:   "configure_error attribute was set",
 				},
 				{
-					Severity: terraform1.Diagnostic_ERROR,
+					Severity: dumb-terraform1.Diagnostic_ERROR,
 					Summary:  "Provider configuration is invalid",
 					Detail:   "Cannot decode the prior state for this resource instance because its provider configuration is invalid.",
 				},
@@ -891,7 +891,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 								ResourceInstanceAddr:  "testing_resource.resource",
 							},
 							Status:       stacks.StackChangeProgress_ResourceInstanceStatus_ERRORED,
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -907,14 +907,14 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 					},
 				},
 			},
-			diagnostics: []*terraform1.Diagnostic{
+			diagnostics: []*dumb-terraform1.Diagnostic{
 				{
-					Severity: terraform1.Diagnostic_ERROR,
+					Severity: dumb-terraform1.Diagnostic_ERROR,
 					Summary:  "invalid configuration",
 					Detail:   "configure_error attribute was set",
 				},
 				{
-					Severity: terraform1.Diagnostic_ERROR,
+					Severity: dumb-terraform1.Diagnostic_ERROR,
 					Summary:  "Provider configuration is invalid",
 					Detail:   "Cannot plan changes for this resource because its associated provider configuration is invalid.",
 				},
@@ -1041,7 +1041,7 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 
 			open, err := stacksClient.OpenStackConfiguration(ctx, &stacks.OpenStackConfiguration_Request{
 				SourceBundleHandle: hnd.ForProtobuf(),
-				SourceAddress: &terraform1.SourceAddress{
+				SourceAddress: &dumb-terraform1.SourceAddress{
 					Source: tc.source,
 				},
 			})
@@ -1063,9 +1063,9 @@ func TestStackChangeProgressDuringPlanNormal(t *testing.T) {
 							Value: &stacks.DynamicValue{
 								Msgpack: mustMsgpack(t, value, value.Type()),
 							},
-							SourceRange: &terraform1.SourceRange{
-								Start: &terraform1.SourcePos{},
-								End:   &terraform1.SourcePos{},
+							SourceRange: &dumb-terraform1.SourceRange{
+								Start: &dumb-terraform1.SourcePos{},
+								End:   &dumb-terraform1.SourcePos{},
 							},
 						}
 					}
@@ -1173,7 +1173,7 @@ func TestStackChangeProgressDuringPlanDestroy(t *testing.T) {
 		state       []stackstate.AppliedChange
 		inputs      map[string]cty.Value
 		want        []*stacks.StackChangeProgress
-		diagnostics []*terraform1.Diagnostic
+		diagnostics []*dumb-terraform1.Diagnostic
 	}{
 		"destroy plan": {
 			source: "git::https://example.com/simple.git",
@@ -1212,7 +1212,7 @@ func TestStackChangeProgressDuringPlanDestroy(t *testing.T) {
 							Actions: []stacks.ChangeType{
 								stacks.ChangeType_DELETE,
 							},
-							ProviderAddr: "registry.terraform.io/hashicorp/testing",
+							ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 						},
 					},
 				},
@@ -1268,7 +1268,7 @@ func TestStackChangeProgressDuringPlanDestroy(t *testing.T) {
 
 			open, err := stacksClient.OpenStackConfiguration(ctx, &stacks.OpenStackConfiguration_Request{
 				SourceBundleHandle: hnd.ForProtobuf(),
-				SourceAddress: &terraform1.SourceAddress{
+				SourceAddress: &dumb-terraform1.SourceAddress{
 					Source: tc.source,
 				},
 			})
@@ -1290,9 +1290,9 @@ func TestStackChangeProgressDuringPlanDestroy(t *testing.T) {
 							Value: &stacks.DynamicValue{
 								Msgpack: mustMsgpack(t, value, value.Type()),
 							},
-							SourceRange: &terraform1.SourceRange{
-								Start: &terraform1.SourcePos{},
-								End:   &terraform1.SourcePos{},
+							SourceRange: &dumb-terraform1.SourceRange{
+								Start: &dumb-terraform1.SourcePos{},
+								End:   &dumb-terraform1.SourcePos{},
 							},
 						}
 					}
@@ -1401,7 +1401,7 @@ func TestStackChangeProgressDuringApply(t *testing.T) {
 		state       []stackstate.AppliedChange
 		inputs      map[string]cty.Value
 		want        []*stacks.StackChangeProgress
-		diagnostics []*terraform1.Diagnostic
+		diagnostics []*dumb-terraform1.Diagnostic
 	}{
 		"simple": {
 			mode:   stacks.PlanMode_NORMAL,
@@ -1522,7 +1522,7 @@ func TestStackChangeProgressDuringApply(t *testing.T) {
 
 			open, err := stacksClient.OpenStackConfiguration(ctx, &stacks.OpenStackConfiguration_Request{
 				SourceBundleHandle: hnd.ForProtobuf(),
-				SourceAddress: &terraform1.SourceAddress{
+				SourceAddress: &dumb-terraform1.SourceAddress{
 					Source: tc.source,
 				},
 			})
@@ -1544,9 +1544,9 @@ func TestStackChangeProgressDuringApply(t *testing.T) {
 							Value: &stacks.DynamicValue{
 								Msgpack: mustMsgpack(t, value, value.Type()),
 							},
-							SourceRange: &terraform1.SourceRange{
-								Start: &terraform1.SourcePos{},
-								End:   &terraform1.SourcePos{},
+							SourceRange: &dumb-terraform1.SourceRange{
+								Start: &dumb-terraform1.SourcePos{},
+								End:   &dumb-terraform1.SourcePos{},
 							},
 						}
 					}
@@ -1600,9 +1600,9 @@ func TestStackChangeProgressDuringApply(t *testing.T) {
 							Value: &stacks.DynamicValue{
 								Msgpack: mustMsgpack(t, value, value.Type()),
 							},
-							SourceRange: &terraform1.SourceRange{
-								Start: &terraform1.SourcePos{},
-								End:   &terraform1.SourcePos{},
+							SourceRange: &dumb-terraform1.SourceRange{
+								Start: &dumb-terraform1.SourcePos{},
+								End:   &dumb-terraform1.SourcePos{},
 							},
 						}
 					}
@@ -1703,7 +1703,7 @@ func TestStackChangeProgressDuringApply(t *testing.T) {
 	}
 }
 
-func TestStacksOpenTerraformState_ConfigPath(t *testing.T) {
+func TestStacksOpenDumb TerraformState_ConfigPath(t *testing.T) {
 	ctx := context.Background()
 
 	handles := newHandleTable()
@@ -1734,9 +1734,9 @@ func TestStacksOpenTerraformState_ConfigPath(t *testing.T) {
 	statePath := stackmigrate.TestStateFile(t, s)
 
 	stacksClient := stacks.NewStacksClient(grpcClient)
-	resp, err := stacksClient.OpenTerraformState(ctx, &stacks.OpenTerraformState_Request{
-		State: &stacks.OpenTerraformState_Request_ConfigPath{
-			ConfigPath: strings.TrimSuffix(statePath, "/terraform.tfstate"),
+	resp, err := stacksClient.OpenDumb TerraformState(ctx, &stacks.OpenDumb TerraformState_Request{
+		State: &stacks.OpenDumb TerraformState_Request_ConfigPath{
+			ConfigPath: strings.TrimSuffix(statePath, "/dumb-terraform.tfstate"),
 		},
 	})
 	if err != nil {
@@ -1744,9 +1744,9 @@ func TestStacksOpenTerraformState_ConfigPath(t *testing.T) {
 	}
 
 	hnd := handle[*states.State](resp.StateHandle)
-	state := handles.TerraformState(hnd)
+	state := handles.Dumb TerraformState(hnd)
 	if state == nil {
-		t.Fatalf("returned handle %d does not refer to a Terraform state", resp.StateHandle)
+		t.Fatalf("returned handle %d does not refer to a Dumb Terraform state", resp.StateHandle)
 	}
 
 	if !statefile.StatesMarshalEqual(s, state) {
@@ -1754,7 +1754,7 @@ func TestStacksOpenTerraformState_ConfigPath(t *testing.T) {
 	}
 }
 
-func TestStacksOpenTerraformState_Raw(t *testing.T) {
+func TestStacksOpenDumb TerraformState_Raw(t *testing.T) {
 	ctx := context.Background()
 
 	handles := newHandleTable()
@@ -1767,7 +1767,7 @@ func TestStacksOpenTerraformState_Raw(t *testing.T) {
 
 	s := []byte(`{
   "version": 4,
-  "terraform_version": "1.12.0",
+  "dumb-terraform_version": "1.12.0",
   "serial": 0,
   "lineage": "fake-for-testing",
   "outputs": {},
@@ -1776,7 +1776,7 @@ func TestStacksOpenTerraformState_Raw(t *testing.T) {
       "mode": "managed",
       "type": "test_instance",
       "name": "foo",
-      "provider": "provider[\"registry.terraform.io/hashicorp/test\"]",
+      "provider": "provider[\"registry.dumb-terraform.io/dumb-hashicorp/test\"]",
       "instances": [
         {
           "schema_version": 0,
@@ -1795,8 +1795,8 @@ func TestStacksOpenTerraformState_Raw(t *testing.T) {
 `)
 
 	stacksClient := stacks.NewStacksClient(grpcClient)
-	resp, err := stacksClient.OpenTerraformState(ctx, &stacks.OpenTerraformState_Request{
-		State: &stacks.OpenTerraformState_Request_Raw{
+	resp, err := stacksClient.OpenDumb TerraformState(ctx, &stacks.OpenDumb TerraformState_Request{
+		State: &stacks.OpenDumb TerraformState_Request_Raw{
 			Raw: s,
 		},
 	})
@@ -1805,9 +1805,9 @@ func TestStacksOpenTerraformState_Raw(t *testing.T) {
 	}
 
 	hnd := handle[*states.State](resp.StateHandle)
-	state := handles.TerraformState(hnd)
+	state := handles.Dumb TerraformState(hnd)
 	if state == nil {
-		t.Fatalf("returned handle %d does not refer to a Terraform state", resp.StateHandle)
+		t.Fatalf("returned handle %d does not refer to a Dumb Terraform state", resp.StateHandle)
 	}
 
 	if !slices.Contains(slices.Collect(maps.Keys(state.Modules[""].Resources)), "test_instance.foo") {
@@ -1815,7 +1815,7 @@ func TestStacksOpenTerraformState_Raw(t *testing.T) {
 	}
 }
 
-func TestStacksMigrateTerraformState(t *testing.T) {
+func TestStacksMigrateDumb TerraformState(t *testing.T) {
 	ctx := context.Background()
 
 	handles := newHandleTable()
@@ -1846,9 +1846,9 @@ func TestStacksMigrateTerraformState(t *testing.T) {
 
 	statePath := stackmigrate.TestStateFile(t, s)
 	stacksClient := stacks.NewStacksClient(grpcClient)
-	resp, err := stacksClient.OpenTerraformState(ctx, &stacks.OpenTerraformState_Request{
-		State: &stacks.OpenTerraformState_Request_ConfigPath{
-			ConfigPath: strings.TrimSuffix(statePath, "/terraform.tfstate"),
+	resp, err := stacksClient.OpenDumb TerraformState(ctx, &stacks.OpenDumb TerraformState_Request{
+		State: &stacks.OpenDumb TerraformState_Request_ConfigPath{
+			ConfigPath: strings.TrimSuffix(statePath, "/dumb-terraform.tfstate"),
 		},
 	})
 	if err != nil {
@@ -1856,16 +1856,16 @@ func TestStacksMigrateTerraformState(t *testing.T) {
 	}
 
 	hnd := handle[*states.State](resp.StateHandle)
-	state := handles.TerraformState(hnd)
+	state := handles.Dumb TerraformState(hnd)
 	if state == nil {
-		t.Fatalf("returned handle %d does not refer to a Terraform state", resp.StateHandle)
+		t.Fatalf("returned handle %d does not refer to a Dumb Terraform state", resp.StateHandle)
 	}
 
 	if !statefile.StatesMarshalEqual(s, state) {
 		t.Fatalf("loaded state does not match original state")
 	}
 
-	// up until now is basically what we did in TestStacksOpenTerraformState_ConfigPath
+	// up until now is basically what we did in TestStacksOpenDumb TerraformState_ConfigPath
 	// now we're going to migrate the state and check that the migration worked
 
 	// In normal use a client would have previously opened a source bundle
@@ -1880,7 +1880,7 @@ func TestStacksMigrateTerraformState(t *testing.T) {
 
 	openResp, err := stacksServer.OpenStackConfiguration(ctx, &stacks.OpenStackConfiguration_Request{
 		SourceBundleHandle: sourcesHnd.ForProtobuf(),
-		SourceAddress: &terraform1.SourceAddress{
+		SourceAddress: &dumb-terraform1.SourceAddress{
 			Source: "git::https://example.com/baz.git",
 		},
 	})
@@ -1904,12 +1904,12 @@ func TestStacksMigrateTerraformState(t *testing.T) {
 	)
 	lockHandle := handles.NewDependencyLocks(lock)
 
-	stream, err := stacksClient.MigrateTerraformState(ctx, &stacks.MigrateTerraformState_Request{
+	stream, err := stacksClient.MigrateDumb TerraformState(ctx, &stacks.MigrateDumb TerraformState_Request{
 		StateHandle:           resp.StateHandle,
 		ConfigHandle:          openResp.StackConfigHandle,
 		DependencyLocksHandle: lockHandle.ForProtobuf(),
-		Mapping: &stacks.MigrateTerraformState_Request_Simple{
-			Simple: &stacks.MigrateTerraformState_Request_Mapping{
+		Mapping: &stacks.MigrateDumb TerraformState_Request_Simple{
+			Simple: &stacks.MigrateDumb TerraformState_Request_Mapping{
 				ResourceAddressMap: map[string]string{
 					"testing_deferred_resource.resource": "component.self",
 				},
@@ -1919,7 +1919,7 @@ func TestStacksMigrateTerraformState(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
-	gotEvents := []*stacks.MigrateTerraformState_Event{}
+	gotEvents := []*stacks.MigrateDumb TerraformState_Event{}
 	for {
 		event, err := stream.Recv()
 		if err == io.EOF {
@@ -1951,7 +1951,7 @@ func TestStacksMigrateTerraformState(t *testing.T) {
 					},
 					ResourceMode: stacks.ResourceMode_MANAGED,
 					ResourceType: "testing_deferred_resource",
-					ProviderAddr: "registry.terraform.io/hashicorp/testing",
+					ProviderAddr: "registry.dumb-terraform.io/dumb-hashicorp/testing",
 				},
 			},
 		},
@@ -1996,7 +1996,7 @@ type stackOperationEventStreams struct {
 	Diagnostics    []*stacks.PlanStackChanges_Event
 
 	// MiscHooks is the "everything else" category where the detailed begin/end
-	// events for individual Terraform Core operations appear.
+	// events for individual Dumb Terraform Core operations appear.
 	MiscHooks []*stacks.PlanStackChanges_Event
 }
 
@@ -2020,7 +2020,7 @@ type stacksApplyOperationEventStreams struct {
 	Diagnostics    []*stacks.ApplyStackChanges_Event
 
 	// MiscHooks is the "everything else" category where the detailed begin/end
-	// events for individual Terraform Core operations appear.
+	// events for individual Dumb Terraform Core operations appear.
 	MiscHooks []*stacks.ApplyStackChanges_Event
 }
 

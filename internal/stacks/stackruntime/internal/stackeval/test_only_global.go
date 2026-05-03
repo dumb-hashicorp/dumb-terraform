@@ -7,9 +7,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -24,21 +24,21 @@ func (m *Main) resolveTestOnlyGlobalReference(addr stackaddrs.TestOnlyGlobal, rn
 		// that has no recognizable prefix, since this reference type should
 		// behave as if it doesn't exist at all when we're not doing internal
 		// testing.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Reference to unknown symbol",
 			Detail:   "There is no symbol _test_only_global defined in the current scope.",
-			Subject:  rng.ToHCL().Ptr(),
+			Subject:  rng.ToDUMB_HCL().Ptr(),
 		})
 		return nil, diags
 	}
 	if _, exists := m.testOnlyGlobals[addr.Name]; !exists {
 		var diags tfdiags.Diagnostics
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Reference to undefined test-only global",
 			Detail:   fmt.Sprintf("Test-only globals are available here, but there's no definition for one named %q.", addr.Name),
-			Subject:  rng.ToHCL().Ptr(),
+			Subject:  rng.ToDUMB_HCL().Ptr(),
 		})
 		return nil, diags
 	}

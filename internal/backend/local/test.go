@@ -11,16 +11,16 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/junit"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/moduletest/graph"
-	teststates "github.com/hashicorp/terraform/internal/moduletest/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/junit"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/graph"
+	teststates "github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type TestSuiteRunner struct {
@@ -42,7 +42,7 @@ type TestSuiteRunner struct {
 	GlobalVariables     map[string]arguments.UnparsedVariableValue
 	GlobalTestVariables map[string]arguments.UnparsedVariableValue
 
-	Opts *terraform.ContextOpts
+	Opts *dumb-terraform.ContextOpts
 
 	View  views.Test
 	JUnit junit.JUnit
@@ -58,7 +58,7 @@ type TestSuiteRunner struct {
 	Stopped   bool
 	Cancelled bool
 
-	// StoppedCtx and CancelledCtx allow in progress Terraform operations to
+	// StoppedCtx and CancelledCtx allow in progress Dumb Terraform operations to
 	// respond to external calls from the test command.
 	StoppedCtx   context.Context
 	CancelledCtx context.Context

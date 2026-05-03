@@ -10,22 +10,22 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/hcl/v2/hcltest"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
 )
 
 func TestMarshalExpressions(t *testing.T) {
 	tests := []struct {
-		Input hcl.Body
+		Input dumb-hcl.Body
 		Want  expressions
 	}{
 		{
-			&hclsyntax.Body{
-				Attributes: hclsyntax.Attributes{
-					"foo": &hclsyntax.Attribute{
-						Expr: &hclsyntax.LiteralValueExpr{
+			&dumb-hclsyntax.Body{
+				Attributes: dumb-hclsyntax.Attributes{
+					"foo": &dumb-hclsyntax.Attribute{
+						Expr: &dumb-hclsyntax.LiteralValueExpr{
 							Val: cty.StringVal("bar"),
 						},
 					},
@@ -39,11 +39,11 @@ func TestMarshalExpressions(t *testing.T) {
 			},
 		},
 		{
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"foo": {
 						Name: "foo",
-						Expr: hcltest.MockExprTraversalSrc(`var.list[1]`),
+						Expr: dumb-hcltest.MockExprTraversalSrc(`var.list[1]`),
 					},
 				},
 			}),
@@ -54,11 +54,11 @@ func TestMarshalExpressions(t *testing.T) {
 			},
 		},
 		{
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"foo": {
 						Name: "foo",
-						Expr: hcltest.MockExprTraversalSrc(`data.template_file.foo[1].vars["baz"]`),
+						Expr: dumb-hcltest.MockExprTraversalSrc(`data.template_file.foo[1].vars["baz"]`),
 					},
 				},
 			}),
@@ -69,11 +69,11 @@ func TestMarshalExpressions(t *testing.T) {
 			},
 		},
 		{
-			hcltest.MockBody(&hcl.BodyContent{
-				Attributes: hcl.Attributes{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Attributes: dumb-hcl.Attributes{
 					"foo": {
 						Name: "foo",
-						Expr: hcltest.MockExprTraversalSrc(`module.foo.bar`),
+						Expr: dumb-hcltest.MockExprTraversalSrc(`module.foo.bar`),
 					},
 				},
 			}),
@@ -84,16 +84,16 @@ func TestMarshalExpressions(t *testing.T) {
 			},
 		},
 		{
-			hcltest.MockBody(&hcl.BodyContent{
-				Blocks: hcl.Blocks{
+			dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+				Blocks: dumb-hcl.Blocks{
 					{
 						Type: "block_to_attr",
-						Body: hcltest.MockBody(&hcl.BodyContent{
+						Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
 
-							Attributes: hcl.Attributes{
+							Attributes: dumb-hcl.Attributes{
 								"foo": {
 									Name: "foo",
-									Expr: hcltest.MockExprTraversalSrc(`module.foo.bar`),
+									Expr: dumb-hcltest.MockExprTraversalSrc(`module.foo.bar`),
 								},
 							},
 						}),
@@ -132,7 +132,7 @@ func TestMarshalExpressions(t *testing.T) {
 
 func TestMarshalExpression(t *testing.T) {
 	tests := []struct {
-		Input hcl.Expression
+		Input dumb-hcl.Expression
 		Want  expression
 	}{
 		{

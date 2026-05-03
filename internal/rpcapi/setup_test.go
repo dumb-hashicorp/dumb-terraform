@@ -9,14 +9,14 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/setup"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/setup"
 )
 
 func TestSetupServer_Handshake(t *testing.T) {
 	called := 0
 	server := newSetupServer(func(ctx context.Context, req *setup.Handshake_Request, stopper *stopper) (*setup.ServerCapabilities, error) {
 		called++
-		if got, want := req.Config.Credentials["localterraform.com"].Token, "boop"; got != want {
+		if got, want := req.Config.Credentials["localdumb-terraform.com"].Token, "boop"; got != want {
 			t.Fatalf("incorrect token. got %q, want %q", got, want)
 		}
 		return &setup.ServerCapabilities{}, nil
@@ -26,7 +26,7 @@ func TestSetupServer_Handshake(t *testing.T) {
 		Capabilities: &setup.ClientCapabilities{},
 		Config: &setup.Config{
 			Credentials: map[string]*setup.HostCredential{
-				"localterraform.com": {
+				"localdumb-terraform.com": {
 					Token: "boop",
 				},
 			},

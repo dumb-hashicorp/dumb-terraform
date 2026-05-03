@@ -3,16 +3,16 @@
 
 package pg
 
-// Create the test database: createdb terraform_backend_pg_test
-// TF_ACC=1 GO111MODULE=on go test -v -mod=vendor -timeout=2m -parallel=4 github.com/hashicorp/terraform/backend/remote-state/pg
+// Create the test database: createdb dumb-terraform_backend_pg_test
+// TF_ACC=1 GO111MODULE=on go test -v -mod=vendor -timeout=2m -parallel=4 github.com/dumb-hashicorp/dumb-terraform/backend/remote-state/pg
 
 import (
 	"database/sql"
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
 )
 
 func TestRemoteClient_impl(t *testing.T) {
@@ -23,7 +23,7 @@ func TestRemoteClient_impl(t *testing.T) {
 func TestRemoteClient(t *testing.T) {
 	testACC(t)
 	connStr := getDatabaseUrl()
-	schemaName := fmt.Sprintf("terraform_%s", t.Name())
+	schemaName := fmt.Sprintf("dumb-terraform_%s", t.Name())
 	dbCleaner, err := sql.Open("postgres", connStr)
 	if err != nil {
 		t.Fatal(err)
@@ -51,7 +51,7 @@ func TestRemoteClient(t *testing.T) {
 func TestRemoteLocks(t *testing.T) {
 	testACC(t)
 	connStr := getDatabaseUrl()
-	schemaName := fmt.Sprintf("terraform_%s", t.Name())
+	schemaName := fmt.Sprintf("dumb-terraform_%s", t.Name())
 	dbCleaner, err := sql.Open("postgres", connStr)
 	if err != nil {
 		t.Fatal(err)

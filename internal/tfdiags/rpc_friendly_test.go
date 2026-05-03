@@ -12,21 +12,21 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 )
 
 func TestDiagnosticsForRPC(t *testing.T) {
 	var diags Diagnostics
 	diags = diags.Append(fmt.Errorf("bad"))
 	diags = diags.Append(SimpleWarning("less bad"))
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagError,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagError,
 		Summary:  "bad bad bad",
 		Detail:   "badily bad bad",
-		Subject: &hcl.Range{
+		Subject: &dumb-hcl.Range{
 			Filename: "foo",
 		},
-		Context: &hcl.Range{
+		Context: &dumb-hcl.Range{
 			Filename: "bar",
 		},
 	})

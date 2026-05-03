@@ -7,17 +7,17 @@ import (
 	"context"
 	"net/rpc"
 
-	"github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
-// UIInput is an implementation of terraform.UIInput that communicates
+// UIInput is an implementation of dumb-terraform.UIInput that communicates
 // over RPC.
 type UIInput struct {
 	Client *rpc.Client
 }
 
-func (i *UIInput) Input(ctx context.Context, opts *terraform.InputOpts) (string, error) {
+func (i *UIInput) Input(ctx context.Context, opts *dumb-terraform.InputOpts) (string, error) {
 	var resp UIInputInputResponse
 	err := i.Client.Call("Plugin.Input", opts, &resp)
 	if err != nil {
@@ -39,11 +39,11 @@ type UIInputInputResponse struct {
 // UIInputServer is a net/rpc compatible structure for serving
 // a UIInputServer. This should not be used directly.
 type UIInputServer struct {
-	UIInput terraform.UIInput
+	UIInput dumb-terraform.UIInput
 }
 
 func (s *UIInputServer) Input(
-	opts *terraform.InputOpts,
+	opts *dumb-terraform.InputOpts,
 	reply *UIInputInputResponse) error {
 	value, err := s.UIInput.Input(context.Background(), opts)
 	*reply = UIInputInputResponse{

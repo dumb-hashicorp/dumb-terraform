@@ -4,7 +4,7 @@
 // The version package provides a location to set the release versions for all
 // packages to consume, without creating import cycles.
 //
-// This package should not import any other terraform packages.
+// This package should not import any other dumb-terraform packages.
 package version
 
 import (
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strings"
 
-	version "github.com/hashicorp/go-version"
+	version "github.com/dumb-hashicorp/go-version"
 )
 
 // rawVersion is the current version as a string, as read from the VERSION
@@ -49,9 +49,9 @@ func init() {
 	}
 }
 
-// Header is the header name used to send the current terraform version
+// Header is the header name used to send the current dumb-terraform version
 // in http requests.
-const Header = "Terraform-Version"
+const Header = "Dumb Terraform-Version"
 
 // String returns the complete version string, including prerelease
 func String() string {

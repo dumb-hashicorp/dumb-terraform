@@ -4,7 +4,7 @@
 package arguments
 
 import (
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Get represents the command-line arguments for the get command.
@@ -16,7 +16,7 @@ type Get struct {
 	// updates and installs the newest versions available.
 	Update bool
 
-	// TestDirectory is the Terraform test directory.
+	// TestDirectory is the Dumb Terraform test directory.
 	TestDirectory string
 }
 

@@ -4,8 +4,8 @@
 package configs
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -33,15 +33,15 @@ import (
 // If wantKeyword is set, the generated warning diagnostic will talk about
 // keywords rather than references. The behavior is otherwise unchanged, and
 // the caller remains responsible for checking that the result is indeed
-// a keyword, e.g. using hcl.ExprAsKeyword.
-func shimTraversalInString(expr hcl.Expression, wantKeyword bool) (hcl.Expression, hcl.Diagnostics) {
+// a keyword, e.g. using dumb-hcl.ExprAsKeyword.
+func shimTraversalInString(expr dumb-hcl.Expression, wantKeyword bool) (dumb-hcl.Expression, dumb-hcl.Diagnostics) {
 	// ObjectConsKeyExpr is a special wrapper type used for keys on object
 	// constructors to deal with the fact that naked identifiers are normally
 	// handled as "bareword" strings rather than as variable references. Since
 	// we know we're interpreting as a traversal anyway (and thus it won't
 	// matter whether it's a string or an identifier) we can safely just unwrap
 	// here and then process whatever we find inside as normal.
-	if ocke, ok := expr.(*hclsyntax.ObjectConsKeyExpr); ok {
+	if ocke, ok := expr.(*dumb-hclsyntax.ObjectConsKeyExpr); ok {
 		expr = ocke.Wrapped
 	}
 
@@ -65,7 +65,7 @@ func shimTraversalInString(expr hcl.Expression, wantKeyword bool) (hcl.Expressio
 	startPos.Column++          // skip initial quote
 	startPos.Byte++            // skip initial quote
 
-	traversal, tDiags := hclsyntax.ParseTraversalAbs(
+	traversal, tDiags := dumb-hclsyntax.ParseTraversalAbs(
 		[]byte(strVal.AsString()),
 		srcRange.Filename,
 		startPos,
@@ -73,22 +73,22 @@ func shimTraversalInString(expr hcl.Expression, wantKeyword bool) (hcl.Expressio
 	diags = append(diags, tDiags...)
 
 	if wantKeyword {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Quoted keywords are deprecated",
-			Detail:   "In this context, keywords are expected literally rather than in quotes. Terraform 0.11 and earlier required quotes, but quoted keywords are now deprecated and will be removed in a future version of Terraform. Remove the quotes surrounding this keyword to silence this warning.",
+			Detail:   "In this context, keywords are expected literally rather than in quotes. Dumb Terraform 0.11 and earlier required quotes, but quoted keywords are now deprecated and will be removed in a future version of Dumb Terraform. Remove the quotes surrounding this keyword to silence this warning.",
 			Subject:  &srcRange,
 		})
 	} else {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Quoted references are deprecated",
-			Detail:   "In this context, references are expected literally rather than in quotes. Terraform 0.11 and earlier required quotes, but quoted references are now deprecated and will be removed in a future version of Terraform. Remove the quotes surrounding this reference to silence this warning.",
+			Detail:   "In this context, references are expected literally rather than in quotes. Dumb Terraform 0.11 and earlier required quotes, but quoted references are now deprecated and will be removed in a future version of Dumb Terraform. Remove the quotes surrounding this reference to silence this warning.",
 			Subject:  &srcRange,
 		})
 	}
 
-	return &hclsyntax.ScopeTraversalExpr{
+	return &dumb-hclsyntax.ScopeTraversalExpr{
 		Traversal: traversal,
 		SrcRange:  srcRange,
 	}, diags
@@ -100,7 +100,7 @@ func shimTraversalInString(expr hcl.Expression, wantKeyword bool) (hcl.Expressio
 //
 // This function does not itself emit any diagnostics, so it's the caller's
 // responsibility to emit a warning diagnostic when this function returns true.
-func shimIsIgnoreChangesStar(expr hcl.Expression) bool {
+func shimIsIgnoreChangesStar(expr dumb-hcl.Expression) bool {
 	val, valDiags := expr.Value(nil)
 	if valDiags.HasErrors() {
 		return false

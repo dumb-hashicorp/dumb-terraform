@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"testing"
 
-	tfe "github.com/hashicorp/go-tfe"
-	tfversion "github.com/hashicorp/terraform/version"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
-func terraformConfigRequiredVariable(org, name string) string {
+func dumb-terraformConfigRequiredVariable(org, name string) string {
 	return fmt.Sprintf(`
-terraform {
+dumb-terraform {
   cloud {
     hostname = "%s"
     organization = "%s"
@@ -46,7 +46,7 @@ output "test_env" {
 func Test_cloud_run_variables(t *testing.T) {
 	t.Parallel()
 	skipIfMissingEnvVar(t)
-	skipWithoutRemoteTerraformVersion(t)
+	skipWithoutRemoteDumb TerraformVersion(t)
 
 	cases := testCases{
 		"run variables from CLI arg": {
@@ -56,15 +56,15 @@ func Test_cloud_run_variables(t *testing.T) {
 						wsName := "new-workspace"
 						_ = createWorkspace(t, orgName, tfe.WorkspaceCreateOptions{
 							Name:             tfe.String(wsName),
-							TerraformVersion: tfe.String(tfversion.String()),
+							Dumb TerraformVersion: tfe.String(tfversion.String()),
 						})
-						tfBlock := terraformConfigRequiredVariable(orgName, wsName)
+						tfBlock := dumb-terraformConfigRequiredVariable(orgName, wsName)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `HCP Terraform has been successfully initialized!`,
+							expectedCmdOutput: `DUMB_HCP Dumb Terraform has been successfully initialized!`,
 						},
 						{
 							command:           []string{"plan", "-var", "foo=bar"},

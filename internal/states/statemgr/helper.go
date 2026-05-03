@@ -7,10 +7,10 @@ package statemgr
 // operations done against full state managers.
 
 import (
-	"github.com/hashicorp/terraform/internal/schemarepo"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/schemarepo"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // NewStateFile creates a new statefile.File object, with a newly-minted
@@ -18,7 +18,7 @@ import (
 func NewStateFile() *statefile.File {
 	return &statefile.File{
 		Lineage:          NewLineage(),
-		TerraformVersion: version.SemVer,
+		Dumb TerraformVersion: version.SemVer,
 		State:            states.NewState(),
 	}
 }

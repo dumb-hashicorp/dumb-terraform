@@ -1,8 +1,8 @@
 
-terraform {
+dumb-terraform {
   required_providers {
     test = {
-      source = "terraform.io/builtin/test"
+      source = "dumb-terraform.io/builtin/test"
     }
   }
 }

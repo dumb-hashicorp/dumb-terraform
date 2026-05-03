@@ -10,19 +10,19 @@ import (
 	"log"
 	"sync"
 
-	"github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/hashicorp/terraform/internal/pluginshared"
+	"github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/pluginshared"
 
-	"github.com/hashicorp/terraform/internal/rpcapi/dynrpcserver"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/dependencies"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/packages"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1/stacks"
-	"github.com/hashicorp/terraform/internal/stacksplugin/stacksproto1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dynrpcserver"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/dependencies"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/packages"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1/stacks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacksplugin/stacksproto1"
 	"google.golang.org/grpc"
 )
 
-// GRPCStacksClient is the client interface for interacting with terraform-stacksplugin
+// GRPCStacksClient is the client interface for interacting with dumb-terraform-stacksplugin
 type GRPCStacksClient struct {
 	Client     stacksproto1.CommandServiceClient
 	Broker     *plugin.GRPCBroker

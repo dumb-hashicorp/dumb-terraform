@@ -6,25 +6,25 @@ package configtesting
 import (
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 )
 
 func TestSynthBodyContent(t *testing.T) {
 	tests := map[string]struct {
 		Values    map[string]cty.Value
-		Schema    *hcl.BodySchema
+		Schema    *dumb-hcl.BodySchema
 		DiagCount int
 	}{
 		"empty": {
 			Values:    map[string]cty.Value{},
-			Schema:    &hcl.BodySchema{},
+			Schema:    &dumb-hcl.BodySchema{},
 			DiagCount: 0,
 		},
 		"missing required attribute": {
 			Values: map[string]cty.Value{},
-			Schema: &hcl.BodySchema{
-				Attributes: []hcl.AttributeSchema{
+			Schema: &dumb-hcl.BodySchema{
+				Attributes: []dumb-hcl.AttributeSchema{
 					{
 						Name:     "nonexist",
 						Required: true,
@@ -35,8 +35,8 @@ func TestSynthBodyContent(t *testing.T) {
 		},
 		"missing optional attribute": {
 			Values: map[string]cty.Value{},
-			Schema: &hcl.BodySchema{
-				Attributes: []hcl.AttributeSchema{
+			Schema: &dumb-hcl.BodySchema{
+				Attributes: []dumb-hcl.AttributeSchema{
 					{
 						Name: "nonexist",
 					},
@@ -48,7 +48,7 @@ func TestSynthBodyContent(t *testing.T) {
 			Values: map[string]cty.Value{
 				"foo": cty.StringVal("unwanted"),
 			},
-			Schema:    &hcl.BodySchema{},
+			Schema:    &dumb-hcl.BodySchema{},
 			DiagCount: 1, // unsupported attribute
 		},
 	}

@@ -8,13 +8,13 @@ import (
 	"sync"
 	"unsafe"
 
-	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 	"github.com/zclconf/go-cty/cty"
 )
 
 var mapLabelNames = []string{"key"}
 
-// specCache is a global cache of all the generated hcldec.Spec values for
+// specCache is a global cache of all the generated dumb-hcldec.Spec values for
 // Blocks. This cache is used by the Block.DecoderSpec method to memoize calls
 // and prevent unnecessary regeneration of the spec, especially when they are
 // large and deeply nested.
@@ -29,16 +29,16 @@ var mapLabelNames = []string{"key"}
 // schema during execution would be an error.
 type specCache struct {
 	sync.Mutex
-	specs map[uintptr]hcldec.Spec
+	specs map[uintptr]dumb-hcldec.Spec
 }
 
 var decoderSpecCache = specCache{
-	specs: map[uintptr]hcldec.Spec{},
+	specs: map[uintptr]dumb-hcldec.Spec{},
 }
 
 // get returns the Spec associated with eth given Block, or nil if non is
 // found.
-func (s *specCache) get(b *Block) hcldec.Spec {
+func (s *specCache) get(b *Block) dumb-hcldec.Spec {
 	s.Lock()
 	defer s.Unlock()
 	k := uintptr(unsafe.Pointer(b))
@@ -46,7 +46,7 @@ func (s *specCache) get(b *Block) hcldec.Spec {
 }
 
 // set stores the given Spec as being the result of b.DecoderSpec().
-func (s *specCache) set(b *Block, spec hcldec.Spec) {
+func (s *specCache) set(b *Block, spec dumb-hcldec.Spec) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -73,14 +73,14 @@ func (s *specCache) delete(b *Block) {
 	delete(s.specs, k)
 }
 
-// DecoderSpec returns a hcldec.Spec that can be used to decode a HCL Body
-// using the facilities in the hcldec package.
+// DecoderSpec returns a dumb-hcldec.Spec that can be used to decode a DUMB_HCL Body
+// using the facilities in the dumb-hcldec package.
 //
 // The returned specification is guaranteed to return a value of the same type
 // returned by method ImpliedType, but it may contain null values if any of the
 // block attributes are defined as optional and/or computed respectively.
-func (b *Block) DecoderSpec() hcldec.Spec {
-	ret := hcldec.ObjectSpec{}
+func (b *Block) DecoderSpec() dumb-hcldec.Spec {
+	ret := dumb-hcldec.ObjectSpec{}
 	if b == nil {
 		return ret
 	}
@@ -105,15 +105,15 @@ func (b *Block) DecoderSpec() hcldec.Spec {
 		childSpec := blockS.Block.DecoderSpec()
 		switch blockS.Nesting {
 		case NestingSingle, NestingGroup:
-			ret[name] = &hcldec.BlockSpec{
+			ret[name] = &dumb-hcldec.BlockSpec{
 				TypeName: name,
 				Nested:   childSpec,
 				Required: blockS.MinItems == 1,
 			}
 			if blockS.Nesting == NestingGroup {
-				ret[name] = &hcldec.DefaultSpec{
+				ret[name] = &dumb-hcldec.DefaultSpec{
 					Primary: ret[name],
-					Default: &hcldec.LiteralSpec{
+					Default: &dumb-hcldec.LiteralSpec{
 						Value: blockS.EmptyValue(),
 					},
 				}
@@ -124,14 +124,14 @@ func (b *Block) DecoderSpec() hcldec.Spec {
 			// dynamically-typed attributes inside we must use a tuple
 			// instead, at the expense of our type then not being predictable.
 			if blockS.Block.specType().HasDynamicTypes() {
-				ret[name] = &hcldec.BlockTupleSpec{
+				ret[name] = &dumb-hcldec.BlockTupleSpec{
 					TypeName: name,
 					Nested:   childSpec,
 					MinItems: blockS.MinItems,
 					MaxItems: blockS.MaxItems,
 				}
 			} else {
-				ret[name] = &hcldec.BlockListSpec{
+				ret[name] = &dumb-hcldec.BlockListSpec{
 					TypeName: name,
 					Nested:   childSpec,
 					MinItems: blockS.MinItems,
@@ -146,7 +146,7 @@ func (b *Block) DecoderSpec() hcldec.Spec {
 			// order to properly compute its internal hashes.)  We assume that
 			// the provider has already used something like InternalValidate to
 			// validate their schema.
-			ret[name] = &hcldec.BlockSetSpec{
+			ret[name] = &dumb-hcldec.BlockSetSpec{
 				TypeName: name,
 				Nested:   childSpec,
 				MinItems: blockS.MinItems,
@@ -158,13 +158,13 @@ func (b *Block) DecoderSpec() hcldec.Spec {
 			// dynamically-typed attributes inside we must use a tuple
 			// instead, at the expense of our type then not being predictable.
 			if blockS.Block.specType().HasDynamicTypes() {
-				ret[name] = &hcldec.BlockObjectSpec{
+				ret[name] = &dumb-hcldec.BlockObjectSpec{
 					TypeName:   name,
 					Nested:     childSpec,
 					LabelNames: mapLabelNames,
 				}
 			} else {
-				ret[name] = &hcldec.BlockMapSpec{
+				ret[name] = &dumb-hcldec.BlockMapSpec{
 					TypeName:   name,
 					Nested:     childSpec,
 					LabelNames: mapLabelNames,
@@ -181,12 +181,12 @@ func (b *Block) DecoderSpec() hcldec.Spec {
 	return ret
 }
 
-func (a *Attribute) decoderSpec(name string) hcldec.Spec {
+func (a *Attribute) decoderSpec(name string) dumb-hcldec.Spec {
 	if a == nil || (a.Type == cty.NilType && a.NestedType == nil) {
 		panic("Invalid attribute schema: schema is nil.")
 	}
 
-	ret := &hcldec.AttrSpec{Name: name}
+	ret := &dumb-hcldec.AttrSpec{Name: name}
 	if a.NestedType != nil {
 		if a.Type != cty.NilType {
 			panic("Invalid attribute schema: NestedType and Type cannot both be set. This is a bug in the provider.")

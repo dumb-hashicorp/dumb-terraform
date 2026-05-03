@@ -11,13 +11,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	hcljson "github.com/hashicorp/hcl/v2/json"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	dumb-hcljson "github.com/dumb-hashicorp/dumb-hcl/v2/json"
 
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // VarEnvPrefix is the prefix for environment variables that represent values
@@ -25,7 +25,7 @@ import (
 const VarEnvPrefix = "TF_VAR_"
 
 // DefaultVarsFilename is the default filename used for vars
-const DefaultVarsFilename = "terraform.tfvars"
+const DefaultVarsFilename = "dumb-terraform.tfvars"
 
 // UnparsedVariableValue represents a variable value provided by the caller
 // whose parsing must be deferred until configuration is available.
@@ -39,7 +39,7 @@ type UnparsedVariableValue interface {
 	//
 	// If error diagnostics are returned, the resulting value may be invalid
 	// or incomplete.
-	ParseVariableValue(mode configs.VariableParsingMode) (*terraform.InputValue, tfdiags.Diagnostics)
+	ParseVariableValue(mode configs.VariableParsingMode) (*dumb-terraform.InputValue, tfdiags.Diagnostics)
 }
 
 // Vars describes arguments which specify non-default variable values. This
@@ -100,23 +100,23 @@ func (v *Vars) CollectValues(onFileLoad func(filename string, src []byte)) (map[
 			ret[name] = unparsedVariableValueString{
 				str:        rawVal,
 				name:       name,
-				sourceType: terraform.ValueFromEnvVar,
+				sourceType: dumb-terraform.ValueFromEnvVar,
 			}
 		}
 	}
 
 	// Next up we have some implicit files that are loaded automatically
-	// if they are present. There's the original terraform.tfvars
+	// if they are present. There's the original dumb-terraform.tfvars
 	// (DefaultVarsFilename) along with the later-added search for all files
 	// ending in .auto.tfvars.
 	if _, err := os.Stat(DefaultVarsFilename); err == nil {
-		varsFromFile, moreDiags := addVarsFromFile(DefaultVarsFilename, terraform.ValueFromAutoFile, onFileLoad)
+		varsFromFile, moreDiags := addVarsFromFile(DefaultVarsFilename, dumb-terraform.ValueFromAutoFile, onFileLoad)
 		maps.Copy(ret, varsFromFile)
 		diags = diags.Append(moreDiags)
 	}
 	const defaultVarsFilenameJSON = DefaultVarsFilename + ".json"
 	if _, err := os.Stat(defaultVarsFilenameJSON); err == nil {
-		varsFromFile, moreDiags := addVarsFromFile(defaultVarsFilenameJSON, terraform.ValueFromAutoFile, onFileLoad)
+		varsFromFile, moreDiags := addVarsFromFile(defaultVarsFilenameJSON, dumb-terraform.ValueFromAutoFile, onFileLoad)
 		maps.Copy(ret, varsFromFile)
 		diags = diags.Append(moreDiags)
 	}
@@ -127,7 +127,7 @@ func (v *Vars) CollectValues(onFileLoad func(filename string, src []byte)) (map[
 			if !isAutoVarFile(name) {
 				continue
 			}
-			varsFromFile, moreDiags := addVarsFromFile(name, terraform.ValueFromAutoFile, onFileLoad)
+			varsFromFile, moreDiags := addVarsFromFile(name, dumb-terraform.ValueFromAutoFile, onFileLoad)
 			maps.Copy(ret, varsFromFile)
 			diags = diags.Append(moreDiags)
 		}
@@ -164,18 +164,18 @@ func (v *Vars) CollectValues(onFileLoad func(filename string, src []byte)) (map[
 			ret[name] = unparsedVariableValueString{
 				str:        rawVal,
 				name:       name,
-				sourceType: terraform.ValueFromCLIArg,
+				sourceType: dumb-terraform.ValueFromCLIArg,
 			}
 
 		case "-var-file":
-			varsFromFile, moreDiags := addVarsFromFile(flagNameValue.Value, terraform.ValueFromNamedFile, onFileLoad)
+			varsFromFile, moreDiags := addVarsFromFile(flagNameValue.Value, dumb-terraform.ValueFromNamedFile, onFileLoad)
 			maps.Copy(ret, varsFromFile)
 			diags = diags.Append(moreDiags)
 
 		default:
 			// Should never happen; always a bug in the code that built up
 			// the contents of m.variableArgs.
-			diags = diags.Append(fmt.Errorf("unsupported variable option name %q (this is a bug in Terraform)", flagNameValue.Name))
+			diags = diags.Append(fmt.Errorf("unsupported variable option name %q (this is a bug in Dumb Terraform)", flagNameValue.Name))
 		}
 	}
 
@@ -193,14 +193,14 @@ func CollectValuesForTests(testsFilePath string, onFileLoad func(filename string
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Warning,
 			"Missing test directory",
-			"The test directory was unspecified when it should always be set. This is a bug in Terraform - please report it."))
+			"The test directory was unspecified when it should always be set. This is a bug in Dumb Terraform - please report it."))
 		return ret, diags
 	}
 
 	// Firstly we collect variables from .tfvars file
 	testVarsFilename := filepath.Join(testsFilePath, DefaultVarsFilename)
 	if _, err := os.Stat(testVarsFilename); err == nil {
-		varsFromFile, moreDiags := addVarsFromFile(testVarsFilename, terraform.ValueFromAutoFile, onFileLoad)
+		varsFromFile, moreDiags := addVarsFromFile(testVarsFilename, dumb-terraform.ValueFromAutoFile, onFileLoad)
 		maps.Copy(ret, varsFromFile)
 		diags = diags.Append(moreDiags)
 
@@ -211,7 +211,7 @@ func CollectValuesForTests(testsFilePath string, onFileLoad func(filename string
 	testVarsFilenameJSON := filepath.Join(testsFilePath, defaultVarsFilenameJSON)
 
 	if _, err := os.Stat(testVarsFilenameJSON); err == nil {
-		varsFromFile, moreDiags := addVarsFromFile(testVarsFilenameJSON, terraform.ValueFromAutoFile, onFileLoad)
+		varsFromFile, moreDiags := addVarsFromFile(testVarsFilenameJSON, dumb-terraform.ValueFromAutoFile, onFileLoad)
 		maps.Copy(ret, varsFromFile)
 		diags = diags.Append(moreDiags)
 	}
@@ -227,7 +227,7 @@ func CollectValuesForTests(testsFilePath string, onFileLoad func(filename string
 				continue
 			}
 
-			varsFromFile, moreDiags := addVarsFromFile(filepath.Join(testsFilePath, info.Name()), terraform.ValueFromAutoFile, onFileLoad)
+			varsFromFile, moreDiags := addVarsFromFile(filepath.Join(testsFilePath, info.Name()), dumb-terraform.ValueFromAutoFile, onFileLoad)
 			maps.Copy(ret, varsFromFile)
 			diags = diags.Append(moreDiags)
 		}
@@ -239,7 +239,7 @@ func CollectValuesForTests(testsFilePath string, onFileLoad func(filename string
 	return ret, diags
 }
 
-func addVarsFromFile(filename string, sourceType terraform.ValueSourceType, onFileLoad func(filename string, src []byte)) (map[string]UnparsedVariableValue, tfdiags.Diagnostics) {
+func addVarsFromFile(filename string, sourceType dumb-terraform.ValueSourceType, onFileLoad func(filename string, src []byte)) (map[string]UnparsedVariableValue, tfdiags.Diagnostics) {
 	to := map[string]UnparsedVariableValue{}
 	var diags tfdiags.Diagnostics
 
@@ -264,18 +264,18 @@ func addVarsFromFile(filename string, sourceType terraform.ValueSourceType, onFi
 	// Record the file source code for snippets in diagnostic messages.
 	onFileLoad(filename, src)
 
-	var f *hcl.File
+	var f *dumb-hcl.File
 	if strings.HasSuffix(filename, ".json") {
-		var hclDiags hcl.Diagnostics
-		f, hclDiags = hcljson.Parse(src, filename)
-		diags = diags.Append(hclDiags)
+		var dumb-hclDiags dumb-hcl.Diagnostics
+		f, dumb-hclDiags = dumb-hcljson.Parse(src, filename)
+		diags = diags.Append(dumb-hclDiags)
 		if f == nil || f.Body == nil {
 			return to, diags
 		}
 	} else {
-		var hclDiags hcl.Diagnostics
-		f, hclDiags = hclsyntax.ParseConfig(src, filename, hcl.Pos{Line: 1, Column: 1})
-		diags = diags.Append(hclDiags)
+		var dumb-hclDiags dumb-hcl.Diagnostics
+		f, dumb-hclDiags = dumb-hclsyntax.ParseConfig(src, filename, dumb-hcl.Pos{Line: 1, Column: 1})
+		diags = diags.Append(dumb-hclDiags)
 		if f == nil || f.Body == nil {
 			return to, diags
 		}
@@ -287,8 +287,8 @@ func addVarsFromFile(filename string, sourceType terraform.ValueSourceType, onFi
 	// definitions, and otherwise our error message for that case is not so
 	// helpful.
 	{
-		content, _, _ := f.Body.PartialContent(&hcl.BodySchema{
-			Blocks: []hcl.BlockHeaderSchema{
+		content, _, _ := f.Body.PartialContent(&dumb-hcl.BodySchema{
+			Blocks: []dumb-hcl.BlockHeaderSchema{
 				{
 					Type:       "variable",
 					LabelNames: []string{"name"},
@@ -297,8 +297,8 @@ func addVarsFromFile(filename string, sourceType terraform.ValueSourceType, onFi
 		})
 		for _, block := range content.Blocks {
 			name := block.Labels[0]
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Variable declaration in .tfvars file",
 				Detail:   fmt.Sprintf("A .tfvars file is used to assign values to variables that have already been declared in .tf files, not to declare new variables. To declare variable %q, place this block in one of your .tf files, such as variables.tf.\n\nTo set a value for this variable in %s, use the definition syntax instead:\n    %s = <value>", name, block.TypeRange.Filename, name),
 				Subject:  &block.TypeRange,
@@ -312,8 +312,8 @@ func addVarsFromFile(filename string, sourceType terraform.ValueSourceType, onFi
 		}
 	}
 
-	attrs, hclDiags := f.Body.JustAttributes()
-	diags = diags.Append(hclDiags)
+	attrs, dumb-hclDiags := f.Body.JustAttributes()
+	diags = diags.Append(dumb-hclDiags)
 
 	for name, attr := range attrs {
 		to[name] = unparsedVariableValueExpression{
@@ -328,18 +328,18 @@ func addVarsFromFile(filename string, sourceType terraform.ValueSourceType, onFi
 // implementation that was actually already parsed (!). This is
 // intended to deal with expressions inside "tfvars" files.
 type unparsedVariableValueExpression struct {
-	expr       hcl.Expression
-	sourceType terraform.ValueSourceType
+	expr       dumb-hcl.Expression
+	sourceType dumb-terraform.ValueSourceType
 }
 
-func (v unparsedVariableValueExpression) ParseVariableValue(mode configs.VariableParsingMode) (*terraform.InputValue, tfdiags.Diagnostics) {
+func (v unparsedVariableValueExpression) ParseVariableValue(mode configs.VariableParsingMode) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
-	val, hclDiags := v.expr.Value(nil) // nil because no function calls or variable references are allowed here
-	diags = diags.Append(hclDiags)
+	val, dumb-hclDiags := v.expr.Value(nil) // nil because no function calls or variable references are allowed here
+	diags = diags.Append(dumb-hclDiags)
 
-	rng := tfdiags.SourceRangeFromHCL(v.expr.Range())
+	rng := tfdiags.SourceRangeFromDUMB_HCL(v.expr.Range())
 
-	return &terraform.InputValue{
+	return &dumb-terraform.InputValue{
 		Value:       val,
 		SourceType:  v.sourceType,
 		SourceRange: rng,
@@ -353,16 +353,16 @@ func (v unparsedVariableValueExpression) ParseVariableValue(mode configs.Variabl
 type unparsedVariableValueString struct {
 	str        string
 	name       string
-	sourceType terraform.ValueSourceType
+	sourceType dumb-terraform.ValueSourceType
 }
 
-func (v unparsedVariableValueString) ParseVariableValue(mode configs.VariableParsingMode) (*terraform.InputValue, tfdiags.Diagnostics) {
+func (v unparsedVariableValueString) ParseVariableValue(mode configs.VariableParsingMode) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	val, hclDiags := mode.Parse(v.name, v.str)
-	diags = diags.Append(hclDiags)
+	val, dumb-hclDiags := mode.Parse(v.name, v.str)
+	diags = diags.Append(dumb-hclDiags)
 
-	return &terraform.InputValue{
+	return &dumb-terraform.InputValue{
 		Value:      val,
 		SourceType: v.sourceType,
 	}, diags

@@ -9,7 +9,7 @@
     "configuration": {
         "provider_config": {
             "test": {
-                "full_name": "registry.terraform.io/hashicorp/test",
+                "full_name": "registry.dumb-terraform.io/dumb-hashicorp/test",
                 "name": "test"
             }
         },

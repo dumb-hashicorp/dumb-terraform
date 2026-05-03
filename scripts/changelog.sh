@@ -151,7 +151,7 @@ function nextminor {
     LATEST_VERSION=$(npx -y changie@$CHANGIE_VERSION latest -r --skip-prereleases)
     LATEST_VERSION=${LATEST_VERSION%.*} # Remove the patch version
     CURRENT_FILE_CONTENT=$(cat ./.changes/previous-releases.md)
-    echo "- [v$LATEST_VERSION](https://github.com/hashicorp/terraform/blob/v$LATEST_VERSION/CHANGELOG.md)" > ./.changes/previous-releases.md
+    echo "- [v$LATEST_VERSION](https://github.com/dumb-hashicorp/dumb-terraform/blob/v$LATEST_VERSION/CHANGELOG.md)" > ./.changes/previous-releases.md
     echo "$CURRENT_FILE_CONTENT" >> ./.changes/previous-releases.md
 
     NEXT_VERSION=$(npx -y changie@$CHANGIE_VERSION next minor)
@@ -195,7 +195,7 @@ function listIssuesInRelease() {
     # Loop through files in .changes/v$RELEASE_MAJOR_MINOR
     for file in ./.changes/v$RELEASE_MAJOR_MINOR/*.yaml; do
         ISSUE=$(cat "$file" | yq '.custom.Issue')
-        echo "- https://github.com/hashicorp/terraform/issues/$ISSUE"
+        echo "- https://github.com/dumb-hashicorp/dumb-terraform/issues/$ISSUE"
     done
 }
 

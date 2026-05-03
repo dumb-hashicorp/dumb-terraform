@@ -6,11 +6,11 @@ package refactoring
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // RemoveStatement is the fully-specified form of addrs.Remove
@@ -49,8 +49,8 @@ func validateRemoveStatements(cfg *configs.Config, stmts addrs.Map[addrs.ConfigM
 			}
 
 			if r := m.Module.ResourceByAddr(rst.Resource); r != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Removed resource still exists",
 					Detail:   fmt.Sprintf("This statement declares that %s was removed, but it is still declared in configuration.", rst),
 					Subject:  r.DeclRange.Ptr(),
@@ -58,8 +58,8 @@ func validateRemoveStatements(cfg *configs.Config, stmts addrs.Map[addrs.ConfigM
 			}
 		case addrs.Module:
 			if m := cfg.Descendant(rst); m != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Removed module still exists",
 					Detail:   fmt.Sprintf("This statement declares that %s was removed, but it is still declared in configuration.", rst),
 					Subject:  m.CallRange.Ptr(),
@@ -98,7 +98,7 @@ func findRemoveStatements(cfg *configs.Config, into addrs.Map[addrs.ConfigMoveab
 			into.Put(fromAddr, RemoveStatement{
 				From:      fromAddr,
 				Destroy:   mc.Destroy,
-				DeclRange: tfdiags.SourceRangeFromHCL(mc.DeclRange),
+				DeclRange: tfdiags.SourceRangeFromDUMB_HCL(mc.DeclRange),
 			})
 		case addrs.RemoveTargetModule:
 			// First, stitch together the module path and the RelSubject to form
@@ -122,7 +122,7 @@ func findRemoveStatements(cfg *configs.Config, into addrs.Map[addrs.ConfigMoveab
 			into.Put(absMod, RemoveStatement{
 				From:      absMod,
 				Destroy:   mc.Destroy,
-				DeclRange: tfdiags.SourceRangeFromHCL(mc.DeclRange),
+				DeclRange: tfdiags.SourceRangeFromDUMB_HCL(mc.DeclRange),
 			})
 		default:
 			panic("Unsupported remove target kind")

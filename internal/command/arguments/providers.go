@@ -3,11 +3,11 @@
 
 package arguments
 
-import "github.com/hashicorp/terraform/internal/tfdiags"
+import "github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
 // Providers represents the command-line arguments for the providers command.
 type Providers struct {
-	// TestsDirectory is the directory containing Terraform test files.
+	// TestsDirectory is the directory containing Dumb Terraform test files.
 	TestsDirectory string
 
 	// Vars are the variable-related flags (-var, -var-file).

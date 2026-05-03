@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
     nonexist = {
-      source = "teamterraform/nonexist"
+      source = "teamdumb-terraform/nonexist"
     }
   }
 }

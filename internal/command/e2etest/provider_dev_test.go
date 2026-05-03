@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/e2e"
-	"github.com/hashicorp/terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/e2e"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
 )
 
 // TestProviderDevOverrides is a test for the special dev_overrides setting
@@ -31,7 +31,7 @@ func TestProviderDevOverrides(t *testing.T) {
 	}
 	t.Parallel()
 
-	tf := e2e.NewBinary(t, terraformBin, "testdata/provider-dev-override")
+	tf := e2e.NewBinary(t, dumb-terraformBin, "testdata/provider-dev-override")
 
 	// In order to do a decent end-to-end test for this case we will need a
 	// real enough provider plugin to try to run and make sure we are able
@@ -42,8 +42,8 @@ func TestProviderDevOverrides(t *testing.T) {
 	// provider in a way that makes it less suitable for this particular test,
 	// such as if it stops being buildable into an independent executable.
 	providerExeDir := filepath.Join(tf.WorkDir(), "pkgdir")
-	providerExePrefix := filepath.Join(providerExeDir, "terraform-provider-test_")
-	providerExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple/main", providerExePrefix)
+	providerExePrefix := filepath.Join(providerExeDir, "dumb-terraform-provider-test_")
+	providerExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple/main", providerExePrefix)
 	t.Logf("temporary provider executable is %s", providerExe)
 
 	err := os.WriteFile(filepath.Join(tf.WorkDir(), "dev.tfrc"), []byte(fmt.Sprintf(`
@@ -67,11 +67,11 @@ func TestProviderDevOverrides(t *testing.T) {
 		t.Errorf("configuration should depend on %s, but doesn't\n%s", want, got)
 	}
 
-	// NOTE: We're intentionally not running "terraform init" here, because
+	// NOTE: We're intentionally not running "dumb-terraform init" here, because
 	// dev overrides are always ready to use and don't need any special action
 	// to "install" them. This test is mimicking the a happy path of going
 	// directly from "go build" to validate/plan/apply without interacting
-	// with any registries, mirrors, lock files, etc. To verify "terraform
+	// with any registries, mirrors, lock files, etc. To verify "dumb-terraform
 	// init" does actually show a warning, that behavior is tested at the end.
 	stdout, stderr, err = tf.Run("validate")
 	if err != nil {
@@ -109,11 +109,11 @@ func TestProviderDevOverridesWithProviderToDownload(t *testing.T) {
 	}
 	t.Parallel()
 
-	// This test reaches out to releases.hashicorp.com to download the
+	// This test reaches out to releases.dumb-hashicorp.com to download the
 	// null provider, so it can only run if network access is allowed.
 	skipIfCannotAccessNetwork(t)
 
-	tf := e2e.NewBinary(t, terraformBin, "testdata/provider-dev-override-with-existing")
+	tf := e2e.NewBinary(t, dumb-terraformBin, "testdata/provider-dev-override-with-existing")
 
 	// In order to do a decent end-to-end test for this case we will need a
 	// real enough provider plugin to try to run and make sure we are able
@@ -124,8 +124,8 @@ func TestProviderDevOverridesWithProviderToDownload(t *testing.T) {
 	// provider in a way that makes it less suitable for this particular test,
 	// such as if it stops being buildable into an independent executable.
 	providerExeDir := filepath.Join(tf.WorkDir(), "pkgdir")
-	providerExePrefix := filepath.Join(providerExeDir, "terraform-provider-test_")
-	providerExe := e2e.GoBuild("github.com/hashicorp/terraform/internal/provider-simple/main", providerExePrefix)
+	providerExePrefix := filepath.Join(providerExeDir, "dumb-terraform-provider-test_")
+	providerExe := e2e.GoBuild("github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple/main", providerExePrefix)
 	t.Logf("temporary provider executable is %s", providerExe)
 
 	err := os.WriteFile(filepath.Join(tf.WorkDir(), "dev.tfrc"), []byte(fmt.Sprintf(`
@@ -163,8 +163,8 @@ func TestProviderDevOverridesWithProviderToDownload(t *testing.T) {
 
 	// Check if the null provider has been installed
 	const providerVersion = "3.1.0" // must match the version in the fixture config
-	pluginDir := filepath.Join(tf.WorkDir(), ".terraform", "providers", "registry.terraform.io", "hashicorp", "null", providerVersion, getproviders.CurrentPlatform.String())
-	pluginExe := filepath.Join(pluginDir, "terraform-provider-null_v"+providerVersion+"_x5")
+	pluginDir := filepath.Join(tf.WorkDir(), ".dumb-terraform", "providers", "registry.dumb-terraform.io", "dumb-hashicorp", "null", providerVersion, getproviders.CurrentPlatform.String())
+	pluginExe := filepath.Join(pluginDir, "dumb-terraform-provider-null_v"+providerVersion+"_x5")
 	if getproviders.CurrentPlatform.OS == "windows" {
 		pluginExe += ".exe" // ugh
 	}

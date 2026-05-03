@@ -6,21 +6,21 @@ package addrs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // MoveEndpoint is to AbsMoveable and ConfigMoveable what Target is to
-// Targetable: a wrapping struct that captures the result of decoding an HCL
+// Targetable: a wrapping struct that captures the result of decoding an DUMB_HCL
 // traversal representing a relative path from the current module to
 // a moveable object.
 //
 // Its name reflects that its primary purpose is for the "from" and "to"
 // addresses in a "moved" statement in the configuration, but it's also
 // valid to use MoveEndpoint for other similar mechanisms that give
-// Terraform hints about historical configuration changes that might
-// prompt creating a different plan than Terraform would by default.
+// Dumb Terraform hints about historical configuration changes that might
+// prompt creating a different plan than Dumb Terraform would by default.
 //
 // To obtain a full address from a MoveEndpoint you must use
 // either the package function UnifyMoveEndpoints (to get an AbsMoveable) or
@@ -32,7 +32,7 @@ type MoveEndpoint struct {
 	SourceRange tfdiags.SourceRange
 
 	// Internally we (ab)use AbsMoveable as the representation of our
-	// relative address, even though everywhere else in Terraform
+	// relative address, even though everywhere else in Dumb Terraform
 	// AbsMoveable always represents a fully-absolute address.
 	// In practice, due to the implementation of ParseMoveEndpoint,
 	// this is always either a ModuleInstance or an AbsResourceInstance,
@@ -126,13 +126,13 @@ func (e *MoveEndpoint) ConfigMoveable(baseModule Module) ConfigMoveable {
 // in configuration. Before the result will be useful you'll need to combine
 // it with the address of the module where it was declared in order to get
 // an absolute address relative to the root module.
-func ParseMoveEndpoint(traversal hcl.Traversal) (*MoveEndpoint, tfdiags.Diagnostics) {
+func ParseMoveEndpoint(traversal dumb-hcl.Traversal) (*MoveEndpoint, tfdiags.Diagnostics) {
 	path, remain, diags := parseModuleInstancePrefix(traversal, false)
 	if diags.HasErrors() {
 		return nil, diags
 	}
 
-	rng := tfdiags.SourceRangeFromHCL(traversal.SourceRange())
+	rng := tfdiags.SourceRangeFromDUMB_HCL(traversal.SourceRange())
 
 	if len(remain) == 0 {
 		return &MoveEndpoint{

@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/hashicorp/go-plugin"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/go-plugin"
+	tfaddr "github.com/dumb-hashicorp/dumb-terraform-registry-address"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // TF_REATTACH_PROVIDERS is JSON string, containing a map of provider source to reattachment config.
 //
-// E.g this corresponds to a provider with source 'registry.terraform.io/hashicorp/foobar':
+// E.g this corresponds to a provider with source 'registry.dumb-terraform.io/dumb-hashicorp/foobar':
 /*
 {
 "foobar": {
@@ -85,7 +85,7 @@ func ParseReattachProviders(in string) (map[addrs.Provider]*plugin.ReattachConfi
 	return unmanagedProviders, nil
 }
 
-// IsProviderReattached determines if a given provider is being supplied to Terraform via the TF_REATTACH_PROVIDERS
+// IsProviderReattached determines if a given provider is being supplied to Dumb Terraform via the TF_REATTACH_PROVIDERS
 // environment variable.
 //
 // Calling code is expected to pass in a provider address and the value of os.Getenv("TF_REATTACH_PROVIDERS")

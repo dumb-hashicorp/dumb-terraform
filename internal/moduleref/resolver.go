@@ -7,13 +7,13 @@ import (
 	"maps"
 	"strings"
 
-	"github.com/hashicorp/go-version"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/modsdir"
+	"github.com/dumb-hashicorp/go-version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/modsdir"
 )
 
 // Resolver is the struct responsible for finding all modules references in
-// Terraform configuration for a given internal module manifest.
+// Dumb Terraform configuration for a given internal module manifest.
 type Resolver struct {
 	manifest         *Manifest
 	internalManifest modsdir.Manifest
@@ -48,7 +48,7 @@ func (r *Resolver) Resolve(cfg *configs.Config) *Manifest {
 	return r.manifest
 }
 
-// findAndTrimReferencedEntries will traverse a given Terraform configuration
+// findAndTrimReferencedEntries will traverse a given Dumb Terraform configuration
 // and attempt find a caller for every entry in the internal module manifest.
 // If an entry is found, it will be removed from the internal manifest and
 // appended to the manifest that records this new information in a nested heirarchy.

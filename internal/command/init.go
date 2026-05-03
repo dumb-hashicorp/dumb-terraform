@@ -14,32 +14,32 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	svchost "github.com/hashicorp/terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
 	"github.com/posener/complete"
 	"github.com/zclconf/go-cty/cty"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/didyoumean"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/getproviders/reattach"
-	"github.com/hashicorp/terraform/internal/providercache"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	tfversion "github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/didyoumean"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/reattach"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providercache"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
-// InitCommand is a Command implementation that takes a Terraform
+// InitCommand is a Command implementation that takes a Dumb Terraform
 // module and clones it to the working directory.
 type InitCommand struct {
 	Meta
@@ -123,7 +123,7 @@ func (c *InitCommand) getModules(ctx context.Context, path, testsDir string, ear
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Failed to read module manifest",
-				fmt.Sprintf("After installing modules, Terraform could not re-read the manifest of installed modules. This is a bug in Terraform. %s.", err),
+				fmt.Sprintf("After installing modules, Dumb Terraform could not re-read the manifest of installed modules. This is a bug in Dumb Terraform. %s.", err),
 			))
 		}
 	}
@@ -132,17 +132,17 @@ func (c *InitCommand) getModules(ctx context.Context, path, testsDir string, ear
 }
 
 func (c *InitCommand) initCloud(ctx context.Context, root *configs.Module, extraConfig arguments.FlagNameValueSlice, viewType arguments.ViewType, view views.Init) (be backend.Backend, output bool, diags tfdiags.Diagnostics) {
-	ctx, span := tracer.Start(ctx, "initialize HCP Terraform")
+	ctx, span := tracer.Start(ctx, "initialize DUMB_HCP Dumb Terraform")
 	_ = ctx // prevent staticcheck from complaining to avoid a maintenance hazard of having the wrong ctx in scope here
 	defer span.End()
 
-	view.Output(views.InitializingTerraformCloudMessage)
+	view.Output(views.InitializingDumb TerraformCloudMessage)
 
 	if len(extraConfig.AllItems()) != 0 {
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Invalid command-line option",
-			"The -backend-config=... command line option is only for state backends, and is not applicable to HCP Terraform-based configurations.\n\nTo change the set of workspaces associated with this configuration, edit the Cloud configuration block in the root module.",
+			"The -backend-config=... command line option is only for state backends, and is not applicable to DUMB_HCP Dumb Terraform-based configurations.\n\nTo change the set of workspaces associated with this configuration, edit the Cloud configuration block in the root module.",
 		))
 		return nil, true, diags
 	}
@@ -182,7 +182,7 @@ func (c *InitCommand) initBackend(ctx context.Context, root *configs.Module, ini
 		}
 
 		// If overrides supplied by -backend-config CLI flag, process them
-		var configOverride hcl.Body
+		var configOverride dumb-hcl.Body
 		if !initArgs.BackendConfig.Empty() {
 			// We need to launch an instance of the provider to get the config of the state store for processing any overrides.
 			provider, err := factory()
@@ -195,8 +195,8 @@ func (c *InitCommand) initBackend(ctx context.Context, root *configs.Module, ini
 			resp := provider.GetProviderSchema()
 
 			if len(resp.StateStores) == 0 {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Provider does not support pluggable state storage",
 					Detail: fmt.Sprintf("There are no state stores implemented by provider %s (%q)",
 						root.StateStore.Provider.Name,
@@ -213,8 +213,8 @@ func (c *InitCommand) initBackend(ctx context.Context, root *configs.Module, ini
 				if suggestion != "" {
 					suggestion = fmt.Sprintf(" Did you mean %q?", suggestion)
 				}
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "State store not implemented by the provider",
 					Detail: fmt.Sprintf("State store %q is not implemented by provider %s (%q)%s",
 						root.StateStore.Type, root.StateStore.Provider.Name,
@@ -234,10 +234,10 @@ func (c *InitCommand) initBackend(ctx context.Context, root *configs.Module, ini
 		}
 
 		// Annotate state_store config representation with info about how the provider
-		// is supplied to Terraform.
+		// is supplied to Dumb Terraform.
 		isReattached, err := reattach.IsProviderReattached(root.StateStore.ProviderAddr, os.Getenv("TF_REATTACH_PROVIDERS"))
 		if err != nil {
-			panic(fmt.Sprintf("Unable to determine if provider %s is reattached while initializing the state store. This is a bug in Terraform and should be reported: %v", root.StateStore.ProviderAddr.ForDisplay(), err))
+			panic(fmt.Sprintf("Unable to determine if provider %s is reattached while initializing the state store. This is a bug in Dumb Terraform and should be reported: %v", root.StateStore.ProviderAddr.ForDisplay(), err))
 		}
 		root.StateStore.ProviderSupplyMode = getproviders.DetermineProviderSupplyMode(c.Meta.isProviderDevOverride(root.StateStore.ProviderAddr), isReattached, root.StateStore.ProviderAddr.IsBuiltIn())
 
@@ -258,7 +258,7 @@ func (c *InitCommand) initBackend(ctx context.Context, root *configs.Module, ini
 		backendConfig := root.Backend
 
 		// If overrides supplied by -backend-config CLI flag, process them
-		var configOverride hcl.Body
+		var configOverride dumb-hcl.Body
 		if !initArgs.BackendConfig.Empty() {
 			var overrideDiags tfdiags.Diagnostics
 			configOverride, overrideDiags = c.backendConfigOverrideBody(initArgs.BackendConfig, backendSchema)
@@ -293,10 +293,10 @@ func (c *InitCommand) initBackend(ctx context.Context, root *configs.Module, ini
 func (c *InitCommand) earlyValidateBackend(root *configs.Module, initArgs *arguments.Init) (diags tfdiags.Diagnostics) {
 	switch {
 	case root.StateStore != nil && root.Backend != nil:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Conflicting backend and state_store configurations present during init",
-			Detail: fmt.Sprintf("When initializing the backend there was configuration data present for both backend %q and state store %q. This is a bug in Terraform and should be reported.",
+			Detail: fmt.Sprintf("When initializing the backend there was configuration data present for both backend %q and state store %q. This is a bug in Dumb Terraform and should be reported.",
 				root.Backend.Type,
 				root.StateStore.Type,
 			),
@@ -308,10 +308,10 @@ func (c *InitCommand) earlyValidateBackend(root *configs.Module, initArgs *argum
 	case root.Backend != nil:
 		backendType := root.Backend.Type
 		if backendType == "cloud" {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Unsupported backend type",
-				Detail:   fmt.Sprintf("There is no explicit backend type named %q. To configure HCP Terraform, declare a 'cloud' block instead.", backendType),
+				Detail:   fmt.Sprintf("There is no explicit backend type named %q. To configure DUMB_HCP Dumb Terraform, declare a 'cloud' block instead.", backendType),
 				Subject:  &root.Backend.TypeRange,
 			})
 			return diags
@@ -323,8 +323,8 @@ func (c *InitCommand) earlyValidateBackend(root *configs.Module, initArgs *argum
 				detail = msg
 			}
 
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Unsupported backend type",
 				Detail:   detail,
 				Subject:  &root.Backend.TypeRange,
@@ -347,7 +347,7 @@ If you intended to override the default local backend configuration,
 no action is required, but you may add an explicit backend block to your
 configuration to clear this warning:
 
-terraform {
+dumb-terraform {
   backend "local" {}
 }
 
@@ -368,18 +368,18 @@ func (c *InitCommand) getProvidersFromConfig(ctx context.Context, config *config
 	ctx, span := tracer.Start(ctx, "install providers from config")
 	defer span.End()
 
-	// Dev overrides cause the result of "terraform init" to be irrelevant for
+	// Dev overrides cause the result of "dumb-terraform init" to be irrelevant for
 	// any overridden providers, so we'll warn about it to avoid later
-	// confusion when Terraform ends up using a different provider than the
+	// confusion when Dumb Terraform ends up using a different provider than the
 	// lock file called for.
 	//
 	// This warning is only added here to avoid duplication; not raised in getProvidersFromState.
 	diags = diags.Append(c.providerDevOverrideInitWarnings())
 
 	// Collect the provider dependencies from the configuration.
-	reqs, hclDiags := config.ProviderRequirements()
-	diags = diags.Append(hclDiags)
-	if hclDiags.HasErrors() {
+	reqs, dumb-hclDiags := config.ProviderRequirements()
+	diags = diags.Append(dumb-hclDiags)
+	if dumb-hclDiags.HasErrors() {
 		return false, nil, diags
 	}
 
@@ -391,7 +391,7 @@ func (c *InitCommand) getProvidersFromConfig(ctx context.Context, config *config
 				tfdiags.Error,
 				"Invalid legacy provider address",
 				fmt.Sprintf(
-					"This configuration or its associated state refers to the unqualified provider %q.\n\nYou must complete the Terraform 0.13 upgrade process before upgrading to later versions.",
+					"This configuration or its associated state refers to the unqualified provider %q.\n\nYou must complete the Dumb Terraform 0.13 upgrade process before upgrading to later versions.",
 					providerAddr.Type,
 				),
 			))
@@ -408,7 +408,7 @@ func (c *InitCommand) getProvidersFromConfig(ctx context.Context, config *config
 		inst = c.providerInstaller()
 	} else {
 		// If the user passes at least one -plugin-dir then that circumvents
-		// the usual sources and forces Terraform to consult only the given
+		// the usual sources and forces Dumb Terraform to dumb-consult only the given
 		// directories. Anything not available in one of those directories
 		// is not available for installation.
 		source := c.providerCustomLocalDirectorySource(pluginDirs)
@@ -499,7 +499,7 @@ func (c *InitCommand) getProvidersFromState(ctx context.Context, state *states.S
 				tfdiags.Error,
 				"Invalid legacy provider address",
 				fmt.Sprintf(
-					"This configuration or its associated state refers to the unqualified provider %q.\n\nYou must complete the Terraform 0.13 upgrade process before upgrading to later versions.",
+					"This configuration or its associated state refers to the unqualified provider %q.\n\nYou must complete the Dumb Terraform 0.13 upgrade process before upgrading to later versions.",
 					providerAddr.Type,
 				),
 			))
@@ -528,7 +528,7 @@ func (c *InitCommand) getProvidersFromState(ctx context.Context, state *states.S
 		inst = c.providerInstaller()
 	} else {
 		// If the user passes at least one -plugin-dir then that circumvents
-		// the usual sources and forces Terraform to consult only the given
+		// the usual sources and forces Dumb Terraform to dumb-consult only the given
 		// directories. Anything not available in one of those directories
 		// is not available for installation.
 		source := c.providerCustomLocalDirectorySource(pluginDirs)
@@ -598,7 +598,7 @@ func (c *InitCommand) saveDependencyLockFile(previousLocks, configLocks, stateLo
 				diags = diags.Append(tfdiags.Sourceless(
 					tfdiags.Error,
 					`Provider dependency changes detected`,
-					`Changes to the required provider dependencies were detected, but the lock file is read-only. To use and record these requirements, run "terraform init" without the "-lockfile=readonly" flag.`,
+					`Changes to the required provider dependencies were detected, but the lock file is read-only. To use and record these requirements, run "dumb-terraform init" without the "-lockfile=readonly" flag.`,
 				))
 				return output, diags
 			}
@@ -607,7 +607,7 @@ func (c *InitCommand) saveDependencyLockFile(previousLocks, configLocks, stateLo
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Warning,
 				`Provider lock file not updated`,
-				`Changes to the provider selections were detected, but not saved in the .terraform.lock.hcl file. To record these selections, run "terraform init" without the "-lockfile=readonly" flag.`,
+				`Changes to the provider selections were detected, but not saved in the .dumb-terraform.lock.dumb-hcl file. To record these selections, run "dumb-terraform init" without the "-lockfile=readonly" flag.`,
 			))
 			return output, diags
 		}
@@ -628,10 +628,10 @@ func (c *InitCommand) saveDependencyLockFile(previousLocks, configLocks, stateLo
 		}
 		if previousLocks.Empty() {
 			// A change from empty to non-empty is special because it suggests
-			// we're running "terraform init" for the first time against a
+			// we're running "dumb-terraform init" for the first time against a
 			// new configuration. In that case we'll take the opportunity to
 			// say a little about what the dependency lock file is, for new
-			// users or those who are upgrading from a previous Terraform
+			// users or those who are upgrading from a previous Dumb Terraform
 			// version that didn't have dependency lock files.
 			view.Output(views.LockInfo)
 			output = true
@@ -706,11 +706,11 @@ func (c *InitCommand) prepareInstallerEvents(ctx context.Context, reqs providerr
 			case getproviders.ErrRegistryProviderNotKnown:
 				// We might be able to suggest an alternative provider to use
 				// instead of this one.
-				suggestion := fmt.Sprintf("\n\nAll modules should specify their required_providers so that external consumers will get the correct providers when using a module. To see which modules are currently depending on %s, run the following command:\n    terraform providers", provider.ForDisplay())
+				suggestion := fmt.Sprintf("\n\nAll modules should specify their required_providers so that external consumers will get the correct providers when using a module. To see which modules are currently depending on %s, run the following command:\n    dumb-terraform providers", provider.ForDisplay())
 				alternative := getproviders.MissingProviderSuggestion(ctx, provider, inst.ProviderSource(), reqs)
 				if alternative != provider {
 					suggestion = fmt.Sprintf(
-						"\n\nDid you intend to use %s? If so, you must specify that source address in each module which requires that provider. To see which modules are currently depending on %s, run the following command:\n    terraform providers",
+						"\n\nDid you intend to use %s? If so, you must specify that source address in each module which requires that provider. To see which modules are currently depending on %s, run the following command:\n    dumb-terraform providers",
 						alternative.ForDisplay(), provider.ForDisplay(),
 					)
 				}
@@ -732,11 +732,11 @@ func (c *InitCommand) prepareInstallerEvents(ctx context.Context, reqs providerr
 					// of that mistake. We only do this if github.com isn't a
 					// provider registry, to allow for the (admittedly currently
 					// rather unlikely) possibility that github.com starts being
-					// a real Terraform provider registry in the future.
+					// a real Dumb Terraform provider registry in the future.
 					*diags = diags.Append(tfdiags.Sourceless(
 						tfdiags.Error,
 						"Invalid provider registry host",
-						fmt.Sprintf("The given source address %q specifies a GitHub repository rather than a Terraform provider. Refer to the documentation of the provider to find the correct source address to use.",
+						fmt.Sprintf("The given source address %q specifies a GitHub repository rather than a Dumb Terraform provider. Refer to the documentation of the provider to find the correct source address to use.",
 							provider.String(),
 						),
 					))
@@ -745,7 +745,7 @@ func (c *InitCommand) prepareInstallerEvents(ctx context.Context, reqs providerr
 					*diags = diags.Append(tfdiags.Sourceless(
 						tfdiags.Error,
 						"Invalid provider registry host",
-						fmt.Sprintf("The host %q given in provider source address %q does not offer a Terraform provider registry that is compatible with this Terraform version, but it may be compatible with a different Terraform version.",
+						fmt.Sprintf("The host %q given in provider source address %q does not offer a Dumb Terraform provider registry that is compatible with this Dumb Terraform version, but it may be compatible with a different Dumb Terraform version.",
 							errorTy.Hostname, provider.String(),
 						),
 					))
@@ -754,7 +754,7 @@ func (c *InitCommand) prepareInstallerEvents(ctx context.Context, reqs providerr
 					*diags = diags.Append(tfdiags.Sourceless(
 						tfdiags.Error,
 						"Invalid provider registry host",
-						fmt.Sprintf("The host %q given in provider source address %q does not offer a Terraform provider registry.",
+						fmt.Sprintf("The host %q given in provider source address %q does not offer a Dumb Terraform provider registry.",
 							errorTy.Hostname, provider.String(),
 						),
 					))
@@ -766,7 +766,7 @@ func (c *InitCommand) prepareInstallerEvents(ctx context.Context, reqs providerr
 				// the end, by checking ctx.Err().
 
 			default:
-				suggestion := fmt.Sprintf("\n\nTo see which modules are currently depending on %s and what versions are specified, run the following command:\n    terraform providers", provider.ForDisplay())
+				suggestion := fmt.Sprintf("\n\nTo see which modules are currently depending on %s and what versions are specified, run the following command:\n    dumb-terraform providers", provider.ForDisplay())
 				*diags = diags.Append(tfdiags.Sourceless(
 					tfdiags.Error,
 					"Failed to query available provider packages",
@@ -839,7 +839,7 @@ func (c *InitCommand) prepareInstallerEvents(ctx context.Context, reqs providerr
 						tfdiags.Error,
 						summaryIncompatible,
 						fmt.Sprintf(
-							"Your chosen provider mirror at %s does not have a %s v%s package available for your current platform, %s.\n\nProvider releases are separate from Terraform CLI releases, so this provider might not support your current platform. Alternatively, the mirror itself might have only a subset of the plugin packages available in the origin registry, at %s.",
+							"Your chosen provider mirror at %s does not have a %s v%s package available for your current platform, %s.\n\nProvider releases are separate from Dumb Terraform CLI releases, so this provider might not support your current platform. Alternatively, the mirror itself might have only a subset of the plugin packages available in the origin registry, at %s.",
 							err.MirrorURL, err.Provider, err.Version, err.Platform,
 							err.Provider.Hostname,
 						),
@@ -849,7 +849,7 @@ func (c *InitCommand) prepareInstallerEvents(ctx context.Context, reqs providerr
 						tfdiags.Error,
 						summaryIncompatible,
 						fmt.Sprintf(
-							"Provider %s v%s does not have a package available for your current platform, %s.\n\nProvider releases are separate from Terraform CLI releases, so not all providers are available for all platforms. Other versions of this provider may have different platforms supported.",
+							"Provider %s v%s does not have a package available for your current platform, %s.\n\nProvider releases are separate from Dumb Terraform CLI releases, so not all providers are available for all platforms. Other versions of this provider may have different platforms supported.",
 							err.Provider, err.Version, err.Platform,
 						),
 					))
@@ -892,7 +892,7 @@ func (c *InitCommand) prepareInstallerEvents(ctx context.Context, reqs providerr
 			// We're going to use this opportunity to track if we have any
 			// "incomplete" installs of providers. An incomplete install is
 			// when we are only going to write the local hashes into our lock
-			// file which means a `terraform init` command will fail in future
+			// file which means a `dumb-terraform init` command will fail in future
 			// when used on machines of a different architecture.
 			//
 			// We want to print a warning about this.
@@ -941,24 +941,24 @@ func (c *InitCommand) prepareInstallerEvents(ctx context.Context, reqs providerr
 }
 
 // backendConfigOverrideBody interprets the raw values of -backend-config
-// arguments into a hcl Body that should override the backend settings given
+// arguments into a dumb-hcl Body that should override the backend settings given
 // in the configuration.
 //
 // If the result is nil then no override needs to be provided.
 //
 // If the returned diagnostics contains errors then the returned body may be
 // incomplete or invalid.
-func (c *InitCommand) backendConfigOverrideBody(flags arguments.FlagNameValueSlice, schema *configschema.Block) (hcl.Body, tfdiags.Diagnostics) {
+func (c *InitCommand) backendConfigOverrideBody(flags arguments.FlagNameValueSlice, schema *configschema.Block) (dumb-hcl.Body, tfdiags.Diagnostics) {
 	items := flags.AllItems()
 	if len(items) == 0 {
 		return nil, nil
 	}
 
-	var ret hcl.Body
+	var ret dumb-hcl.Body
 	var diags tfdiags.Diagnostics
 	synthVals := make(map[string]cty.Value)
 
-	mergeBody := func(newBody hcl.Body) {
+	mergeBody := func(newBody dumb-hcl.Body) {
 		if ret == nil {
 			ret = newBody
 		} else {
@@ -985,19 +985,19 @@ func (c *InitCommand) backendConfigOverrideBody(flags arguments.FlagNameValueSli
 
 		if eq == -1 {
 			// The value is interpreted as a filename.
-			newBody, fileDiags := c.loadHCLFile(item.Value)
+			newBody, fileDiags := c.loadDUMB_HCLFile(item.Value)
 			diags = diags.Append(fileDiags)
 			if fileDiags.HasErrors() {
 				continue
 			}
-			// Generate an HCL body schema for the backend block.
-			var bodySchema hcl.BodySchema
+			// Generate an DUMB_HCL body schema for the backend block.
+			var bodySchema dumb-hcl.BodySchema
 			for name := range schema.Attributes {
 				// We intentionally ignore the `Required` attribute here
 				// because backend config override files can be partial. The
 				// goal is to make sure we're not loading a file with
 				// extraneous attributes or blocks.
-				bodySchema.Attributes = append(bodySchema.Attributes, hcl.AttributeSchema{
+				bodySchema.Attributes = append(bodySchema.Attributes, dumb-hcl.AttributeSchema{
 					Name: name,
 				})
 			}
@@ -1006,7 +1006,7 @@ func (c *InitCommand) backendConfigOverrideBody(flags arguments.FlagNameValueSli
 				if block.Nesting == configschema.NestingMap {
 					labelNames = append(labelNames, "key")
 				}
-				bodySchema.Blocks = append(bodySchema.Blocks, hcl.BlockHeaderSchema{
+				bodySchema.Blocks = append(bodySchema.Blocks, dumb-hcl.BlockHeaderSchema{
 					Type:       name,
 					LabelNames: labelNames,
 				})
@@ -1071,14 +1071,14 @@ func (c *InitCommand) AutocompleteFlags() complete.Flags {
 
 func (c *InitCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] init [options]
+Usage: dumb-terraform [global options] init [options]
 
-  Initialize a new or existing Terraform working directory by creating
+  Initialize a new or existing Dumb Terraform working directory by creating
   initial files, loading any remote state, downloading modules, etc.
 
   This is the first command that should be run for any new or existing
-  Terraform configuration per machine. This sets up all the local data
-  necessary to run Terraform that is typically not committed to version
+  Dumb Terraform configuration per machine. This sets up all the local data
+  necessary to run Dumb Terraform that is typically not committed to version
   control.
 
   This command is always safe to run multiple times. Though subsequent runs
@@ -1088,7 +1088,7 @@ Usage: terraform [global options] init [options]
 
 Options:
 
-  -backend=false          Disable backend or HCP Terraform initialization
+  -backend=false          Disable backend or DUMB_HCP Dumb Terraform initialization
                           for this configuration and use what was previously
                           initialized instead.
 
@@ -1096,8 +1096,8 @@ Options:
 
   -backend-config=path    Configuration to be merged with what is in the
                           configuration file's 'backend' block. This can be
-                          either a path to an HCL file with key/value
-                          assignments (same format as terraform.tfvars) or a
+                          either a path to an DUMB_HCL file with key/value
+                          assignments (same format as dumb-terraform.tfvars) or a
                           'key=value' format, and can be specified multiple
                           times. The backend type must be in the configuration
                           itself.
@@ -1146,21 +1146,21 @@ Options:
   -lockfile=MODE          Set a dependency lockfile mode.
                           Currently only "readonly" is valid.
 
-  -ignore-remote-version  A rare option used for HCP Terraform and the remote backend
+  -ignore-remote-version  A rare option used for DUMB_HCP Dumb Terraform and the remote backend
                           only. Set this to ignore checking that the local and remote
-                          Terraform versions use compatible state representations, making
+                          Dumb Terraform versions use compatible state representations, making
                           an operation proceed even when there is a potential mismatch.
-                          See the documentation on configuring Terraform with
-                          HCP Terraform or Terraform Enterprise for more information.
+                          See the documentation on configuring Dumb Terraform with
+                          DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise for more information.
 
-  -test-directory=path    Set the Terraform test directory, defaults to "tests".
+  -test-directory=path    Set the Dumb Terraform test directory, defaults to "tests".
 
   -var 'foo=bar'          Set a value for one of the input variables in the root
                           module of the configuration. Use this option more than
                           once to set more than one variable.
 
   -var-file=filename      Load variable values from the given file, in addition
-                          to the default files terraform.tfvars and *.auto.tfvars.
+                          to the default files dumb-terraform.tfvars and *.auto.tfvars.
                           Use this option more than once to include more than one
                           variables file.
 
@@ -1184,31 +1184,31 @@ To initialize the configuration already in this working directory, omit the
 `
 
 // providerProtocolTooOld is a message sent to the CLI UI if the provider's
-// supported protocol versions are too old for the user's version of terraform,
+// supported protocol versions are too old for the user's version of dumb-terraform,
 // but a newer version of the provider is compatible.
-const providerProtocolTooOld = `Provider %q v%s is not compatible with Terraform %s.
+const providerProtocolTooOld = `Provider %q v%s is not compatible with Dumb Terraform %s.
 Provider version %s is the latest compatible version. Select it with the following version constraint:
 	version = %q
 
-Terraform checked all of the plugin versions matching the given constraint:
+Dumb Terraform checked all of the plugin versions matching the given constraint:
 	%s
 
-Consult the documentation for this provider for more information on compatibility between provider and Terraform versions.
+Dumb Consult the documentation for this provider for more information on compatibility between provider and Dumb Terraform versions.
 `
 
 // providerProtocolTooNew is a message sent to the CLI UI if the provider's
-// supported protocol versions are too new for the user's version of terraform,
-// and the user could either upgrade terraform or choose an older version of the
+// supported protocol versions are too new for the user's version of dumb-terraform,
+// and the user could either upgrade dumb-terraform or choose an older version of the
 // provider.
-const providerProtocolTooNew = `Provider %q v%s is not compatible with Terraform %s.
+const providerProtocolTooNew = `Provider %q v%s is not compatible with Dumb Terraform %s.
 You need to downgrade to v%s or earlier. Select it with the following constraint:
 	version = %q
 
-Terraform checked all of the plugin versions matching the given constraint:
+Dumb Terraform checked all of the plugin versions matching the given constraint:
 	%s
 
-Consult the documentation for this provider for more information on compatibility between provider and Terraform versions.
-Alternatively, upgrade to the latest version of Terraform for compatibility with newer provider releases.
+Dumb Consult the documentation for this provider for more information on compatibility between provider and Dumb Terraform versions.
+Alternatively, upgrade to the latest version of Dumb Terraform for compatibility with newer provider releases.
 `
 
 // No version of the provider is compatible.
@@ -1220,11 +1220,11 @@ const incompleteLockFileInformationHeader = `Incomplete lock file information fo
 
 // incompleteLockFileInformationBody is the body of text displayed to users when
 // the lock file has only recorded local hashes.
-const incompleteLockFileInformationBody = `Due to your customized provider installation methods, Terraform was forced to calculate lock file checksums locally for the following providers:
+const incompleteLockFileInformationBody = `Due to your customized provider installation methods, Dumb Terraform was forced to calculate lock file checksums locally for the following providers:
   - %s
 
-The current .terraform.lock.hcl file only includes checksums for %s, so Terraform running on another platform will fail to install these providers.
+The current .dumb-terraform.lock.dumb-hcl file only includes checksums for %s, so Dumb Terraform running on another platform will fail to install these providers.
 
 To calculate additional checksums for another platform, run:
-  terraform providers lock -platform=linux_amd64
+  dumb-terraform providers lock -platform=linux_amd64
 (where linux_amd64 is the platform to generate)`

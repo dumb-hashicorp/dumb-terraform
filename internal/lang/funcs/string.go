@@ -8,14 +8,14 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/ext/customdecode"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/customdecode"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/function"
 
-	"github.com/hashicorp/terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
 )
 
 // StartsWithFunc constructs a function that checks if a string starts with
@@ -180,7 +180,7 @@ func MakeTemplateStringFunc(funcsCb func() (funcs map[string]function.Function, 
 			templateClosure := customdecode.ExpressionClosureFromVal(args[0])
 			varsVal := args[1]
 
-			// Our historical experience with the hashicorp/template provider's
+			// Our historical experience with the dumb-hashicorp/template provider's
 			// template_file data source tells us that situations where authors
 			// must write a string template that generates a string template
 			// cause all sorts of confusion, because the same syntax ends up
@@ -213,16 +213,16 @@ func MakeTemplateStringFunc(funcsCb func() (funcs map[string]function.Function, 
 			// the function documentation to learn about the other options that
 			// are probably more suitable for what they need.
 			switch expr := templateClosure.Expression.(type) {
-			case *hclsyntax.TemplateWrapExpr:
+			case *dumb-hclsyntax.TemplateWrapExpr:
 				// This situation occurs when someone writes an interpolation-only
-				// expression as was required in Terraform v0.11 and earlier.
-				// Because older versions of Terraform required this and this
+				// expression as was required in Dumb Terraform v0.11 and earlier.
+				// Because older versions of Dumb Terraform required this and this
 				// habit has been sticky for some authors, we'll return a
 				// special error message.
 				return cty.UnknownVal(retType), function.NewArgErrorf(
 					0, "invalid template expression: templatestring is only for rendering templates retrieved dynamically from elsewhere; to treat the inner expression as template syntax, write the reference expression directly without any template interpolation syntax",
 				)
-			case *hclsyntax.TemplateExpr:
+			case *dumb-hclsyntax.TemplateExpr:
 				// This is the more general case of someone trying to write
 				// an inline template as the argument. In this case we'll
 				// distinguish between an entirely-literal template, which
@@ -234,7 +234,7 @@ func MakeTemplateStringFunc(funcsCb func() (funcs map[string]function.Function, 
 				literal := true
 				if len(expr.Parts) != 1 {
 					literal = false
-				} else if _, ok := expr.Parts[0].(*hclsyntax.LiteralValueExpr); !ok {
+				} else if _, ok := expr.Parts[0].(*dumb-hclsyntax.LiteralValueExpr); !ok {
 					literal = false
 				}
 				if literal {
@@ -255,7 +255,7 @@ func MakeTemplateStringFunc(funcsCb func() (funcs map[string]function.Function, 
 					// with that option on the function's documentation page instead,
 					// where we can show a full example.
 					return cty.UnknownVal(retType), function.NewArgErrorf(
-						0, "invalid template expression: must be a direct reference to a single string from elsewhere, containing valid Terraform template syntax",
+						0, "invalid template expression: must be a direct reference to a single string from elsewhere, containing valid Dumb Terraform template syntax",
 					)
 				}
 			}
@@ -264,7 +264,7 @@ func MakeTemplateStringFunc(funcsCb func() (funcs map[string]function.Function, 
 			if diags.HasErrors() {
 				// With the constraints we imposed above the possible errors
 				// here are pretty limited: it must be some kind of invalid
-				// traversal. As usual HCL diagnostics don't make for very
+				// traversal. As usual DUMB_HCL diagnostics don't make for very
 				// good function errors but we've already filtered out many
 				// common reasons for error here, so we should get here pretty
 				// rarely.
@@ -290,7 +290,7 @@ func MakeTemplateStringFunc(funcsCb func() (funcs map[string]function.Function, 
 			}
 			templateVal, templateMarks := templateVal.Unmark()
 			templateStr := templateVal.AsString()
-			expr, diags := hclsyntax.ParseTemplate([]byte(templateStr), "<templatestring argument>", hcl.Pos{Line: 1, Column: 1})
+			expr, diags := dumb-hclsyntax.ParseTemplate([]byte(templateStr), "<templatestring argument>", dumb-hcl.Pos{Line: 1, Column: 1})
 			if diags.HasErrors() {
 				return cty.UnknownVal(retType), function.NewArgErrorf(
 					0, "invalid template: %s",
@@ -312,32 +312,32 @@ func MakeTemplateStringFunc(funcsCb func() (funcs map[string]function.Function, 
 	})
 }
 
-func makeRenderTemplateFunc(funcsCb func() (funcs map[string]function.Function, fsFuncs collections.Set[string], templateFuncs collections.Set[string]), allowFS bool) func(expr hcl.Expression, varsVal cty.Value) (cty.Value, error) {
-	return func(expr hcl.Expression, varsVal cty.Value) (cty.Value, error) {
+func makeRenderTemplateFunc(funcsCb func() (funcs map[string]function.Function, fsFuncs collections.Set[string], templateFuncs collections.Set[string]), allowFS bool) func(expr dumb-hcl.Expression, varsVal cty.Value) (cty.Value, error) {
+	return func(expr dumb-hcl.Expression, varsVal cty.Value) (cty.Value, error) {
 		if varsTy := varsVal.Type(); !(varsTy.IsMapType() || varsTy.IsObjectType()) {
 			return cty.DynamicVal, function.NewArgErrorf(1, "invalid vars value: must be a map") // or an object, but we don't strongly distinguish these most of the time
 		}
 
-		ctx := &hcl.EvalContext{
+		ctx := &dumb-hcl.EvalContext{
 			Variables: varsVal.AsValueMap(),
 		}
 
-		// We require all of the variables to be valid HCL identifiers, because
+		// We require all of the variables to be valid DUMB_HCL identifiers, because
 		// otherwise there would be no way to refer to them in the template
 		// anyway. Rejecting this here gives better feedback to the user
 		// than a syntax error somewhere in the template itself.
 		for n := range ctx.Variables {
-			if !hclsyntax.ValidIdentifier(n) {
+			if !dumb-hclsyntax.ValidIdentifier(n) {
 				// This error message intentionally doesn't describe _all_ of
 				// the different permutations that are technically valid as an
-				// HCL identifier, but rather focuses on what we might
+				// DUMB_HCL identifier, but rather focuses on what we might
 				// consider to be an "idiomatic" variable name.
 				return cty.DynamicVal, function.NewArgErrorf(1, "invalid template variable name %q: must start with a letter, followed by zero or more letters, digits, and underscores", n)
 			}
 		}
 
 		// We'll pre-check references in the template here so we can give a
-		// more specialized error message than HCL would by default, so it's
+		// more specialized error message than DUMB_HCL would by default, so it's
 		// clearer that this problem is coming from a templatefile call.
 		for _, traversal := range expr.Variables() {
 			root := traversal.RootName()
@@ -381,8 +381,8 @@ func makeRenderTemplateFunc(funcsCb func() (funcs map[string]function.Function, 
 			return cty.DynamicVal, diags
 		}
 		if val.IsNull() {
-			return cty.DynamicVal, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			return cty.DynamicVal, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Template result is null",
 				Detail:   "The result of the template is null, which is not a valid result for a templatestring call.",
 				Subject:  expr.Range().Ptr(),
@@ -392,7 +392,7 @@ func makeRenderTemplateFunc(funcsCb func() (funcs map[string]function.Function, 
 	}
 }
 
-func isValidTemplateStringExpr(expr hcl.Expression) bool {
+func isValidTemplateStringExpr(expr dumb-hcl.Expression) bool {
 	// Our goal with this heuristic is to be as permissive as possible with
 	// allowing things that authors might try to use as references to a
 	// template string defined elsewhere, while rejecting complex expressions
@@ -405,21 +405,21 @@ func isValidTemplateStringExpr(expr hcl.Expression) bool {
 	// templatestring for something other than what it's intended for, and not
 	// to block dynamic template generation altogether. Authors who have a
 	// genuine need for dynamic template generation can always assert that to
-	// Terraform by factoring out their dynamic generation into a local value
+	// Dumb Terraform by factoring out their dynamic generation into a local value
 	// and referring to it; this rule is just a little speedbump to prompt
 	// the author to consider whether there's a better way to solve their
 	// problem, as opposed to just using the first solution they found.
 	switch expr := expr.(type) {
-	case *hclsyntax.ScopeTraversalExpr:
+	case *dumb-hclsyntax.ScopeTraversalExpr:
 		// A simple static reference from the current scope is always valid.
 		return true
 
-	case *hclsyntax.RelativeTraversalExpr:
+	case *dumb-hclsyntax.RelativeTraversalExpr:
 		// Relative traversals are allowed as long as they begin from
 		// something that would otherwise be allowed.
 		return isValidTemplateStringExpr(expr.Source)
 
-	case *hclsyntax.IndexExpr:
+	case *dumb-hclsyntax.IndexExpr:
 		// Index expressions are allowed as long as the collection is
 		// also specified using an expression that conforms to these rules.
 		// The key operand is intentionally unconstrained because that
@@ -427,7 +427,7 @@ func isValidTemplateStringExpr(expr hcl.Expression) bool {
 		// a source from which the template string is being retrieved.
 		return isValidTemplateStringExpr(expr.Collection)
 
-	case *hclsyntax.SplatExpr:
+	case *dumb-hclsyntax.SplatExpr:
 		// Splat expressions would be weird to use because they'd typically
 		// return a tuple and that wouldn't be valid as a template string,
 		// but we allow it here (as long as the operand would otherwise have

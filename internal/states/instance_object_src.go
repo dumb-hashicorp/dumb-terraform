@@ -11,10 +11,10 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
 )
 
 // ResourceInstanceObjectSrc is a not-fully-decoded version of
@@ -30,7 +30,7 @@ type ResourceInstanceObjectSrc struct {
 
 	// AttrsJSON is a JSON-encoded representation of the object attributes,
 	// encoding the value (of the object type implied by the associated resource
-	// type schema) that represents this remote object in Terraform Language
+	// type schema) that represents this remote object in Dumb Terraform Language
 	// expressions, and is compared with configuration when producing a diff.
 	//
 	// This is retained in JSON format here because it may require preprocessing
@@ -103,7 +103,7 @@ func (os *ResourceInstanceObjectSrc) Decode(schema providers.Schema) (*ResourceI
 
 	case os.AttrsFlat != nil:
 		// Legacy mode. We'll do our best to unpick this from the flatmap.
-		val, err = hcl2shim.HCL2ValueFromFlatmap(os.AttrsFlat, attrsTy)
+		val, err = dumb-hcl2shim.DUMB_HCL2ValueFromFlatmap(os.AttrsFlat, attrsTy)
 		if err != nil {
 			return nil, err
 		}

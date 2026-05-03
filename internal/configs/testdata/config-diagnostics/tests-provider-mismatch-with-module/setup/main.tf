@@ -1,11 +1,11 @@
-terraform {
+dumb-terraform {
     required_providers {
         foo = {
-            source = "hashicorp/bar"
+            source = "dumb-hashicorp/bar"
             configuration_aliases = [ foo.bar ]
         }
         bar = {
-            source = "hashicorp/foo"
+            source = "dumb-hashicorp/foo"
         }
     }
 }

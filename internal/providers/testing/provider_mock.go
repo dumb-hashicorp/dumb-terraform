@@ -9,13 +9,13 @@ import (
 	"slices"
 	"sync"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 	"github.com/zclconf/go-cty/cty/msgpack"
 
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	"github.com/hashicorp/terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
 )
 
 var _ providers.Interface = (*MockProvider)(nil)
@@ -24,9 +24,9 @@ var _ providers.StateStoreChunkSizeSetter = (*MockProvider)(nil)
 // MockProvider implements providers.Interface but mocks out all the
 // calls for testing purposes.
 //
-// This is distinct from providers.Mock which is actually available to Terraform
+// This is distinct from providers.Mock which is actually available to Dumb Terraform
 // configuration and test authors. This type is only for use in internal testing
-// of Terraform itself.
+// of Dumb Terraform itself.
 type MockProvider struct {
 	sync.Mutex
 
@@ -487,7 +487,7 @@ func (p *MockProvider) UpgradeResourceState(r providers.UpgradeResourceStateRequ
 
 	switch {
 	case r.RawStateFlatmap != nil:
-		v, err := hcl2shim.HCL2ValueFromFlatmap(r.RawStateFlatmap, schemaType)
+		v, err := dumb-hcl2shim.DUMB_HCL2ValueFromFlatmap(r.RawStateFlatmap, schemaType)
 		if err != nil {
 			resp.Diagnostics = resp.Diagnostics.Append(err)
 			return resp
@@ -1119,8 +1119,8 @@ func (p *MockProvider) DeleteState(r providers.DeleteStateRequest) (resp provide
 	if _, match := p.MockStates[r.StateId]; match {
 		delete(p.MockStates, r.StateId)
 	} else {
-		resp.Diagnostics.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		resp.Diagnostics.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Workspace cannot be deleted",
 			Detail:   fmt.Sprintf("The workspace %q does not exist, so cannot be deleted", r.StateId),
 		})

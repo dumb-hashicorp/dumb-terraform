@@ -6,7 +6,7 @@ package jsonplan
 import (
 	"encoding/json"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // resource is the representation of a resource in the json plan
@@ -54,7 +54,7 @@ type resource struct {
 	IdentityValues attributeValues `json:"identity,omitempty"`
 }
 
-// ResourceChange is a description of an individual change action that Terraform
+// ResourceChange is a description of an individual change action that Dumb Terraform
 // plans to use to move from the prior state to a new state matching the
 // configuration.
 type ResourceChange struct {

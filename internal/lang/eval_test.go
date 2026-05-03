@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang/langrefs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/langrefs"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
@@ -72,7 +72,7 @@ func TestScopeEvalContext(t *testing.T) {
 		PathAttrs: map[string]cty.Value{
 			"module": cty.StringVal("foo/bar"),
 		},
-		TerraformAttrs: map[string]cty.Value{
+		Dumb TerraformAttrs: map[string]cty.Value{
 			"workspace": cty.StringVal("default"),
 		},
 		InputVariables: map[string]cty.Value{
@@ -375,9 +375,9 @@ func TestScopeEvalContext(t *testing.T) {
 			},
 		},
 		{
-			Expr: `terraform.workspace`,
+			Expr: `dumb-terraform.workspace`,
 			Want: map[string]cty.Value{
-				"terraform": cty.ObjectVal(map[string]cty.Value{
+				"dumb-terraform": cty.ObjectVal(map[string]cty.Value{
 					"workspace": cty.StringVal("default"),
 				}),
 			},
@@ -441,7 +441,7 @@ func TestScopeEvalContext(t *testing.T) {
 		Want        map[string]cty.Value
 		TestingOnly bool
 	}) {
-		expr, parseDiags := hclsyntax.ParseExpression([]byte(test.Expr), "", hcl.Pos{Line: 1, Column: 1})
+		expr, parseDiags := dumb-hclsyntax.ParseExpression([]byte(test.Expr), "", dumb-hcl.Pos{Line: 1, Column: 1})
 		if len(parseDiags) != 0 {
 			t.Errorf("unexpected diagnostics during parse")
 			for _, diag := range parseDiags {
@@ -766,7 +766,7 @@ func TestScopeExpandEvalBlock(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			file, parseDiags := hclsyntax.ParseConfig([]byte(test.Config), "", hcl.Pos{Line: 1, Column: 1})
+			file, parseDiags := dumb-hclsyntax.ParseConfig([]byte(test.Config), "", dumb-hcl.Pos{Line: 1, Column: 1})
 			if len(parseDiags) != 0 {
 				t.Errorf("unexpected diagnostics during parse")
 				for _, diag := range parseDiags {
@@ -826,7 +826,7 @@ func TestScopeEvalSelfBlock(t *testing.T) {
 			"cwd":    cty.StringVal("/home/foo/bar"),
 			"root":   cty.StringVal("/home/foo"),
 		},
-		TerraformAttrs: map[string]cty.Value{
+		Dumb TerraformAttrs: map[string]cty.Value{
 			"workspace": cty.StringVal("default"),
 		},
 	}
@@ -902,7 +902,7 @@ func TestScopeEvalSelfBlock(t *testing.T) {
 			},
 		},
 		{
-			Config: `attr = terraform.workspace`,
+			Config: `attr = dumb-terraform.workspace`,
 			Want: map[string]cty.Value{
 				"attr": cty.StringVal("default"),
 				"num":  cty.NullVal(cty.Number),
@@ -912,7 +912,7 @@ func TestScopeEvalSelfBlock(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Config, func(t *testing.T) {
-			file, parseDiags := hclsyntax.ParseConfig([]byte(test.Config), "", hcl.Pos{Line: 1, Column: 1})
+			file, parseDiags := dumb-hclsyntax.ParseConfig([]byte(test.Config), "", dumb-hcl.Pos{Line: 1, Column: 1})
 			if len(parseDiags) != 0 {
 				t.Errorf("unexpected diagnostics during parse")
 				for _, diag := range parseDiags {

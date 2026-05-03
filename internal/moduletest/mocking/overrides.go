@@ -6,10 +6,10 @@ package mocking
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -23,7 +23,7 @@ type Overrides struct {
 	localOverrides    addrs.Map[addrs.Targetable, *configs.Override]
 }
 
-func PackageOverrides(ctx *hcl.EvalContext, run *configs.TestRun, file *configs.TestFile, mocks map[addrs.RootProviderConfig]*configs.MockData) (*Overrides, tfdiags.Diagnostics) {
+func PackageOverrides(ctx *dumb-hcl.EvalContext, run *configs.TestRun, file *configs.TestFile, mocks map[addrs.RootProviderConfig]*configs.MockData) (*Overrides, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	overrides := &Overrides{
 		providerOverrides: make(map[addrs.RootProviderConfig]addrs.Map[addrs.Targetable, *configs.Override]),
@@ -35,10 +35,10 @@ func PackageOverrides(ctx *hcl.EvalContext, run *configs.TestRun, file *configs.
 
 		override.Values = cty.NilVal
 		if override.RawExpr != nil {
-			values, hclDiags := override.RawExpr.Value(ctx)
+			values, dumb-hclDiags := override.RawExpr.Value(ctx)
 			if values != cty.NilVal && !values.Type().IsObjectType() {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid outputs attribute",
 					Detail:   fmt.Sprintf("%s blocks must specify an outputs attribute that is an object.", override.BlockName),
 					Subject:  override.ValuesRange.Ptr(),
@@ -46,7 +46,7 @@ func PackageOverrides(ctx *hcl.EvalContext, run *configs.TestRun, file *configs.
 				return diags
 			}
 			override.Values = values
-			diags = diags.Append(hclDiags)
+			diags = diags.Append(dumb-hclDiags)
 		}
 
 		container.Put(target, override)

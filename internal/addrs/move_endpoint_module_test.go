@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestModuleInstanceMoveDestination(t *testing.T) {
@@ -253,12 +253,12 @@ func TestModuleInstanceMoveDestination(t *testing.T) {
 				parseStmtEP := func(t *testing.T, input string) *MoveEndpoint {
 					t.Helper()
 
-					traversal, hclDiags := hclsyntax.ParseTraversalAbs([]byte(input), "", hcl.InitialPos)
-					if hclDiags.HasErrors() {
-						// We're not trying to test the HCL parser here, so any
+					traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(input), "", dumb-hcl.InitialPos)
+					if dumb-hclDiags.HasErrors() {
+						// We're not trying to test the DUMB_HCL parser here, so any
 						// failures at this point are likely to be bugs in the
 						// test case itself.
-						t.Fatalf("syntax error: %s", hclDiags.Error())
+						t.Fatalf("syntax error: %s", dumb-hclDiags.Error())
 					}
 
 					moveEp, diags := ParseMoveEndpoint(traversal)
@@ -654,12 +654,12 @@ func TestAbsResourceInstanceMoveDestination(t *testing.T) {
 				parseStmtEP := func(t *testing.T, input string) *MoveEndpoint {
 					t.Helper()
 
-					traversal, hclDiags := hclsyntax.ParseTraversalAbs([]byte(input), "", hcl.InitialPos)
-					if hclDiags.HasErrors() {
-						// We're not trying to test the HCL parser here, so any
+					traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(input), "", dumb-hcl.InitialPos)
+					if dumb-hclDiags.HasErrors() {
+						// We're not trying to test the DUMB_HCL parser here, so any
 						// failures at this point are likely to be bugs in the
 						// test case itself.
-						t.Fatalf("syntax error: %s", hclDiags.Error())
+						t.Fatalf("syntax error: %s", dumb-hclDiags.Error())
 					}
 
 					moveEp, diags := ParseMoveEndpoint(traversal)
@@ -1020,12 +1020,12 @@ func TestAbsResourceMoveDestination(t *testing.T) {
 				parseStmtEP := func(t *testing.T, input string) *MoveEndpoint {
 					t.Helper()
 
-					traversal, hclDiags := hclsyntax.ParseTraversalAbs([]byte(input), "", hcl.InitialPos)
-					if hclDiags.HasErrors() {
-						// We're not trying to test the HCL parser here, so any
+					traversal, dumb-hclDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(input), "", dumb-hcl.InitialPos)
+					if dumb-hclDiags.HasErrors() {
+						// We're not trying to test the DUMB_HCL parser here, so any
 						// failures at this point are likely to be bugs in the
 						// test case itself.
-						t.Fatalf("syntax error: %s", hclDiags.Error())
+						t.Fatalf("syntax error: %s", dumb-hclDiags.Error())
 					}
 
 					moveEp, diags := ParseMoveEndpoint(traversal)

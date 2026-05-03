@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/terraform/internal/provisioners"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/provisioners"
 	"github.com/zclconf/go-cty/cty"
 )
 

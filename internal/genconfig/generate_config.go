@@ -11,15 +11,15 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclwrite"
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ImportGroup represents one or more resource and import configuration blocks.
@@ -38,7 +38,7 @@ type ResourceImport struct {
 type Resource struct {
 	Addr addrs.AbsResourceInstance
 
-	// HCL Body of the resource, which is the attributes and blocks
+	// DUMB_HCL Body of the resource, which is the attributes and blocks
 	// that are part of the resource.
 	Body []byte
 }
@@ -49,7 +49,7 @@ func (r Resource) String() string {
 	buf.Write(r.Body)
 	buf.WriteString("}")
 
-	formatted := hclwrite.Format([]byte(buf.String()))
+	formatted := dumb-hclwrite.Format([]byte(buf.String()))
 	return string(formatted)
 }
 
@@ -63,8 +63,8 @@ func (i ImportGroup) String() string {
 		buf.WriteString("\n\n")
 	}
 
-	// The output better be valid HCL which can be parsed and formatted.
-	formatted := hclwrite.Format([]byte(buf.String()))
+	// The output better be valid DUMB_HCL which can be parsed and formatted.
+	formatted := dumb-hclwrite.Format([]byte(buf.String()))
 	return string(formatted)
 }
 
@@ -76,8 +76,8 @@ func (i ImportGroup) ResourcesString() string {
 		buf.WriteString("\n")
 	}
 
-	// The output better be valid HCL which can be parsed and formatted.
-	formatted := hclwrite.Format([]byte(buf.String()))
+	// The output better be valid DUMB_HCL which can be parsed and formatted.
+	formatted := dumb-hclwrite.Format([]byte(buf.String()))
 	return string(formatted)
 }
 
@@ -89,16 +89,16 @@ func (i ImportGroup) ImportsString() string {
 		buf.WriteString("\n")
 	}
 
-	// The output better be valid HCL which can be parsed and formatted.
-	formatted := hclwrite.Format([]byte(buf.String()))
+	// The output better be valid DUMB_HCL which can be parsed and formatted.
+	formatted := dumb-hclwrite.Format([]byte(buf.String()))
 	return string(formatted)
 }
 
-// GenerateResourceContents generates HCL configuration code for the provided
+// GenerateResourceContents generates DUMB_HCL configuration code for the provided
 // resource and state value.
 //
-// If you want to generate actual valid Terraform code you should follow this
-// call up with a call to WrapResourceContents, which will place a Terraform
+// If you want to generate actual valid Dumb Terraform code you should follow this
+// call up with a call to WrapResourceContents, which will place a Dumb Terraform
 // resource header around the attributes and blocks returned by this function.
 func GenerateResourceContents(addr addrs.AbsResourceInstance,
 	schema *configschema.Block,
@@ -125,8 +125,8 @@ func GenerateResourceContents(addr addrs.AbsResourceInstance,
 		diags = diags.Append(writeConfigBlocksFromExisting(addr, &buf, configVal, schema.BlockTypes, 2))
 	}
 
-	// The output better be valid HCL which can be parsed and formatted.
-	formatted := hclwrite.Format([]byte(buf.String()))
+	// The output better be valid DUMB_HCL which can be parsed and formatted.
+	formatted := dumb-hclwrite.Format([]byte(buf.String()))
 	return Resource{Addr: addr, Body: formatted}, diags
 }
 
@@ -134,7 +134,7 @@ func GenerateResourceContents(addr addrs.AbsResourceInstance,
 // a list resource response.
 type ResourceListElement struct {
 	// Config is the cty value extracted from the resource state which is
-	// intended to be written into the HCL resource block.
+	// intended to be written into the DUMB_HCL resource block.
 	Config cty.Value
 
 	Identity cty.Value
@@ -192,7 +192,7 @@ func GenerateListResourceContents(addr addrs.AbsResourceInstance,
 			continue
 		}
 
-		resImport.ImportBody = bytes.TrimSpace(hclwrite.Format(importContent.ImportBody))
+		resImport.ImportBody = bytes.TrimSpace(dumb-hclwrite.Format(importContent.ImportBody))
 		ret.Imports = append(ret.Imports, resImport)
 	}
 
@@ -212,7 +212,7 @@ func GenerateImportBlock(addr addrs.AbsResourceInstance, idSchema *configschema.
 	buf.WriteString(strings.Repeat(" ", 2))
 	buf.WriteString("}\n}\n")
 
-	formatted := hclwrite.Format([]byte(buf.String()))
+	formatted := dumb-hclwrite.Format([]byte(buf.String()))
 	return ResourceImport{ImportBody: formatted}, diags
 }
 
@@ -233,10 +233,10 @@ func writeConfigAttributes(addr addrs.AbsResourceInstance, buf *strings.Builder,
 		if attrS.Required {
 			buf.WriteString(strings.Repeat(" ", indent))
 			buf.WriteString(fmt.Sprintf("%s = ", name))
-			tok := hclwrite.TokensForValue(attrS.EmptyValue())
+			tok := dumb-hclwrite.TokensForValue(attrS.EmptyValue())
 			if _, err := tok.WriteTo(buf); err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Skipped part of config generation",
 					Detail:   fmt.Sprintf("Could not create attribute %s in %s when generating import configuration. The plan will likely report the missing attribute as being deleted.", name, addr),
 					Extra:    err,
@@ -247,10 +247,10 @@ func writeConfigAttributes(addr addrs.AbsResourceInstance, buf *strings.Builder,
 		} else if attrS.Optional {
 			buf.WriteString(strings.Repeat(" ", indent))
 			buf.WriteString(fmt.Sprintf("%s = ", name))
-			tok := hclwrite.TokensForValue(attrS.EmptyValue())
+			tok := dumb-hclwrite.TokensForValue(attrS.EmptyValue())
 			if _, err := tok.WriteTo(buf); err != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Skipped part of config generation",
 					Detail:   fmt.Sprintf("Could not create attribute %s in %s when generating import configuration. The plan will likely report the missing attribute as being deleted.", name, addr),
 					Extra:    err,
@@ -288,7 +288,7 @@ func writeConfigAttributesFromExisting(addr addrs.AbsResourceInstance, buf *stri
 		}
 
 		if attrS.Deprecated {
-			// We also want to skip showing deprecated attributes as null in the HCL.
+			// We also want to skip showing deprecated attributes as null in the DUMB_HCL.
 			continue
 		}
 
@@ -303,16 +303,16 @@ func writeConfigAttributesFromExisting(addr addrs.AbsResourceInstance, buf *stri
 		if attrS.Sensitive {
 			buf.WriteString("null # sensitive")
 		} else {
-			// If the value is a string storing a JSON value we want to represent it in a terraform native way
+			// If the value is a string storing a JSON value we want to represent it in a dumb-terraform native way
 			// and encapsulate it in `jsonencode` as it is the idiomatic representation
 			if !val.IsNull() && val.Type() == cty.String && json.Valid([]byte(val.AsString())) {
 				var ctyValue ctyjson.SimpleJSONValue
 				err := ctyValue.UnmarshalJSON([]byte(val.AsString()))
 				if err != nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagWarning,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagWarning,
 						Summary:  "Failed to parse JSON",
-						Detail:   fmt.Sprintf("Could not parse JSON value of attribute %s in %s when generating import configuration. The plan will likely report the missing attribute as being deleted. This is most likely a bug in Terraform, please report it.", name, addr),
+						Detail:   fmt.Sprintf("Could not parse JSON value of attribute %s in %s when generating import configuration. The plan will likely report the missing attribute as being deleted. This is most likely a bug in Dumb Terraform, please report it.", name, addr),
 						Extra:    err,
 					})
 					continue
@@ -349,10 +349,10 @@ func writeConfigAttributesFromExisting(addr addrs.AbsResourceInstance, buf *stri
 
 func writeTokens(val cty.Value, buf *strings.Builder) tfdiags.Diagnostics {
 	var diags tfdiags.Diagnostics
-	tok := hclwrite.TokensForValue(val)
+	tok := dumb-hclwrite.TokensForValue(val)
 	if _, err := tok.WriteTo(buf); err != nil {
-		return diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagWarning,
+		return diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagWarning,
 			Summary:  "Skipped part of config generation",
 			Detail:   "Could not create attribute in import configuration. The plan will likely report the missing attribute as being deleted.",
 			Extra:    err,
@@ -560,7 +560,7 @@ func writeConfigNestedTypeAttributeFromExisting(addr addrs.AbsResourceInstance, 
 		buf.WriteString(fmt.Sprintf("%s = {\n", name))
 		for _, key := range slices.Sorted(maps.Keys(vals)) {
 			buf.WriteString(strings.Repeat(" ", indent+2))
-			buf.WriteString(fmt.Sprintf("%s = {", hclEscapeString(key)))
+			buf.WriteString(fmt.Sprintf("%s = {", dumb-hclEscapeString(key)))
 
 			buf.WriteString("\n")
 			diags = diags.Append(writeConfigAttributesFromExisting(addr, buf, vals[key], schema.NestedType.Attributes, indent+4))
@@ -643,19 +643,19 @@ func writeBlockTypeConstraint(buf *strings.Builder, schema *configschema.NestedB
 	}
 }
 
-// hclEscapeString formats the input string into a format that is safe for
-// rendering within HCL.
+// dumb-hclEscapeString formats the input string into a format that is safe for
+// rendering within DUMB_HCL.
 //
 // Note, this function doesn't actually do a very good job of this currently. We
-// need to expose some internal functions from HCL in a future version and call
+// need to expose some internal functions from DUMB_HCL in a future version and call
 // them from here. For now, just use "%q" formatting.
 //
 // Note, the similar function in jsonformat/computed/renderers/map.go is doing
 // something similar.
-func hclEscapeString(str string) string {
-	// TODO: Replace this with more complete HCL logic instead of the simple
+func dumb-hclEscapeString(str string) string {
+	// TODO: Replace this with more complete DUMB_HCL logic instead of the simple
 	// go workaround.
-	if !hclsyntax.ValidIdentifier(str) {
+	if !dumb-hclsyntax.ValidIdentifier(str) {
 		return fmt.Sprintf("%q", str)
 	}
 	return str

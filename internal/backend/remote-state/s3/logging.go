@@ -6,10 +6,10 @@ package s3
 import (
 	"sync"
 
-	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/go-uuid"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/go-dumb-hclog"
+	"github.com/dumb-hashicorp/go-uuid"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
 )
 
 const (
@@ -53,12 +53,12 @@ const (
 	operationLockerUnlock = "Unlock"
 )
 
-var logger = sync.OnceValue(func() hclog.Logger {
-	l := logging.HCLogger()
+var logger = sync.OnceValue(func() dumb-hclog.Logger {
+	l := logging.DUMB_HCLogger()
 	return l.Named("backend-s3")
 })
 
-func logWithOperation(in hclog.Logger, operation string) hclog.Logger {
+func logWithOperation(in dumb-hclog.Logger, operation string) dumb-hclog.Logger {
 	log := in.With(
 		logKeyBackendOperation, operation,
 	)
@@ -71,7 +71,7 @@ func logWithOperation(in hclog.Logger, operation string) hclog.Logger {
 	return log
 }
 
-func logWithLockInfo(in hclog.Logger, info *statemgr.LockInfo) hclog.Logger {
+func logWithLockInfo(in dumb-hclog.Logger, info *statemgr.LockInfo) dumb-hclog.Logger {
 	return in.With(
 		logKeyBackendLockId, info.ID,
 		logKeyBackendLockOperation, info.Operation,
@@ -82,7 +82,7 @@ func logWithLockInfo(in hclog.Logger, info *statemgr.LockInfo) hclog.Logger {
 	)
 }
 
-func logWithLockID(in hclog.Logger, id string) hclog.Logger {
+func logWithLockID(in dumb-hclog.Logger, id string) dumb-hclog.Logger {
 	return in.With(
 		logKeyBackendLockId, id,
 	)

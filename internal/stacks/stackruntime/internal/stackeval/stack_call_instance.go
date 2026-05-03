@@ -8,20 +8,20 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StackCallInstance represents an instance of a [StackCall], acting as
@@ -114,7 +114,7 @@ func (c *StackCallInstance) InputVariableValues(ctx context.Context, phase EvalP
 // attributes of the result for their appearance in downstream expressions.
 func (c *StackCallInstance) CheckInputVariableValues(ctx context.Context, phase EvalPhase) (cty.Value, tfdiags.Diagnostics) {
 	return doOnceWithDiags(ctx, c.tracingName()+" inputs", c.inputVariableValues.For(phase),
-		validateStackCallInstanceInputsFn(c.Stack(ctx, phase), c.call.config.config.Inputs, c.call.config.config.DeclRange.ToHCL().Ptr(), c, phase))
+		validateStackCallInstanceInputsFn(c.Stack(ctx, phase), c.call.config.config.Inputs, c.call.config.config.DeclRange.ToDUMB_HCL().Ptr(), c, phase))
 }
 
 // ResolveExpressionReference implements ExpressionScope for the arguments
@@ -167,13 +167,13 @@ func (c *StackCallInstance) tracingName() string {
 	return fmt.Sprintf("%s call", c.CalledStackAddr())
 }
 
-func validateStackCallInstanceInputsFn(stack *Stack, expr hcl.Expression, rng *hcl.Range, scope ExpressionScope, phase EvalPhase) func(ctx context.Context) (cty.Value, tfdiags.Diagnostics) {
+func validateStackCallInstanceInputsFn(stack *Stack, expr dumb-hcl.Expression, rng *dumb-hcl.Range, scope ExpressionScope, phase EvalPhase) func(ctx context.Context) (cty.Value, tfdiags.Diagnostics) {
 	return func(ctx context.Context) (cty.Value, tfdiags.Diagnostics) {
 		var diags tfdiags.Diagnostics
 		wantTy, defs := stack.InputsType()
 
 		v := cty.EmptyObjectVal
-		var hclCtx *hcl.EvalContext
+		var dumb-hclCtx *dumb-hcl.EvalContext
 		if expr != nil {
 			result, moreDiags := EvalExprAndEvalContext(ctx, expr, phase, scope)
 			diags = diags.Append(moreDiags)
@@ -181,7 +181,7 @@ func validateStackCallInstanceInputsFn(stack *Stack, expr hcl.Expression, rng *h
 				return cty.DynamicVal, diags
 			}
 			expr = result.Expression
-			hclCtx = result.EvalContext
+			dumb-hclCtx = result.EvalContext
 			v = result.Value
 		}
 
@@ -193,17 +193,17 @@ func validateStackCallInstanceInputsFn(stack *Stack, expr hcl.Expression, rng *h
 			// altogether when there's at least one required attribute, so we'll
 			// return slightly different messages in each case.
 			if expr != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity:    hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity:    dumb-hcl.DiagError,
 					Summary:     "Invalid inputs for embedded stack",
 					Detail:      fmt.Sprintf("Invalid input variable definition object: %s.", tfdiags.FormatError(err)),
 					Subject:     rng,
 					Expression:  expr,
-					EvalContext: hclCtx,
+					EvalContext: dumb-hclCtx,
 				})
 			} else {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Missing required inputs for embedded stack",
 					Detail:   fmt.Sprintf("Must provide \"inputs\" argument to define the embedded stack's input variables: %s.", tfdiags.FormatError(err)),
 					Subject:  rng,
@@ -226,20 +226,20 @@ func validateStackCallInstanceInputsFn(stack *Stack, expr hcl.Expression, rng *h
 					for _, path := range ephemeralPaths {
 						if len(path) == 0 {
 							// The entire value is ephemeral, then.
-							markDiags = markDiags.Append(&hcl.Diagnostic{
-								Severity:    hcl.DiagError,
+							markDiags = markDiags.Append(&dumb-hcl.Diagnostic{
+								Severity:    dumb-hcl.DiagError,
 								Summary:     "Ephemeral value not allowed",
 								Detail:      fmt.Sprintf("The input variable %q does not accept ephemeral values.", varAddr.Name),
 								Subject:     rng,
 								Expression:  expr,
-								EvalContext: hclCtx,
+								EvalContext: dumb-hclCtx,
 								Extra:       diagnosticCausedByEphemeral(true),
 							})
 						} else {
 							// Something nested inside is ephemeral, so we'll be
 							// more specific.
-							markDiags = markDiags.Append(&hcl.Diagnostic{
-								Severity: hcl.DiagError,
+							markDiags = markDiags.Append(&dumb-hcl.Diagnostic{
+								Severity: dumb-hcl.DiagError,
 								Summary:  "Ephemeral value not allowed",
 								Detail: fmt.Sprintf(
 									"The input variable %q does not accept ephemeral values, so the value for %s is not compatible.",
@@ -247,7 +247,7 @@ func validateStackCallInstanceInputsFn(stack *Stack, expr hcl.Expression, rng *h
 								),
 								Subject:     rng,
 								Expression:  expr,
-								EvalContext: hclCtx,
+								EvalContext: dumb-hclCtx,
 								Extra:       diagnosticCausedByEphemeral(true),
 							})
 						}

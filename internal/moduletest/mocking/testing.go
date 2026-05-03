@@ -4,8 +4,8 @@
 package mocking
 
 import (
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
 )
 
 type InitProviderOverrides func(map[addrs.RootProviderConfig]addrs.Map[addrs.Targetable, *configs.Override])

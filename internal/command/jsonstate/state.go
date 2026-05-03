@@ -13,13 +13,13 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command/jsonchecks"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonchecks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 const (
@@ -32,11 +32,11 @@ const (
 	DataResourceMode    = "data"
 )
 
-// state is the top-level representation of the json format of a terraform
+// state is the top-level representation of the json format of a dumb-terraform
 // state.
 type state struct {
 	FormatVersion    string          `json:"format_version,omitempty"`
-	TerraformVersion string          `json:"terraform_version,omitempty"`
+	Dumb TerraformVersion string          `json:"dumb-terraform_version,omitempty"`
 	Values           *stateValues    `json:"values,omitempty"`
 	Checks           json.RawMessage `json:"checks,omitempty"`
 }
@@ -107,10 +107,10 @@ type Resource struct {
 	// addresses relative to the containing module.
 	DependsOn []string `json:"depends_on,omitempty"`
 
-	// Tainted is true if the resource is tainted in terraform state.
+	// Tainted is true if the resource is tainted in dumb-terraform state.
 	Tainted bool `json:"tainted,omitempty"`
 
-	// Deposed is set if the resource is deposed in terraform state.
+	// Deposed is set if the resource is deposed in dumb-terraform state.
 	DeposedKey string `json:"deposed_key,omitempty"`
 
 	// The version of the resource identity schema the "identity" property
@@ -178,7 +178,7 @@ func newState() *state {
 
 // MarshalForRenderer returns the pre-json encoding changes of the state, in a
 // format available to the structured renderer.
-func MarshalForRenderer(sf *statefile.File, schemas *terraform.Schemas) (Module, map[string]Output, error) {
+func MarshalForRenderer(sf *statefile.File, schemas *dumb-terraform.Schemas) (Module, map[string]Output, error) {
 	if sf.State.Modules == nil {
 		// Empty state case.
 		return Module{}, nil, nil
@@ -197,8 +197,8 @@ func MarshalForRenderer(sf *statefile.File, schemas *terraform.Schemas) (Module,
 	return root, outputs, err
 }
 
-// Marshal returns the json encoding of a terraform state.
-func Marshal(sf *statefile.File, schemas *terraform.Schemas) ([]byte, error) {
+// Marshal returns the json encoding of a dumb-terraform state.
+func Marshal(sf *statefile.File, schemas *dumb-terraform.Schemas) ([]byte, error) {
 	output := newState()
 
 	if sf == nil || sf.State.Empty() {
@@ -206,8 +206,8 @@ func Marshal(sf *statefile.File, schemas *terraform.Schemas) ([]byte, error) {
 		return ret, err
 	}
 
-	if sf.TerraformVersion != nil {
-		output.TerraformVersion = sf.TerraformVersion.String()
+	if sf.Dumb TerraformVersion != nil {
+		output.Dumb TerraformVersion = sf.Dumb TerraformVersion.String()
 	}
 	// output.StateValues
 	err := output.marshalStateValues(sf.State, schemas)
@@ -223,7 +223,7 @@ func Marshal(sf *statefile.File, schemas *terraform.Schemas) ([]byte, error) {
 	return ret, err
 }
 
-func (jsonstate *state) marshalStateValues(s *states.State, schemas *terraform.Schemas) error {
+func (jsonstate *state) marshalStateValues(s *states.State, schemas *dumb-terraform.Schemas) error {
 	var sv stateValues
 	var err error
 
@@ -271,7 +271,7 @@ func MarshalOutputs(outputs map[string]*states.OutputValue) (map[string]Output, 
 	return ret, nil
 }
 
-func marshalRootModule(s *states.State, schemas *terraform.Schemas) (Module, error) {
+func marshalRootModule(s *states.State, schemas *dumb-terraform.Schemas) (Module, error) {
 	var ret Module
 	var err error
 
@@ -315,10 +315,10 @@ func marshalRootModule(s *states.State, schemas *terraform.Schemas) (Module, err
 }
 
 // marshalModules is an ungainly recursive function to build a module structure
-// out of terraform state.
+// out of dumb-terraform state.
 func marshalModules(
 	s *states.State,
-	schemas *terraform.Schemas,
+	schemas *dumb-terraform.Schemas,
 	modules []addrs.ModuleInstance,
 	moduleMap map[string][]addrs.ModuleInstance,
 ) ([]Module, error) {
@@ -356,7 +356,7 @@ func marshalModules(
 	return ret, nil
 }
 
-func marshalResources(resources map[string]*states.Resource, schemas *terraform.Schemas) ([]Resource, error) {
+func marshalResources(resources map[string]*states.Resource, schemas *dumb-terraform.Schemas) ([]Resource, error) {
 	var ret []Resource
 
 	var sortedResources []*states.Resource
@@ -622,7 +622,7 @@ func unmarkValueForMarshaling(v cty.Value) (unmarkedV cty.Value, sensitivePaths 
 	_, otherMarks = marks.PathsWithMark(otherMarks, marks.Deprecation)
 	if len(otherMarks) != 0 {
 		return cty.NilVal, nil, fmt.Errorf(
-			"%s: cannot serialize value marked as %#v for inclusion in a state snapshot (this is a bug in Terraform)",
+			"%s: cannot serialize value marked as %#v for inclusion in a state snapshot (this is a bug in Dumb Terraform)",
 			tfdiags.FormatCtyPath(otherMarks[0].Path), otherMarks[0].Marks,
 		)
 	}

@@ -10,21 +10,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig/typeexpr"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/typeexpr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Stack represents an instance of a [StackConfig] after it's had its
@@ -491,11 +491,11 @@ func (s *Stack) resolveExpressionReference(
 	case stackaddrs.InputVariable:
 		ret := s.InputVariable(addr)
 		if ret == nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Reference to undeclared input variable",
 				Detail:   fmt.Sprintf("There is no variable %q block declared in this stack.", addr.Name),
-				Subject:  ref.SourceRange.ToHCL().Ptr(),
+				Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 			return nil, diags
 		}
@@ -503,11 +503,11 @@ func (s *Stack) resolveExpressionReference(
 	case stackaddrs.LocalValue:
 		ret := s.LocalValue(addr)
 		if ret == nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Reference to undeclared local value",
 				Detail:   fmt.Sprintf("There is no local %q declared in this stack.", addr.Name),
-				Subject:  ref.SourceRange.ToHCL().Ptr(),
+				Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 			return nil, diags
 		}
@@ -515,11 +515,11 @@ func (s *Stack) resolveExpressionReference(
 	case stackaddrs.Component:
 		ret := s.Component(addr)
 		if ret == nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Reference to undeclared component",
 				Detail:   fmt.Sprintf("There is no component %q block declared in this stack.", addr.Name),
-				Subject:  ref.SourceRange.ToHCL().Ptr(),
+				Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 			return nil, diags
 		}
@@ -527,11 +527,11 @@ func (s *Stack) resolveExpressionReference(
 	case stackaddrs.StackCall:
 		ret := s.EmbeddedStackCall(addr)
 		if ret == nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Reference to undeclared embedded stack",
 				Detail:   fmt.Sprintf("There is no stack %q block declared in this stack.", addr.Name),
-				Subject:  ref.SourceRange.ToHCL().Ptr(),
+				Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 			return nil, diags
 		}
@@ -539,11 +539,11 @@ func (s *Stack) resolveExpressionReference(
 	case stackaddrs.ProviderConfigRef:
 		ret := s.ProviderByLocalAddr(addr)
 		if ret == nil {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Reference to undeclared provider configuration",
 				Detail:   fmt.Sprintf("There is no provider %q %q block declared in this stack.", addr.ProviderLocalName, addr.Name),
-				Subject:  ref.SourceRange.ToHCL().Ptr(),
+				Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 			return nil, diags
 		}
@@ -552,33 +552,33 @@ func (s *Stack) resolveExpressionReference(
 		switch addr {
 		case stackaddrs.EachKey:
 			if repetition.EachKey == cty.NilVal {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid 'each' reference",
 					Detail:   "The special symbol 'each' is not defined in this location. This symbol is valid only inside multi-instance blocks that use the 'for_each' argument.",
-					Subject:  ref.SourceRange.ToHCL().Ptr(),
+					Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 				})
 				return nil, diags
 			}
 			return JustValue{repetition.EachKey}, diags
 		case stackaddrs.EachValue:
 			if repetition.EachValue == cty.NilVal {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid 'each' reference",
 					Detail:   "The special symbol 'each' is not defined in this location. This symbol is valid only inside multi-instance blocks that use the 'for_each' argument.",
-					Subject:  ref.SourceRange.ToHCL().Ptr(),
+					Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 				})
 				return nil, diags
 			}
 			return JustValue{repetition.EachValue}, diags
 		case stackaddrs.CountIndex:
 			if repetition.CountIndex == cty.NilVal {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid 'count' reference",
 					Detail:   "The special symbol 'count' is not defined in this location. This symbol is valid only inside multi-instance blocks that use the 'count' argument.",
-					Subject:  ref.SourceRange.ToHCL().Ptr(),
+					Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 				})
 				return nil, diags
 			}
@@ -590,15 +590,15 @@ func (s *Stack) resolveExpressionReference(
 				ref.Target = selfAddr
 				return s.resolveExpressionReference(ctx, ref, nil, repetition)
 			} else {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid 'self' reference",
 					Detail:   "The special symbol 'self' is not defined in this location.",
-					Context:  ref.SourceRange.ToHCL().Ptr(),
+					Context:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 				})
 				return nil, diags
 			}
-		case stackaddrs.TerraformApplying:
+		case stackaddrs.Dumb TerraformApplying:
 			return JustValue{cty.BoolVal(s.main.Applying()).Mark(marks.Ephemeral)}, diags
 		default:
 			// The above should be exhaustive for all defined values of this type.
@@ -606,11 +606,11 @@ func (s *Stack) resolveExpressionReference(
 		}
 
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid reference",
 			Detail:   fmt.Sprintf("The object %s is not in scope at this location.", addr.String()),
-			Subject:  ref.SourceRange.ToHCL().Ptr(),
+			Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 		})
 		return nil, diags
 	}
@@ -637,11 +637,11 @@ func (s *Stack) PlanChanges(ctx context.Context) ([]stackplan.PlannedChange, tfd
 
 			for _, inst := range insts {
 				if existing, exists := seen[inst.from.Item.Key]; exists {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid `from` attribute",
-						Detail:   fmt.Sprintf("The `from` attribute resolved to component instance %s, which is already claimed by another removed block at %s.", inst.from, existing.call.config.config.DeclRange.ToHCL()),
-						Subject:  inst.call.config.config.DeclRange.ToHCL().Ptr(),
+						Detail:   fmt.Sprintf("The `from` attribute resolved to component instance %s, which is already claimed by another removed block at %s.", inst.from, existing.call.config.config.DeclRange.ToDUMB_HCL()),
+						Subject:  inst.call.config.config.DeclRange.ToDUMB_HCL().Ptr(),
 					})
 					continue
 				}
@@ -660,11 +660,11 @@ func (s *Stack) PlanChanges(ctx context.Context) ([]stackplan.PlannedChange, tfd
 
 			for _, inst := range insts {
 				if existing, exists := seen.GetOk(inst.from); exists {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid `from` attribute",
-						Detail:   fmt.Sprintf("The `from` attribute resolved to stack instance %s, which is already claimed by another removed block at %s.", inst.from, existing.call.config.config.DeclRange.ToHCL()),
-						Subject:  inst.call.config.config.DeclRange.ToHCL().Ptr(),
+						Detail:   fmt.Sprintf("The `from` attribute resolved to stack instance %s, which is already claimed by another removed block at %s.", inst.from, existing.call.config.config.DeclRange.ToDUMB_HCL()),
+						Subject:  inst.call.config.config.DeclRange.ToDUMB_HCL().Ptr(),
 					})
 					continue
 				}
@@ -727,11 +727,11 @@ Instance:
 
 			removed, _ := s.validateMissingInstanceAgainstRemovedBlocks(ctx, inst, PlanPhase)
 			if removed != nil {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid removed block",
 					Detail:   fmt.Sprintf("The component instance %s could not be removed. The linked removed block was not executed because the `from` attribute of the removed block targets a component or embedded stack within an orphaned embedded stack.\n\nIn order to remove an entire stack, update your removed block to target the entire removed stack itself instead of the specific elements within it.", inst.String()),
-					Subject:  removed.DeclRange.ToHCL().Ptr(),
+					Subject:  removed.DeclRange.ToDUMB_HCL().Ptr(),
 				})
 				continue
 			}

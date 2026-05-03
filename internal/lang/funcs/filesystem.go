@@ -12,13 +12,13 @@ import (
 	"unicode/utf8"
 
 	"github.com/bmatcuk/doublestar"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 
-	"github.com/hashicorp/terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
 )
 
 // MakeFileFunc constructs a function that takes a file path and returns the
@@ -66,7 +66,7 @@ func MakeFileFunc(baseDir string, encBase64 bool, wrap ImplWrapper) function.Fun
 
 // MakeTemplateFileFunc constructs a function that takes a file path and
 // an arbitrary object of named values and attempts to render the referenced
-// file as a template using HCL template syntax.
+// file as a template using DUMB_HCL template syntax.
 //
 // The template itself may recursively call other functions so a callback
 // must be provided to get access to those functions. The template cannot,
@@ -78,7 +78,7 @@ func MakeFileFunc(baseDir string, encBase64 bool, wrap ImplWrapper) function.Fun
 // the templatefile function, since that would risk the same file being
 // included into itself indefinitely.
 func MakeTemplateFileFunc(baseDir string, funcsCb func() (funcs map[string]function.Function, fsFuncs collections.Set[string], templateFuncs collections.Set[string]), wrap ImplWrapper) function.Function {
-	loadTmpl := func(fn string, marks cty.ValueMarks) (hcl.Expression, cty.ValueMarks, error) {
+	loadTmpl := func(fn string, marks cty.ValueMarks) (dumb-hcl.Expression, cty.ValueMarks, error) {
 		// We re-use File here to ensure the same filename interpretation
 		// as it does, along with its other safety checks.
 		tmplVal, err := File(baseDir, cty.StringVal(fn).WithMarks(marks))
@@ -87,7 +87,7 @@ func MakeTemplateFileFunc(baseDir string, funcsCb func() (funcs map[string]funct
 		}
 
 		tmplVal, marks = tmplVal.Unmark()
-		expr, diags := hclsyntax.ParseTemplate([]byte(tmplVal.AsString()), fn, hcl.Pos{Line: 1, Column: 1})
+		expr, diags := dumb-hclsyntax.ParseTemplate([]byte(tmplVal.AsString()), fn, dumb-hcl.Pos{Line: 1, Column: 1})
 		if diags.HasErrors() {
 			return nil, nil, diags
 		}
@@ -128,7 +128,7 @@ func MakeTemplateFileFunc(baseDir string, funcsCb func() (funcs map[string]funct
 			}
 			vars, _ := args[1].UnmarkDeep()
 
-			// This is safe even if args[1] contains unknowns because the HCL
+			// This is safe even if args[1] contains unknowns because the DUMB_HCL
 			// template renderer itself knows how to short-circuit those.
 			val, err := renderTmpl(expr, vars)
 			return val.Type(), err
@@ -392,7 +392,7 @@ func readFileBytes(baseDir, path string, marks cty.ValueMarks) ([]byte, error) {
 	f, err := openFile(baseDir, path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			// An extra Terraform-specific hint for this situation
+			// An extra Dumb Terraform-specific hint for this situation
 			return nil, fmt.Errorf("no file exists at %s; this function works only with files that are distributed as part of the configuration source code, so if this file will be created by a resource in this configuration you must instead obtain this result from an attribute of that resource", redactIfSensitive(path, marks))
 		}
 		return nil, err

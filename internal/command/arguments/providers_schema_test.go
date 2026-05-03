@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestParseProvidersSchema_valid(t *testing.T) {
@@ -55,7 +55,7 @@ func TestParseProvidersSchema_invalid(t *testing.T) {
 				tfdiags.Sourceless(
 					tfdiags.Error,
 					"The -json flag is required",
-					"The `terraform providers schema` command requires the `-json` flag.",
+					"The `dumb-terraform providers schema` command requires the `-json` flag.",
 				),
 			},
 		},
@@ -87,7 +87,7 @@ func TestParseProvidersSchema_invalid(t *testing.T) {
 				tfdiags.Sourceless(
 					tfdiags.Error,
 					"The -json flag is required",
-					"The `terraform providers schema` command requires the `-json` flag.",
+					"The `dumb-terraform providers schema` command requires the `-json` flag.",
 				),
 			},
 		},

@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/plugin/discovery"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plugin/discovery"
 )
 
 // Module represents the dependencies of a single module, as well being

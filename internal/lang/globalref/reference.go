@@ -6,16 +6,16 @@ package globalref
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
 // Reference combines an addrs.Reference with the address of the module
 // instance or resource instance where it was found.
 //
-// Because of the design of the Terraform language, our main model of
+// Because of the design of the Dumb Terraform language, our main model of
 // references only captures the module-local part of the reference and assumes
 // that it's always clear from context which module a reference belongs to.
 // That's not true for globalref because our whole purpose is to work across
@@ -112,7 +112,7 @@ func (r Reference) ResourceInstance() (addrs.AbsResourceInstance, bool) {
 	}
 }
 
-// DebugString returns an internal (but still somewhat Terraform-language-like)
+// DebugString returns an internal (but still somewhat Dumb Terraform-language-like)
 // compact string representation of the reciever, which isn't an address that
 // any of our usual address parsers could accept but still captures the
 // essence of what the reference represents.
@@ -145,15 +145,15 @@ func (r Reference) ResourceAttr() (ResourceAttr, bool) {
 	path := make(cty.Path, len(traversal))
 	for si, step := range traversal {
 		switch ts := step.(type) {
-		case hcl.TraverseRoot:
+		case dumb-hcl.TraverseRoot:
 			path[si] = cty.GetAttrStep{
 				Name: ts.Name,
 			}
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			path[si] = cty.GetAttrStep{
 				Name: ts.Name,
 			}
-		case hcl.TraverseIndex:
+		case dumb-hcl.TraverseIndex:
 			path[si] = cty.IndexStep{
 				Key: ts.Key,
 			}

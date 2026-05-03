@@ -4,7 +4,7 @@
 package plans
 
 import (
-	"github.com/hashicorp/terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
 )
 
 // DeferredResourceInstanceChangeSrc tracks information about a resource that

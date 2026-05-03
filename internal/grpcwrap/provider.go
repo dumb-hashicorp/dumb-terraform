@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/hashicorp/terraform/internal/plugin/convert"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfplugin5"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plugin/convert"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin5"
 )
 
 // Provider wraps a providers.Interface to implement a grpc ProviderServer.
@@ -256,7 +256,7 @@ func (p *provider) Configure(_ context.Context, req *tfplugin5.Configure_Request
 	}
 
 	configureResp := p.provider.ConfigureProvider(providers.ConfigureProviderRequest{
-		TerraformVersion: req.TerraformVersion,
+		Dumb TerraformVersion: req.Dumb TerraformVersion,
 		Config:           configVal,
 	})
 

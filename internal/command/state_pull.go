@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StatePullCommand is a Command implementation that allows downloading
@@ -95,13 +95,13 @@ func (c *StatePullCommand) Run(args []string) int {
 
 func (c *StatePullCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] state pull [options]
+Usage: dumb-terraform [global options] state pull [options]
 
   Pull the state from its location, upgrade the local copy, and output it
   to stdout.
 
   This command "pulls" the current state and outputs it to stdout.
-  As part of this process, Terraform will upgrade the state format of the
+  As part of this process, Dumb Terraform will upgrade the state format of the
   local copy to the current version.
 
   The primary use of this is for state stored remotely. This command
@@ -114,7 +114,7 @@ Options:
                       once to set more than one variable.
 
   -var-file=filename  Load variable values from the given file, in addition
-                      to the default files terraform.tfvars and *.auto.tfvars.
+                      to the default files dumb-terraform.tfvars and *.auto.tfvars.
                       Use this option more than once to include more than one
                       variables file.
 

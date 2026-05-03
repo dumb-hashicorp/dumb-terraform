@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/rpcapi/terraform1"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi/dumb-terraform1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
 	"github.com/google/go-cmp/cmp"
 	"google.golang.org/protobuf/testing/protocmp"
@@ -18,7 +18,7 @@ import (
 func TestDiagnosticsToProto(t *testing.T) {
 	tests := map[string]struct {
 		Input tfdiags.Diagnostics
-		Want  []*terraform1.Diagnostic
+		Want  []*dumb-terraform1.Diagnostic
 	}{
 		"nil": {
 			Input: nil,
@@ -36,9 +36,9 @@ func TestDiagnosticsToProto(t *testing.T) {
 					"But I'll get over it.",
 				),
 			},
-			Want: []*terraform1.Diagnostic{
+			Want: []*dumb-terraform1.Diagnostic{
 				{
-					Severity: terraform1.Diagnostic_ERROR,
+					Severity: dumb-terraform1.Diagnostic_ERROR,
 					Summary:  "Something annoying",
 					Detail:   "But I'll get over it.",
 				},
@@ -52,9 +52,9 @@ func TestDiagnosticsToProto(t *testing.T) {
 					"That's no moon; it's a space station.",
 				),
 			},
-			Want: []*terraform1.Diagnostic{
+			Want: []*dumb-terraform1.Diagnostic{
 				{
-					Severity: terraform1.Diagnostic_WARNING,
+					Severity: dumb-terraform1.Diagnostic_WARNING,
 					Summary:  "I have a very bad feeling about this",
 					Detail:   "That's no moon; it's a space station.",
 				},
@@ -62,14 +62,14 @@ func TestDiagnosticsToProto(t *testing.T) {
 		},
 		"with subject": {
 			Input: tfdiags.Diagnostics{}.Append(
-				&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Something annoying",
 					Detail:   "But I'll get over it.",
-					Subject: &hcl.Range{
+					Subject: &dumb-hcl.Range{
 						Filename: "git::https://example.com/foo.git",
-						Start:    hcl.InitialPos,
-						End: hcl.Pos{
+						Start:    dumb-hcl.InitialPos,
+						End: dumb-hcl.Pos{
 							Byte:   2,
 							Line:   3,
 							Column: 4,
@@ -77,19 +77,19 @@ func TestDiagnosticsToProto(t *testing.T) {
 					},
 				},
 			),
-			Want: []*terraform1.Diagnostic{
+			Want: []*dumb-terraform1.Diagnostic{
 				{
-					Severity: terraform1.Diagnostic_ERROR,
+					Severity: dumb-terraform1.Diagnostic_ERROR,
 					Summary:  "Something annoying",
 					Detail:   "But I'll get over it.",
-					Subject: &terraform1.SourceRange{
+					Subject: &dumb-terraform1.SourceRange{
 						SourceAddr: "git::https://example.com/foo.git",
-						Start: &terraform1.SourcePos{
+						Start: &dumb-terraform1.SourcePos{
 							Byte:   0,
 							Line:   1,
 							Column: 1,
 						},
-						End: &terraform1.SourcePos{
+						End: &dumb-terraform1.SourcePos{
 							Byte:   2,
 							Line:   3,
 							Column: 4,
@@ -100,23 +100,23 @@ func TestDiagnosticsToProto(t *testing.T) {
 		},
 		"with subject and context": {
 			Input: tfdiags.Diagnostics{}.Append(
-				&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Something annoying",
 					Detail:   "But I'll get over it.",
-					Subject: &hcl.Range{
+					Subject: &dumb-hcl.Range{
 						Filename: "git::https://example.com/foo.git",
-						Start:    hcl.InitialPos,
-						End: hcl.Pos{
+						Start:    dumb-hcl.InitialPos,
+						End: dumb-hcl.Pos{
 							Byte:   2,
 							Line:   3,
 							Column: 4,
 						},
 					},
-					Context: &hcl.Range{
+					Context: &dumb-hcl.Range{
 						Filename: "git::https://example.com/foo.git",
-						Start:    hcl.InitialPos,
-						End: hcl.Pos{
+						Start:    dumb-hcl.InitialPos,
+						End: dumb-hcl.Pos{
 							Byte:   5,
 							Line:   6,
 							Column: 7,
@@ -124,32 +124,32 @@ func TestDiagnosticsToProto(t *testing.T) {
 					},
 				},
 			),
-			Want: []*terraform1.Diagnostic{
+			Want: []*dumb-terraform1.Diagnostic{
 				{
-					Severity: terraform1.Diagnostic_ERROR,
+					Severity: dumb-terraform1.Diagnostic_ERROR,
 					Summary:  "Something annoying",
 					Detail:   "But I'll get over it.",
-					Subject: &terraform1.SourceRange{
+					Subject: &dumb-terraform1.SourceRange{
 						SourceAddr: "git::https://example.com/foo.git",
-						Start: &terraform1.SourcePos{
+						Start: &dumb-terraform1.SourcePos{
 							Byte:   0,
 							Line:   1,
 							Column: 1,
 						},
-						End: &terraform1.SourcePos{
+						End: &dumb-terraform1.SourcePos{
 							Byte:   2,
 							Line:   3,
 							Column: 4,
 						},
 					},
-					Context: &terraform1.SourceRange{
+					Context: &dumb-terraform1.SourceRange{
 						SourceAddr: "git::https://example.com/foo.git",
-						Start: &terraform1.SourcePos{
+						Start: &dumb-terraform1.SourcePos{
 							Byte:   0,
 							Line:   1,
 							Column: 1,
 						},
-						End: &terraform1.SourcePos{
+						End: &dumb-terraform1.SourcePos{
 							Byte:   5,
 							Line:   6,
 							Column: 7,
@@ -165,9 +165,9 @@ func TestDiagnosticsToProto(t *testing.T) {
 			Input: tfdiags.Diagnostics{}.Append(
 				fmt.Errorf("oh no bad"),
 			),
-			Want: []*terraform1.Diagnostic{
+			Want: []*dumb-terraform1.Diagnostic{
 				{
-					Severity: terraform1.Diagnostic_ERROR,
+					Severity: dumb-terraform1.Diagnostic_ERROR,
 					Summary:  "oh no bad",
 				},
 			},

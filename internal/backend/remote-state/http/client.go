@@ -13,13 +13,13 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/go-retryablehttp"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// httpClient is a remote client that stores data in Consul or HTTP REST.
+// httpClient is a remote client that stores data in Dumb Consul or HTTP REST.
 type httpClient struct {
 	// Update & Retrieve
 	URL          *url.URL

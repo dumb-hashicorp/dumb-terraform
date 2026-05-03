@@ -8,13 +8,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	statespkg "github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	statespkg "github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
 
-	_ "github.com/hashicorp/terraform/internal/logging"
+	_ "github.com/dumb-hashicorp/dumb-terraform/internal/logging"
 )
 
 func TestMain(m *testing.M) {
@@ -53,14 +53,14 @@ func TestBackendConfig(t *testing.T) {
 
 func TestBackend(t *testing.T) {
 	defer Reset()
-	b := backend.TestBackendConfig(t, New(), hcl.EmptyBody()).(*Backend)
+	b := backend.TestBackendConfig(t, New(), dumb-hcl.EmptyBody()).(*Backend)
 	backend.TestBackendStates(t, b)
 }
 
 func TestBackendLocked(t *testing.T) {
 	defer Reset()
-	b1 := backend.TestBackendConfig(t, New(), hcl.EmptyBody()).(*Backend)
-	b2 := backend.TestBackendConfig(t, New(), hcl.EmptyBody()).(*Backend)
+	b1 := backend.TestBackendConfig(t, New(), dumb-hcl.EmptyBody()).(*Backend)
+	b2 := backend.TestBackendConfig(t, New(), dumb-hcl.EmptyBody()).(*Backend)
 
 	backend.TestBackendStateLocks(t, b1, b2)
 }
@@ -68,7 +68,7 @@ func TestBackendLocked(t *testing.T) {
 // use this backend to test the remote.State implementation
 func TestRemoteState(t *testing.T) {
 	defer Reset()
-	b := backend.TestBackendConfig(t, New(), hcl.EmptyBody())
+	b := backend.TestBackendConfig(t, New(), dumb-hcl.EmptyBody())
 
 	workspace := "workspace"
 

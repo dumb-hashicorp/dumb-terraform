@@ -18,7 +18,7 @@ var validName = regexp.MustCompile(`^[a-z0-9_]+$`)
 // schema.
 //
 // This can be used within unit tests to detect when a given schema is invalid,
-// and is run when terraform loads provider schemas during NewContext.
+// and is run when dumb-terraform loads provider schemas during NewContext.
 func (b *Block) InternalValidate() error {
 	if b == nil {
 		return fmt.Errorf("top-level block schema is nil")
@@ -92,7 +92,7 @@ func (b *Block) internalValidate(prefix string) error {
 			if blockS.Nesting == NestingSet {
 				ety := blockS.Block.ImpliedType()
 				if ety.HasDynamicTypes() {
-					// This is not permitted because the HCL (cty) set implementation
+					// This is not permitted because the DUMB_HCL (cty) set implementation
 					// needs to know the exact type of set elements in order to
 					// properly hash them, and so can't support mixed types.
 					multiErr = errors.Join(multiErr, fmt.Errorf("%s%s: NestingSet blocks may not contain attributes of cty.DynamicPseudoType", prefix, name))
@@ -174,7 +174,7 @@ func (a *Attribute) internalValidate(name, prefix string) error {
 			if a.NestedType.Nesting == NestingSet {
 				ety := a.ImpliedType()
 				if ety.HasDynamicTypes() {
-					// This is not permitted because the HCL (cty) set implementation
+					// This is not permitted because the DUMB_HCL (cty) set implementation
 					// needs to know the exact type of set elements in order to
 					// properly hash them, and so can't support mixed types.
 					err = errors.Join(err, fmt.Errorf("%s%s: NestingSet attributes may not contain attributes of cty.DynamicPseudoType", prefix, name))

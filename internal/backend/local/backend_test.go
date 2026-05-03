@@ -12,13 +12,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -154,7 +154,7 @@ func TestLocal_useOfPathAttribute(t *testing.T) {
 	if sDiags.HasErrors() {
 		t.Fatalf("unexpected error returned from StateMgr: %s", sDiags.Err())
 	}
-	fizzbuzzStatePath := fmt.Sprintf("%s/terraform.tfstate.d/%s/terraform.tfstate", td, workspace)
+	fizzbuzzStatePath := fmt.Sprintf("%s/dumb-terraform.tfstate.d/%s/dumb-terraform.tfstate", td, workspace)
 	err = stmgr.WriteState(s)
 	if err != nil {
 		t.Fatalf("unexpected error returned from WriteState")
@@ -229,10 +229,10 @@ func TestLocal_useOfWorkspaceDirAttribute(t *testing.T) {
 
 	// Writing to the default workspace's state creates a file.
 	// As path attribute was left null, the default location
-	// ./terraform.tfstate is used.
+	// ./dumb-terraform.tfstate is used.
 	// Unaffected by the `workspace_dir` location.
 	workspace := backend.DefaultStateName
-	defaultStatePath := fmt.Sprintf("%s/terraform.tfstate", td)
+	defaultStatePath := fmt.Sprintf("%s/dumb-terraform.tfstate", td)
 	stmgr, sDiags := b.StateMgr(workspace)
 	if sDiags.HasErrors() {
 		t.Fatalf("unexpected error returned from StateMgr: %s", sDiags.Err())
@@ -253,7 +253,7 @@ func TestLocal_useOfWorkspaceDirAttribute(t *testing.T) {
 	// Writing to a non-default workspace's state creates a file
 	// that's affected by the `workspace_dir` location
 	workspace = "fizzbuzz"
-	fizzbuzzStatePath := fmt.Sprintf("%s/%s/%s/terraform.tfstate", td, workspaceDir, workspace)
+	fizzbuzzStatePath := fmt.Sprintf("%s/%s/%s/dumb-terraform.tfstate", td, workspaceDir, workspace)
 	stmgr, sDiags = b.StateMgr(workspace)
 	if sDiags.HasErrors() {
 		t.Fatalf("unexpected error returned from StateMgr: %s", sDiags.Err())
@@ -560,7 +560,7 @@ func TestLocal_PathsConflictWith(t *testing.T) {
 	originalBackend := New()
 
 	// Create a default workspace state file in a non-root directory
-	originalBackend.StatePath = "foobar/terraform.tfstate"
+	originalBackend.StatePath = "foobar/dumb-terraform.tfstate"
 	defaultStatePath := filepath.Join(td, originalBackend.StatePath)
 	stmgrDefault, _ := originalBackend.StateMgr("")
 	err := stmgrDefault.WriteState(exampleState)
@@ -579,8 +579,8 @@ func TestLocal_PathsConflictWith(t *testing.T) {
 	checkState(t, foobarStatePath, exampleState.String())
 
 	// Scenario where:
-	// * original backend has state for a 'foobar' workspace at terraform.tfstate.d/foobar/terraform.tfstate
-	// * new local backend is configured via `path` to store 'default' state at terraform.tfstate.d/foobar/terraform.tfstate
+	// * original backend has state for a 'foobar' workspace at dumb-terraform.tfstate.d/foobar/dumb-terraform.tfstate
+	// * new local backend is configured via `path` to store 'default' state at dumb-terraform.tfstate.d/foobar/dumb-terraform.tfstate
 	scenario1 := New()
 	scenario1.StatePath = foobarStatePath
 

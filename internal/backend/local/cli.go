@@ -6,7 +6,7 @@ package local
 import (
 	"log"
 
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
 )
 
 // backendrun.CLI impl.

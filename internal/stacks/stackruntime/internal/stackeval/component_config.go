@@ -8,23 +8,23 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/ext/typeexpr"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/ext/typeexpr"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/instances"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	stackparser "github.com/hashicorp/terraform/internal/stacks/stackconfig/parser"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/instances"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	stackparser "github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/parser"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/internal/stackeval/stubs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 var (
@@ -60,8 +60,8 @@ func (c *ComponentConfig) Addr() stackaddrs.ConfigComponent {
 }
 
 // DeclRange implements ConfigComponentExpressionScope
-func (c *ComponentConfig) DeclRange() *hcl.Range {
-	return c.config.DeclRange.ToHCL().Ptr()
+func (c *ComponentConfig) DeclRange() *dumb-hcl.Range {
+	return c.config.DeclRange.ToDUMB_HCL().Ptr()
 }
 
 // StackConfig implements ConfigComponentExpressionScope
@@ -77,7 +77,7 @@ func (c *ComponentConfig) ModuleTree(ctx context.Context) *configs.Config {
 	return ret
 }
 
-// CheckModuleTree loads the tree of Terraform modules starting at the
+// CheckModuleTree loads the tree of Dumb Terraform modules starting at the
 // component block's configured source address, returning the resulting
 // configuration object if successful.
 //
@@ -103,25 +103,25 @@ func (c *ComponentConfig) CheckModuleTree(ctx context.Context) (*configs.Config,
 			parser.AllowLanguageExperiments(c.main.LanguageExperimentsAllowed())
 
 			if !parser.IsConfigDir(rootModuleSource) {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Can't load module for component",
-					Detail:   fmt.Sprintf("The source location %s does not contain a Terraform module.", rootModuleSource),
-					Subject:  c.config.SourceAddrRange.ToHCL().Ptr(),
+					Detail:   fmt.Sprintf("The source location %s does not contain a Dumb Terraform module.", rootModuleSource),
+					Subject:  c.config.SourceAddrRange.ToDUMB_HCL().Ptr(),
 				})
 				return nil, diags
 			}
 
-			rootMod, hclDiags := parser.LoadConfigDir(rootModuleSource)
-			diags = diags.Append(hclDiags)
-			if hclDiags.HasErrors() {
+			rootMod, dumb-hclDiags := parser.LoadConfigDir(rootModuleSource)
+			diags = diags.Append(dumb-hclDiags)
+			if dumb-hclDiags.HasErrors() {
 				return nil, diags
 			}
 
 			walker := stackparser.NewSourceBundleModuleWalker(rootModuleSource, sources, parser)
-			configRoot, hclDiags := configs.BuildConfig(rootMod, walker, nil)
-			diags = diags.Append(hclDiags)
-			if hclDiags.HasErrors() {
+			configRoot, dumb-hclDiags := configs.BuildConfig(rootMod, walker, nil)
+			diags = diags.Append(dumb-hclDiags)
+			if dumb-hclDiags.HasErrors() {
 				return nil, diags
 			}
 
@@ -139,7 +139,7 @@ func (c *ComponentConfig) CheckModuleTree(ctx context.Context) (*configs.Config,
 //
 // These rules deal with a small number of exceptions where the modules language
 // as used by stacks is a subset of the modules language from traditional
-// Terraform. Not all such exceptions are handled in this way because
+// Dumb Terraform. Not all such exceptions are handled in this way because
 // some of them cannot be handled statically, but this is a reasonable place
 // to handle the simpler concerns and allows us to return error messages that
 // talk specifically about stacks, which would be harder to achieve if these
@@ -164,23 +164,23 @@ func validateModuleForStacks(moduleAddr addrs.Module, module *configs.Module) tf
 		// that's being directly called from the stack configuration, because
 		// we can give some direct advice for how to correct the problem there,
 		// whereas for a nested module we assume that it's a third-party module
-		// written for much older versions of Terraform before we deprecated
+		// written for much older versions of Dumb Terraform before we deprecated
 		// inline provider configurations and thus the solution is most likely
 		// to be selecting a different module that is Stacks-compatible, because
 		// removing a legacy inline provider configuration from a shared module
 		// would be a breaking change to that module.
 		if moduleAddr.IsRoot() {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Inline provider configuration not allowed",
 				Detail:   "A module used as a stack component must have all of its provider configurations passed from the stack configuration, using the \"providers\" argument within the component configuration block.",
 				Subject:  pc.DeclRange.Ptr(),
 			})
 		} else {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Inline provider configuration not allowed",
-				Detail:   "This module is not compatible with Terraform Stacks, because it declares an inline provider configuration.\n\nTo be used with stacks, this module must instead accept provider configurations from its caller.",
+				Detail:   "This module is not compatible with Dumb Terraform Stacks, because it declares an inline provider configuration.\n\nTo be used with stacks, this module must instead accept provider configurations from its caller.",
 				Subject:  pc.DeclRange.Ptr(),
 			})
 		}
@@ -190,8 +190,8 @@ func validateModuleForStacks(moduleAddr addrs.Module, module *configs.Module) tf
 	// perform the early evaluation phase that const variables rely on.
 	for _, v := range module.Variables {
 		if v.ConstSet {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Const variable not supported in stacks",
 				Detail:   "Variables with const = true are not supported in modules used as stack components. Const variables are evaluated during configuration loading, which is not supported in the stacks runtime.",
 				Subject:  v.DeclRange.Ptr(),
@@ -262,7 +262,7 @@ func (c *ComponentConfig) CheckInputVariableValues(ctx context.Context, phase Ev
 // ExprReferenceValue implements Referenceable.
 func (c *ComponentConfig) ExprReferenceValue(ctx context.Context, phase EvalPhase) cty.Value {
 	// Currently we don't say anything at all about component results during
-	// validation, since the main Terraform language's validate call doesn't
+	// validation, since the main Dumb Terraform language's validate call doesn't
 	// return any information about hypothetical root module output values.
 	// We don't expose ComponentConfig in any scope outside of the validation
 	// phase, so this is sufficient for all phases. (See [Component] for how
@@ -350,7 +350,7 @@ func (c *ComponentConfig) checkValid(ctx context.Context, phase EvalPhase) tfdia
 			}
 		}
 
-		tfCtx, err := terraform.NewContext(&terraform.ContextOpts{
+		tfCtx, err := dumb-terraform.NewContext(&dumb-terraform.ContextOpts{
 			Providers:                providerFactories,
 			PreloadedProviderSchemas: providerSchemas,
 			Provisioners:             c.main.availableProvisioners(),
@@ -360,19 +360,19 @@ func (c *ComponentConfig) checkValid(ctx context.Context, phase EvalPhase) tfdia
 			// ContextOpts above.
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
-				"Failed to instantiate Terraform modules runtime",
-				fmt.Sprintf("Could not load the main Terraform language runtime: %s.\n\nThis is a bug in Terraform; please report it!", err),
+				"Failed to instantiate Dumb Terraform modules runtime",
+				fmt.Sprintf("Could not load the main Dumb Terraform language runtime: %s.\n\nThis is a bug in Dumb Terraform; please report it!", err),
 			))
 			return diags, nil
 		}
 
 		providerClients, valid := unconfiguredProviderClients(c.main, providerTypes)
 		if !valid {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Cannot validate component",
 				Detail:   fmt.Sprintf("Cannot validate %s because its provider configuration assignments are invalid.", c.addr),
-				Subject:  c.config.DeclRange.ToHCL().Ptr(),
+				Subject:  c.config.DeclRange.ToDUMB_HCL().Ptr(),
 			})
 			return diags, nil
 		}
@@ -390,7 +390,7 @@ func (c *ComponentConfig) checkValid(ctx context.Context, phase EvalPhase) tfdia
 			}
 		}()
 
-		diags = diags.Append(tfCtx.Validate(moduleTree, &terraform.ValidateOpts{
+		diags = diags.Append(tfCtx.Validate(moduleTree, &dumb-terraform.ValidateOpts{
 			ExternalProviders:         providerClients,
 			AllowRootEphemeralOutputs: false, // TODO(issues/37822): Enable this.
 		}))

@@ -11,29 +11,29 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/didyoumean"
-	"github.com/hashicorp/terraform/internal/lang"
-	"github.com/hashicorp/terraform/internal/lang/langrefs"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/moduletest/mocking"
-	teststates "github.com/hashicorp/terraform/internal/moduletest/states"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/didyoumean"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/langrefs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/mocking"
+	teststates "github.com/dumb-hashicorp/dumb-terraform/internal/moduletest/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // EvalContext is a container for context relating to the evaluation of a
-// particular .tftest.hcl file.
+// particular .tftest.dumb-hcl file.
 // This context is used to track the various values that are available to the
 // test suite, both from the test suite itself and from the results of the runs
 // within the suite.
@@ -44,7 +44,7 @@ type EvalContext struct {
 	// test graph is executed, while the unparsedVariables will be lazily
 	// evaluated by each run block that needs them.
 	unparsedVariables map[string]arguments.UnparsedVariableValue
-	parsedVariables   terraform.InputValues
+	parsedVariables   dumb-terraform.InputValues
 	variableStatus    map[string]moduletest.Status
 	variablesLock     sync.Mutex
 
@@ -86,7 +86,7 @@ type EvalContext struct {
 	mode moduletest.CommandMode
 
 	deferralAllowed bool
-	evalSem         terraform.Semaphore
+	evalSem         dumb-terraform.Semaphore
 
 	// repair is true if the test suite is being run in cleanup repair mode.
 	// It is only set when in test cleanup mode.
@@ -119,7 +119,7 @@ func NewEvalContext(opts EvalContextOpts) *EvalContext {
 	stopCtx, stop := context.WithCancel(opts.StopCtx)
 	return &EvalContext{
 		unparsedVariables: opts.UnparsedVariables,
-		parsedVariables:   make(terraform.InputValues),
+		parsedVariables:   make(dumb-terraform.InputValues),
 		variableStatus:    make(map[string]moduletest.Status),
 		variablesLock:     sync.Mutex{},
 		runBlocks:         make(map[string]*moduletest.Run),
@@ -139,7 +139,7 @@ func NewEvalContext(opts EvalContextOpts) *EvalContext {
 		renderer:          opts.Render,
 		mode:              opts.Mode,
 		deferralAllowed:   opts.DeferralAllowed,
-		evalSem:           terraform.NewSemaphore(opts.Concurrency),
+		evalSem:           dumb-terraform.NewSemaphore(opts.Concurrency),
 		overrides:         make(map[string]*mocking.Overrides),
 	}
 }
@@ -176,7 +176,7 @@ func (ec *EvalContext) Verbose() bool {
 	return ec.verbose
 }
 
-func (ec *EvalContext) HclContext(references []*addrs.Reference) (*hcl.EvalContext, tfdiags.Diagnostics) {
+func (ec *EvalContext) Dumb HclContext(references []*addrs.Reference) (*dumb-hcl.EvalContext, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	runs := make(map[string]cty.Value)
@@ -187,11 +187,11 @@ func (ec *EvalContext) HclContext(references []*addrs.Reference) (*hcl.EvalConte
 		case addrs.Run:
 			run, ok := ec.GetOutput(subject.Name)
 			if !ok {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Reference to unknown run block",
 					Detail:   fmt.Sprintf("The run block %q does not exist within this test file.", subject.Name),
-					Subject:  reference.SourceRange.ToHCL().Ptr(),
+					Subject:  reference.SourceRange.ToDUMB_HCL().Ptr(),
 				})
 				continue
 			}
@@ -213,13 +213,13 @@ func (ec *EvalContext) HclContext(references []*addrs.Reference) (*hcl.EvalConte
 				// the prior run was a plan-only run and that some of its
 				// output values were not known. If this arises for a
 				// run that performed a full apply then this is a bug in
-				// Terraform's modules runtime, because unknown output
+				// Dumb Terraform's modules runtime, because unknown output
 				// values should not be possible in that case.
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Reference to unknown value",
 					Detail:   fmt.Sprintf("The value for %s is unknown. Run block %q is executing a \"plan\" operation, and the specified output value is only known after apply.", reference.DisplayString(), subject.Name),
-					Subject:  reference.SourceRange.ToHCL().Ptr(),
+					Subject:  reference.SourceRange.ToDUMB_HCL().Ptr(),
 				})
 				continue
 			}
@@ -236,25 +236,25 @@ func (ec *EvalContext) HclContext(references []*addrs.Reference) (*hcl.EvalConte
 				continue
 			}
 
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Reference to unavailable variable",
 				Detail:   fmt.Sprintf("The input variable %q does not exist within this test file.", subject.Name),
-				Subject:  reference.SourceRange.ToHCL().Ptr(),
+				Subject:  reference.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 			continue
 
 		default:
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid reference",
-				Detail:   "You can only reference run blocks and variables from within Terraform Test files.",
-				Subject:  reference.SourceRange.ToHCL().Ptr(),
+				Detail:   "You can only reference run blocks and variables from within Dumb Terraform Test files.",
+				Subject:  reference.SourceRange.ToDUMB_HCL().Ptr(),
 			})
 		}
 	}
 
-	return &hcl.EvalContext{
+	return &dumb-hcl.EvalContext{
 		Variables: map[string]cty.Value{
 			"run": cty.ObjectVal(runs),
 			"var": cty.ObjectVal(vars),
@@ -271,7 +271,7 @@ func (ec *EvalContext) HclContext(references []*addrs.Reference) (*hcl.EvalConte
 // already available in resultScope in case there are additional input
 // variables that were defined only for use in the test suite. Any variable
 // not defined in extraVariableVals will be evaluated through resultScope instead.
-func (ec *EvalContext) EvaluateRun(run *configs.TestRun, module *configs.Module, resultScope *lang.Scope, extraVariableVals terraform.InputValues) (moduletest.Status, cty.Value, tfdiags.Diagnostics) {
+func (ec *EvalContext) EvaluateRun(run *configs.TestRun, module *configs.Module, resultScope *lang.Scope, extraVariableVals dumb-terraform.InputValues) (moduletest.Status, cty.Value, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
 	// We need a derived evaluation scope that also supports referring to
@@ -314,7 +314,7 @@ func (ec *EvalContext) EvaluateRun(run *configs.TestRun, module *configs.Module,
 		// might be useful to the user.
 		ruleDiags = ruleDiags.Append(diagsForEphemeralResources(refs))
 
-		hclCtx, moreDiags := scope.EvalContext(refs)
+		dumb-hclCtx, moreDiags := scope.EvalContext(refs)
 		ruleDiags = ruleDiags.Append(moreDiags)
 		if moreDiags.HasErrors() {
 			// if we can't evaluate the context properly, we can't evaluate the rule
@@ -325,14 +325,14 @@ func (ec *EvalContext) EvaluateRun(run *configs.TestRun, module *configs.Module,
 			continue
 		}
 
-		errorMessage, moreDiags := lang.EvalCheckErrorMessage(rule.ErrorMessage, hclCtx, nil)
+		errorMessage, moreDiags := lang.EvalCheckErrorMessage(rule.ErrorMessage, dumb-hclCtx, nil)
 		ruleDiags = ruleDiags.Append(moreDiags)
 
 		errorMessage, _ = errorMessage.Unmark()
 		errorMessageStr := strings.TrimSpace(errorMessage.AsString())
 
-		runVal, hclDiags := rule.Condition.Value(hclCtx)
-		ruleDiags = ruleDiags.Append(hclDiags)
+		runVal, dumb-hclDiags := rule.Condition.Value(dumb-hclCtx)
+		ruleDiags = ruleDiags.Append(dumb-hclDiags)
 
 		diags = diags.Append(ruleDiags)
 		if ruleDiags.HasErrors() {
@@ -343,13 +343,13 @@ func (ec *EvalContext) EvaluateRun(run *configs.TestRun, module *configs.Module,
 
 		if runVal.IsNull() {
 			status = status.Merge(moduletest.Error)
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity:    hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity:    dumb-hcl.DiagError,
 				Summary:     "Invalid condition run",
 				Detail:      "Condition expression must return either true or false, not null.",
 				Subject:     rule.Condition.Range().Ptr(),
 				Expression:  rule.Condition,
-				EvalContext: hclCtx,
+				EvalContext: dumb-hclCtx,
 			})
 			log.Printf("[TRACE] EvalContext.Evaluate: check rule %d for %s has null condition result", i, run.Name)
 			continue
@@ -357,13 +357,13 @@ func (ec *EvalContext) EvaluateRun(run *configs.TestRun, module *configs.Module,
 
 		if !runVal.IsKnown() {
 			status = status.Merge(moduletest.Error)
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity:    hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity:    dumb-hcl.DiagError,
 				Summary:     "Unknown condition value",
 				Detail:      "Condition expression could not be evaluated at this time. This means you have executed a `run` block with `command = plan` and one of the values your condition depended on is not known until after the plan has been applied. Either remove this value from your condition, or execute an `apply` command from this `run` block. Alternatively, if there is an override for this value, you can make it available during the plan phase by setting `override_during = plan` in the `override_` block.",
 				Subject:     rule.Condition.Range().Ptr(),
 				Expression:  rule.Condition,
-				EvalContext: hclCtx,
+				EvalContext: dumb-hclCtx,
 			})
 			log.Printf("[TRACE] EvalContext.Evaluate: check rule %d for %s has unknown condition result", i, run.Name)
 			continue
@@ -372,13 +372,13 @@ func (ec *EvalContext) EvaluateRun(run *configs.TestRun, module *configs.Module,
 		var err error
 		if runVal, err = convert.Convert(runVal, cty.Bool); err != nil {
 			status = status.Merge(moduletest.Error)
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity:    hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity:    dumb-hcl.DiagError,
 				Summary:     "Invalid condition run",
 				Detail:      fmt.Sprintf("Invalid condition run value: %s.", tfdiags.FormatError(err)),
 				Subject:     rule.Condition.Range().Ptr(),
 				Expression:  rule.Condition,
-				EvalContext: hclCtx,
+				EvalContext: dumb-hclCtx,
 			})
 			log.Printf("[TRACE] EvalContext.Evaluate: check rule %d for %s has non-boolean condition result", i, run.Name)
 			continue
@@ -391,13 +391,13 @@ func (ec *EvalContext) EvaluateRun(run *configs.TestRun, module *configs.Module,
 		if runVal.False() {
 			log.Printf("[TRACE] EvalContext.Evaluate: test assertion failed for %s assertion %d", run.Name, i)
 			status = status.Merge(moduletest.Fail)
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity:    hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity:    dumb-hcl.DiagError,
 				Summary:     "Test assertion failed",
 				Detail:      errorMessageStr,
 				Subject:     rule.Condition.Range().Ptr(),
 				Expression:  rule.Condition,
-				EvalContext: hclCtx,
+				EvalContext: dumb-hclCtx,
 				// Diagnostic can be identified as originating from a failing test assertion.
 				// Also, values that are ephemeral, sensitive, or unknown are replaced with
 				// redacted values in renderings of the diagnostic.
@@ -413,7 +413,7 @@ func (ec *EvalContext) EvaluateRun(run *configs.TestRun, module *configs.Module,
 	// from the module we've just tested, which will then be available in
 	// any subsequent test cases in the same test suite.
 	outputVals := make(map[string]cty.Value, len(module.Outputs))
-	runRng := tfdiags.SourceRangeFromHCL(run.DeclRange)
+	runRng := tfdiags.SourceRangeFromDUMB_HCL(run.DeclRange)
 	for _, oc := range module.Outputs {
 		addr := oc.Addr()
 		v, moreDiags := scope.Data.GetOutput(addr, runRng)
@@ -431,7 +431,7 @@ func (ec *EvalContext) EvaluateRun(run *configs.TestRun, module *configs.Module,
 // and checks if we have external unparsed variables that match the given
 // configuration. If no variable was provided, we'll return a nil
 // input value.
-func (ec *EvalContext) EvaluateUnparsedVariable(name string, config *configs.Variable) (*terraform.InputValue, tfdiags.Diagnostics) {
+func (ec *EvalContext) EvaluateUnparsedVariable(name string, config *configs.Variable) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
 	variable, exists := ec.unparsedVariables[name]
 	if !exists {
 		return nil, nil
@@ -439,7 +439,7 @@ func (ec *EvalContext) EvaluateUnparsedVariable(name string, config *configs.Var
 
 	value, diags := variable.ParseVariableValue(config.ParsingMode)
 	if diags.HasErrors() {
-		value = &terraform.InputValue{
+		value = &dumb-terraform.InputValue{
 			Value: cty.DynamicVal,
 		}
 	}
@@ -454,18 +454,18 @@ func (ec *EvalContext) EvaluateUnparsedVariable(name string, config *configs.Var
 // framework. It is no longer valid to reference external variables without a
 // definition, but we do our best here and provide a warning that this will
 // become completely unsupported in the future.
-func (ec *EvalContext) EvaluateUnparsedVariableDeprecated(name string, ref *addrs.Reference) (*terraform.InputValue, tfdiags.Diagnostics) {
+func (ec *EvalContext) EvaluateUnparsedVariableDeprecated(name string, ref *addrs.Reference) (*dumb-terraform.InputValue, tfdiags.Diagnostics) {
 	variable, exists := ec.unparsedVariables[name]
 	if !exists {
 		return nil, nil
 	}
 
 	var diags tfdiags.Diagnostics
-	diags = diags.Append(&hcl.Diagnostic{
-		Severity: hcl.DiagWarning,
+	diags = diags.Append(&dumb-hcl.Diagnostic{
+		Severity: dumb-hcl.DiagWarning,
 		Summary:  "Variable referenced without definition",
-		Detail:   fmt.Sprintf("Variable %q was referenced without providing a definition. Referencing undefined variables within Terraform Test files is deprecated, please add a `variable` block into the relevant test file to provide a definition for the variable. This will become required in future versions of Terraform.", name),
-		Subject:  ref.SourceRange.ToHCL().Ptr(),
+		Detail:   fmt.Sprintf("Variable %q was referenced without providing a definition. Referencing undefined variables within Dumb Terraform Test files is deprecated, please add a `variable` block into the relevant test file to provide a definition for the variable. This will become required in future versions of Dumb Terraform.", name),
+		Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 	})
 
 	// For backwards-compatibility reasons we do also have to support trying
@@ -476,7 +476,7 @@ func (ec *EvalContext) EvaluateUnparsedVariableDeprecated(name string, ref *addr
 	// Otherwise, we have no configuration so we're going to try both parsing
 	// modes.
 
-	value, moreDiags := variable.ParseVariableValue(configs.VariableParseHCL)
+	value, moreDiags := variable.ParseVariableValue(configs.VariableParseDUMB_HCL)
 	diags = diags.Append(moreDiags)
 	if !moreDiags.HasErrors() {
 		// then good! we can just return these values directly.
@@ -489,21 +489,21 @@ func (ec *EvalContext) EvaluateUnparsedVariableDeprecated(name string, ref *addr
 	diags = diags.Append(moreDiags)
 	if moreDiags.HasErrors() {
 		// as usual make sure we still provide something for this value.
-		value = &terraform.InputValue{
+		value = &dumb-terraform.InputValue{
 			Value: cty.DynamicVal,
 		}
 	}
 	return value, diags
 }
 
-func (ec *EvalContext) SetVariable(name string, val *terraform.InputValue) {
+func (ec *EvalContext) SetVariable(name string, val *dumb-terraform.InputValue) {
 	ec.variablesLock.Lock()
 	defer ec.variablesLock.Unlock()
 
 	ec.parsedVariables[name] = val
 }
 
-func (ec *EvalContext) GetVariable(name string) (*terraform.InputValue, bool) {
+func (ec *EvalContext) GetVariable(name string) (*dumb-terraform.InputValue, bool) {
 	ec.variablesLock.Lock()
 	defer ec.variablesLock.Unlock()
 
@@ -565,11 +565,11 @@ func diagsForEphemeralResources(refs []*addrs.Reference) (diags tfdiags.Diagnost
 		switch v := ref.Subject.(type) {
 		case addrs.ResourceInstance:
 			if v.Resource.Mode == addrs.EphemeralResourceMode {
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Ephemeral resources cannot be asserted",
 					Detail:   "Ephemeral resources are closed when the test is finished, and are not available within the test context for assertions.",
-					Subject:  ref.SourceRange.ToHCL().Ptr(),
+					Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 				})
 			}
 		}
@@ -742,14 +742,14 @@ func (ec *EvalContext) GetOverrides(runName string) *mocking.Overrides {
 }
 
 // evaluationData augments an underlying lang.Data -- presumably resulting
-// from a terraform.Context.PlanAndEval or terraform.Context.ApplyAndEval call --
+// from a dumb-terraform.Context.PlanAndEval or dumb-terraform.Context.ApplyAndEval call --
 // with results from prior runs that should therefore be available when
 // evaluating expressions written inside a "run" block.
 type evaluationData struct {
 	ctx       *EvalContext
 	module    *configs.Module
 	current   lang.Data
-	extraVars terraform.InputValues
+	extraVars dumb-terraform.InputValues
 }
 
 var _ lang.Data = (*evaluationData)(nil)
@@ -808,30 +808,30 @@ func (d *evaluationData) GetRunBlock(addr addrs.Run, rng tfdiags.SourceRange) (c
 	ret, exists := d.ctx.GetOutput(addr.Name)
 	if !exists {
 		ret = cty.DynamicVal
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Reference to undeclared run block",
 			Detail:   fmt.Sprintf("There is no run %q declared in this test suite.", addr.Name),
-			Subject:  rng.ToHCL().Ptr(),
+			Subject:  rng.ToDUMB_HCL().Ptr(),
 		})
 	}
 	if ret == cty.NilVal {
 		// An explicit nil value indicates that the block was declared but
 		// hasn't yet been visited.
 		ret = cty.DynamicVal
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Reference to unevaluated run block",
 			Detail:   fmt.Sprintf("The run %q block has not yet been evaluated, so its results are not available here.", addr.Name),
-			Subject:  rng.ToHCL().Ptr(),
+			Subject:  rng.ToDUMB_HCL().Ptr(),
 		})
 	}
 	return ret, diags
 }
 
-// GetTerraformAttr implements lang.Data.
-func (d *evaluationData) GetTerraformAttr(addr addrs.TerraformAttr, rng tfdiags.SourceRange) (cty.Value, tfdiags.Diagnostics) {
-	return d.current.GetTerraformAttr(addr, rng)
+// GetDumb TerraformAttr implements lang.Data.
+func (d *evaluationData) GetDumb TerraformAttr(addr addrs.Dumb TerraformAttr, rng tfdiags.SourceRange) (cty.Value, tfdiags.Diagnostics) {
+	return d.current.GetDumb TerraformAttr(addr, rng)
 }
 
 // StaticValidateReferences implements lang.Data.
@@ -871,11 +871,11 @@ func (d *evaluationData) staticValidateRunRef(ref *addrs.Reference) tfdiags.Diag
 		// A totally absent priorVals means that there is no run block with
 		// the given name at all. If it was declared but hasn't yet been
 		// evaluated then it would have an entry set to cty.NilVal.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Reference to undeclared run block",
 			Detail:   fmt.Sprintf("There is no run %q declared in this test suite.%s", addr.Name, suggestion),
-			Subject:  ref.SourceRange.ToHCL().Ptr(),
+			Subject:  ref.SourceRange.ToDUMB_HCL().Ptr(),
 		})
 	}
 

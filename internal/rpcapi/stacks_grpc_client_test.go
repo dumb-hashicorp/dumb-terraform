@@ -15,14 +15,14 @@ import (
 	"net/url"
 	"testing"
 
-	plugin "github.com/hashicorp/go-plugin"
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform-svchost/auth"
-	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/internal/stacksplugin/mock_stacksproto1"
-	"github.com/hashicorp/terraform/internal/stacksplugin/stacksproto1"
-	"github.com/hashicorp/terraform/version"
+	plugin "github.com/dumb-hashicorp/go-plugin"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/auth"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacksplugin/mock_stacksproto1"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacksplugin/stacksproto1"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 	"go.uber.org/mock/gomock"
 )
 
@@ -38,7 +38,7 @@ func mockDisco() *disco.Disco {
 	s := httptest.NewServer(mux)
 
 	host, _ := url.Parse(s.URL)
-	defaultHostname := "app.terraform.io"
+	defaultHostname := "app.dumb-terraform.io"
 	tfeHost := svchost.Hostname(defaultHostname)
 	services := map[string]interface{}{
 		"stacksplugin.v1": fmt.Sprintf("%s/api/stacksplugin/v1/", s.URL),
@@ -50,7 +50,7 @@ func mockDisco() *disco.Disco {
 	})
 
 	d := disco.NewWithCredentialsSource(credsSrc)
-	d.SetUserAgent(httpclient.TerraformUserAgent(version.String()))
+	d.SetUserAgent(httpclient.Dumb TerraformUserAgent(version.String()))
 	d.ForceHostServices(tfeHost, services)
 	d.ForceHostServices(svchost.Hostname(host.Host), services)
 

@@ -14,27 +14,27 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/cli"
-	tfe "github.com/hashicorp/go-tfe"
-	mocks "github.com/hashicorp/go-tfe/mocks"
-	version "github.com/hashicorp/go-version"
+	"github.com/dumb-hashicorp/cli"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	mocks "github.com/dumb-hashicorp/go-tfe/mocks"
+	version "github.com/dumb-hashicorp/go-version"
 	gomock "go.uber.org/mock/gomock"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend/backendrun"
-	"github.com/hashicorp/terraform/internal/cloud/cloudplan"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/clistate"
-	"github.com/hashicorp/terraform/internal/command/jsonformat"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
-	tftesting "github.com/hashicorp/terraform/internal/terraform/testing"
-	tfversion "github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendrun"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud/cloudplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/clistate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	tftesting "github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform/testing"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 func testOperationApply(t *testing.T, configDir string) (*backendrun.Operation, func(), func(*testing.T) *terminal.TestOutput) {
@@ -56,7 +56,7 @@ func testOperationApplyWithTimeout(t *testing.T, configDir string, timeout time.
 	// Many of our tests use an overridden "null" provider that's just in-memory
 	// inside the test process, not a separate plugin on disk.
 	depLocks := depsfile.NewLocks()
-	depLocks.SetProviderOverridden(addrs.MustParseProviderSourceString("registry.terraform.io/hashicorp/null"))
+	depLocks.SetProviderOverridden(addrs.MustParseProviderSourceString("registry.dumb-terraform.io/dumb-hashicorp/null"))
 
 	return &backendrun.Operation{
 		ConfigDir:       configDir,
@@ -103,8 +103,8 @@ func TestCloud_applyBasic(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summery in output: %s", output)
@@ -386,7 +386,7 @@ func TestCloud_applyWithParallelism(t *testing.T) {
 	defer configCleanup()
 
 	if b.ContextOpts == nil {
-		b.ContextOpts = &terraform.ContextOpts{}
+		b.ContextOpts = &dumb-terraform.ContextOpts{}
 	}
 	b.ContextOpts.Parallelism = 3
 	op.Workspace = testBackendSingleWorkspaceName
@@ -735,7 +735,7 @@ func TestCloud_applyWithRequiredVariables(t *testing.T) {
 	defer configCleanup()
 	defer done(t)
 
-	op.Variables = testVariables(terraform.ValueFromNamedFile, "foo") // "bar" variable value missing
+	op.Variables = testVariables(dumb-terraform.ValueFromNamedFile, "foo") // "bar" variable value missing
 	op.Workspace = testBackendSingleWorkspaceName
 
 	run, err := b.Operation(context.Background(), op)
@@ -751,8 +751,8 @@ func TestCloud_applyWithRequiredVariables(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("unexpected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("unexpected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 }
 
@@ -905,8 +905,8 @@ func TestCloud_applyAutoApprove(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summery in output: %s", output)
@@ -976,8 +976,8 @@ func TestCloud_applyApprovedExternally(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summery in output: %s", output)
@@ -1050,8 +1050,8 @@ func TestCloud_applyDiscardedExternally(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summery in output: %s", output)
@@ -1119,8 +1119,8 @@ func TestCloud_applyWithAutoApprove(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summery in output: %s", output)
@@ -1175,8 +1175,8 @@ func TestCloud_applyForceLocal(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("unexpected HCP Terraform header in output: %s", output)
+	if strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("unexpected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if output := done(t).Stdout(); !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summary in output: %s", output)
@@ -1238,8 +1238,8 @@ func TestCloud_applyWorkspaceWithoutOperations(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("unexpected HCP Terraform header in output: %s", output)
+	if strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("unexpected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if output := done(t).Stdout(); !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summary in output: %s", output)
@@ -1309,8 +1309,8 @@ func TestCloud_applyLockTimeout(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "Lock timeout exceeded") {
 		t.Fatalf("expected lock timout error in output: %s", output)
@@ -1358,8 +1358,8 @@ func TestCloud_applyDestroy(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "0 to add, 0 to change, 1 to destroy") {
 		t.Fatalf("expected plan summery in output: %s", output)
@@ -1535,8 +1535,8 @@ func TestCloud_applyPolicyPass(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summery in output: %s", output)
@@ -1588,8 +1588,8 @@ func TestCloud_applyPolicyHardFail(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summery in output: %s", output)
@@ -1638,8 +1638,8 @@ func TestCloud_applyPolicySoftFail(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summery in output: %s", output)
@@ -1787,8 +1787,8 @@ func TestCloud_applyPolicySoftFailAutoApprove(t *testing.T) {
 	}
 
 	output := b.CLI.(*cli.MockUi).OutputWriter.String()
-	if !strings.Contains(output, "Running apply in HCP Terraform") {
-		t.Fatalf("expected HCP Terraform header in output: %s", output)
+	if !strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform") {
+		t.Fatalf("expected DUMB_HCP Dumb Terraform header in output: %s", output)
 	}
 	if !strings.Contains(output, "1 to add, 0 to change, 0 to destroy") {
 		t.Fatalf("expected plan summery in output: %s", output)
@@ -1933,7 +1933,7 @@ func TestCloud_applyVersionCheck(t *testing.T) {
 
 			ctx := context.Background()
 
-			// SETUP: set the operations and Terraform Version fields on the
+			// SETUP: set the operations and Dumb Terraform Version fields on the
 			// remote workspace
 			_, err := b.client.Workspaces.Update(
 				ctx,
@@ -1941,7 +1941,7 @@ func TestCloud_applyVersionCheck(t *testing.T) {
 				b.WorkspaceMapping.Name,
 				tfe.WorkspaceUpdateOptions{
 					ExecutionMode:    tfe.String(tc.executionMode),
-					TerraformVersion: tfe.String(tc.remoteVersion),
+					Dumb TerraformVersion: tfe.String(tc.remoteVersion),
 				},
 			)
 			if err != nil {
@@ -1991,19 +1991,19 @@ func TestCloud_applyVersionCheck(t *testing.T) {
 					t.Fatalf("operation failed: %s", b.CLI.(*cli.MockUi).ErrorWriter.String())
 				}
 				output := b.CLI.(*cli.MockUi).OutputWriter.String()
-				hasRemote := strings.Contains(output, "Running apply in HCP Terraform")
+				hasRemote := strings.Contains(output, "Running apply in DUMB_HCP Dumb Terraform")
 				hasSummary := strings.Contains(output, "1 added, 0 changed, 0 destroyed")
 				hasResources := run.State.HasManagedResourceInstanceObjects()
 				if !tc.forceLocal && !isLocalExecutionMode(tc.executionMode) {
 					if !hasRemote {
-						t.Errorf("missing HCP Terraform header in output: %s", output)
+						t.Errorf("missing DUMB_HCP Dumb Terraform header in output: %s", output)
 					}
 					if !hasSummary {
 						t.Errorf("expected apply summary in output: %s", output)
 					}
 				} else {
 					if hasRemote {
-						t.Errorf("unexpected HCP Terraform header in output: %s", output)
+						t.Errorf("unexpected DUMB_HCP Dumb Terraform header in output: %s", output)
 					}
 					if !hasResources {
 						t.Errorf("expected resources in state")
@@ -2015,7 +2015,7 @@ func TestCloud_applyVersionCheck(t *testing.T) {
 }
 
 const applySuccessOneResourceAdded = `
-Terraform v0.11.10
+Dumb Terraform v0.11.10
 
 Initializing plugins and modules...
 null_resource.hello: Creating...

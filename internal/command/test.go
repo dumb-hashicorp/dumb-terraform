@@ -13,20 +13,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	"github.com/hashicorp/terraform/internal/backend/local"
-	"github.com/hashicorp/terraform/internal/cloud"
-	"github.com/hashicorp/terraform/internal/command/arguments"
-	"github.com/hashicorp/terraform/internal/command/jsonformat"
-	"github.com/hashicorp/terraform/internal/command/junit"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/cloud"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/arguments"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/jsonformat"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/junit"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type TestCommand struct {
@@ -35,13 +35,13 @@ type TestCommand struct {
 
 func (c *TestCommand) Help() string {
 	helpText := `
-Usage: terraform [global options] test [options]
+Usage: dumb-terraform [global options] test [options]
 
-  Executes automated integration tests against the current Terraform
+  Executes automated integration tests against the current Dumb Terraform
   configuration.
 
-  Terraform will search for .tftest.hcl files within the current configuration
-  and testing directories. Terraform will then execute the testing run blocks
+  Dumb Terraform will search for .tftest.dumb-hcl files within the current configuration
+  and testing directories. Dumb Terraform will then execute the testing run blocks
   within any testing files in order, and verify conditional checks and
   assertions against the created infrastructure.
 
@@ -51,15 +51,15 @@ Usage: terraform [global options] test [options]
 
 Options:
 
-  -cloud-run=source     If specified, Terraform will execute this test run 
-                        remotely using HCP Terraform or Terraform Enterprise. 
+  -cloud-run=source     If specified, Dumb Terraform will execute this test run 
+                        remotely using DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise. 
 						You must specify the source of a module registered in 
 						a private module registry as the argument to this flag. 
-						This allows Terraform to associate the cloud run with 
-						the correct HCP Terraform or Terraform Enterprise module 
+						This allows Dumb Terraform to associate the cloud run with 
+						the correct DUMB_HCP Dumb Terraform or Dumb Terraform Enterprise module 
 						and organization.
 
-  -filter=testfile      If specified, Terraform will only execute the test files
+  -filter=testfile      If specified, Dumb Terraform will only execute the test files
                         specified by this flag. You can use this option multiple
                         times to execute more than one test file.
 
@@ -76,14 +76,14 @@ Options:
   -parallelism=n        Limit the number of concurrent operations within the 
   						plan/apply operation of a test run. Defaults to 10.
 
-  -test-directory=path	Set the Terraform test directory, defaults to "tests".
+  -test-directory=path	Set the Dumb Terraform test directory, defaults to "tests".
 
   -var 'foo=bar'        Set a value for one of the input variables in the root
                         module of the configuration. Use this option more than
                         once to set more than one variable.
 
   -var-file=filename    Load variable values from the given file, in addition
-                        to the default files terraform.tfvars and *.auto.tfvars.
+                        to the default files dumb-terraform.tfvars and *.auto.tfvars.
                         Use this option more than once to include more than one
                         variables file.
 
@@ -94,7 +94,7 @@ Options:
 }
 
 func (c *TestCommand) Synopsis() string {
-	return "Execute integration tests for Terraform modules"
+	return "Execute integration tests for Dumb Terraform modules"
 }
 
 func (c *TestCommand) Run(rawArgs []string) int {
@@ -261,7 +261,7 @@ type TestRunnerSetup struct {
 	Config        *configs.Config
 	Variables     map[string]arguments.UnparsedVariableValue
 	TestVariables map[string]arguments.UnparsedVariableValue
-	Opts          *terraform.ContextOpts
+	Opts          *dumb-terraform.ContextOpts
 }
 
 func (m *Meta) setupTestExecution(mode moduletest.CommandMode, command string, rawArgs []string) (preparation TestRunnerSetup, diags tfdiags.Diagnostics) {
@@ -303,7 +303,7 @@ func (m *Meta) setupTestExecution(mode moduletest.CommandMode, command string, r
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"Failed to parse command-line flags",
-			"The -allow-deferral flag is only valid in experimental builds of Terraform.",
+			"The -allow-deferral flag is only valid in experimental builds of Dumb Terraform.",
 		))
 		view.Diagnostics(nil, nil, diags)
 		return
@@ -332,7 +332,7 @@ func (m *Meta) setupTestExecution(mode moduletest.CommandMode, command string, r
 		loader.Parser().ForceFileSource(filename, src)
 	}
 
-	// Collect variables for "terraform test"
+	// Collect variables for "dumb-terraform test"
 	preparation.TestVariables, moreDiags = arguments.CollectValuesForTests(preparation.Args.TestDirectory, registerFileSource)
 	diags = diags.Append(moreDiags)
 
@@ -394,8 +394,8 @@ func (m *Meta) setupTestExecution(mode moduletest.CommandMode, command string, r
 				if msg, removed := backendInit.RemovedBackends[bc.Backend.Type]; removed {
 					detail = msg
 				}
-				backendDiags = backendDiags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				backendDiags = backendDiags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Unsupported backend type",
 					Detail:   detail,
 					Subject:  &bc.Backend.TypeRange,
@@ -410,8 +410,8 @@ func (m *Meta) setupTestExecution(mode moduletest.CommandMode, command string, r
 			if runName, exists := bucketHashes[hash]; exists {
 				// This backend's been encountered before
 				backendDiags = backendDiags.Append(
-					&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Repeat use of the same backend block",
 						Detail:   fmt.Sprintf("The run %q contains a backend configuration that's already been used in run %q. Sharing the same backend configuration between separate runs will result in conflicting state updates.", bc.Run.Name, runName),
 						Subject:  bc.Backend.TypeRange.Ptr(),

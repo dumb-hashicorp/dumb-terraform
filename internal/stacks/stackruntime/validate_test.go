@@ -8,15 +8,15 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders/providerreqs"
-	"github.com/hashicorp/terraform/internal/providers"
-	stacks_testing_provider "github.com/hashicorp/terraform/internal/stacks/stackruntime/testing"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/providerreqs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	stacks_testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 type validateTestInput struct {
@@ -75,14 +75,14 @@ var (
 		"const-variable-in-component": {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Const variable not supported in stacks",
 					Detail:   "Variables with const = true are not supported in modules used as stack components. Const variables are evaluated during configuration loading, which is not supported in the stacks runtime.",
-					Subject: &hcl.Range{
+					Subject: &dumb-hcl.Range{
 						Filename: mainBundleSourceAddrStr("const-variable-in-component/const-variable-in-component.tf"),
-						Start:    hcl.Pos{Line: 10, Column: 1, Byte: 124},
-						End:      hcl.Pos{Line: 10, Column: 17, Byte: 140},
+						Start:    dumb-hcl.Pos{Line: 10, Column: 1, Byte: 124},
+						End:      dumb-hcl.Pos{Line: 10, Column: 17, Byte: 140},
 					},
 				})
 				return diags
@@ -91,14 +91,14 @@ var (
 		"validate-undeclared-variable": {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Reference to undeclared input variable",
 					Detail:   `There is no variable "a" block declared in this stack.`,
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("validate-undeclared-variable/validate-undeclared-variable.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 3, Column: 11, Byte: 40},
-						End:      hcl.Pos{Line: 3, Column: 16, Byte: 45},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("validate-undeclared-variable/validate-undeclared-variable.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 3, Column: 11, Byte: 40},
+						End:      dumb-hcl.Pos{Line: 3, Column: 16, Byte: 45},
 					},
 				})
 				return diags
@@ -107,14 +107,14 @@ var (
 		"invalid-configuration": {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Unsupported argument",
 					Detail:   "An argument named \"invalid\" is not expected here.",
-					Subject: &hcl.Range{
+					Subject: &dumb-hcl.Range{
 						Filename: mainBundleSourceAddrStr("invalid-configuration/invalid-configuration.tf"),
-						Start:    hcl.Pos{Line: 11, Column: 3, Byte: 163},
-						End:      hcl.Pos{Line: 11, Column: 10, Byte: 170},
+						Start:    dumb-hcl.Pos{Line: 11, Column: 3, Byte: 163},
+						End:      dumb-hcl.Pos{Line: 11, Column: 10, Byte: 170},
 					},
 				})
 				return diags
@@ -123,24 +123,24 @@ var (
 		filepath.Join("with-single-input", "undeclared-provider"): {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Reference to undeclared provider configuration",
 					Detail:   "There is no provider \"testing\" \"default\" block declared in this stack.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/undeclared-provider/undeclared-provider.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 10, Column: 15, Byte: 163},
-						End:      hcl.Pos{Line: 10, Column: 39, Byte: 187},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/undeclared-provider/undeclared-provider.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 10, Column: 15, Byte: 163},
+						End:      dumb-hcl.Pos{Line: 10, Column: 39, Byte: 187},
 					},
 				})
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Reference to undeclared provider configuration",
 					Detail:   "There is no provider \"testing\" \"default\" block declared in this stack.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/undeclared-provider/undeclared-provider.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 25, Column: 15, Byte: 379},
-						End:      hcl.Pos{Line: 25, Column: 39, Byte: 403},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/undeclared-provider/undeclared-provider.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 25, Column: 15, Byte: 379},
+						End:      dumb-hcl.Pos{Line: 25, Column: 39, Byte: 403},
 					},
 				})
 				return diags
@@ -149,24 +149,24 @@ var (
 		filepath.Join("with-single-input", "missing-provider"): {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Missing required provider configuration",
-					Detail:   "The root module for component.removed requires a provider configuration named \"testing\" for provider \"hashicorp/testing\", which is not assigned in the block's \"providers\" argument.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/missing-provider/missing-provider.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 25, Column: 1, Byte: 337},
-						End:      hcl.Pos{Line: 25, Column: 8, Byte: 344},
+					Detail:   "The root module for component.removed requires a provider configuration named \"testing\" for provider \"dumb-hashicorp/testing\", which is not assigned in the block's \"providers\" argument.",
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/missing-provider/missing-provider.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 25, Column: 1, Byte: 337},
+						End:      dumb-hcl.Pos{Line: 25, Column: 8, Byte: 344},
 					},
 				})
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Missing required provider configuration",
-					Detail:   "The root module for component.self requires a provider configuration named \"testing\" for provider \"hashicorp/testing\", which is not assigned in the block's \"providers\" argument.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/missing-provider/missing-provider.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 14, Column: 1, Byte: 169},
-						End:      hcl.Pos{Line: 14, Column: 17, Byte: 185},
+					Detail:   "The root module for component.self requires a provider configuration named \"testing\" for provider \"dumb-hashicorp/testing\", which is not assigned in the block's \"providers\" argument.",
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/missing-provider/missing-provider.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 14, Column: 1, Byte: 169},
+						End:      dumb-hcl.Pos{Line: 14, Column: 17, Byte: 185},
 					},
 				})
 				return diags
@@ -175,24 +175,24 @@ var (
 		filepath.Join("with-single-input", "invalid-provider-type"): {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid provider configuration",
-					Detail:   "The provider configuration slot \"testing\" requires a configuration for provider \"registry.terraform.io/hashicorp/testing\", not for provider \"terraform.io/builtin/testing\".",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/invalid-provider-type/invalid-provider-type.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 22, Column: 15, Byte: 378},
-						End:      hcl.Pos{Line: 22, Column: 39, Byte: 402},
+					Detail:   "The provider configuration slot \"testing\" requires a configuration for provider \"registry.dumb-terraform.io/dumb-hashicorp/testing\", not for provider \"dumb-terraform.io/builtin/testing\".",
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/invalid-provider-type/invalid-provider-type.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 22, Column: 15, Byte: 378},
+						End:      dumb-hcl.Pos{Line: 22, Column: 39, Byte: 402},
 					},
 				})
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid provider configuration",
-					Detail:   "The provider configuration slot \"testing\" requires a configuration for provider \"registry.terraform.io/hashicorp/testing\", not for provider \"terraform.io/builtin/testing\".",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/invalid-provider-type/invalid-provider-type.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 37, Column: 15, Byte: 614},
-						End:      hcl.Pos{Line: 37, Column: 39, Byte: 638},
+					Detail:   "The provider configuration slot \"testing\" requires a configuration for provider \"registry.dumb-terraform.io/dumb-hashicorp/testing\", not for provider \"dumb-terraform.io/builtin/testing\".",
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/invalid-provider-type/invalid-provider-type.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 37, Column: 15, Byte: 614},
+						End:      dumb-hcl.Pos{Line: 37, Column: 39, Byte: 638},
 					},
 				})
 				return diags
@@ -201,14 +201,14 @@ var (
 		filepath.Join("with-single-input", "invalid-provider-config"): {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Unsupported argument",
 					Detail:   "An argument named \"imaginary\" is not expected here.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/invalid-provider-config/invalid-provider-config.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 11, Column: 5, Byte: 218},
-						End:      hcl.Pos{Line: 11, Column: 14, Byte: 227},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/invalid-provider-config/invalid-provider-config.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 11, Column: 5, Byte: 218},
+						End:      dumb-hcl.Pos{Line: 11, Column: 14, Byte: 227},
 					},
 				})
 				return diags
@@ -217,14 +217,14 @@ var (
 		filepath.Join("with-single-input", "undeclared-variable"): {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Reference to undeclared input variable",
 					Detail:   `There is no variable "input" block declared in this stack.`,
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/undeclared-variable/undeclared-variable.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 19, Column: 13, Byte: 284},
-						End:      hcl.Pos{Line: 19, Column: 22, Byte: 293},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/undeclared-variable/undeclared-variable.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 19, Column: 13, Byte: 284},
+						End:      dumb-hcl.Pos{Line: 19, Column: 22, Byte: 293},
 					},
 				})
 				return diags
@@ -233,14 +233,14 @@ var (
 		filepath.Join("with-single-input", "missing-variable"): {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid inputs for component",
 					Detail:   "Invalid input variable definition object: attribute \"input\" is required.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/missing-variable/missing-variable.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 22, Column: 12, Byte: 338},
-						End:      hcl.Pos{Line: 22, Column: 14, Byte: 340},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/missing-variable/missing-variable.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 22, Column: 12, Byte: 338},
+						End:      dumb-hcl.Pos{Line: 22, Column: 14, Byte: 340},
 					},
 				})
 				return diags
@@ -249,14 +249,14 @@ var (
 		filepath.Join("with-single-input", "input-from-missing-component"): {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Reference to undeclared component",
 					Detail:   "There is no component \"output\" block declared in this stack.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/input-from-missing-component/input-from-missing-component.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 19, Column: 13, Byte: 314},
-						End:      hcl.Pos{Line: 19, Column: 29, Byte: 330},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/input-from-missing-component/input-from-missing-component.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 19, Column: 13, Byte: 314},
+						End:      dumb-hcl.Pos{Line: 19, Column: 29, Byte: 330},
 					},
 				})
 				return diags
@@ -265,14 +265,14 @@ var (
 		filepath.Join("with-single-input", "input-from-provider"): {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid inputs for component",
-					Detail:   "Invalid input variable definition object: attribute \"input\": string required, but have configuration for hashicorp/testing provider.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/input-from-provider/input-from-provider.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 17, Column: 12, Byte: 239},
-						End:      hcl.Pos{Line: 20, Column: 4, Byte: 339},
+					Detail:   "Invalid input variable definition object: attribute \"input\": string required, but have configuration for dumb-hashicorp/testing provider.",
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/input-from-provider/input-from-provider.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 17, Column: 12, Byte: 239},
+						End:      dumb-hcl.Pos{Line: 20, Column: 4, Byte: 339},
 					},
 				})
 				return diags
@@ -281,55 +281,55 @@ var (
 		filepath.Join("with-single-input", "depends-on-invalid"): {
 			diags: func() tfdiags.Diagnostics {
 				var diags tfdiags.Diagnostics
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid depends_on target",
 					Detail:   "The depends_on argument must refer to an embedded stack or component, but this reference refers to \"var.input\".",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/depends-on-invalid/depends-on-invalid.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 22, Column: 17, Byte: 293},
-						End:      hcl.Pos{Line: 22, Column: 26, Byte: 302},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/depends-on-invalid/depends-on-invalid.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 22, Column: 17, Byte: 293},
+						End:      dumb-hcl.Pos{Line: 22, Column: 26, Byte: 302},
 					},
 				})
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid depends_on target",
 					Detail:   "The depends_on argument must refer to an embedded stack or component, but this reference refers to \"var.input\".",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/depends-on-invalid/depends-on-invalid.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 37, Column: 17, Byte: 509},
-						End:      hcl.Pos{Line: 37, Column: 26, Byte: 518},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/depends-on-invalid/depends-on-invalid.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 37, Column: 17, Byte: 509},
+						End:      dumb-hcl.Pos{Line: 37, Column: 26, Byte: 518},
 					},
 				})
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid depends_on target",
 					Detail:   "The depends_on reference \"component.missing\" does not exist.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/depends-on-invalid/depends-on-invalid.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 22, Column: 28, Byte: 304},
-						End:      hcl.Pos{Line: 22, Column: 45, Byte: 321},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/depends-on-invalid/depends-on-invalid.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 22, Column: 28, Byte: 304},
+						End:      dumb-hcl.Pos{Line: 22, Column: 45, Byte: 321},
 					},
 				})
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid depends_on target",
 					Detail:   "The depends_on reference \"stack.missing\" does not exist.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/depends-on-invalid/depends-on-invalid.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 37, Column: 28, Byte: 520},
-						End:      hcl.Pos{Line: 37, Column: 41, Byte: 533},
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/depends-on-invalid/depends-on-invalid.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 37, Column: 28, Byte: 520},
+						End:      dumb-hcl.Pos{Line: 37, Column: 41, Byte: 533},
 					},
 				})
-				diags = diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagWarning,
+				diags = diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagWarning,
 					Summary:  "Non-valid depends_on target",
 					Detail: "The depends_on argument should refer directly to an embedded stack or component in configuration, but this reference is too deep.\n\n" +
-						"Terraform Stacks has simplified the reference to the nearest valid target, \"component.first\". To remove this warning, update the configuration to the same target.",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("with-single-input/depends-on-invalid/depends-on-invalid.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 52, Column: 17, Byte: 722},
-						End:      hcl.Pos{Line: 52, Column: 32, Byte: 737},
+						"Dumb Terraform Stacks has simplified the reference to the nearest valid target, \"component.first\". To remove this warning, update the configuration to the same target.",
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("with-single-input/depends-on-invalid/depends-on-invalid.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 52, Column: 17, Byte: 722},
+						End:      dumb-hcl.Pos{Line: 52, Column: 32, Byte: 737},
 					},
 				})
 				return diags
@@ -371,8 +371,8 @@ func TestValidate_valid(t *testing.T) {
 			testContext := TestContext{
 				config: loadMainBundleConfigForTest(t, name),
 				providers: map[addrs.Provider]providers.Factory{
-					// We support both hashicorp/testing and
-					// terraform.io/builtin/testing as providers. This lets us
+					// We support both dumb-hashicorp/testing and
+					// dumb-terraform.io/builtin/testing as providers. This lets us
 					// test the provider aliasing feature. Both providers
 					// support the same set of resources and data sources.
 					addrs.NewDefaultProvider("testing"): func() (providers.Interface, error) {
@@ -422,8 +422,8 @@ func TestValidate_invalid(t *testing.T) {
 			testContext := TestContext{
 				config: loadMainBundleConfigForTest(t, name),
 				providers: map[addrs.Provider]providers.Factory{
-					// We support both hashicorp/testing and
-					// terraform.io/builtin/testing as providers. This lets us
+					// We support both dumb-hashicorp/testing and
+					// dumb-terraform.io/builtin/testing as providers. This lets us
 					// test the provider aliasing feature. Both providers
 					// support the same set of resources and data sources.
 					addrs.NewDefaultProvider("testing"): func() (providers.Interface, error) {
@@ -465,7 +465,7 @@ func TestValidate(t *testing.T) {
   - stack.a.output.a
   - stack.a inputs
 
-Terraform uses references to decide a suitable order for performing operations, so configuration items may not refer to their own results either directly or indirectly.`,
+Dumb Terraform uses references to decide a suitable order for performing operations, so configuration items may not refer to their own results either directly or indirectly.`,
 				))
 			}),
 		},
@@ -476,10 +476,10 @@ Terraform uses references to decide a suitable order for performing operations, 
 					tfdiags.Error,
 					"Self-dependent items in configuration",
 					`The following items in your configuration form a circular dependency chain through their references:
-  - component.boundary
-  - component.vault-config
+  - component.dumb-boundary
+  - component.dumb-vault-config
 
-Terraform uses references to decide a suitable order for performing operations, so configuration items may not refer to their own results either directly or indirectly.`,
+Dumb Terraform uses references to decide a suitable order for performing operations, so configuration items may not refer to their own results either directly or indirectly.`,
 				))
 			}),
 		},
@@ -492,43 +492,43 @@ Terraform uses references to decide a suitable order for performing operations, 
 			},
 			locks: depsfile.NewLocks(), // deliberately empty
 			wantDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-				return diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				return diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Provider missing from lockfile",
-					Detail:   "Provider \"registry.terraform.io/hashicorp/testing\" is not in the lockfile. This provider must be in the lockfile to be used in the configuration. Please run `terraform stacks providers lock` to update the lockfile and run this operation again with an updated configuration.",
-					Subject: &hcl.Range{
-						Filename: "git::https://example.com/test.git//with-single-input/input-from-component/input-from-component.tfcomponent.hcl",
-						Start:    hcl.Pos{Line: 8, Column: 1, Byte: 98},
-						End:      hcl.Pos{Line: 8, Column: 29, Byte: 126},
+					Detail:   "Provider \"registry.dumb-terraform.io/dumb-hashicorp/testing\" is not in the lockfile. This provider must be in the lockfile to be used in the configuration. Please run `dumb-terraform stacks providers lock` to update the lockfile and run this operation again with an updated configuration.",
+					Subject: &dumb-hcl.Range{
+						Filename: "git::https://example.com/test.git//with-single-input/input-from-component/input-from-component.tfcomponent.dumb-hcl",
+						Start:    dumb-hcl.Pos{Line: 8, Column: 1, Byte: 98},
+						End:      dumb-hcl.Pos{Line: 8, Column: 29, Byte: 126},
 					},
 				})
 			}),
 		},
-		"implied-provider-type-with-hashicorp-provider": {
-			path: filepath.Join("legacy-module", "with-hashicorp-provider"),
+		"implied-provider-type-with-dumb-hashicorp-provider": {
+			path: filepath.Join("legacy-module", "with-dumb-hashicorp-provider"),
 			providers: map[addrs.Provider]providers.Factory{
 				addrs.NewDefaultProvider("testing"): func() (providers.Interface, error) {
 					return stacks_testing_provider.NewProvider(t), nil
 				},
 			},
 		},
-		"implied-provider-type-with-non-hashicorp-provider": {
-			path: filepath.Join("legacy-module", "with-non-hashicorp-provider"),
+		"implied-provider-type-with-non-dumb-hashicorp-provider": {
+			path: filepath.Join("legacy-module", "with-non-dumb-hashicorp-provider"),
 			providers: map[addrs.Provider]providers.Factory{
 				addrs.NewProvider(addrs.DefaultProviderRegistryHost, "other", "testing"): func() (providers.Interface, error) {
 					return stacks_testing_provider.NewProvider(t), nil
 				},
 			},
 			wantDiags: initDiags(func(diags tfdiags.Diagnostics) tfdiags.Diagnostics {
-				return diags.Append(&hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				return diags.Append(&dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Invalid provider configuration",
-					Detail: "The provider configuration slot \"testing\" requires a configuration for provider \"registry.terraform.io/hashicorp/testing\", not for provider \"registry.terraform.io/other/testing\"." +
-						"\n\nThe module does not declare a source address for \"testing\" in its required_providers block, so Terraform assumed \"hashicorp/testing\" for backward-compatibility with older versions of Terraform",
-					Subject: &hcl.Range{
-						Filename: mainBundleSourceAddrStr("legacy-module/with-non-hashicorp-provider/with-non-hashicorp-provider.tfcomponent.hcl"),
-						Start:    hcl.Pos{Line: 21, Column: 15, Byte: 447},
-						End:      hcl.Pos{Line: 21, Column: 39, Byte: 471},
+					Detail: "The provider configuration slot \"testing\" requires a configuration for provider \"registry.dumb-terraform.io/dumb-hashicorp/testing\", not for provider \"registry.dumb-terraform.io/other/testing\"." +
+						"\n\nThe module does not declare a source address for \"testing\" in its required_providers block, so Dumb Terraform assumed \"dumb-hashicorp/testing\" for backward-compatibility with older versions of Dumb Terraform",
+					Subject: &dumb-hcl.Range{
+						Filename: mainBundleSourceAddrStr("legacy-module/with-non-dumb-hashicorp-provider/with-non-dumb-hashicorp-provider.tfcomponent.dumb-hcl"),
+						Start:    dumb-hcl.Pos{Line: 21, Column: 15, Byte: 447},
+						End:      dumb-hcl.Pos{Line: 21, Column: 39, Byte: 471},
 					},
 				})
 			}),

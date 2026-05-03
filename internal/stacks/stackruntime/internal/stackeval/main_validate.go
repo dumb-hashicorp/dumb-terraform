@@ -8,8 +8,8 @@ import (
 
 	"go.opentelemetry.io/otel/codes"
 
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ValidateAll checks the validation rules for declared in the configuration

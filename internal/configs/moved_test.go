@@ -7,37 +7,37 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcltest"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 func TestMovedBlock_decode(t *testing.T) {
-	blockRange := hcl.Range{
+	blockRange := dumb-hcl.Range{
 		Filename: "mock.tf",
-		Start:    hcl.Pos{Line: 3, Column: 12, Byte: 27},
-		End:      hcl.Pos{Line: 3, Column: 19, Byte: 34},
+		Start:    dumb-hcl.Pos{Line: 3, Column: 12, Byte: 27},
+		End:      dumb-hcl.Pos{Line: 3, Column: 19, Byte: 34},
 	}
 
-	foo_expr := hcltest.MockExprTraversalSrc("test_instance.foo")
-	bar_expr := hcltest.MockExprTraversalSrc("test_instance.bar")
+	foo_expr := dumb-hcltest.MockExprTraversalSrc("test_instance.foo")
+	bar_expr := dumb-hcltest.MockExprTraversalSrc("test_instance.bar")
 
-	foo_index_expr := hcltest.MockExprTraversalSrc("test_instance.foo[1]")
-	bar_index_expr := hcltest.MockExprTraversalSrc("test_instance.bar[\"one\"]")
+	foo_index_expr := dumb-hcltest.MockExprTraversalSrc("test_instance.foo[1]")
+	bar_index_expr := dumb-hcltest.MockExprTraversalSrc("test_instance.bar[\"one\"]")
 
-	mod_foo_expr := hcltest.MockExprTraversalSrc("module.foo")
-	mod_bar_expr := hcltest.MockExprTraversalSrc("module.bar")
+	mod_foo_expr := dumb-hcltest.MockExprTraversalSrc("module.foo")
+	mod_bar_expr := dumb-hcltest.MockExprTraversalSrc("module.bar")
 
 	tests := map[string]struct {
-		input *hcl.Block
+		input *dumb-hcl.Block
 		want  *Moved
 		err   string
 	}{
 		"success": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "moved",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: foo_expr,
@@ -58,10 +58,10 @@ func TestMovedBlock_decode(t *testing.T) {
 			``,
 		},
 		"indexed resources": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "moved",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: foo_index_expr,
@@ -82,10 +82,10 @@ func TestMovedBlock_decode(t *testing.T) {
 			``,
 		},
 		"modules": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "moved",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: mod_foo_expr,
@@ -106,10 +106,10 @@ func TestMovedBlock_decode(t *testing.T) {
 			``,
 		},
 		"error: missing argument": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "moved",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"from": {
 							Name: "from",
 							Expr: foo_expr,
@@ -125,10 +125,10 @@ func TestMovedBlock_decode(t *testing.T) {
 			"Missing required argument",
 		},
 		"error: type mismatch": {
-			&hcl.Block{
+			&dumb-hcl.Block{
 				Type: "moved",
-				Body: hcltest.MockBody(&hcl.BodyContent{
-					Attributes: hcl.Attributes{
+				Body: dumb-hcltest.MockBody(&dumb-hcl.BodyContent{
+					Attributes: dumb-hcl.Attributes{
 						"to": {
 							Name: "to",
 							Expr: foo_expr,
@@ -196,10 +196,10 @@ func TestMovedBlock_inModule(t *testing.T) {
 	}
 }
 
-func mustMoveEndpointFromExpr(expr hcl.Expression) *addrs.MoveEndpoint {
-	traversal, hcldiags := hcl.AbsTraversalForExpr(expr)
-	if hcldiags.HasErrors() {
-		panic(hcldiags.Errs())
+func mustMoveEndpointFromExpr(expr dumb-hcl.Expression) *addrs.MoveEndpoint {
+	traversal, dumb-hcldiags := dumb-hcl.AbsTraversalForExpr(expr)
+	if dumb-hcldiags.HasErrors() {
+		panic(dumb-hcldiags.Errs())
 	}
 
 	ep, diags := addrs.ParseMoveEndpoint(traversal)

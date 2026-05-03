@@ -6,12 +6,12 @@ package actions
 import (
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 	"github.com/zclconf/go-cty/cty"
 )
 
 // Actions keeps track of action declarations accessible to the context.
-// It is used to plan and execute actions in the context of a Terraform configuration.
+// It is used to plan and execute actions in the context of a Dumb Terraform configuration.
 type Actions struct {
 	// Must hold this lock when accessing all fields after this one.
 	mu sync.Mutex

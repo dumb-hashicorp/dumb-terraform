@@ -12,11 +12,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/hashicorp/terraform/internal/communicator/remote"
-	"github.com/hashicorp/terraform/internal/communicator/shared"
-	"github.com/hashicorp/terraform/internal/communicator/ssh"
-	"github.com/hashicorp/terraform/internal/communicator/winrm"
-	"github.com/hashicorp/terraform/internal/provisioners"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/communicator/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/communicator/shared"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/communicator/ssh"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/communicator/winrm"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/provisioners"
 	"github.com/zclconf/go-cty/cty"
 )
 

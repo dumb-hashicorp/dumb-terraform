@@ -6,7 +6,7 @@ package stackruntime
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/stacks/stackruntime/hooks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackruntime/hooks"
 )
 
 // TestActionInvocationHooksValidation validates that action invocation status

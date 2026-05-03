@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -22,7 +22,7 @@ import (
 // out as something special and rare.
 //
 // This is not something we expect to see used a lot, but it's an important
-// part of our strategy to evolve the Terraform language in future using
+// part of our strategy to evolve the Dumb Terraform language in future using
 // editions, so that later editions can define new meta-arguments without
 // blocking access to externally-defined arguments of the same name.
 //
@@ -59,19 +59,19 @@ func TestEscapingBlockResource(t *testing.T) {
 				t.Errorf("wrong count\ngot:  %#v\nwant: %#v", got, want)
 			}
 		}
-		if got, want := rc.ForEach, hcl.Expression(nil); got != want {
+		if got, want := rc.ForEach, dumb-hcl.Expression(nil); got != want {
 			// Shouldn't have any count because our test fixture only has
 			// for_each in the escaping block.
 			t.Errorf("wrong for_each\ngot:  %#v\nwant: %#v", got, want)
 		}
 
-		schema := &hcl.BodySchema{
-			Attributes: []hcl.AttributeSchema{
+		schema := &dumb-hcl.BodySchema{
+			Attributes: []dumb-hcl.AttributeSchema{
 				{Name: "normal", Required: true},
 				{Name: "count", Required: true},
 				{Name: "for_each", Required: true},
 			},
-			Blocks: []hcl.BlockHeaderSchema{
+			Blocks: []dumb-hcl.BlockHeaderSchema{
 				{Type: "normal_block"},
 				{Type: "lifecycle"},
 				{Type: "_"},
@@ -107,12 +107,12 @@ func TestEscapingBlockResource(t *testing.T) {
 		}
 		pc := rc.Managed.Provisioners[0]
 
-		schema := &hcl.BodySchema{
-			Attributes: []hcl.AttributeSchema{
+		schema := &dumb-hcl.BodySchema{
+			Attributes: []dumb-hcl.AttributeSchema{
 				{Name: "when", Required: true},
 				{Name: "normal", Required: true},
 			},
-			Blocks: []hcl.BlockHeaderSchema{
+			Blocks: []dumb-hcl.BlockHeaderSchema{
 				{Type: "normal_block"},
 				{Type: "lifecycle"},
 				{Type: "_"},
@@ -156,19 +156,19 @@ func TestEscapingBlockData(t *testing.T) {
 			t.Errorf("wrong count\ngot:  %#v\nwant: %#v", got, want)
 		}
 	}
-	if got, want := rc.ForEach, hcl.Expression(nil); got != want {
+	if got, want := rc.ForEach, dumb-hcl.Expression(nil); got != want {
 		// Shouldn't have any count because our test fixture only has
 		// for_each in the escaping block.
 		t.Errorf("wrong for_each\ngot:  %#v\nwant: %#v", got, want)
 	}
 
-	schema := &hcl.BodySchema{
-		Attributes: []hcl.AttributeSchema{
+	schema := &dumb-hcl.BodySchema{
+		Attributes: []dumb-hcl.AttributeSchema{
 			{Name: "normal", Required: true},
 			{Name: "count", Required: true},
 			{Name: "for_each", Required: true},
 		},
-		Blocks: []hcl.BlockHeaderSchema{
+		Blocks: []dumb-hcl.BlockHeaderSchema{
 			{Type: "normal_block"},
 			{Type: "lifecycle"},
 			{Type: "_"},
@@ -222,19 +222,19 @@ func TestEscapingBlockModule(t *testing.T) {
 			t.Errorf("wrong count\ngot:  %#v\nwant: %#v", got, want)
 		}
 	}
-	if got, want := mc.ForEach, hcl.Expression(nil); got != want {
+	if got, want := mc.ForEach, dumb-hcl.Expression(nil); got != want {
 		// Shouldn't have any count because our test fixture only has
 		// for_each in the escaping block.
 		t.Errorf("wrong for_each\ngot:  %#v\nwant: %#v", got, want)
 	}
 
-	schema := &hcl.BodySchema{
-		Attributes: []hcl.AttributeSchema{
+	schema := &dumb-hcl.BodySchema{
+		Attributes: []dumb-hcl.AttributeSchema{
 			{Name: "normal", Required: true},
 			{Name: "count", Required: true},
 			{Name: "for_each", Required: true},
 		},
-		Blocks: []hcl.BlockHeaderSchema{
+		Blocks: []dumb-hcl.BlockHeaderSchema{
 			{Type: "normal_block"},
 			{Type: "lifecycle"},
 			{Type: "_"},
@@ -283,8 +283,8 @@ func TestEscapingBlockProvider(t *testing.T) {
 		t.Errorf("wrong alias\ngot:  %#v\nwant: %#v", got, want)
 	}
 
-	schema := &hcl.BodySchema{
-		Attributes: []hcl.AttributeSchema{
+	schema := &dumb-hcl.BodySchema{
+		Attributes: []dumb-hcl.AttributeSchema{
 			{Name: "normal", Required: true},
 			{Name: "alias", Required: true},
 			{Name: "version", Required: true},

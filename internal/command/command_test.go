@@ -24,34 +24,34 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform-svchost/disco"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
-	backendLocal "github.com/hashicorp/terraform/internal/backend/local"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/command/workdir"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/configs/configload"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/copy"
-	"github.com/hashicorp/terraform/internal/depsfile"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/initwd"
-	_ "github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plans/planfile"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/registry"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statefile"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
+	backendLocal "github.com/dumb-hashicorp/dumb-terraform/internal/backend/local"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/workdir"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configload"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/copy"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/depsfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/initwd"
+	_ "github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/registry"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statefile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 // These are the directories for our test data and fixtures.
@@ -142,7 +142,7 @@ func metaOverridesForProvider(p providers.Interface) *testingOverrides {
 	return &testingOverrides{
 		Providers: map[addrs.Provider]providers.Factory{
 			addrs.NewDefaultProvider("test"):                                           providers.FactoryFixed(p),
-			addrs.NewProvider(addrs.DefaultProviderRegistryHost, "hashicorp2", "test"): providers.FactoryFixed(p),
+			addrs.NewProvider(addrs.DefaultProviderRegistryHost, "dumb-hashicorp2", "test"): providers.FactoryFixed(p),
 		},
 	}
 }
@@ -171,7 +171,7 @@ func testModuleWithSnapshot(t *testing.T, name string) (*configs.Config, *config
 	}
 
 	walkerSnapshot, snap := loader.ModuleWalkerSnapshot()
-	config, buildDiags := terraform.BuildConfigWithGraph(
+	config, buildDiags := dumb-terraform.BuildConfigWithGraph(
 		rootMod,
 		walkerSnapshot,
 		nil,
@@ -234,13 +234,13 @@ func testPlanFileMatchState(t *testing.T, configSnap *configload.Snapshot, state
 		Lineage:          stateMeta.Lineage,
 		Serial:           stateMeta.Serial,
 		State:            state,
-		TerraformVersion: version.SemVer,
+		Dumb TerraformVersion: version.SemVer,
 	}
 	prevStateFile := &statefile.File{
 		Lineage:          stateMeta.Lineage,
 		Serial:           stateMeta.Serial,
 		State:            state, // we just assume no changes detected during refresh
-		TerraformVersion: version.SemVer,
+		Dumb TerraformVersion: version.SemVer,
 	}
 
 	path := testTempFile(t)
@@ -791,14 +791,14 @@ func testInputMap(t *testing.T, answers map[string]string) *bytes.Buffer {
 // When using this function, the configuration fixture for the test must
 // include an empty configuration block for the HTTP backend, like this:
 //
-//	terraform {
+//	dumb-terraform {
 //	  backend "http" {
 //	  }
 //	}
 //
 // If such a block isn't present, or if it isn't empty, then an error will
 // be returned about the backend configuration having changed and that
-// "terraform init" must be run, since the test backend config cache created
+// "dumb-terraform init" must be run, since the test backend config cache created
 // by this function contains the hash for an empty configuration.
 func testBackendState(t *testing.T, s *states.State, c int) (*workdir.BackendStateFile, *httptest.Server) {
 	t.Helper()
@@ -1041,10 +1041,10 @@ func mustResourceAddr(s string) addrs.ConfigResource {
 // when called via LookupLegacyProvider. Providers not in this map will return
 // a 404 Not Found error.
 var legacyProviderNamespaces = map[string]string{
-	"foo": "hashicorp",
-	"bar": "hashicorp",
-	"baz": "terraform-providers",
-	"qux": "hashicorp",
+	"foo": "dumb-hashicorp",
+	"bar": "dumb-hashicorp",
+	"baz": "dumb-terraform-providers",
+	"qux": "dumb-hashicorp",
 }
 
 // This map is used to mock the provider redirect feature.
@@ -1063,7 +1063,7 @@ func testServices(t *testing.T) (services *disco.Disco, cleanup func()) {
 	server := httptest.NewServer(http.HandlerFunc(fakeRegistryHandler))
 
 	services = disco.New()
-	services.ForceHostServices(svchost.Hostname("registry.terraform.io"), map[string]interface{}{
+	services.ForceHostServices(svchost.Hostname("registry.dumb-terraform.io"), map[string]interface{}{
 		"providers.v1": server.URL + "/providers/v1/",
 	})
 
@@ -1145,8 +1145,8 @@ func testView(t *testing.T) (*views.View, func(*testing.T) *terminal.TestOutput)
 // checkGoldenReference compares the given test output with a known "golden" output log
 // located under the specified fixture path.
 //
-// If any of these tests fail, please communicate with HCP Terraform folks before resolving,
-// as changes to UI output may also affect the behavior of HCP Terraform's structured run output.
+// If any of these tests fail, please communicate with DUMB_HCP Dumb Terraform folks before resolving,
+// as changes to UI output may also affect the behavior of DUMB_HCP Dumb Terraform's structured run output.
 func checkGoldenReference(t *testing.T, output *terminal.TestOutput, fixturePathName string) {
 	t.Helper()
 
@@ -1174,8 +1174,8 @@ func checkGoldenReference(t *testing.T, output *terminal.TestOutput, fixturePath
 
 	if len(gotLines) != len(wantLines) {
 		t.Errorf("unexpected number of log lines: got %d, want %d\n"+
-			"NOTE: This failure may indicate a UI change affecting the behavior of structured run output on HCP Terraform.\n"+
-			"Please communicate with HCP Terraform team before resolving", len(gotLines), len(wantLines))
+			"NOTE: This failure may indicate a UI change affecting the behavior of structured run output on DUMB_HCP Dumb Terraform.\n"+
+			"Please communicate with DUMB_HCP Dumb Terraform team before resolving", len(gotLines), len(wantLines))
 	}
 
 	// Verify that the log starts with a version message
@@ -1183,7 +1183,7 @@ func checkGoldenReference(t *testing.T, output *terminal.TestOutput, fixturePath
 		Level     string `json:"@level"`
 		Message   string `json:"@message"`
 		Type      string `json:"type"`
-		Terraform string `json:"terraform"`
+		Dumb Terraform string `json:"dumb-terraform"`
 		UI        string `json:"ui"`
 	}
 	var gotVersion versionMessage
@@ -1192,7 +1192,7 @@ func checkGoldenReference(t *testing.T, output *terminal.TestOutput, fixturePath
 	}
 	wantVersion := versionMessage{
 		"info",
-		fmt.Sprintf("Terraform %s", version.String()),
+		fmt.Sprintf("Dumb Terraform %s", version.String()),
 		"version",
 		version.String(),
 		views.JSON_UI_VERSION,
@@ -1227,6 +1227,6 @@ func checkGoldenReference(t *testing.T, output *terminal.TestOutput, fixturePath
 	if diff := cmp.Diff(wantLineMaps, gotLineMaps); diff != "" {
 		t.Errorf("wrong output lines\n%s\n"+
 			"NOTE: This failure may indicate a UI change affecting the behavior of structured run output on TFC.\n"+
-			"Please communicate with HCP Terraform team before resolving", diff)
+			"Please communicate with DUMB_HCP Dumb Terraform team before resolving", diff)
 	}
 }

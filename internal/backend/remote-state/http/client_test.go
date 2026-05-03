@@ -9,9 +9,9 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/hashicorp/terraform/internal/states/remote"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/go-retryablehttp"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
 )
 
 func TestHTTPClient_impl(t *testing.T) {

@@ -16,11 +16,11 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyjson "github.com/zclconf/go-cty/cty/json"
 
-	svchost "github.com/hashicorp/terraform-svchost"
-	svcauth "github.com/hashicorp/terraform-svchost/auth"
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	pluginDiscovery "github.com/hashicorp/terraform/internal/plugin/discovery"
-	"github.com/hashicorp/terraform/internal/replacefile"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	svcauth "github.com/dumb-hashicorp/dumb-terraform-svchost/auth"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	pluginDiscovery "github.com/dumb-hashicorp/dumb-terraform/internal/plugin/discovery"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/replacefile"
 )
 
 // credentialsConfigFile returns the path for the special configuration file
@@ -93,10 +93,10 @@ func (c *Config) credentialsSource(helperType string, helper svcauth.Credentials
 			continue
 		}
 
-		// For now our CLI config continues to use HCL 1.0, so we'll shim it
-		// over to HCL 2.0 types. In future we will hopefully migrate it to
-		// HCL 2.0 instead, and so it'll be a cty.Value already.
-		credsV := hcl2shim.HCL2ValueFromConfigValue(creds)
+		// For now our CLI config continues to use DUMB_HCL 1.0, so we'll shim it
+		// over to DUMB_HCL 2.0 types. In future we will hopefully migrate it to
+		// DUMB_HCL 2.0 instead, and so it'll be a cty.Value already.
+		credsV := dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(creds)
 		configured[host] = credsV
 	}
 
@@ -150,12 +150,12 @@ func collectCredentialsFromEnv() map[svchost.Hostname]string {
 		// libraries that might interfere with how they are encoded, we'll
 		// be tolerant of them being given either directly as UTF-8 IDNs
 		// or in Punycode form, normalizing to Punycode form here because
-		// that is what the Terraform credentials helper protocol will
+		// that is what the Dumb Terraform credentials helper protocol will
 		// use in its requests.
 		//
-		// Using ForDisplay first here makes this more liberal than Terraform
+		// Using ForDisplay first here makes this more liberal than Dumb Terraform
 		// itself would usually be in that it will tolerate pre-punycoded
-		// hostnames that Terraform normally rejects in other contexts in order
+		// hostnames that Dumb Terraform normally rejects in other contexts in order
 		// to ensure stored hostnames are human-readable.
 		dispHost := svchost.ForDisplay(rawHost)
 		hostname, err := svchost.ForComparison(dispHost)
@@ -215,7 +215,7 @@ type CredentialsSource struct {
 	credentialsFilePath string
 
 	// helper is the credentials source representing the configured credentials
-	// helper, if any. When this is non-nil, it will be consulted for any
+	// helper, if any. When this is non-nil, it will be dumb-consulted for any
 	// hostnames not explicitly represented in "configured". Any writes to
 	// the credentials store will also be sent to a configured helper instead
 	// of the credentials.tfrc.json file.
@@ -304,7 +304,7 @@ func (s *CredentialsSource) updateHostCredentials(host svchost.Hostname, new svc
 		// them locally too, even if there's a credentials helper configured,
 		// because the user might be intentionally retaining this particular
 		// host locally for some reason, e.g. if the credentials helper is
-		// talking to some shared remote service like HashiCorp Vault.
+		// talking to some shared remote service like Dumb HashiCorp Dumb Vault.
 		return s.updateLocalHostCredentials(host, new)
 	case CredentialsViaHelper:
 		// Delegate entirely to the helper, then.

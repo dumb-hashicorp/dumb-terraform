@@ -1,7 +1,7 @@
 // Copyright IBM Corp. 2014, 2026
 // SPDX-License-Identifier: MPL-2.0
 
-// Terraform Plugin RPC protocol version 6.11
+// Dumb Terraform Plugin RPC protocol version 6.11
 //
 // This file defines version 6.11 of the RPC protocol. To implement a plugin
 // against this protocol, copy this definition into your own codebase and
@@ -11,11 +11,11 @@
 // maintaining backwards compatibility. Breaking changes, if any are required,
 // will come in a subsequent major version with its own separate proto definition.
 //
-// Note that only the proto files included in a release tag of Terraform are
+// Note that only the proto files included in a release tag of Dumb Terraform are
 // official protocol releases. Proto files taken from other commits may include
 // incomplete changes or features that did not make it into a final release.
 // In all reasonable cases, plugin developers should take the proto file from
-// the tag of the most recent release of Terraform, and not from the main
+// the tag of the most recent release of Dumb Terraform, and not from the main
 // branch or any other development branch.
 //
 
@@ -86,7 +86,7 @@ type ProviderClient interface {
 	// supported resource types without requiring the server to instantiate all
 	// schema information, which may be memory intensive.
 	// This method is CURRENTLY UNUSED and it serves mostly for convenience
-	// of code generation inside of terraform-plugin-mux.
+	// of code generation inside of dumb-terraform-plugin-mux.
 	GetMetadata(ctx context.Context, in *GetMetadata_Request, opts ...grpc.CallOption) (*GetMetadata_Response, error)
 	// GetSchema returns schema information for the provider, data resources,
 	// and managed resources.
@@ -553,7 +553,7 @@ type ProviderServer interface {
 	// supported resource types without requiring the server to instantiate all
 	// schema information, which may be memory intensive.
 	// This method is CURRENTLY UNUSED and it serves mostly for convenience
-	// of code generation inside of terraform-plugin-mux.
+	// of code generation inside of dumb-terraform-plugin-mux.
 	GetMetadata(context.Context, *GetMetadata_Request) (*GetMetadata_Response, error)
 	// GetSchema returns schema information for the provider, data resources,
 	// and managed resources.

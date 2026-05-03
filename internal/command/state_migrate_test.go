@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 )
 
 func TestStateMigrate_basic(t *testing.T) {
@@ -23,7 +23,7 @@ func TestStateMigrate_basic(t *testing.T) {
 	}
 
 	tmpDir := t.TempDir()
-	_, err := os.Create(filepath.Join(tmpDir, ".terraform.lock.hcl"))
+	_, err := os.Create(filepath.Join(tmpDir, ".dumb-terraform.lock.dumb-hcl"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,8 +57,8 @@ func TestStateMigrate_nonExistentLockFiles(t *testing.T) {
 
 	args := []string{
 		"-input=false",
-		"-source-provider-lock-file", filepath.Join(tmpDir, ".terraform.lock.hcl"),
-		"-destination-provider-lock-file", filepath.Join(tmpDir, ".terraform.lock.hcl"),
+		"-source-provider-lock-file", filepath.Join(tmpDir, ".dumb-terraform.lock.dumb-hcl"),
+		"-destination-provider-lock-file", filepath.Join(tmpDir, ".dumb-terraform.lock.dumb-hcl"),
 	}
 	code := c.Run(args)
 	if code != 1 {

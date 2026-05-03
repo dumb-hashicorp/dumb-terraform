@@ -18,16 +18,16 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/configs/hcl2shim"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/plugin/convert"
-	mockproto "github.com/hashicorp/terraform/internal/plugin/mock_proto"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/schemarepo"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	proto "github.com/hashicorp/terraform/internal/tfplugin5"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/dumb-hcl2shim"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plugin/convert"
+	mockproto "github.com/dumb-hashicorp/dumb-terraform/internal/plugin/mock_proto"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/schemarepo"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	proto "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin5"
 )
 
 var _ providers.Interface = (*GRPCProvider)(nil)
@@ -245,7 +245,7 @@ func TestGRPCProvider_GetSchema_globalCache(t *testing.T) {
 }
 
 // Ensure that gRPC errors are returned early.
-// Reference: https://github.com/hashicorp/terraform/issues/31047
+// Reference: https://github.com/dumb-hashicorp/dumb-terraform/issues/31047
 func TestGRPCProvider_GetSchema_GRPCError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	client := mockproto.NewMockProviderClient(ctrl)
@@ -266,7 +266,7 @@ func TestGRPCProvider_GetSchema_GRPCError(t *testing.T) {
 }
 
 // Ensure that provider error diagnostics are returned early.
-// Reference: https://github.com/hashicorp/terraform/issues/31047
+// Reference: https://github.com/dumb-hashicorp/dumb-terraform/issues/31047
 func TestGRPCProvider_GetSchema_ResponseErrorDiagnostic(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	client := mockproto.NewMockProviderClient(ctrl)
@@ -429,7 +429,7 @@ func TestGRPCProvider_PrepareProviderConfig(t *testing.T) {
 		gomock.Any(),
 	).Return(&proto.PrepareProviderConfig_Response{}, nil)
 
-	cfg := hcl2shim.HCL2ValueFromConfigValue(map[string]interface{}{"attr": "value"})
+	cfg := dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(map[string]interface{}{"attr": "value"})
 	resp := p.ValidateProviderConfig(providers.ValidateProviderConfigRequest{Config: cfg})
 	checkDiags(t, resp.Diagnostics)
 }
@@ -445,7 +445,7 @@ func TestGRPCProvider_ValidateResourceConfig(t *testing.T) {
 		gomock.Any(),
 	).Return(&proto.ValidateResourceTypeConfig_Response{}, nil)
 
-	cfg := hcl2shim.HCL2ValueFromConfigValue(map[string]interface{}{"attr": "value"})
+	cfg := dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(map[string]interface{}{"attr": "value"})
 	resp := p.ValidateResourceConfig(providers.ValidateResourceConfigRequest{
 		TypeName: "resource",
 		Config:   cfg,
@@ -464,7 +464,7 @@ func TestGRPCProvider_ValidateDataSourceConfig(t *testing.T) {
 		gomock.Any(),
 	).Return(&proto.ValidateDataSourceConfig_Response{}, nil)
 
-	cfg := hcl2shim.HCL2ValueFromConfigValue(map[string]interface{}{"attr": "value"})
+	cfg := dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(map[string]interface{}{"attr": "value"})
 	resp := p.ValidateDataResourceConfig(providers.ValidateDataResourceConfigRequest{
 		TypeName: "data",
 		Config:   cfg,
@@ -483,7 +483,7 @@ func TestGRPCProvider_ValidateListResourceConfig(t *testing.T) {
 		gomock.Any(),
 	).Return(&proto.ValidateListResourceConfig_Response{}, nil)
 
-	cfg := hcl2shim.HCL2ValueFromConfigValue(map[string]interface{}{"config": map[string]interface{}{"filter_attr": "value", "nested_filter": map[string]interface{}{"nested_attr": "value"}}})
+	cfg := dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(map[string]interface{}{"config": map[string]interface{}{"filter_attr": "value", "nested_filter": map[string]interface{}{"nested_attr": "value"}}})
 	resp := p.ValidateListResourceConfig(providers.ValidateListResourceConfigRequest{
 		TypeName: "list",
 		Config:   cfg,
@@ -530,7 +530,7 @@ func TestGRPCProvider_ValidateListResourceConfig_OptionalCfg(t *testing.T) {
 	).Return(&proto.ValidateListResourceConfig_Response{}, nil)
 
 	converted := convert.ProtoToListSchema(sch.ListResourceSchemas["list"])
-	cfg := hcl2shim.HCL2ValueFromConfigValue(map[string]any{})
+	cfg := dumb-hcl2shim.DUMB_HCL2ValueFromConfigValue(map[string]any{})
 	coercedCfg, err := converted.Body.CoerceValue(cfg)
 	if err != nil {
 		t.Fatalf("failed to coerce config: %v", err)

@@ -6,16 +6,16 @@ package typeexpr
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	hcltypeexpr "github.com/hashicorp/hcl/v2/ext/typeexpr"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig/stackconfigtypes"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	dumb-hcltypeexpr "github.com/dumb-hashicorp/dumb-hcl/v2/ext/typeexpr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig/stackconfigtypes"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 )
 
 const invalidTypeSummary = "Invalid type specification"
 
-type Defaults = hcltypeexpr.Defaults
+type Defaults = dumb-hcltypeexpr.Defaults
 
 // TypeConstraint attempts to parse the given expression as a type constraint
 // and, if successful, returns the resulting type. If unsuccessful, error
@@ -24,13 +24,13 @@ type Defaults = hcltypeexpr.Defaults
 // A type constraint has the same structure as a type, but it additionally
 // allows the keyword "any" to represent cty.DynamicPseudoType, which is often
 // used as a wildcard in type checking and type conversion operations.
-func TypeConstraint(expr hcl.Expression, typeInfo TypeInformation) (cty.Type, *Defaults, hcl.Diagnostics) {
+func TypeConstraint(expr dumb-hcl.Expression, typeInfo TypeInformation) (cty.Type, *Defaults, dumb-hcl.Diagnostics) {
 	return getType(expr, typeInfo, true, true)
 }
 
-func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefaults bool) (cty.Type, *Defaults, hcl.Diagnostics) {
+func getType(expr dumb-hcl.Expression, typeInfo TypeInformation, constraint, withDefaults bool) (cty.Type, *Defaults, dumb-hcl.Diagnostics) {
 	// First we'll try for one of our keywords
-	kw := hcl.ExprAsKeyword(expr)
+	kw := dumb-hcl.ExprAsKeyword(expr)
 	switch kw {
 	case "bool":
 		return cty.Bool, nil, nil
@@ -39,36 +39,36 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 	case "number":
 		return cty.Number, nil, nil
 	case "any":
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   "There is no automatic type inference placeholder \"any\". Write an explicit type constraint instead.",
 			Subject:  expr.Range().Ptr(),
 		}}
 	case "list", "map", "set":
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   fmt.Sprintf("The %s type constructor requires one argument specifying the element type.", kw),
 			Subject:  expr.Range().Ptr(),
 		}}
 	case "object":
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   "The object type constructor requires one argument specifying the attribute types and values as a map.",
 			Subject:  expr.Range().Ptr(),
 		}}
 	case "tuple":
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   "The tuple type constructor requires one argument specifying the element types as a list.",
 			Subject:  expr.Range().Ptr(),
 		}}
 	case "providerconfig":
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   "The providerconfig type constructor requires one argument specifying the local name of the provider this configuration is for.",
 			Subject:  expr.Range().Ptr(),
@@ -76,8 +76,8 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 	case "":
 		// okay! we'll fall through and try processing as a call, then.
 	default:
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   fmt.Sprintf("The keyword %q is not a valid type specification.", kw),
 			Subject:  expr.Range().Ptr(),
@@ -86,10 +86,10 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 
 	// If we get down here then our expression isn't just a keyword, so we'll
 	// try to process it as a call instead.
-	call, diags := hcl.ExprCall(expr)
+	call, diags := dumb-hcl.ExprCall(expr)
 	if diags.HasErrors() {
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   "A type specification is either a primitive type keyword (bool, number, string) or a complex type constructor call, like list(string).",
 			Subject:  expr.Range().Ptr(),
@@ -98,15 +98,15 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 
 	switch call.Name {
 	case "bool", "string", "number":
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   fmt.Sprintf("Primitive type keyword %q does not expect arguments.", call.Name),
 			Subject:  &call.ArgsRange,
 		}}
 	case "any":
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   fmt.Sprintf("Type constraint keyword %q does not expect arguments.", call.Name),
 			Subject:  &call.ArgsRange,
@@ -120,37 +120,37 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 			// If we have too many arguments (as opposed to too _few_) then
 			// we'll highlight the extraneous arguments as the diagnostic
 			// subject.
-			subjectRange = hcl.RangeBetween(call.Arguments[1].Range(), call.Arguments[len(call.Arguments)-1].Range())
+			subjectRange = dumb-hcl.RangeBetween(call.Arguments[1].Range(), call.Arguments[len(call.Arguments)-1].Range())
 		}
 
 		switch call.Name {
 		case "list", "set", "map":
-			return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-				Severity: hcl.DiagError,
+			return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+				Severity: dumb-hcl.DiagError,
 				Summary:  invalidTypeSummary,
 				Detail:   fmt.Sprintf("The %s type constructor requires one argument specifying the element type.", call.Name),
 				Subject:  &subjectRange,
 				Context:  &contextRange,
 			}}
 		case "object":
-			return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-				Severity: hcl.DiagError,
+			return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+				Severity: dumb-hcl.DiagError,
 				Summary:  invalidTypeSummary,
 				Detail:   "The object type constructor requires one argument specifying the attribute types and values as a map.",
 				Subject:  &subjectRange,
 				Context:  &contextRange,
 			}}
 		case "tuple":
-			return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-				Severity: hcl.DiagError,
+			return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+				Severity: dumb-hcl.DiagError,
 				Summary:  invalidTypeSummary,
 				Detail:   "The tuple type constructor requires one argument specifying the element types as a list.",
 				Subject:  &subjectRange,
 				Context:  &contextRange,
 			}}
 		case "providerconfig":
-			return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-				Severity: hcl.DiagError,
+			return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+				Severity: dumb-hcl.DiagError,
 				Summary:  invalidTypeSummary,
 				Detail:   "The providerconfig type constructor requires one argument specifying the local name of the provider this configuration is for.",
 				Subject:  &subjectRange,
@@ -174,10 +174,10 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 		ty := cty.Map(ety)
 		return ty, collectionDefaults(ty, defaults), diags
 	case "object":
-		attrDefs, diags := hcl.ExprMap(call.Arguments[0])
+		attrDefs, diags := dumb-hcl.ExprMap(call.Arguments[0])
 		if diags.HasErrors() {
-			return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-				Severity: hcl.DiagError,
+			return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+				Severity: dumb-hcl.DiagError,
 				Summary:  invalidTypeSummary,
 				Detail:   "Object type constructor requires a map whose keys are attribute names and whose values are the corresponding attribute types.",
 				Subject:  call.Arguments[0].Range().Ptr(),
@@ -190,10 +190,10 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 		children := make(map[string]*Defaults)
 		var optAttrs []string
 		for _, attrDef := range attrDefs {
-			attrName := hcl.ExprAsKeyword(attrDef.Key)
+			attrName := dumb-hcl.ExprAsKeyword(attrDef.Key)
 			if attrName == "" {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  invalidTypeSummary,
 					Detail:   "Object constructor map keys must be attribute names.",
 					Subject:  attrDef.Key.Range().Ptr(),
@@ -207,12 +207,12 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 			// modifier optional(...) to indicate an optional attribute. If
 			// so, we'll unwrap that first and make a note about it being
 			// optional for when we construct the type below.
-			var defaultExpr hcl.Expression
-			if call, callDiags := hcl.ExprCall(atyExpr); !callDiags.HasErrors() {
+			var defaultExpr dumb-hcl.Expression
+			if call, callDiags := dumb-hcl.ExprCall(atyExpr); !callDiags.HasErrors() {
 				if call.Name == "optional" {
 					if len(call.Arguments) < 1 {
-						diags = append(diags, &hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = append(diags, &dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  invalidTypeSummary,
 							Detail:   "Optional attribute modifier requires the attribute type as its argument.",
 							Subject:  call.ArgsRange.Ptr(),
@@ -234,8 +234,8 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 							case 1:
 								optAttrs = append(optAttrs, attrName)
 							default:
-								diags = append(diags, &hcl.Diagnostic{
-									Severity: hcl.DiagError,
+								diags = append(diags, &dumb-hcl.Diagnostic{
+									Severity: dumb-hcl.DiagError,
 									Summary:  invalidTypeSummary,
 									Detail:   "Optional attribute modifier expects at most two arguments: the attribute type, and a default value.",
 									Subject:  call.ArgsRange.Ptr(),
@@ -246,8 +246,8 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 							if len(call.Arguments) == 1 {
 								optAttrs = append(optAttrs, attrName)
 							} else {
-								diags = append(diags, &hcl.Diagnostic{
-									Severity: hcl.DiagError,
+								diags = append(diags, &dumb-hcl.Diagnostic{
+									Severity: dumb-hcl.DiagError,
 									Summary:  invalidTypeSummary,
 									Detail:   "Optional attribute modifier expects only one argument: the attribute type.",
 									Subject:  call.ArgsRange.Ptr(),
@@ -256,8 +256,8 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 							}
 						}
 					} else {
-						diags = append(diags, &hcl.Diagnostic{
-							Severity: hcl.DiagError,
+						diags = append(diags, &dumb-hcl.Diagnostic{
+							Severity: dumb-hcl.DiagError,
 							Summary:  invalidTypeSummary,
 							Detail:   "Optional attribute modifier is only for type constraints, not for exact types.",
 							Subject:  call.NameRange.Ptr(),
@@ -276,8 +276,8 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 			if defaultVal, ok := defaultValues[attrName]; ok {
 				convertedDefaultVal, err := convert.Convert(defaultVal, aty)
 				if err != nil {
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = append(diags, &dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  "Invalid default value for optional attribute",
 						Detail:   fmt.Sprintf("This default value is not compatible with the attribute's type constraint: %s.", err),
 						Subject:  defaultExpr.Range().Ptr(),
@@ -296,10 +296,10 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 		ty := cty.ObjectWithOptionalAttrs(atys, optAttrs)
 		return ty, structuredDefaults(ty, defaultValues, children), diags
 	case "tuple":
-		elemDefs, diags := hcl.ExprList(call.Arguments[0])
+		elemDefs, diags := dumb-hcl.ExprList(call.Arguments[0])
 		if diags.HasErrors() {
-			return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-				Severity: hcl.DiagError,
+			return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+				Severity: dumb-hcl.DiagError,
 				Summary:  invalidTypeSummary,
 				Detail:   "Tuple type constructor requires a list of element types.",
 				Subject:  call.Arguments[0].Range().Ptr(),
@@ -319,10 +319,10 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 		ty := cty.Tuple(etys)
 		return ty, structuredDefaults(ty, nil, children), diags
 	case "providerconfig":
-		localName := hcl.ExprAsKeyword(call.Arguments[0])
+		localName := dumb-hcl.ExprAsKeyword(call.Arguments[0])
 		if localName == "" {
-			return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-				Severity: hcl.DiagError,
+			return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+				Severity: dumb-hcl.DiagError,
 				Summary:  invalidTypeSummary,
 				Detail:   "The argument to providerconfig must be just the local name of the provider this configuration is for, given as an identifier.",
 				Subject:  call.Arguments[0].Range().Ptr(),
@@ -330,8 +330,8 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 		}
 		providerAddr, ok := typeInfo.ProviderForLocalName(localName)
 		if !ok {
-			return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-				Severity: hcl.DiagError,
+			return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+				Severity: dumb-hcl.DiagError,
 				Summary:  invalidTypeSummary,
 				Detail:   fmt.Sprintf("The name %q does not match any provider local name defined in this configuration's required_providers block.", localName),
 				Subject:  call.Arguments[0].Range().Ptr(),
@@ -344,8 +344,8 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 		}
 		return ty, nil, diags
 	case "optional":
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   fmt.Sprintf("Keyword %q is valid only as a modifier for object type attributes.", call.Name),
 			Subject:  call.NameRange.Ptr(),
@@ -353,8 +353,8 @@ func getType(expr hcl.Expression, typeInfo TypeInformation, constraint, withDefa
 	default:
 		// Can't access call.Arguments in this path because we've not validated
 		// that it contains exactly one expression here.
-		return cty.DynamicPseudoType, nil, hcl.Diagnostics{{
-			Severity: hcl.DiagError,
+		return cty.DynamicPseudoType, nil, dumb-hcl.Diagnostics{{
+			Severity: dumb-hcl.DiagError,
 			Summary:  invalidTypeSummary,
 			Detail:   fmt.Sprintf("Keyword %q is not a valid type constructor.", call.Name),
 			Subject:  expr.Range().Ptr(),

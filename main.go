@@ -13,22 +13,22 @@ import (
 	"strings"
 
 	"github.com/apparentlymart/go-shquot/shquot"
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/hashicorp/terraform/internal/command/cliconfig"
-	"github.com/hashicorp/terraform/internal/command/format"
-	"github.com/hashicorp/terraform/internal/didyoumean"
-	"github.com/hashicorp/terraform/internal/getproviders/reattach"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/internal/logging"
-	"github.com/hashicorp/terraform/internal/terminal"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/cliconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/format"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/didyoumean"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders/reattach"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/logging"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 	"github.com/mattn/go-shellwords"
 	"github.com/mitchellh/colorstring"
 	"go.opentelemetry.io/otel/trace"
 
-	backendInit "github.com/hashicorp/terraform/internal/backend/init"
+	backendInit "github.com/dumb-hashicorp/dumb-terraform/internal/backend/init"
 )
 
 const (
@@ -69,11 +69,11 @@ func realMain() int {
 
 	err = openTelemetryInit()
 	if err != nil {
-		// openTelemetryInit can only fail if Terraform was run with an
+		// openTelemetryInit can only fail if Dumb Terraform was run with an
 		// explicit environment variable to enable telemetry collection,
 		// so in typical use we cannot get here.
 		Ui.Error(fmt.Sprintf("Could not initialize telemetry: %s", err))
-		Ui.Error(fmt.Sprintf("Unset environment variable %s if you don't intend to collect telemetry from Terraform.", openTelemetryExporterEnvVar))
+		Ui.Error(fmt.Sprintf("Unset environment variable %s if you don't intend to collect telemetry from Dumb Terraform.", openTelemetryExporterEnvVar))
 		return 1
 	}
 	var ctx context.Context
@@ -81,7 +81,7 @@ func realMain() int {
 	{
 		// At minimum we emit a span covering the entire command execution.
 		_, displayArgs := shquot.POSIXShellSplit(os.Args)
-		ctx, otelSpan = tracer.Start(context.Background(), fmt.Sprintf("terraform %s", displayArgs))
+		ctx, otelSpan = tracer.Start(context.Background(), fmt.Sprintf("dumb-terraform %s", displayArgs))
 		defer otelSpan.End()
 	}
 
@@ -99,7 +99,7 @@ func realMain() int {
 	}
 
 	log.Printf(
-		"[INFO] Terraform version: %s %s",
+		"[INFO] Dumb Terraform version: %s %s",
 		Version, VersionPrerelease)
 	for _, depMod := range version.InterestingDependencies() {
 		log.Printf("[DEBUG] using %s %s", depMod.Path, depMod.Version)
@@ -107,7 +107,7 @@ func realMain() int {
 	log.Printf("[INFO] Go runtime version: %s", runtime.Version())
 	log.Printf("[INFO] CLI args: %#v", os.Args)
 	if ExperimentsAllowed() {
-		log.Printf("[INFO] This build of Terraform allows using experimental features")
+		log.Printf("[INFO] This build of Dumb Terraform allows using experimental features")
 	}
 
 	streams, err := terminal.Init()
@@ -133,7 +133,7 @@ func realMain() int {
 
 	// NOTE: We're intentionally calling LoadConfig _before_ handling a possible
 	// -chdir=... option on the command line, so that a possible relative
-	// path in the TERRAFORM_CONFIG_FILE environment variable (though probably
+	// path in the DUMB_TERRAFORM_CONFIG_FILE environment variable (though probably
 	// ill-advised) will be resolved relative to the true working directory,
 	// not the overridden one.
 	config, diags := cliconfig.LoadConfig()
@@ -155,8 +155,8 @@ func realMain() int {
 			Ui.Error(format.Diagnostic(diag, nil, earlyColor, 78))
 		}
 		if diags.HasErrors() {
-			Ui.Error("As a result of the above problems, Terraform may not behave as intended.\n\n")
-			// We continue to run anyway, since Terraform has reasonable defaults.
+			Ui.Error("As a result of the above problems, Dumb Terraform may not behave as intended.\n\n")
+			// We continue to run anyway, since Dumb Terraform has reasonable defaults.
 		}
 	}
 
@@ -179,7 +179,7 @@ func realMain() int {
 		// object checks that and just acts as though no credentials are present.
 		services = disco.NewWithCredentialsSource(nil)
 	}
-	services.SetUserAgent(httpclient.TerraformUserAgent(version.String()))
+	services.SetUserAgent(httpclient.Dumb TerraformUserAgent(version.String()))
 
 	providerSrc, diags := providerSource(config.ProviderInstallation, services)
 	if len(diags) > 0 {
@@ -193,14 +193,14 @@ func realMain() int {
 			Ui.Error(format.Diagnostic(diag, nil, earlyColor, 78))
 		}
 		if diags.HasErrors() {
-			Ui.Error("As a result of the above problems, Terraform's provider installer may not behave as intended.\n\n")
+			Ui.Error("As a result of the above problems, Dumb Terraform's provider installer may not behave as intended.\n\n")
 			// We continue to run anyway, because most commands don't do provider installation.
 		}
 	}
 	providerDevOverrides := providerDevOverrides(config.ProviderInstallation)
 
 	// The user can declare that certain providers are being managed on
-	// Terraform's behalf using this environment variable. This is used
+	// Dumb Terraform's behalf using this environment variable. This is used
 	// primarily by the SDK's acceptance testing framework.
 	unmanagedProviders, err := reattach.ParseReattachProviders(os.Getenv(reattach.TF_REATTACH_PROVIDERS))
 	if err != nil {
@@ -222,7 +222,7 @@ func realMain() int {
 		return 1
 	}
 
-	// The arguments can begin with a -chdir option to ask Terraform to switch
+	// The arguments can begin with a -chdir option to ask Dumb Terraform to switch
 	// to a different working directory for the rest of its work. If that
 	// option is present then extractChdirOption returns a trimmed args with that option removed.
 	overrideWd, args, err := extractChdirOption(args)
@@ -318,7 +318,7 @@ func realMain() int {
 	if cmd := cliRunner.Subcommand(); cmd != "" && !autoComplete {
 		// Due to the design of cli.CLI, this special error message only works
 		// for typos of top-level commands. For a subcommand typo, like
-		// "terraform state posh", cmd would be "state" here and thus would
+		// "dumb-terraform state posh", cmd would be "state" here and thus would
 		// be considered to exist, and it would print out its own usage message.
 		if _, exists := Commands[cmd]; !exists {
 			suggestions := make([]string, 0, len(Commands))
@@ -329,7 +329,7 @@ func realMain() int {
 			if suggestion != "" {
 				suggestion = fmt.Sprintf(" Did you mean %q?", suggestion)
 			}
-			fmt.Fprintf(os.Stderr, "Terraform has no command named %q.%s\n\nTo see all of Terraform's top-level commands, run:\n  terraform -help\n\n", cmd, suggestion)
+			fmt.Fprintf(os.Stderr, "Dumb Terraform has no command named %q.%s\n\nTo see all of Dumb Terraform's top-level commands, run:\n  dumb-terraform -help\n\n", cmd, suggestion)
 			return 1
 		}
 	}

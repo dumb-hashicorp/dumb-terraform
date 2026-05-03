@@ -7,15 +7,15 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcldec"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/configs"
-	"github.com/hashicorp/terraform/internal/moduletest"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/tfdiags"
-	"github.com/hashicorp/terraform/version"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/moduletest"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 var (
@@ -53,7 +53,7 @@ func (n *NodeProviderConfigure) Execute(ctx *EvalContext) {
 
 	var references []*addrs.Reference
 	var referenceDiags tfdiags.Diagnostics
-	for _, traversal := range hcldec.Variables(n.Config.Config, spec) {
+	for _, traversal := range dumb-hcldec.Variables(n.Config.Config, spec) {
 		ref, moreDiags := addrs.ParseRefFromTestingScope(traversal)
 		referenceDiags = referenceDiags.Append(moreDiags)
 		if ref != nil {
@@ -71,7 +71,7 @@ func (n *NodeProviderConfigure) Execute(ctx *EvalContext) {
 		return
 	}
 
-	hclContext, moreDiags := ctx.HclContext(references)
+	dumb-hclContext, moreDiags := ctx.Dumb HclContext(references)
 	n.File.AppendDiagnostics(moreDiags)
 	if moreDiags.HasErrors() {
 		ctx.SetProviderStatus(n.Addr, moduletest.Error)
@@ -82,19 +82,19 @@ func (n *NodeProviderConfigure) Execute(ctx *EvalContext) {
 	// mock data, so we will evaluate the data here.
 	if mock, ok := n.Provider.(*providers.Mock); ok {
 		for _, res := range mock.Data.MockResources {
-			values, exprHclDiags := res.RawExpr.Value(hclContext)
-			moreDiags = moreDiags.Append(exprHclDiags)
+			values, exprDumb HclDiags := res.RawExpr.Value(dumb-hclContext)
+			moreDiags = moreDiags.Append(exprDumb HclDiags)
 			res.Defaults = values
 		}
 		for _, res := range mock.Data.MockDataSources {
-			values, exprHclDiags := res.RawExpr.Value(hclContext)
-			moreDiags = moreDiags.Append(exprHclDiags)
+			values, exprDumb HclDiags := res.RawExpr.Value(dumb-hclContext)
+			moreDiags = moreDiags.Append(exprDumb HclDiags)
 			res.Defaults = values
 		}
 	}
 
-	body, decHclDiags := hcldec.Decode(n.Config.Config, spec, hclContext)
-	moreDiags = moreDiags.Append(decHclDiags)
+	body, decDumb HclDiags := dumb-hcldec.Decode(n.Config.Config, spec, dumb-hclContext)
+	moreDiags = moreDiags.Append(decDumb HclDiags)
 	if moreDiags.HasErrors() {
 		n.File.AppendDiagnostics(moreDiags)
 		ctx.SetProviderStatus(n.Addr, moduletest.Error)
@@ -103,7 +103,7 @@ func (n *NodeProviderConfigure) Execute(ctx *EvalContext) {
 
 	unmarkedBody, _ := body.UnmarkDeep()
 	response := n.Provider.ConfigureProvider(providers.ConfigureProviderRequest{
-		TerraformVersion: version.SemVer.String(),
+		Dumb TerraformVersion: version.SemVer.String(),
 		Config:           unmarkedBody,
 		ClientCapabilities: providers.ClientCapabilities{
 			DeferralAllowed:            ctx.deferralAllowed,
@@ -121,7 +121,7 @@ func (n *NodeProviderConfigure) Execute(ctx *EvalContext) {
 
 func (n *NodeProviderConfigure) References() []*addrs.Reference {
 	var refs []*addrs.Reference
-	for _, variable := range hcldec.Variables(n.Config.Config, n.Schema.Provider.Body.DecoderSpec()) {
+	for _, variable := range dumb-hcldec.Variables(n.Config.Config, n.Schema.Provider.Body.DecoderSpec()) {
 		ref, _ := addrs.ParseRefFromTestingScope(variable)
 		if ref != nil {
 			refs = append(refs, ref)
@@ -159,8 +159,8 @@ func (n *NodeProviderClose) Execute(ctx *EvalContext) {
 
 	if err := n.Provider.Close(); err != nil {
 		var diags tfdiags.Diagnostics
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Failed to close provider",
 			Detail:   fmt.Sprintf("Failed to close provider: %s", err.Error()),
 			Subject:  n.Config.DeclRange.Ptr(),

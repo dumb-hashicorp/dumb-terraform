@@ -11,24 +11,24 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/hcl/v2/hcltest"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hcltest"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 	"google.golang.org/protobuf/encoding/prototext"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/plans"
-	"github.com/hashicorp/terraform/internal/promising"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/stacks/stackaddrs"
-	"github.com/hashicorp/terraform/internal/stacks/stackconfig"
-	"github.com/hashicorp/terraform/internal/stacks/stackplan"
-	"github.com/hashicorp/terraform/internal/stacks/stackstate"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/promising"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackaddrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackplan"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/stacks/stackstate"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestInputVariableValue(t *testing.T) {
@@ -502,10 +502,10 @@ func TestInputVariablePlanChanges(t *testing.T) {
 // unknown/null condition results, and unknown error messages.  These tests
 // exercise the logic independently of the full stack-evaluator machinery.
 func TestEvalVariableValidation(t *testing.T) {
-	// parseExpr parses a real HCL expression from a source string.
-	parseExpr := func(t *testing.T, src string) hcl.Expression {
+	// parseExpr parses a real DUMB_HCL expression from a source string.
+	parseExpr := func(t *testing.T, src string) dumb-hcl.Expression {
 		t.Helper()
-		expr, diags := hclsyntax.ParseExpression([]byte(src), "test.hcl", hcl.Pos{Line: 1, Column: 1})
+		expr, diags := dumb-hclsyntax.ParseExpression([]byte(src), "test.dumb-hcl", dumb-hcl.Pos{Line: 1, Column: 1})
 		if diags.HasErrors() {
 			t.Fatalf("failed to parse expression %q: %s", src, diags.Error())
 		}
@@ -513,21 +513,21 @@ func TestEvalVariableValidation(t *testing.T) {
 	}
 
 	// makeFakeRule builds a minimal stackconfig.CheckRule from two expressions.
-	makeFakeRule := func(condition, errorMessage hcl.Expression) *stackconfig.CheckRule {
+	makeFakeRule := func(condition, errorMessage dumb-hcl.Expression) *stackconfig.CheckRule {
 		return &stackconfig.CheckRule{
 			Condition:    condition,
 			ErrorMessage: errorMessage,
-			DeclRange: hcl.Range{
-				Filename: "test.hcl",
-				Start:    hcl.Pos{Line: 2, Column: 1},
-				End:      hcl.Pos{Line: 5, Column: 1},
+			DeclRange: dumb-hcl.Range{
+				Filename: "test.dumb-hcl",
+				Start:    dumb-hcl.Pos{Line: 2, Column: 1},
+				End:      dumb-hcl.Pos{Line: 5, Column: 1},
 			},
 		}
 	}
 
-	// makeVarCtx builds an HCL evaluation context that exposes var.foo = val.
-	makeVarCtx := func(val cty.Value) *hcl.EvalContext {
-		return &hcl.EvalContext{
+	// makeVarCtx builds an DUMB_HCL evaluation context that exposes var.foo = val.
+	makeVarCtx := func(val cty.Value) *dumb-hcl.EvalContext {
+		return &dumb-hcl.EvalContext{
 			Variables: map[string]cty.Value{
 				"var": cty.ObjectVal(map[string]cty.Value{
 					"foo": val,
@@ -536,18 +536,18 @@ func TestEvalVariableValidation(t *testing.T) {
 		}
 	}
 
-	valueRange := hcl.Range{
-		Filename: "test.hcl",
-		Start:    hcl.Pos{Line: 1, Column: 1},
-		End:      hcl.Pos{Line: 1, Column: 10},
+	valueRange := dumb-hcl.Range{
+		Filename: "test.dumb-hcl",
+		Start:    dumb-hcl.Pos{Line: 1, Column: 1},
+		End:      dumb-hcl.Pos{Line: 1, Column: 10},
 	}
 
 	// --- Basic pass/fail ---
 
 	t.Run("condition passes, clean message → no diagnostics", func(t *testing.T) {
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.True),
-			hcltest.MockExprLiteral(cty.StringVal("Value is invalid.")),
+			dumb-hcltest.MockExprLiteral(cty.True),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Value is invalid.")),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("good")), valueRange)
 		assertNoDiags(t, diags)
@@ -555,8 +555,8 @@ func TestEvalVariableValidation(t *testing.T) {
 
 	t.Run("condition fails, clean message → Invalid value for variable", func(t *testing.T) {
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.False),
-			hcltest.MockExprLiteral(cty.StringVal("Value must be 'good'.")),
+			dumb-hcltest.MockExprLiteral(cty.False),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Value must be 'good'.")),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("bad")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -571,8 +571,8 @@ func TestEvalVariableValidation(t *testing.T) {
 		// The error_message evaluates to a sensitive string even though the
 		// condition passes.  This structural problem must always be reported.
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.True),
-			hcltest.MockExprLiteral(cty.StringVal("Contains secret").Mark(marks.Sensitive)),
+			dumb-hcltest.MockExprLiteral(cty.True),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Contains secret").Mark(marks.Sensitive)),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("good")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -589,8 +589,8 @@ func TestEvalVariableValidation(t *testing.T) {
 
 	t.Run("condition fails, sensitive error_message → both diagnostics", func(t *testing.T) {
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.False),
-			hcltest.MockExprLiteral(cty.StringVal("Contains secret").Mark(marks.Sensitive)),
+			dumb-hcltest.MockExprLiteral(cty.False),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Contains secret").Mark(marks.Sensitive)),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("bad")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -607,8 +607,8 @@ func TestEvalVariableValidation(t *testing.T) {
 
 	t.Run("condition passes, ephemeral error_message → flagged even on success", func(t *testing.T) {
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.True),
-			hcltest.MockExprLiteral(cty.StringVal("Contains ephemeral").Mark(marks.Ephemeral)),
+			dumb-hcltest.MockExprLiteral(cty.True),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Contains ephemeral").Mark(marks.Ephemeral)),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("good")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -625,8 +625,8 @@ func TestEvalVariableValidation(t *testing.T) {
 
 	t.Run("condition fails, ephemeral error_message → both diagnostics", func(t *testing.T) {
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.False),
-			hcltest.MockExprLiteral(cty.StringVal("Contains ephemeral").Mark(marks.Ephemeral)),
+			dumb-hcltest.MockExprLiteral(cty.False),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Contains ephemeral").Mark(marks.Ephemeral)),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("bad")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -644,8 +644,8 @@ func TestEvalVariableValidation(t *testing.T) {
 	t.Run("condition result unknown → no diagnostics", func(t *testing.T) {
 		// Unknown condition means we cannot determine validity yet; skip quietly.
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.UnknownVal(cty.Bool)),
-			hcltest.MockExprLiteral(cty.StringVal("Value is invalid.")),
+			dumb-hcltest.MockExprLiteral(cty.UnknownVal(cty.Bool)),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Value is invalid.")),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.UnknownVal(cty.String)), valueRange)
 		assertNoDiags(t, diags)
@@ -653,8 +653,8 @@ func TestEvalVariableValidation(t *testing.T) {
 
 	t.Run("condition result null → Invalid variable validation result", func(t *testing.T) {
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.NullVal(cty.Bool)),
-			hcltest.MockExprLiteral(cty.StringVal("Value is invalid.")),
+			dumb-hcltest.MockExprLiteral(cty.NullVal(cty.Bool)),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Value is invalid.")),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("anything")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -668,12 +668,12 @@ func TestEvalVariableValidation(t *testing.T) {
 	t.Run("error message unknown, condition fails → Invalid error message only", func(t *testing.T) {
 		// An unknown error_message is always a structural problem: the validation
 		// block is invalid regardless of whether the condition passes or fails,
-		// because Terraform can never safely display the message.
+		// because Dumb Terraform can never safely display the message.
 		// We return early on the unknown message, so "Invalid value for variable"
 		// must NOT also be emitted.
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.False),
-			hcltest.MockExprLiteral(cty.UnknownVal(cty.String)),
+			dumb-hcltest.MockExprLiteral(cty.False),
+			dumb-hcltest.MockExprLiteral(cty.UnknownVal(cty.String)),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("bad")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -690,12 +690,12 @@ func TestEvalVariableValidation(t *testing.T) {
 	t.Run("error message unknown, condition passes → Invalid error message only", func(t *testing.T) {
 		// An unknown error_message is always a structural problem: the validation
 		// block is invalid regardless of whether the condition passes or fails,
-		// because Terraform can never safely display the message.
+		// because Dumb Terraform can never safely display the message.
 		// We return early on the unknown message, so "Invalid value for variable"
 		// must NOT be emitted even though the condition passed.
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.True),
-			hcltest.MockExprLiteral(cty.UnknownVal(cty.String)),
+			dumb-hcltest.MockExprLiteral(cty.True),
+			dumb-hcltest.MockExprLiteral(cty.UnknownVal(cty.String)),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("good")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -716,12 +716,12 @@ func TestEvalVariableValidation(t *testing.T) {
 		// (var.foo == "good") evaluates to a sensitive bool; Unmark() peels
 		// off the mark so the check works correctly.  The error_message is a
 		// plain literal → no "Error message refers to sensitive values" diag.
-		hclCtx := makeVarCtx(cty.StringVal("bad").Mark(marks.Sensitive))
+		dumb-hclCtx := makeVarCtx(cty.StringVal("bad").Mark(marks.Sensitive))
 		rule := makeFakeRule(
 			parseExpr(t, `var.foo == "good"`),
-			hcltest.MockExprLiteral(cty.StringVal("Value is not allowed.")),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Value is not allowed.")),
 		)
-		diags := evalVariableValidation(rule, hclCtx, valueRange)
+		diags := evalVariableValidation(rule, dumb-hclCtx, valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
 			return d.Severity() == tfdiags.Error &&
 				d.Description().Summary == "Invalid value for variable"
@@ -737,12 +737,12 @@ func TestEvalVariableValidation(t *testing.T) {
 		// When the error_message interpolates a sensitive variable the
 		// evaluated message is itself sensitive — both the sensitive-value
 		// diagnostic and the generic failure diagnostic must be emitted.
-		hclCtx := makeVarCtx(cty.StringVal("secret").Mark(marks.Sensitive))
+		dumb-hclCtx := makeVarCtx(cty.StringVal("secret").Mark(marks.Sensitive))
 		rule := makeFakeRule(
 			parseExpr(t, `var.foo == "good"`),
 			parseExpr(t, `"Value '${var.foo}' is not allowed."`),
 		)
-		diags := evalVariableValidation(rule, hclCtx, valueRange)
+		diags := evalVariableValidation(rule, dumb-hclCtx, valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
 			return d.Severity() == tfdiags.Error &&
 				d.Description().Summary == "Error message refers to sensitive values"
@@ -757,12 +757,12 @@ func TestEvalVariableValidation(t *testing.T) {
 		// The condition passes but the error_message references an ephemeral
 		// variable, making the message itself ephemeral.  This structural
 		// problem must still be reported.
-		hclCtx := makeVarCtx(cty.StringVal("good").Mark(marks.Ephemeral))
+		dumb-hclCtx := makeVarCtx(cty.StringVal("good").Mark(marks.Ephemeral))
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.True),
+			dumb-hcltest.MockExprLiteral(cty.True),
 			parseExpr(t, `"Value '${var.foo}' is not allowed."`),
 		)
-		diags := evalVariableValidation(rule, hclCtx, valueRange)
+		diags := evalVariableValidation(rule, dumb-hclCtx, valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
 			return d.Severity() == tfdiags.Error &&
 				d.Description().Summary == "Error message refers to ephemeral values"
@@ -776,16 +776,16 @@ func TestEvalVariableValidation(t *testing.T) {
 
 	// --- Condition evaluation error ---
 
-	t.Run("condition evaluation error → early return with HCL error", func(t *testing.T) {
+	t.Run("condition evaluation error → early return with DUMB_HCL error", func(t *testing.T) {
 		// When the condition expression itself fails to evaluate (e.g. it references
 		// an undefined variable), evalVariableValidation must return early with the
 		// evaluation error and must NOT emit "Invalid value for variable" or
 		// "Invalid variable validation result".
 		rule := makeFakeRule(
 			parseExpr(t, "undefined_var.foo"),
-			hcltest.MockExprLiteral(cty.StringVal("Value is invalid.")),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Value is invalid.")),
 		)
-		// hclCtx only has "var", so "undefined_var" is unknown → evaluation error.
+		// dumb-hclCtx only has "var", so "undefined_var" is unknown → evaluation error.
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("anything")), valueRange)
 		if !diags.HasErrors() {
 			t.Fatal("expected at least one error diagnostic, got none")
@@ -806,8 +806,8 @@ func TestEvalVariableValidation(t *testing.T) {
 		// A condition that returns a list (or any value that cannot be converted
 		// to bool) hits the convert.Convert(result, cty.Bool) failure path.
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.ListValEmpty(cty.String)),
-			hcltest.MockExprLiteral(cty.StringVal("Value is invalid.")),
+			dumb-hcltest.MockExprLiteral(cty.ListValEmpty(cty.String)),
+			dumb-hcltest.MockExprLiteral(cty.StringVal("Value is invalid.")),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("anything")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -829,8 +829,8 @@ func TestEvalVariableValidation(t *testing.T) {
 		// falls back to "Failed to evaluate condition error message." in the
 		// detail of the "Invalid value for variable" diagnostic.
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.False),
-			hcltest.MockExprLiteral(cty.NullVal(cty.String)),
+			dumb-hcltest.MockExprLiteral(cty.False),
+			dumb-hcltest.MockExprLiteral(cty.NullVal(cty.String)),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("bad")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -848,8 +848,8 @@ func TestEvalVariableValidation(t *testing.T) {
 		// "Invalid error message" and "Invalid value for variable" (with the
 		// fallback text) must be emitted.
 		rule := makeFakeRule(
-			hcltest.MockExprLiteral(cty.False),
-			hcltest.MockExprLiteral(cty.ListValEmpty(cty.String)),
+			dumb-hcltest.MockExprLiteral(cty.False),
+			dumb-hcltest.MockExprLiteral(cty.ListValEmpty(cty.String)),
 		)
 		diags := evalVariableValidation(rule, makeVarCtx(cty.StringVal("bad")), valueRange)
 		assertMatchingDiag(t, diags, func(d tfdiags.Diagnostic) bool {
@@ -967,7 +967,7 @@ func TestInputVariableValidation(t *testing.T) {
 // that exposes a simple "upper" string function.
 func TestInputVariableValidationWithProviderFunction(t *testing.T) {
 	cfg := testStackConfig(t, "input_variable", "validation_provider_function")
-	providerTypeAddr := addrs.MustParseProviderSourceString("terraform.io/builtin/testing")
+	providerTypeAddr := addrs.MustParseProviderSourceString("dumb-terraform.io/builtin/testing")
 
 	newMockProvider := func(t *testing.T) (*testing_provider.MockProvider, providers.Factory) {
 		t.Helper()

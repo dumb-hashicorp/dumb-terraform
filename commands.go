@@ -8,29 +8,29 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/hashicorp/cli"
-	"github.com/hashicorp/go-plugin"
-	svchost "github.com/hashicorp/terraform-svchost"
-	"github.com/hashicorp/terraform-svchost/auth"
-	"github.com/hashicorp/terraform-svchost/disco"
+	"github.com/dumb-hashicorp/cli"
+	"github.com/dumb-hashicorp/go-plugin"
+	svchost "github.com/dumb-hashicorp/dumb-terraform-svchost"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/auth"
+	"github.com/dumb-hashicorp/dumb-terraform-svchost/disco"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/command"
-	"github.com/hashicorp/terraform/internal/command/cliconfig"
-	"github.com/hashicorp/terraform/internal/command/views"
-	"github.com/hashicorp/terraform/internal/command/webbrowser"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	pluginDiscovery "github.com/hashicorp/terraform/internal/plugin/discovery"
-	"github.com/hashicorp/terraform/internal/rpcapi"
-	"github.com/hashicorp/terraform/internal/terminal"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/cliconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/views"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/command/webbrowser"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	pluginDiscovery "github.com/dumb-hashicorp/dumb-terraform/internal/plugin/discovery"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/rpcapi"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/terminal"
 )
 
 // runningInAutomationEnvName gives the name of an environment variable that
 // can be set to any non-empty value in order to suppress certain messages
-// that assume that Terraform is being run from a command prompt.
+// that assume that Dumb Terraform is being run from a command prompt.
 const runningInAutomationEnvName = "TF_IN_AUTOMATION"
 
-// Commands is the mapping of all the available Terraform commands.
+// Commands is the mapping of all the available Dumb Terraform commands.
 var Commands map[string]cli.CommandFactory
 
 // PrimaryCommands is an ordered sequence of the top-level commands (not
@@ -113,7 +113,7 @@ func initCommands(
 		AllowExperimentalFeatures: ExperimentsAllowed(),
 	}
 
-	// The command list is included in the terraform -help
+	// The command list is included in the dumb-terraform -help
 	// output, which is in turn included in the docs at
 	// .../docs/cli/commands/index.mdx (in web-unified-docs); if you
 	// add, remove or reclassify commands then consider updating
@@ -290,7 +290,7 @@ func initCommands(
 
 		// "rpcapi" is handled a bit differently because the whole point of
 		// this interface is to bypass the CLI layer so wrapping automation can
-		// get as-direct-as-possible access to Terraform Core functionality,
+		// get as-direct-as-possible access to Dumb Terraform Core functionality,
 		// without interference from behaviors that are intended for CLI
 		// end-user convenience. We bypass the "command" package entirely
 		// for this command in particular.

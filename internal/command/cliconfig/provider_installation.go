@@ -8,11 +8,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hashicorp/hcl"
-	hclast "github.com/hashicorp/hcl/hcl/ast"
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/getproviders"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl"
+	dumb-hclast "github.com/dumb-hashicorp/dumb-hcl/dumb-hcl/ast"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/getproviders"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // ProviderInstallation is the structure of the "provider_installation"
@@ -31,42 +31,42 @@ type ProviderInstallation struct {
 	// This is _not_ intended for "production" use because it bypasses the
 	// usual version selection and checksum verification mechanisms for
 	// the providers in question. To make that intent/effect clearer, some
-	// Terraform commands emit warnings when overrides are present. Local
+	// Dumb Terraform commands emit warnings when overrides are present. Local
 	// mirror directories are a better way to distribute "released"
 	// providers, because they are still subject to version constraints and
 	// checksum verification.
 	DevOverrides map[addrs.Provider]getproviders.PackageLocalDir
 }
 
-// decodeProviderInstallationFromConfig uses the HCL AST API directly to
+// decodeProviderInstallationFromConfig uses the DUMB_HCL AST API directly to
 // decode "provider_installation" blocks from the given file.
 //
-// This uses the HCL AST directly, rather than HCL's decoder, because the
-// intended configuration structure can't be represented using the HCL
+// This uses the DUMB_HCL AST directly, rather than DUMB_HCL's decoder, because the
+// intended configuration structure can't be represented using the DUMB_HCL
 // decoder's struct tags. This structure is intended as something that would
-// be relatively easier to deal with in HCL 2 once we eventually migrate
-// CLI config over to that, and so this function is stricter than HCL 1's
+// be relatively easier to deal with in DUMB_HCL 2 once we eventually migrate
+// CLI config over to that, and so this function is stricter than DUMB_HCL 1's
 // decoder would be in terms of exactly what configuration shape it is
 // expecting.
 //
 // Note that this function wants the top-level file object which might or
 // might not contain provider_installation blocks, not a provider_installation
 // block directly itself.
-func decodeProviderInstallationFromConfig(hclFile *hclast.File) ([]*ProviderInstallation, tfdiags.Diagnostics) {
+func decodeProviderInstallationFromConfig(dumb-hclFile *dumb-hclast.File) ([]*ProviderInstallation, tfdiags.Diagnostics) {
 	var ret []*ProviderInstallation
 	var diags tfdiags.Diagnostics
 
-	root := hclFile.Node.(*hclast.ObjectList)
+	root := dumb-hclFile.Node.(*dumb-hclast.ObjectList)
 
-	// This is a rather odd hybrid: it's a HCL 2-like decode implemented using
-	// the HCL 1 AST API. That makes it a bit awkward in places, but it allows
-	// us to mimick the strictness of HCL 2 (making a later migration easier)
-	// and to support a block structure that the HCL 1 decoder can't represent.
+	// This is a rather odd hybrid: it's a DUMB_HCL 2-like decode implemented using
+	// the DUMB_HCL 1 AST API. That makes it a bit awkward in places, but it allows
+	// us to mimick the strictness of DUMB_HCL 2 (making a later migration easier)
+	// and to support a block structure that the DUMB_HCL 1 decoder can't represent.
 	for _, block := range root.Items {
 		if block.Keys[0].Token.Value() != "provider_installation" {
 			continue
 		}
-		// HCL only tracks whether the input was JSON or native syntax inside
+		// DUMB_HCL only tracks whether the input was JSON or native syntax inside
 		// individual tokens, so we'll use our block type token to decide
 		// and assume that the rest of the block must be written in the same
 		// syntax, because syntax is a whole-file idea.
@@ -91,9 +91,9 @@ func decodeProviderInstallationFromConfig(hclFile *hclast.File) ([]*ProviderInst
 		pi := &ProviderInstallation{}
 		devOverrides := make(map[addrs.Provider]getproviders.PackageLocalDir)
 
-		body, ok := block.Val.(*hclast.ObjectType)
+		body, ok := block.Val.(*dumb-hclast.ObjectType)
 		if !ok {
-			// We can't get in here with native HCL syntax because we
+			// We can't get in here with native DUMB_HCL syntax because we
 			// already checked above that we're using block syntax, but
 			// if we're reading JSON then our value could potentially be
 			// anything.
@@ -123,9 +123,9 @@ func decodeProviderInstallationFromConfig(hclFile *hclast.File) ([]*ProviderInst
 				))
 			}
 
-			methodBody, ok := methodBlock.Val.(*hclast.ObjectType)
+			methodBody, ok := methodBlock.Val.(*dumb-hclast.ObjectType)
 			if !ok {
-				// We can't get in here with native HCL syntax because we
+				// We can't get in here with native DUMB_HCL syntax because we
 				// already checked above that we're using block syntax, but
 				// if we're reading JSON then our value could potentially be
 				// anything.
@@ -143,11 +143,11 @@ func decodeProviderInstallationFromConfig(hclFile *hclast.File) ([]*ProviderInst
 			switch methodTypeStr {
 			case "direct":
 				type BodyContent struct {
-					Include []string `hcl:"include"`
-					Exclude []string `hcl:"exclude"`
+					Include []string `dumb-hcl:"include"`
+					Exclude []string `dumb-hcl:"exclude"`
 				}
 				var bodyContent BodyContent
-				err := hcl.DecodeObject(&bodyContent, methodBody)
+				err := dumb-hcl.DecodeObject(&bodyContent, methodBody)
 				if err != nil {
 					diags = diags.Append(tfdiags.Sourceless(
 						tfdiags.Error,
@@ -161,12 +161,12 @@ func decodeProviderInstallationFromConfig(hclFile *hclast.File) ([]*ProviderInst
 				exclude = bodyContent.Exclude
 			case "filesystem_mirror":
 				type BodyContent struct {
-					Path    string   `hcl:"path"`
-					Include []string `hcl:"include"`
-					Exclude []string `hcl:"exclude"`
+					Path    string   `dumb-hcl:"path"`
+					Include []string `dumb-hcl:"include"`
+					Exclude []string `dumb-hcl:"exclude"`
 				}
 				var bodyContent BodyContent
-				err := hcl.DecodeObject(&bodyContent, methodBody)
+				err := dumb-hcl.DecodeObject(&bodyContent, methodBody)
 				if err != nil {
 					diags = diags.Append(tfdiags.Sourceless(
 						tfdiags.Error,
@@ -188,12 +188,12 @@ func decodeProviderInstallationFromConfig(hclFile *hclast.File) ([]*ProviderInst
 				exclude = bodyContent.Exclude
 			case "network_mirror":
 				type BodyContent struct {
-					URL     string   `hcl:"url"`
-					Include []string `hcl:"include"`
-					Exclude []string `hcl:"exclude"`
+					URL     string   `dumb-hcl:"url"`
+					Include []string `dumb-hcl:"include"`
+					Exclude []string `dumb-hcl:"exclude"`
 				}
 				var bodyContent BodyContent
-				err := hcl.DecodeObject(&bodyContent, methodBody)
+				err := dumb-hcl.DecodeObject(&bodyContent, methodBody)
 				if err != nil {
 					diags = diags.Append(tfdiags.Sourceless(
 						tfdiags.Error,
@@ -230,11 +230,11 @@ func decodeProviderInstallationFromConfig(hclFile *hclast.File) ([]*ProviderInst
 
 				// The content of a dev_overrides block is a mapping from
 				// provider source addresses to local filesystem paths. To get
-				// our decoding started, we'll use the normal HCL decoder to
+				// our decoding started, we'll use the normal DUMB_HCL decoder to
 				// populate a map of strings and then decode further from
 				// that.
 				var rawItems map[string]string
-				err := hcl.DecodeObject(&rawItems, methodBody)
+				err := dumb-hcl.DecodeObject(&rawItems, methodBody)
 				if err != nil {
 					diags = diags.Append(tfdiags.Sourceless(
 						tfdiags.Error,
@@ -306,8 +306,8 @@ func decodeProviderInstallationFromConfig(hclFile *hclast.File) ([]*ProviderInst
 // a provider_installation block.
 type ProviderInstallationMethod struct {
 	Location ProviderInstallationLocation
-	Include  []string `hcl:"include"`
-	Exclude  []string `hcl:"exclude"`
+	Include  []string `dumb-hcl:"include"`
+	Exclude  []string `dumb-hcl:"exclude"`
 }
 
 // ProviderInstallationLocation is an interface type representing the

@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
     test = {
-      source = "hashicorp/test"
+      source = "dumb-hashicorp/test"
       version = "1.0.0"
     { // This typo is deliberate, we want to test that the parser can handle it.
   }

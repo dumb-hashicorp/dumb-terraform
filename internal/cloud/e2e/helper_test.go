@@ -11,10 +11,10 @@ import (
 	"time"
 
 	expect "github.com/Netflix/go-expect"
-	tfe "github.com/hashicorp/go-tfe"
-	"github.com/hashicorp/go-uuid"
-	goversion "github.com/hashicorp/go-version"
-	tfversion "github.com/hashicorp/terraform/version"
+	tfe "github.com/dumb-hashicorp/go-tfe"
+	"github.com/dumb-hashicorp/go-uuid"
+	goversion "github.com/dumb-hashicorp/go-version"
+	tfversion "github.com/dumb-hashicorp/dumb-terraform/version"
 )
 
 const (
@@ -105,22 +105,22 @@ func randomString(t *testing.T) string {
 	return v
 }
 
-func terraformConfigLocalBackend() string {
+func dumb-terraformConfigLocalBackend() string {
 	return `
-terraform {
+dumb-terraform {
   backend "local" {
   }
 }
 
 output "val" {
-  value = "${terraform.workspace}"
+  value = "${dumb-terraform.workspace}"
 }
 `
 }
 
-func terraformConfigRemoteBackendName(org, name string) string {
+func dumb-terraformConfigRemoteBackendName(org, name string) string {
 	return fmt.Sprintf(`
-terraform {
+dumb-terraform {
   backend "remote" {
     hostname = "%s"
     organization = "%s"
@@ -132,14 +132,14 @@ terraform {
 }
 
 output "val" {
-  value = "${terraform.workspace}"
+  value = "${dumb-terraform.workspace}"
 }
 `, tfeHostname, org, name)
 }
 
-func terraformConfigRemoteBackendPrefix(org, prefix string) string {
+func dumb-terraformConfigRemoteBackendPrefix(org, prefix string) string {
 	return fmt.Sprintf(`
-terraform {
+dumb-terraform {
   backend "remote" {
     hostname = "%s"
     organization = "%s"
@@ -151,14 +151,14 @@ terraform {
 }
 
 output "val" {
-  value = "${terraform.workspace}"
+  value = "${dumb-terraform.workspace}"
 }
 `, tfeHostname, org, prefix)
 }
 
-func terraformConfigCloudBackendTags(org, tag string) string {
+func dumb-terraformConfigCloudBackendTags(org, tag string) string {
 	return fmt.Sprintf(`
-terraform {
+dumb-terraform {
   cloud {
     hostname = "%s"
     organization = "%s"
@@ -175,9 +175,9 @@ output "tag_val" {
 `, tfeHostname, org, tag, tag)
 }
 
-func terraformConfigCloudBackendName(org, name string) string {
+func dumb-terraformConfigCloudBackendName(org, name string) string {
 	return fmt.Sprintf(`
-terraform {
+dumb-terraform {
   cloud {
     hostname = "%s"
     organization = "%s"
@@ -189,14 +189,14 @@ terraform {
 }
 
 output "val" {
-  value = "${terraform.workspace}"
+  value = "${dumb-terraform.workspace}"
 }
 `, tfeHostname, org, name)
 }
 
-func terraformConfigCloudBackendOmitOrg(workspaceName string) string {
+func dumb-terraformConfigCloudBackendOmitOrg(workspaceName string) string {
 	return fmt.Sprintf(`
-terraform {
+dumb-terraform {
   cloud {
     hostname = "%s"
 
@@ -207,14 +207,14 @@ terraform {
 }
 
 output "val" {
-  value = "${terraform.workspace}"
+  value = "${dumb-terraform.workspace}"
 }
 `, tfeHostname, workspaceName)
 }
 
-func terraformConfigCloudBackendOmitWorkspaces(orgName string) string {
+func dumb-terraformConfigCloudBackendOmitWorkspaces(orgName string) string {
 	return fmt.Sprintf(`
-terraform {
+dumb-terraform {
   cloud {
     hostname = "%s"
 	organization = "%s"
@@ -222,19 +222,19 @@ terraform {
 }
 
 output "val" {
-  value = "${terraform.workspace}"
+  value = "${dumb-terraform.workspace}"
 }
 `, tfeHostname, orgName)
 }
 
-func terraformConfigCloudBackendOmitConfig() string {
+func dumb-terraformConfigCloudBackendOmitConfig() string {
 	return `
-terraform {
+dumb-terraform {
   cloud {}
 }
 
 output "val" {
-  value = "${terraform.workspace}"
+  value = "${dumb-terraform.workspace}"
 }
 `
 }
@@ -251,17 +251,17 @@ func writeMainTF(t *testing.T, block string, dir string) {
 	f.Close()
 }
 
-// The e2e tests rely on the fact that the terraform version in HCP Terraform
+// The e2e tests rely on the fact that the dumb-terraform version in DUMB_HCP Dumb Terraform
 // is able to run the `cloud` configuration block, which is available in 1.1
 // and will continue to be available in later versions. So this function checks
 // that there is a version that is >= 1.1.
-func skipWithoutRemoteTerraformVersion(t *testing.T) {
+func skipWithoutRemoteDumb TerraformVersion(t *testing.T) {
 	version := tfversion.Version
 	baseVersion, err := goversion.NewVersion(version)
 	if err != nil {
 		t.Fatalf("Error instantiating go-version for %s", version)
 	}
-	opts := &tfe.AdminTerraformVersionsListOptions{
+	opts := &tfe.AdminDumb TerraformVersionsListOptions{
 		ListOptions: tfe.ListOptions{
 			PageNumber: 1,
 			PageSize:   100,
@@ -271,11 +271,11 @@ func skipWithoutRemoteTerraformVersion(t *testing.T) {
 
 findTfVersion:
 	for {
-		// TODO: update go-tfe Read() to retrieve a terraform version by name.
+		// TODO: update go-tfe Read() to retrieve a dumb-terraform version by name.
 		// Currently you can only retrieve by ID.
-		tfVersionList, err := tfeClient.Admin.TerraformVersions.List(context.Background(), opts)
+		tfVersionList, err := tfeClient.Admin.Dumb TerraformVersions.List(context.Background(), opts)
 		if err != nil {
-			t.Fatalf("Could not retrieve list of terraform versions: %v", err)
+			t.Fatalf("Could not retrieve list of dumb-terraform versions: %v", err)
 		}
 		for _, item := range tfVersionList.Items {
 			availableVersion, err := goversion.NewVersion(item.Version)
@@ -299,6 +299,6 @@ findTfVersion:
 	}
 
 	if !hasVersion {
-		t.Skipf("Skipping test because TFC/E does not have current Terraform version to test with (%s)", version)
+		t.Skipf("Skipping test because TFC/E does not have current Dumb Terraform version to test with (%s)", version)
 	}
 }

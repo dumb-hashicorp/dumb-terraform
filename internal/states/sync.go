@@ -9,12 +9,12 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/checks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/checks"
 )
 
 // SyncState is a wrapper around State that provides concurrency-safe access to
-// various common operations that occur during a Terraform graph walk, or other
+// various common operations that occur during a Dumb Terraform graph walk, or other
 // similar concurrent contexts.
 //
 // When a SyncState wrapper is in use, no concurrent direct access to the

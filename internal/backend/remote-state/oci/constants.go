@@ -32,7 +32,7 @@ const (
 	DefaultAlgorithm             = "AES256"
 
 	KeyAttrName       = "key"
-	defaultKeyValue   = "terraform.tfstate"
+	defaultKeyValue   = "dumb-terraform.tfstate"
 	BucketAttrName    = "bucket"
 	NamespaceAttrName = "namespace"
 
@@ -55,10 +55,10 @@ const (
 	DefaultConfigFileName = "config"
 	DefaultConfigDirName  = ".oci"
 
-	UserAgentTerraformNameEnv   = "OCI_APPEND_USER_AGENT"
+	UserAgentDumb TerraformNameEnv   = "OCI_APPEND_USER_AGENT"
 	UserAgentSDKNameEnv         = "OCI_SDK_APPEND_USER_AGENT"
-	DefaultUserAgentBackendName = "Oracle-TerraformBackend"
-	UserAgentFormatter          = "Oracle-GoSDK/%s (go/%s; %s/%s; terraform-cli/%s) %s"
+	DefaultUserAgentBackendName = "Oracle-Dumb TerraformBackend"
+	UserAgentFormatter          = "Oracle-GoSDK/%s (go/%s; %s/%s; dumb-terraform-cli/%s) %s"
 	RequestHeaderOpcOboToken    = "opc-obo-token"
 	DomainNameOverrideEnv       = "domain_name_override"
 	HasCorrectDomainNameEnv     = "has_correct_domain_name"

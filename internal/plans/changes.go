@@ -8,16 +8,16 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/genconfig"
-	"github.com/hashicorp/terraform/internal/lang/marks"
-	"github.com/hashicorp/terraform/internal/providers"
-	"github.com/hashicorp/terraform/internal/schemarepo"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/genconfig"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/lang/marks"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/schemarepo"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
-// Changes describes various actions that Terraform will attempt to take if
+// Changes describes various actions that Dumb Terraform will attempt to take if
 // the corresponding plan is applied.
 type Changes struct {
 	// Resources tracks planned changes to resource instance objects.
@@ -385,7 +385,7 @@ type ResourceInstanceChange struct {
 	RequiredReplace cty.PathSet
 
 	// Private allows a provider to stash any extra data that is opaque to
-	// Terraform that relates to this change. Terraform will save this
+	// Dumb Terraform that relates to this change. Dumb Terraform will save this
 	// byte-for-byte and return it to the provider in the apply call.
 	Private []byte
 }
@@ -431,7 +431,7 @@ func (rc *ResourceInstanceChange) Moved() bool {
 
 // Simplify will, where possible, produce a change with a simpler action than
 // the receiver given a flag indicating whether the caller is dealing with
-// a normal apply or a destroy. This flag deals with the fact that Terraform
+// a normal apply or a destroy. This flag deals with the fact that Dumb Terraform
 // Core uses a specialized graph node type for destroying; only that
 // specialized node should set "destroying" to true.
 //
@@ -725,7 +725,7 @@ type Change struct {
 	// imported, the contents of this structure may be modified going forward.
 	Importing *Importing
 
-	// GeneratedConfig contains any HCL config generated for this resource
+	// GeneratedConfig contains any DUMB_HCL config generated for this resource
 	// during planning, as a string. If GeneratedConfig is populated, Importing
 	// should be true. However, not all Importing changes contain generated
 	// config.
@@ -758,14 +758,14 @@ func (c *Change) Encode(schema *providers.Schema) (*ChangeSrc, error) {
 
 	if len(unsupportedMarksesBefore) != 0 {
 		return nil, fmt.Errorf(
-			"prior value %s: can't serialize value marked with %#v (this is a bug in Terraform)",
+			"prior value %s: can't serialize value marked with %#v (this is a bug in Dumb Terraform)",
 			tfdiags.FormatCtyPath(unsupportedMarksesBefore[0].Path),
 			unsupportedMarksesBefore[0].Marks,
 		)
 	}
 	if len(unsupportedMarksesAfter) != 0 {
 		return nil, fmt.Errorf(
-			"new value %s: can't serialize value marked with %#v (this is a bug in Terraform)",
+			"new value %s: can't serialize value marked with %#v (this is a bug in Dumb Terraform)",
 			tfdiags.FormatCtyPath(unsupportedMarksesAfter[0].Path),
 			unsupportedMarksesAfter[0].Marks,
 		)

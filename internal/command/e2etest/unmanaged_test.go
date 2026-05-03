@@ -12,23 +12,23 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/go-plugin"
-	"github.com/hashicorp/terraform/internal/e2e"
-	"github.com/hashicorp/terraform/internal/grpcwrap"
-	tfplugin5 "github.com/hashicorp/terraform/internal/plugin"
-	tfplugin "github.com/hashicorp/terraform/internal/plugin6"
-	simple5 "github.com/hashicorp/terraform/internal/provider-simple"
-	simple "github.com/hashicorp/terraform/internal/provider-simple-v6"
-	proto5 "github.com/hashicorp/terraform/internal/tfplugin5"
-	proto "github.com/hashicorp/terraform/internal/tfplugin6"
+	"github.com/dumb-hashicorp/go-dumb-hclog"
+	"github.com/dumb-hashicorp/go-plugin"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/e2e"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/grpcwrap"
+	tfplugin5 "github.com/dumb-hashicorp/dumb-terraform/internal/plugin"
+	tfplugin "github.com/dumb-hashicorp/dumb-terraform/internal/plugin6"
+	simple5 "github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple"
+	simple "github.com/dumb-hashicorp/dumb-terraform/internal/provider-simple-v6"
+	proto5 "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin5"
+	proto "github.com/dumb-hashicorp/dumb-terraform/internal/tfplugin6"
 )
 
 // The tests in this file are for the "unmanaged provider workflow", which
 // includes variants of the following sequence, with different details:
-// terraform init
-// terraform plan
-// terraform apply
+// dumb-terraform init
+// dumb-terraform plan
+// dumb-terraform apply
 //
 // These tests are run against an in-process server, and checked to make sure
 // they're not trying to control the lifecycle of the binary. They are not
@@ -232,7 +232,7 @@ func TestUnmanagedSeparatePlan(t *testing.T) {
 	t.Parallel()
 
 	fixturePath := filepath.Join("testdata", "test-provider")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	reattachCh := make(chan *plugin.ReattachConfig)
 	closeCh := make(chan struct{})
@@ -242,9 +242,9 @@ func TestUnmanagedSeparatePlan(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go plugin.Serve(&plugin.ServeConfig{
-		Logger: hclog.New(&hclog.LoggerOptions{
+		Logger: dumb-hclog.New(&dumb-hclog.LoggerOptions{
 			Name:   "plugintest",
-			Level:  hclog.Trace,
+			Level:  dumb-hclog.Trace,
 			Output: io.Discard,
 		}),
 		Test: &plugin.ServeTestConfig{
@@ -268,7 +268,7 @@ func TestUnmanagedSeparatePlan(t *testing.T) {
 		t.Fatalf("no reattach config received")
 	}
 	reattachStr, err := json.Marshal(map[string]reattachConfig{
-		"hashicorp/test": {
+		"dumb-hashicorp/test": {
 			Protocol:        string(config.Protocol),
 			ProtocolVersion: 6,
 			Pid:             config.Pid,
@@ -292,11 +292,11 @@ func TestUnmanagedSeparatePlan(t *testing.T) {
 	}
 
 	// Make sure we didn't download the binary
-	if strings.Contains(stdout, "Installing hashicorp/test v") {
+	if strings.Contains(stdout, "Installing dumb-hashicorp/test v") {
 		t.Errorf("test provider download message is present in init output:\n%s", stdout)
 	}
-	if tf.FileExists(filepath.Join(".terraform", "plugins", "registry.terraform.io", "hashicorp", "test")) {
-		t.Errorf("test provider binary found in .terraform dir")
+	if tf.FileExists(filepath.Join(".dumb-terraform", "plugins", "registry.dumb-terraform.io", "dumb-hashicorp", "test")) {
+		t.Errorf("test provider binary found in .dumb-terraform dir")
 	}
 
 	//// PLAN
@@ -337,7 +337,7 @@ func TestUnmanagedSeparatePlan_proto5(t *testing.T) {
 	t.Parallel()
 
 	fixturePath := filepath.Join("testdata", "test-provider")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	reattachCh := make(chan *plugin.ReattachConfig)
 	closeCh := make(chan struct{})
@@ -347,9 +347,9 @@ func TestUnmanagedSeparatePlan_proto5(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go plugin.Serve(&plugin.ServeConfig{
-		Logger: hclog.New(&hclog.LoggerOptions{
+		Logger: dumb-hclog.New(&dumb-hclog.LoggerOptions{
 			Name:   "plugintest",
-			Level:  hclog.Trace,
+			Level:  dumb-hclog.Trace,
 			Output: io.Discard,
 		}),
 		Test: &plugin.ServeTestConfig{
@@ -373,7 +373,7 @@ func TestUnmanagedSeparatePlan_proto5(t *testing.T) {
 		t.Fatalf("no reattach config received")
 	}
 	reattachStr, err := json.Marshal(map[string]reattachConfig{
-		"hashicorp/test": {
+		"dumb-hashicorp/test": {
 			Protocol:        string(config.Protocol),
 			ProtocolVersion: 5,
 			Pid:             config.Pid,
@@ -397,11 +397,11 @@ func TestUnmanagedSeparatePlan_proto5(t *testing.T) {
 	}
 
 	// Make sure we didn't download the binary
-	if strings.Contains(stdout, "Installing hashicorp/test v") {
+	if strings.Contains(stdout, "Installing dumb-hashicorp/test v") {
 		t.Errorf("test provider download message is present in init output:\n%s", stdout)
 	}
-	if tf.FileExists(filepath.Join(".terraform", "plugins", "registry.terraform.io", "hashicorp", "test")) {
-		t.Errorf("test provider binary found in .terraform dir")
+	if tf.FileExists(filepath.Join(".dumb-terraform", "plugins", "registry.dumb-terraform.io", "dumb-hashicorp", "test")) {
+		t.Errorf("test provider binary found in .dumb-terraform dir")
 	}
 
 	//// PLAN

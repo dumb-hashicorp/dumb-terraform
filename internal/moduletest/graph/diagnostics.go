@@ -3,12 +3,12 @@
 
 package graph
 
-import "github.com/hashicorp/terraform/internal/tfdiags"
+import "github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 
 // DiagnosticCausedByTestFailure implements multiple interfaces that enables it to
 // be used in the "Extra" field of a diagnostic. This type should only be used as
 // the Extra for diagnostics reporting assertions that fail in a run block during
-// `terraform test`.
+// `dumb-terraform test`.
 //
 // DiagnosticCausedByTestFailure implements the [DiagnosticExtraCausedByTestFailure]
 // interface. This allows downstream logic to identify diagnostics that are specifically

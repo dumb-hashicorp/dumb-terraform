@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/hashicorp/terraform/internal/plans/planfile"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/plans/planfile"
 )
 
 // NOTE: Temporary file until this branch is cleaned up.

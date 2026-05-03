@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	tfe "github.com/hashicorp/go-tfe"
+	tfe "github.com/dumb-hashicorp/go-tfe"
 )
 
 type taskStages map[tfe.Stage]*tfe.TaskStage

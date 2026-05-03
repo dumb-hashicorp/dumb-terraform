@@ -6,12 +6,12 @@ package configs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Provider represents a "provider" block in a module or file. A provider
@@ -19,15 +19,15 @@ import (
 // configurations for each actual provider.
 type Provider struct {
 	Name       string
-	NameRange  hcl.Range
+	NameRange  dumb-hcl.Range
 	Alias      string
-	AliasRange *hcl.Range // nil if no alias set
+	AliasRange *dumb-hcl.Range // nil if no alias set
 
 	Version VersionConstraint
 
-	Config hcl.Body
+	Config dumb-hcl.Body
 
-	DeclRange hcl.Range
+	DeclRange dumb-hcl.Range
 
 	// TODO: this may not be set in some cases, so it is not yet suitable for
 	// use outside of this package. We currently only use it for internal
@@ -51,8 +51,8 @@ type Provider struct {
 	MockDataExternalSource string
 }
 
-func decodeProviderBlock(block *hcl.Block, testFile bool) (*Provider, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
+func decodeProviderBlock(block *dumb-hcl.Block, testFile bool) (*Provider, dumb-hcl.Diagnostics) {
+	var diags dumb-hcl.Diagnostics
 
 	content, config, moreDiags := block.Body.PartialContent(providerBlockSchema)
 	diags = append(diags, moreDiags...)
@@ -81,13 +81,13 @@ func decodeProviderBlock(block *hcl.Block, testFile bool) (*Provider, hcl.Diagno
 	}
 
 	if attr, exists := content.Attributes["alias"]; exists {
-		valDiags := gohcl.DecodeExpression(attr.Expr, nil, &provider.Alias)
+		valDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &provider.Alias)
 		diags = append(diags, valDiags...)
 		provider.AliasRange = attr.Expr.Range().Ptr()
 
-		if !hclsyntax.ValidIdentifier(provider.Alias) {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+		if !dumb-hclsyntax.ValidIdentifier(provider.Alias) {
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Invalid provider configuration alias",
 				Detail:   fmt.Sprintf("An alias must be a valid name. %s", badIdentifierDetail),
 			})
@@ -96,20 +96,20 @@ func decodeProviderBlock(block *hcl.Block, testFile bool) (*Provider, hcl.Diagno
 
 	if attr, exists := content.Attributes["version"]; exists {
 		if testFile {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Version constraints are not allowed in test files",
 				Detail:   "Version constraints inside provider configuration blocks are not allowed in test files. To silence this error, move the provider version constraint into the required_providers block of the configuration that uses this provider.",
 				Subject:  attr.Expr.Range().Ptr(),
 			})
 		} else {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagWarning,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagWarning,
 				Summary:  "Version constraints inside provider configuration blocks are deprecated",
-				Detail:   "Terraform 0.13 and earlier allowed provider version constraints inside the provider configuration block, but that is now deprecated and will be removed in a future version of Terraform. To silence this warning, move the provider version constraint into the required_providers block.",
+				Detail:   "Dumb Terraform 0.13 and earlier allowed provider version constraints inside the provider configuration block, but that is now deprecated and will be removed in a future version of Dumb Terraform. To silence this warning, move the provider version constraint into the required_providers block.",
 				Subject:  attr.Expr.Range().Ptr(),
 			})
-			var versionDiags hcl.Diagnostics
+			var versionDiags dumb-hcl.Diagnostics
 			provider.Version, versionDiags = decodeVersionConstraint(attr)
 			diags = append(diags, versionDiags...)
 		}
@@ -118,22 +118,22 @@ func decodeProviderBlock(block *hcl.Block, testFile bool) (*Provider, hcl.Diagno
 	// Reserved attribute names
 	for _, name := range []string{"count", "depends_on", "for_each", "source"} {
 		if attr, exists := content.Attributes[name]; exists {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Reserved argument name in provider block",
-				Detail:   fmt.Sprintf("The provider argument name %q is reserved for use by Terraform in a future version.", name),
+				Detail:   fmt.Sprintf("The provider argument name %q is reserved for use by Dumb Terraform in a future version.", name),
 				Subject:  &attr.NameRange,
 			})
 		}
 	}
 
-	var seenEscapeBlock *hcl.Block
+	var seenEscapeBlock *dumb-hcl.Block
 	for _, block := range content.Blocks {
 		switch block.Type {
 		case "_":
 			if seenEscapeBlock != nil {
-				diags = append(diags, &hcl.Diagnostic{
-					Severity: hcl.DiagError,
+				diags = append(diags, &dumb-hcl.Diagnostic{
+					Severity: dumb-hcl.DiagError,
 					Summary:  "Duplicate escaping block",
 					Detail: fmt.Sprintf(
 						"The special block type \"_\" can be used to force particular arguments to be interpreted as provider-specific rather than as meta-arguments, but each provider block can have only one such block. The first escaping block was at %s.",
@@ -148,15 +148,15 @@ func decodeProviderBlock(block *hcl.Block, testFile bool) (*Provider, hcl.Diagno
 			// When there's an escaping block its content merges with the
 			// existing config we extracted earlier, so later decoding
 			// will see a blend of both.
-			provider.Config = hcl.MergeBodies([]hcl.Body{provider.Config, block.Body})
+			provider.Config = dumb-hcl.MergeBodies([]dumb-hcl.Body{provider.Config, block.Body})
 
 		default:
 			// All of the other block types in our schema are reserved for
 			// future expansion.
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = append(diags, &dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  "Reserved block type name in provider block",
-				Detail:   fmt.Sprintf("The block type name %q is reserved for use by Terraform in a future version.", block.Type),
+				Detail:   fmt.Sprintf("The block type name %q is reserved for use by Dumb Terraform in a future version.", block.Type),
 				Subject:  &block.TypeRange,
 			})
 		}
@@ -193,7 +193,7 @@ func (p *Provider) moduleUniqueKey() string {
 //
 // If the returned diagnostics contains errors then the result value is invalid
 // and must not be used.
-func ParseProviderConfigCompact(traversal hcl.Traversal) (addrs.LocalProviderConfig, tfdiags.Diagnostics) {
+func ParseProviderConfigCompact(traversal dumb-hcl.Traversal) (addrs.LocalProviderConfig, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	ret := addrs.LocalProviderConfig{
 		LocalName: traversal.RootName(),
@@ -206,12 +206,12 @@ func ParseProviderConfigCompact(traversal hcl.Traversal) (addrs.LocalProviderCon
 
 	aliasStep := traversal[1]
 	switch ts := aliasStep.(type) {
-	case hcl.TraverseAttr:
+	case dumb-hcl.TraverseAttr:
 		ret.Alias = ts.Name
 		return ret, diags
 	default:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider configuration address",
 			Detail:   "The provider type name must either stand alone or be followed by an alias name separated with a dot.",
 			Subject:  aliasStep.SourceRange().Ptr(),
@@ -219,8 +219,8 @@ func ParseProviderConfigCompact(traversal hcl.Traversal) (addrs.LocalProviderCon
 	}
 
 	if len(traversal) > 2 {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider configuration address",
 			Detail:   "Extraneous extra operators after provider configuration address.",
 			Subject:  traversal[2:].SourceRange().Ptr(),
@@ -231,14 +231,14 @@ func ParseProviderConfigCompact(traversal hcl.Traversal) (addrs.LocalProviderCon
 }
 
 // ParseProviderConfigCompactStr is a helper wrapper around ParseProviderConfigCompact
-// that takes a string and parses it with the HCL native syntax traversal parser
+// that takes a string and parses it with the DUMB_HCL native syntax traversal parser
 // before interpreting it.
 //
 // This should be used only in specialized situations since it will cause the
 // created references to not have any meaningful source location information.
 // If a reference string is coming from a source that should be identified in
 // error messages then the caller should instead parse it directly using a
-// suitable function from the HCL API and pass the traversal itself to
+// suitable function from the DUMB_HCL API and pass the traversal itself to
 // ParseProviderConfigCompact.
 //
 // Error diagnostics are returned if either the parsing fails or the analysis
@@ -248,7 +248,7 @@ func ParseProviderConfigCompact(traversal hcl.Traversal) (addrs.LocalProviderCon
 func ParseProviderConfigCompactStr(str string) (addrs.LocalProviderConfig, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 
-	traversal, parseDiags := hclsyntax.ParseTraversalAbs([]byte(str), "", hcl.Pos{Line: 1, Column: 1})
+	traversal, parseDiags := dumb-hclsyntax.ParseTraversalAbs([]byte(str), "", dumb-hcl.Pos{Line: 1, Column: 1})
 	diags = diags.Append(parseDiags)
 	if parseDiags.HasErrors() {
 		return addrs.LocalProviderConfig{}, diags
@@ -259,8 +259,8 @@ func ParseProviderConfigCompactStr(str string) (addrs.LocalProviderConfig, tfdia
 	return addr, diags
 }
 
-var providerBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var providerBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{
 			Name: "alias",
 		},
@@ -274,7 +274,7 @@ var providerBlockSchema = &hcl.BodySchema{
 		{Name: "for_each"},
 		{Name: "source"},
 	},
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "_"}, // meta-argument escaping block
 
 		// The rest of these are reserved for future expansion.
@@ -285,13 +285,13 @@ var providerBlockSchema = &hcl.BodySchema{
 
 // checkProviderNameNormalized verifies that the given string is already
 // normalized and returns an error if not.
-func checkProviderNameNormalized(name string, declrange hcl.Range) hcl.Diagnostics {
-	var diags hcl.Diagnostics
+func checkProviderNameNormalized(name string, declrange dumb-hcl.Range) dumb-hcl.Diagnostics {
+	var diags dumb-hcl.Diagnostics
 	// verify that the provider local name is normalized
 	normalized, err := addrs.IsProviderPartNormalized(name)
 	if err != nil {
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider local name",
 			Detail:   fmt.Sprintf("%s is an invalid provider local name: %s", name, err),
 			Subject:  &declrange,
@@ -301,8 +301,8 @@ func checkProviderNameNormalized(name string, declrange hcl.Range) hcl.Diagnosti
 	if !normalized {
 		// we would have returned this error already
 		normalizedProvider, _ := addrs.ParseProviderPart(name)
-		diags = append(diags, &hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = append(diags, &dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid provider local name",
 			Detail:   fmt.Sprintf("Provider names must be normalized. Replace %q with %q to fix this error.", name, normalizedProvider),
 			Subject:  &declrange,

@@ -7,20 +7,20 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform/internal/e2e"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/e2e"
 )
 
-// TestProviderDevOverrides is a test that terraform can execute a 3rd party
+// TestProviderDevOverrides is a test that dumb-terraform can execute a 3rd party
 // provisioner plugin.
 func TestProvisioner(t *testing.T) {
 	t.Parallel()
 
-	// This test reaches out to releases.hashicorp.com to download the
+	// This test reaches out to releases.dumb-hashicorp.com to download the
 	// template and null providers, so it can only run if network access is
 	// allowed.
 	skipIfCannotAccessNetwork(t)
 
-	tf := e2e.NewBinary(t, terraformBin, "testdata/provisioner")
+	tf := e2e.NewBinary(t, dumb-terraformBin, "testdata/provisioner")
 
 	//// INIT
 	_, stderr, err := tf.Run("init")

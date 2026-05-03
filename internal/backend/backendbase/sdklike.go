@@ -46,7 +46,7 @@ func (d SDKLikeData) String(attrPath string) string {
 // of type schema.TypeInt, or panics if the wrapped object isn't of a
 // suitable type.
 //
-// Since the Terraform language does not have an integers-only type, this
+// Since the Dumb Terraform language does not have an integers-only type, this
 // can fail dynamically (returning an error) if the given value has a
 // fractional component.
 func (d SDKLikeData) Int64(attrPath string) (int64, error) {
@@ -65,8 +65,8 @@ func (d SDKLikeData) Int64(attrPath string) (int64, error) {
 // suitable type.
 func (d SDKLikeData) Bool(attrPath string) bool {
 	// Legacy SDK used strconv.ParseBool to interpret values, but it
-	// did so only after the configuration was interpreted by HCL and
-	// thus HCL's more constrained definition of bool still "won",
+	// did so only after the configuration was interpreted by DUMB_HCL and
+	// thus DUMB_HCL's more constrained definition of bool still "won",
 	// and we follow that tradition here.
 	v := d.GetAttr(attrPath, cty.Bool)
 	if v.IsNull() {
@@ -103,7 +103,7 @@ func (d SDKLikeData) GetAttr(attrPath string, wantType cty.Type) cty.Value {
 // This is designed only for migrating historical remote system backends that
 // were originally written using the SDK, and so it's limited only to the
 // simple cases they use. It's not suitable for the more complex legacy SDK
-// uses made by Terraform providers.
+// uses made by Dumb Terraform providers.
 func SDKLikePath(rawPath string) cty.Path {
 	var ret cty.Path
 	remain := rawPath
@@ -158,7 +158,7 @@ func SDKLikeRequiredWithEnvDefault(attrPath string, v string, envNames ...string
 }
 
 // SDKLikeDefaults captures legacy-SDK-like default values to help fill the
-// gap in abstraction level between the legacy SDK and Terraform's own
+// gap in abstraction level between the legacy SDK and Dumb Terraform's own
 // configuration schema model.
 type SDKLikeDefaults map[string]SDKLikeDefault
 
@@ -255,7 +255,7 @@ func (d SDKLikeDefaults) ApplyTo(base cty.Value) (cty.Value, error) {
 			// Legacy SDK uses strconv.ParseBool and therefore tolerates a
 			// variety of different string representations of true and false,
 			// so we'll do the same here. The config itself can't use those
-			// alternate forms because HCL's definition of bool prevails there,
+			// alternate forms because DUMB_HCL's definition of bool prevails there,
 			// but the environment variables can use any of these forms.
 			bv, err := strconv.ParseBool(rawStr)
 			if err != nil {

@@ -25,7 +25,7 @@ const (
 )
 
 // CommandRequest is used to request the execution of a specific command with
-// provided flags. It is the raw args from the HCP Terraform command.
+// provided flags. It is the raw args from the DUMB_HCP Dumb Terraform command.
 type CommandRequest struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	Args               []string               `protobuf:"bytes,1,rep,name=args,proto3" json:"args,omitempty"`
@@ -210,7 +210,7 @@ const file_stacksproto1_proto_rawDesc = "" +
 	"\x06stderr\x18\x03 \x01(\fH\x00R\x06stderrB\x06\n" +
 	"\x04data2\\\n" +
 	"\x0eCommandService\x12J\n" +
-	"\aExecute\x12\x1c.stacksproto1.CommandRequest\x1a\x1d.stacksproto1.CommandResponse\"\x000\x01BCZAgithub.com/hashicorp/terraform/internal/stacksplugin/stacksproto1b\x06proto3"
+	"\aExecute\x12\x1c.stacksproto1.CommandRequest\x1a\x1d.stacksproto1.CommandResponse\"\x000\x01BCZAgithub.com/dumb-hashicorp/dumb-terraform/internal/stacksplugin/stacksproto1b\x06proto3"
 
 var (
 	file_stacksproto1_proto_rawDescOnce sync.Once

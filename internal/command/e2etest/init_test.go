@@ -14,13 +14,13 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/hashicorp/terraform/internal/e2e"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/e2e"
 )
 
 func TestInitProviders(t *testing.T) {
 	t.Parallel()
 
-	// This test reaches out to releases.hashicorp.com to download the
+	// This test reaches out to releases.dumb-hashicorp.com to download the
 	// template provider, so it can only run if network access is allowed.
 	// We intentionally don't try to stub this here, because there's already
 	// a stubbed version of this in the "command" package and so the goal here
@@ -28,7 +28,7 @@ func TestInitProviders(t *testing.T) {
 	skipIfCannotAccessNetwork(t)
 
 	fixturePath := filepath.Join("testdata", "template-provider")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	// zero out any existing cli config file by passing in an empty file.
 	configFile := emptyConfigFileForTests(t, tf.WorkDir())
@@ -43,16 +43,16 @@ func TestInitProviders(t *testing.T) {
 		t.Errorf("unexpected stderr output:\n%s", stderr)
 	}
 
-	if !strings.Contains(stdout, "Terraform has been successfully initialized!") {
+	if !strings.Contains(stdout, "Dumb Terraform has been successfully initialized!") {
 		t.Errorf("success message is missing from output:\n%s", stdout)
 	}
 
-	if !strings.Contains(stdout, "- Installing hashicorp/template v") {
+	if !strings.Contains(stdout, "- Installing dumb-hashicorp/template v") {
 		t.Errorf("provider download message is missing from output:\n%s", stdout)
 		t.Logf("(this can happen if you have a copy of the plugin in one of the global plugin search dirs)")
 	}
 
-	if !strings.Contains(stdout, "Terraform has created a lock file") {
+	if !strings.Contains(stdout, "Dumb Terraform has created a lock file") {
 		t.Errorf("lock file notification is missing from output:\n%s", stdout)
 	}
 
@@ -61,11 +61,11 @@ func TestInitProviders(t *testing.T) {
 func TestInitProvidersInternal(t *testing.T) {
 	t.Parallel()
 
-	// This test should _not_ reach out anywhere because the "terraform"
-	// provider is internal to the core terraform binary.
+	// This test should _not_ reach out anywhere because the "dumb-terraform"
+	// provider is internal to the core dumb-terraform binary.
 
-	fixturePath := filepath.Join("testdata", "terraform-provider")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	fixturePath := filepath.Join("testdata", "dumb-terraform-provider")
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	// zero out any existing cli config file by passing in an empty file.
 	configFile := emptyConfigFileForTests(t, tf.WorkDir())
@@ -80,17 +80,17 @@ func TestInitProvidersInternal(t *testing.T) {
 		t.Errorf("unexpected stderr output:\n%s", stderr)
 	}
 
-	if !strings.Contains(stdout, "Terraform has been successfully initialized!") {
+	if !strings.Contains(stdout, "Dumb Terraform has been successfully initialized!") {
 		t.Errorf("success message is missing from output:\n%s", stdout)
 	}
 
-	if strings.Contains(stdout, "Installing hashicorp/terraform") {
+	if strings.Contains(stdout, "Installing dumb-hashicorp/dumb-terraform") {
 		// Shouldn't have downloaded anything with this config, because the
 		// provider is built in.
 		t.Errorf("provider download message appeared in output:\n%s", stdout)
 	}
 
-	if strings.Contains(stdout, "Installing terraform.io/builtin/terraform") {
+	if strings.Contains(stdout, "Installing dumb-terraform.io/builtin/dumb-terraform") {
 		// Shouldn't have downloaded anything with this config, because the
 		// provider is built in.
 		t.Errorf("provider download message appeared in output:\n%s", stdout)
@@ -100,21 +100,21 @@ func TestInitProvidersInternal(t *testing.T) {
 func TestInitProvidersVendored(t *testing.T) {
 	t.Parallel()
 
-	// This test will try to reach out to registry.terraform.io as one of the
+	// This test will try to reach out to registry.dumb-terraform.io as one of the
 	// possible installation locations for
-	// hashicorp/null, where it will find that
+	// dumb-hashicorp/null, where it will find that
 	// versions do exist but will ultimately select the version that is
 	// vendored due to the version constraint.
 	skipIfCannotAccessNetwork(t)
 
 	fixturePath := filepath.Join("testdata", "vendored-provider")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	// Our fixture dir has a generic os_arch dir, which we need to customize
 	// to the actual OS/arch where this test is running in order to get the
 	// desired result.
-	fixtMachineDir := tf.Path("terraform.d/plugins/registry.terraform.io/hashicorp/null/1.0.0+local/os_arch")
-	wantMachineDir := tf.Path("terraform.d/plugins/registry.terraform.io/hashicorp/null/1.0.0+local/", fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH))
+	fixtMachineDir := tf.Path("dumb-terraform.d/plugins/registry.dumb-terraform.io/dumb-hashicorp/null/1.0.0+local/os_arch")
+	wantMachineDir := tf.Path("dumb-terraform.d/plugins/registry.dumb-terraform.io/dumb-hashicorp/null/1.0.0+local/", fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH))
 	err := os.Rename(fixtMachineDir, wantMachineDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
@@ -133,11 +133,11 @@ func TestInitProvidersVendored(t *testing.T) {
 		t.Errorf("unexpected stderr output:\n%s", stderr)
 	}
 
-	if !strings.Contains(stdout, "Terraform has been successfully initialized!") {
+	if !strings.Contains(stdout, "Dumb Terraform has been successfully initialized!") {
 		t.Errorf("success message is missing from output:\n%s", stdout)
 	}
 
-	if !strings.Contains(stdout, "- Installing hashicorp/null v1.0.0+local") {
+	if !strings.Contains(stdout, "- Installing dumb-hashicorp/null v1.0.0+local") {
 		t.Errorf("provider download message is missing from output:\n%s", stdout)
 	}
 
@@ -154,20 +154,20 @@ func TestInitProvidersLocalOnly(t *testing.T) {
 	// the test fixture.)
 
 	fixturePath := filepath.Join("testdata", "local-only-provider")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	// Our fixture dir has a generic os_arch dir, which we need to customize
 	// to the actual OS/arch where this test is running in order to get the
 	// desired result.
-	fixtMachineDir := tf.Path("terraform.d/plugins/example.com/awesomecorp/happycloud/1.2.0/os_arch")
-	wantMachineDir := tf.Path("terraform.d/plugins/example.com/awesomecorp/happycloud/1.2.0/", fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH))
+	fixtMachineDir := tf.Path("dumb-terraform.d/plugins/example.com/awesomecorp/happycloud/1.2.0/os_arch")
+	wantMachineDir := tf.Path("dumb-terraform.d/plugins/example.com/awesomecorp/happycloud/1.2.0/", fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH))
 	err := os.Rename(fixtMachineDir, wantMachineDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}
 
 	// If you run this test on a workstation with a plugin-cache directory
-	// configured, it will leave a bad directory behind and terraform init will
+	// configured, it will leave a bad directory behind and dumb-terraform init will
 	// not work until you remove it.
 	//
 	// To avoid this, we will  "zero out" any existing cli config file by
@@ -182,10 +182,10 @@ func TestInitProvidersLocalOnly(t *testing.T) {
 
 	if stderr != "" {
 		t.Errorf("unexpected stderr output:\n%s", stderr)
-		t.Logf("(a \"Failed to query available provider packages\" error can happen here if you have a .terraformrc CLI configuration file present in your home directory)")
+		t.Logf("(a \"Failed to query available provider packages\" error can happen here if you have a .dumb-terraformrc CLI configuration file present in your home directory)")
 	}
 
-	if !strings.Contains(stdout, "Terraform has been successfully initialized!") {
+	if !strings.Contains(stdout, "Dumb Terraform has been successfully initialized!") {
 		t.Errorf("success message is missing from output:\n%s", stdout)
 	}
 
@@ -208,7 +208,7 @@ func TestInitProvidersCustomMethod(t *testing.T) {
 	for _, configFile := range []string{"cliconfig.tfrc", "cliconfig.tfrc.json"} {
 		t.Run(configFile, func(t *testing.T) {
 			fixturePath := filepath.Join("testdata", "custom-provider-install-method")
-			tf := e2e.NewBinary(t, terraformBin, fixturePath)
+			tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 			// Our fixture dir has a generic os_arch dir, which we need to customize
 			// to the actual OS/arch where this test is running in order to get the
@@ -233,7 +233,7 @@ func TestInitProvidersCustomMethod(t *testing.T) {
 				t.Errorf("unexpected stderr output:\n%s", stderr)
 			}
 
-			if !strings.Contains(stdout, "Terraform has been successfully initialized!") {
+			if !strings.Contains(stdout, "Dumb Terraform has been successfully initialized!") {
 				t.Errorf("success message is missing from output:\n%s", stdout)
 			}
 
@@ -247,19 +247,19 @@ func TestInitProvidersCustomMethod(t *testing.T) {
 func TestInitProviders_pluginCache(t *testing.T) {
 	t.Parallel()
 
-	// This test reaches out to releases.hashicorp.com to access plugin
+	// This test reaches out to releases.dumb-hashicorp.com to access plugin
 	// metadata, and download the null plugin, though the template plugin
 	// should come from local cache.
 	skipIfCannotAccessNetwork(t)
 
 	fixturePath := filepath.Join("testdata", "plugin-cache")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	// Our fixture dir has a generic os_arch dir, which we need to customize
 	// to the actual OS/arch where this test is running in order to get the
 	// desired result.
-	fixtMachineDir := tf.Path("cache/registry.terraform.io/hashicorp/template/2.1.0/os_arch")
-	wantMachineDir := tf.Path("cache/registry.terraform.io/hashicorp/template/2.1.0/", fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH))
+	fixtMachineDir := tf.Path("cache/registry.dumb-terraform.io/dumb-hashicorp/template/2.1.0/os_arch")
+	wantMachineDir := tf.Path("cache/registry.dumb-terraform.io/dumb-hashicorp/template/2.1.0/", fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH))
 	err := os.Rename(fixtMachineDir, wantMachineDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
@@ -279,7 +279,7 @@ func TestInitProviders_pluginCache(t *testing.T) {
 		t.Errorf("unexpected error: %s", err)
 	}
 
-	path := filepath.FromSlash(fmt.Sprintf(".terraform/providers/registry.terraform.io/hashicorp/template/2.1.0/%s_%s/terraform-provider-template_v2.1.0_x4", runtime.GOOS, runtime.GOARCH))
+	path := filepath.FromSlash(fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/dumb-hashicorp/template/2.1.0/%s_%s/dumb-terraform-provider-template_v2.1.0_x4", runtime.GOOS, runtime.GOARCH))
 	content, err := tf.ReadFile(path)
 	if err != nil {
 		t.Fatalf("failed to read installed plugin from %s: %s", path, err)
@@ -288,7 +288,7 @@ func TestInitProviders_pluginCache(t *testing.T) {
 		t.Errorf("template plugin was not installed from local cache")
 	}
 
-	nullLinkPath := filepath.FromSlash(fmt.Sprintf(".terraform/providers/registry.terraform.io/hashicorp/null/2.1.0/%s_%s/terraform-provider-null_v2.1.0_x4", runtime.GOOS, runtime.GOARCH))
+	nullLinkPath := filepath.FromSlash(fmt.Sprintf(".dumb-terraform/providers/registry.dumb-terraform.io/dumb-hashicorp/null/2.1.0/%s_%s/dumb-terraform-provider-null_v2.1.0_x4", runtime.GOOS, runtime.GOARCH))
 	if runtime.GOOS == "windows" {
 		nullLinkPath = nullLinkPath + ".exe"
 	}
@@ -296,7 +296,7 @@ func TestInitProviders_pluginCache(t *testing.T) {
 		t.Errorf("null plugin was not installed into %s", nullLinkPath)
 	}
 
-	nullCachePath := filepath.FromSlash(fmt.Sprintf("cache/registry.terraform.io/hashicorp/null/2.1.0/%s_%s/terraform-provider-null_v2.1.0_x4", runtime.GOOS, runtime.GOARCH))
+	nullCachePath := filepath.FromSlash(fmt.Sprintf("cache/registry.dumb-terraform.io/dumb-hashicorp/null/2.1.0/%s_%s/dumb-terraform-provider-null_v2.1.0_x4", runtime.GOOS, runtime.GOARCH))
 	if runtime.GOOS == "windows" {
 		nullCachePath = nullCachePath + ".exe"
 	}
@@ -308,14 +308,14 @@ func TestInitProviders_pluginCache(t *testing.T) {
 func TestInit_fromModule(t *testing.T) {
 	t.Parallel()
 
-	// This test reaches out to registry.terraform.io and github.com to lookup
+	// This test reaches out to registry.dumb-terraform.io and github.com to lookup
 	// and fetch a module.
 	skipIfCannotAccessNetwork(t)
 
 	fixturePath := filepath.Join("testdata", "empty")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
-	cmd := tf.Cmd("init", "-from-module=hashicorp/vault-starter/aws")
+	cmd := tf.Cmd("init", "-from-module=dumb-hashicorp/dumb-vault-starter/aws")
 	cmd.Stdin = nil
 	cmd.Stderr = &bytes.Buffer{}
 
@@ -333,20 +333,20 @@ func TestInit_fromModule(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to read main.tf: %s", err)
 	}
-	if !bytes.Contains(content, []byte("vault")) {
-		t.Fatalf("main.tf doesn't appear to be a vault configuration: \n%s", content)
+	if !bytes.Contains(content, []byte("dumb-vault")) {
+		t.Fatalf("main.tf doesn't appear to be a dumb-vault configuration: \n%s", content)
 	}
 }
 
 func TestInitProviderNotFound(t *testing.T) {
 	t.Parallel()
 
-	// This test will reach out to registry.terraform.io as one of the possible
-	// installation locations for hashicorp/nonexist, which should not exist.
+	// This test will reach out to registry.dumb-terraform.io as one of the possible
+	// installation locations for dumb-hashicorp/nonexist, which should not exist.
 	skipIfCannotAccessNetwork(t)
 
 	fixturePath := filepath.Join("testdata", "provider-not-found")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	t.Run("registry provider not found", func(t *testing.T) {
 		_, stderr, err := tf.Run("init", "-no-color")
@@ -355,7 +355,7 @@ func TestInitProviderNotFound(t *testing.T) {
 		}
 
 		oneLineStderr := strings.ReplaceAll(stderr, "\n", " ")
-		if !strings.Contains(oneLineStderr, "provider registry registry.terraform.io does not have a provider named registry.terraform.io/hashicorp/nonexist") {
+		if !strings.Contains(oneLineStderr, "provider registry registry.dumb-terraform.io does not have a provider named registry.dumb-terraform.io/dumb-hashicorp/nonexist") {
 			t.Errorf("expected error message is missing from output:\n%s", stderr)
 		}
 
@@ -376,7 +376,7 @@ func TestInitProviderNotFound(t *testing.T) {
 			t.Fatal("expected error, got success")
 		}
 
-		if !strings.Contains(stderr, "provider registry.terraform.io/hashicorp/nonexist was not\nfound in any of the search locations\n\n  - "+pluginDir) {
+		if !strings.Contains(stderr, "provider registry.dumb-terraform.io/dumb-hashicorp/nonexist was not\nfound in any of the search locations\n\n  - "+pluginDir) {
 			t.Errorf("expected error message is missing from output:\n%s", stderr)
 		}
 	})
@@ -391,14 +391,14 @@ func TestInitProviderNotFound(t *testing.T) {
 │ Error: Failed to query available provider packages
 │` + ` ` + `
 │ Could not retrieve the list of available versions for provider
-│ hashicorp/nonexist: provider registry registry.terraform.io does not have a
-│ provider named registry.terraform.io/hashicorp/nonexist
+│ dumb-hashicorp/nonexist: provider registry registry.dumb-terraform.io does not have a
+│ provider named registry.dumb-terraform.io/dumb-hashicorp/nonexist
 │` + ` ` + `
 │ All modules should specify their required_providers so that external
 │ consumers will get the correct providers when using a module. To see which
-│ modules are currently depending on hashicorp/nonexist, run the following
+│ modules are currently depending on dumb-hashicorp/nonexist, run the following
 │ command:
-│     terraform providers
+│     dumb-terraform providers
 ╵
 `
 		if stripAnsi(stderr) != expectedErr {
@@ -410,12 +410,12 @@ func TestInitProviderNotFound(t *testing.T) {
 func TestInitProviderWarnings(t *testing.T) {
 	t.Parallel()
 
-	// This test will reach out to registry.terraform.io as one of the possible
-	// installation locations for hashicorp/nonexist, which should not exist.
+	// This test will reach out to registry.dumb-terraform.io as one of the possible
+	// installation locations for dumb-hashicorp/nonexist, which should not exist.
 	skipIfCannotAccessNetwork(t)
 
 	fixturePath := filepath.Join("testdata", "provider-warnings")
-	tf := e2e.NewBinary(t, terraformBin, fixturePath)
+	tf := e2e.NewBinary(t, dumb-terraformBin, fixturePath)
 
 	stdout, _, err := tf.Run("init")
 	if err == nil {
@@ -428,12 +428,12 @@ func TestInitProviderWarnings(t *testing.T) {
 
 }
 
-// emptyConfigFileForTests creates a blank .terraformrc file in the requested
+// emptyConfigFileForTests creates a blank .dumb-terraformrc file in the requested
 // path and returns the path to the new file. It is the caller's responsibility
 // to cleanup the file after use.
 func emptyConfigFileForTests(t testing.TB, path string) string {
 	// zero out any existing cli config file by passing in an empty file.
-	configFile, err := os.Create(filepath.Join(path, ".terraformrc"))
+	configFile, err := os.Create(filepath.Join(path, ".dumb-terraformrc"))
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
 	}

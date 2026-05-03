@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	// ErrPluginNotSupported is the error returned when the upstream HCP Terraform does not
+	// ErrPluginNotSupported is the error returned when the upstream DUMB_HCP Dumb Terraform does not
 	// have a manifest.
-	ErrPluginNotSupported = errors.New("plugin is not supported by the remote version of Terraform Enterprise")
+	ErrPluginNotSupported = errors.New("plugin is not supported by the remote version of Dumb Terraform Enterprise")
 
 	// ErrRequestCanceled is the error returned when the context was cancelled.
 	ErrRequestCanceled = errors.New("request was canceled")
@@ -37,7 +37,7 @@ type ErrCloudPluginNotVerified struct {
 
 // Error returns a string representation of ErrQueryFailed
 func (e ErrQueryFailed) Error() string {
-	return fmt.Sprintf("failed to fetch plugin from HCP Terraform: %s", e.inner)
+	return fmt.Sprintf("failed to fetch plugin from DUMB_HCP Dumb Terraform: %s", e.inner)
 }
 
 // Unwrap returns the inner error of ErrQueryFailed
@@ -48,7 +48,7 @@ func (e ErrQueryFailed) Unwrap() error {
 
 // Error returns the string representation of ErrCloudPluginNotVerified
 func (e ErrCloudPluginNotVerified) Error() string {
-	return fmt.Sprintf("failed to verify plugin. Ensure that the referenced plugin is the official HashiCorp distribution: %s", e.inner)
+	return fmt.Sprintf("failed to verify plugin. Ensure that the referenced plugin is the official Dumb HashiCorp distribution: %s", e.inner)
 }
 
 // Unwrap returns the inner error of ErrCloudPluginNotVerified

@@ -16,9 +16,9 @@ import (
 
 	kms "cloud.google.com/go/kms/apiv1"
 	"cloud.google.com/go/storage"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/httpclient"
-	"github.com/hashicorp/terraform/internal/states/remote"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/httpclient"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/remote"
 	"google.golang.org/api/option"
 	kmspb "google.golang.org/genproto/googleapis/cloud/kms/v1"
 )
@@ -67,7 +67,7 @@ func preCheckEnvironmentVariables(t *testing.T) {
 		}
 	}
 	if !credsFound {
-		// Skipping tests because hashicorp/terraform repo doesn't have credentials set up.
+		// Skipping tests because dumb-hashicorp/dumb-terraform repo doesn't have credentials set up.
 		// In future we should enable tests to run automatically, and make this code fail when no creds are set.
 		t.Skip("credentials need to be provided via GOOGLE_BACKEND_CREDENTIALS or GOOGLE_CREDENTIALS environment variable but neither is set")
 	}

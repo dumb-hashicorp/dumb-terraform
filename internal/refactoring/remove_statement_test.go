@@ -8,11 +8,11 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/refactoring"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/refactoring"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 func TestFindRemoveStatements(t *testing.T) {
@@ -64,55 +64,55 @@ func TestFindRemoveStatements(t *testing.T) {
 		addrs.MakeMapElem[addrs.ConfigMoveable, refactoring.RemoveStatement](configResourceBasic, refactoring.RemoveStatement{
 			From:    configResourceBasic,
 			Destroy: false,
-			DeclRange: tfdiags.SourceRangeFromHCL(hcl.Range{
+			DeclRange: tfdiags.SourceRangeFromDUMB_HCL(dumb-hcl.Range{
 				Filename: "testdata/remove-statements/main.tf",
-				Start:    hcl.Pos{Line: 2, Column: 1, Byte: 27},
-				End:      hcl.Pos{Line: 2, Column: 8, Byte: 34},
+				Start:    dumb-hcl.Pos{Line: 2, Column: 1, Byte: 27},
+				End:      dumb-hcl.Pos{Line: 2, Column: 8, Byte: 34},
 			}),
 		}),
 		addrs.MakeMapElem[addrs.ConfigMoveable, refactoring.RemoveStatement](configResourceWithModule, refactoring.RemoveStatement{
 			From:    configResourceWithModule,
 			Destroy: false,
-			DeclRange: tfdiags.SourceRangeFromHCL(hcl.Range{
+			DeclRange: tfdiags.SourceRangeFromDUMB_HCL(dumb-hcl.Range{
 				Filename: "testdata/remove-statements/main.tf",
-				Start:    hcl.Pos{Line: 10, Column: 1, Byte: 138},
-				End:      hcl.Pos{Line: 10, Column: 8, Byte: 145},
+				Start:    dumb-hcl.Pos{Line: 10, Column: 1, Byte: 138},
+				End:      dumb-hcl.Pos{Line: 10, Column: 8, Byte: 145},
 			}),
 		}),
 		addrs.MakeMapElem[addrs.ConfigMoveable, refactoring.RemoveStatement](configModuleBasic, refactoring.RemoveStatement{
 			From:    configModuleBasic,
 			Destroy: false,
-			DeclRange: tfdiags.SourceRangeFromHCL(hcl.Range{
+			DeclRange: tfdiags.SourceRangeFromDUMB_HCL(dumb-hcl.Range{
 				Filename: "testdata/remove-statements/main.tf",
-				Start:    hcl.Pos{Line: 18, Column: 1, Byte: 253},
-				End:      hcl.Pos{Line: 18, Column: 8, Byte: 260},
+				Start:    dumb-hcl.Pos{Line: 18, Column: 1, Byte: 253},
+				End:      dumb-hcl.Pos{Line: 18, Column: 8, Byte: 260},
 			}),
 		}),
 		addrs.MakeMapElem[addrs.ConfigMoveable, refactoring.RemoveStatement](configResourceOverridden, refactoring.RemoveStatement{
 			From:    configResourceOverridden,
 			Destroy: true,
-			DeclRange: tfdiags.SourceRangeFromHCL(hcl.Range{
+			DeclRange: tfdiags.SourceRangeFromDUMB_HCL(dumb-hcl.Range{
 				Filename: "testdata/remove-statements/main.tf", // the statement in the parent module takes precedence
-				Start:    hcl.Pos{Line: 30, Column: 1, Byte: 428},
-				End:      hcl.Pos{Line: 30, Column: 8, Byte: 435},
+				Start:    dumb-hcl.Pos{Line: 30, Column: 1, Byte: 428},
+				End:      dumb-hcl.Pos{Line: 30, Column: 8, Byte: 435},
 			}),
 		}),
 		addrs.MakeMapElem[addrs.ConfigMoveable, refactoring.RemoveStatement](configResourceInModule, refactoring.RemoveStatement{
 			From:    configResourceInModule,
 			Destroy: true,
-			DeclRange: tfdiags.SourceRangeFromHCL(hcl.Range{
+			DeclRange: tfdiags.SourceRangeFromDUMB_HCL(dumb-hcl.Range{
 				Filename: "testdata/remove-statements/child/main.tf",
-				Start:    hcl.Pos{Line: 10, Column: 1, Byte: 141},
-				End:      hcl.Pos{Line: 10, Column: 8, Byte: 148},
+				Start:    dumb-hcl.Pos{Line: 10, Column: 1, Byte: 141},
+				End:      dumb-hcl.Pos{Line: 10, Column: 8, Byte: 148},
 			}),
 		}),
 		addrs.MakeMapElem[addrs.ConfigMoveable, refactoring.RemoveStatement](configModuleInModule, refactoring.RemoveStatement{
 			From:    configModuleInModule,
 			Destroy: false,
-			DeclRange: tfdiags.SourceRangeFromHCL(hcl.Range{
+			DeclRange: tfdiags.SourceRangeFromDUMB_HCL(dumb-hcl.Range{
 				Filename: "testdata/remove-statements/child/main.tf",
-				Start:    hcl.Pos{Line: 18, Column: 1, Byte: 247},
-				End:      hcl.Pos{Line: 18, Column: 8, Byte: 254},
+				Start:    dumb-hcl.Pos{Line: 18, Column: 1, Byte: 247},
+				End:      dumb-hcl.Pos{Line: 18, Column: 8, Byte: 254},
 			}),
 		}),
 	)

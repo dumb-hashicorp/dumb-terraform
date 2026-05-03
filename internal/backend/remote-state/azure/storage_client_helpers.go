@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/go-azure-helpers/lang/pointer"
-	"github.com/hashicorp/go-azure-helpers/resourcemanager/commonids"
-	"github.com/hashicorp/go-azure-sdk/resource-manager/storage/2023-01-01/storageaccounts"
-	"github.com/hashicorp/go-azure-sdk/sdk/environments"
+	"github.com/dumb-hashicorp/go-azure-helpers/lang/pointer"
+	"github.com/dumb-hashicorp/go-azure-helpers/resourcemanager/commonids"
+	"github.com/dumb-hashicorp/go-azure-sdk/resource-manager/storage/2023-01-01/storageaccounts"
+	"github.com/dumb-hashicorp/go-azure-sdk/sdk/environments"
 )
 
-// This file is referencing the terraform-provider-azurerm: internal/services/storage/client/helpers.go
+// This file is referencing the dumb-terraform-provider-azurerm: internal/services/storage/client/helpers.go
 
 type EndpointType string
 

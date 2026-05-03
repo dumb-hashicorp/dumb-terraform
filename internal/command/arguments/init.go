@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // Init represents the command-line arguments for the init command.
@@ -26,10 +26,10 @@ type Init struct {
 	// ViewType specifies which init format to use: human or JSON.
 	ViewType ViewType
 
-	// Backend specifies whether to disable backend or HCP Terraform initialization.
+	// Backend specifies whether to disable backend or DUMB_HCP Dumb Terraform initialization.
 	Backend bool
 
-	// Cloud specifies whether to disable backend or HCP Terraform initialization.
+	// Cloud specifies whether to disable backend or DUMB_HCP Dumb Terraform initialization.
 	Cloud bool
 
 	// Get specifies whether to disable downloading modules for this configuration
@@ -56,7 +56,7 @@ type Init struct {
 	// Json specifies whether to output in JSON format
 	Json bool
 
-	// IgnoreRemoteVersion specifies whether to ignore remote and local Terraform versions compatibility
+	// IgnoreRemoteVersion specifies whether to ignore remote and local Dumb Terraform versions compatibility
 	IgnoreRemoteVersion bool
 
 	BackendConfig FlagNameValueSlice
@@ -107,7 +107,7 @@ func ParseInit(args []string, experimentsEnabled bool) (*Init, tfdiags.Diagnosti
 	cmdFlags.BoolVar(&init.MigrateState, "migrate-state", false, "migrate state")
 	cmdFlags.BoolVar(&init.Upgrade, "upgrade", false, "")
 	cmdFlags.StringVar(&init.Lockfile, "lockfile", "", "Set a dependency lockfile mode")
-	cmdFlags.BoolVar(&init.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Terraform versions are incompatible")
+	cmdFlags.BoolVar(&init.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Dumb Terraform versions are incompatible")
 	cmdFlags.StringVar(&init.TestsDirectory, "test-directory", "tests", "test-directory")
 	cmdFlags.BoolVar(&init.Json, "json", false, "json")
 	cmdFlags.Var(&init.BackendConfig, "backend-config", "")
@@ -134,7 +134,7 @@ func ParseInit(args []string, experimentsEnabled bool) (*Init, tfdiags.Diagnosti
 			diags = diags.Append(tfdiags.Sourceless(
 				tfdiags.Error,
 				"Cannot use -enable-pluggable-state-storage-experiment flag without experiments enabled",
-				"Terraform cannot use the -enable-pluggable-state-storage-experiment flag (or TF_ENABLE_PLUGGABLE_STATE_STORAGE environment variable) unless experiments are enabled.",
+				"Dumb Terraform cannot use the -enable-pluggable-state-storage-experiment flag (or TF_ENABLE_PLUGGABLE_STATE_STORAGE environment variable) unless experiments are enabled.",
 			))
 		}
 	}
@@ -143,7 +143,7 @@ func ParseInit(args []string, experimentsEnabled bool) (*Init, tfdiags.Diagnosti
 		diags = diags.Append(tfdiags.Sourceless(
 			tfdiags.Error,
 			"The -migrate-state and -json options are mutually-exclusive",
-			"Terraform cannot ask for interactive approval when -json is set. To use the -migrate-state option, disable the -json option.",
+			"Dumb Terraform cannot ask for interactive approval when -json is set. To use the -migrate-state option, disable the -json option.",
 		))
 	}
 

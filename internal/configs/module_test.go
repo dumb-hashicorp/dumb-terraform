@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -40,15 +40,15 @@ func TestNewModule_provider_local_name(t *testing.T) {
 		t.Error("wrong local name returned for a non-local provider")
 	}
 
-	// can also look up the "terraform" provider and see that it sources is
+	// can also look up the "dumb-terraform" provider and see that it sources is
 	// allowed to be overridden, even though there is a builtin provider
-	// called "terraform".
-	p = addrs.NewProvider(addrs.DefaultProviderRegistryHost, "not-builtin", "not-terraform")
+	// called "dumb-terraform".
+	p = addrs.NewProvider(addrs.DefaultProviderRegistryHost, "not-builtin", "not-dumb-terraform")
 	if name, exists := mod.ProviderLocalNames[p]; !exists {
-		t.Fatal("provider FQN not-builtin/not-terraform not found")
+		t.Fatal("provider FQN not-builtin/not-dumb-terraform not found")
 	} else {
-		if name != "terraform" {
-			t.Fatalf("provider localname mismatch: got %s, want terraform", name)
+		if name != "dumb-terraform" {
+			t.Fatalf("provider localname mismatch: got %s, want dumb-terraform", name)
 		}
 	}
 }
@@ -297,7 +297,7 @@ func TestImpliedProviderForUnqualifiedType(t *testing.T) {
 	foo := addrs.NewProvider("registry.acme.corp", "acme", "foo")
 	whatever := addrs.NewProvider(addrs.DefaultProviderRegistryHost, "acme", "something")
 	bar := addrs.NewDefaultProvider("bar")
-	tf := addrs.NewBuiltInProvider("terraform")
+	tf := addrs.NewBuiltInProvider("dumb-terraform")
 
 	tests := []struct {
 		Type     string
@@ -306,7 +306,7 @@ func TestImpliedProviderForUnqualifiedType(t *testing.T) {
 		{"foo", foo},
 		{"whatever", whatever},
 		{"bar", bar},
-		{"terraform", tf},
+		{"dumb-terraform", tf},
 	}
 	for _, test := range tests {
 		got := mod.ImpliedProviderForUnqualifiedType(test.Type)
@@ -337,7 +337,7 @@ func TestModule_backend_overrides_a_backend(t *testing.T) {
 			t.Fatal(diags.Error())
 		}
 
-		wantAttr := cty.StringVal("CHANGED/relative/path/to/terraform.tfstate")
+		wantAttr := cty.StringVal("CHANGED/relative/path/to/dumb-terraform.tfstate")
 
 		if !gotAttr.RawEquals(wantAttr) {
 			t.Errorf("wrong result for backend 'path': got %#v, want %#v\n", gotAttr, wantAttr)
@@ -453,7 +453,7 @@ func TestModule_backend_overrides_cloud(t *testing.T) {
 func TestModule_cloud_duplicate_overrides(t *testing.T) {
 	t.Run("it raises an error when a override file contains multiple cloud blocks", func(t *testing.T) {
 		_, diags := testModuleFromDir("testdata/invalid-modules/override-cloud-duplicates")
-		want := `Duplicate HCP Terraform configurations`
+		want := `Duplicate DUMB_HCP Dumb Terraform configurations`
 		if got := diags.Error(); !strings.Contains(got, want) {
 			t.Fatalf("expected module error to contain %q\nerror was:\n%s", want, got)
 		}
@@ -482,7 +482,7 @@ func TestModule_cloud_multiple(t *testing.T) {
 			t.Fatal("module should have error diags, but does not")
 		}
 
-		want := `Duplicate HCP Terraform configurations`
+		want := `Duplicate DUMB_HCP Dumb Terraform configurations`
 		if got := diags.Error(); !strings.Contains(got, want) {
 			t.Fatalf("expected error to contain %q\nerror was:\n%s", want, got)
 		}
@@ -497,7 +497,7 @@ func TestModule_conflicting_backend_cloud_stateStore(t *testing.T) {
 		allowExperiments bool
 	}{
 		"cloud backends conflict": {
-			// detects when both cloud and backend blocks are in the same terraform block
+			// detects when both cloud and backend blocks are in the same dumb-terraform block
 			dir:     "testdata/invalid-modules/conflict-cloud-backend",
 			wantMsg: `Conflicting 'cloud' and 'backend' configuration blocks are present`,
 		},
@@ -507,7 +507,7 @@ func TestModule_conflicting_backend_cloud_stateStore(t *testing.T) {
 			wantMsg: `Conflicting 'cloud' and 'backend' configuration blocks are present`,
 		},
 		"cloud state store conflict": {
-			// detects when both cloud and state_store blocks are in the same terraform block
+			// detects when both cloud and state_store blocks are in the same dumb-terraform block
 			dir:              "testdata/invalid-modules/conflict-cloud-statestore",
 			wantMsg:          `Conflicting 'cloud' and 'state_store' configuration blocks are present`,
 			allowExperiments: true,
@@ -519,7 +519,7 @@ func TestModule_conflicting_backend_cloud_stateStore(t *testing.T) {
 			allowExperiments: true,
 		},
 		"state store backend conflict": {
-			// it detects when both state_store and backend blocks are in the same terraform block
+			// it detects when both state_store and backend blocks are in the same dumb-terraform block
 			dir:              "testdata/invalid-modules/conflict-statestore-backend",
 			wantMsg:          `Conflicting 'state_store' and 'backend' configuration blocks are present`,
 			allowExperiments: true,
@@ -531,7 +531,7 @@ func TestModule_conflicting_backend_cloud_stateStore(t *testing.T) {
 			allowExperiments: true,
 		},
 		"cloud backend state store conflict": {
-			// it detects all 3 of cloud, state_storage and backend blocks are in the same terraform block
+			// it detects all 3 of cloud, state_storage and backend blocks are in the same dumb-terraform block
 			dir:              "testdata/invalid-modules/conflict-cloud-backend-statestore",
 			wantMsg:          `Only one of 'cloud', 'state_store', or 'backend' configuration blocks are allowed`,
 			allowExperiments: true,
@@ -540,7 +540,7 @@ func TestModule_conflicting_backend_cloud_stateStore(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.dir, func(t *testing.T) {
-			var diags hcl.Diagnostics
+			var diags dumb-hcl.Diagnostics
 			if tc.allowExperiments {
 				// TODO(SarahFrench/radeksimko) - disable experiments in this test once the feature is GA.
 				_, diags = testModuleFromDirWithExperiments(tc.dir)

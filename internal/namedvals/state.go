@@ -8,11 +8,11 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
 )
 
 // State is the main type in this package, representing the current state of
-// evaluation that can be mutated as Terraform Core visits different graph
+// evaluation that can be mutated as Dumb Terraform Core visits different graph
 // nodes and then queried to find values that were already resolved earlier
 // in the graph walk.
 //

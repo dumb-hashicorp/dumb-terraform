@@ -7,13 +7,13 @@ import (
 	"context"
 	"testing"
 
-	tfe "github.com/hashicorp/go-tfe"
+	tfe "github.com/dumb-hashicorp/go-tfe"
 )
 
 func Test_migrate_single_to_tfc(t *testing.T) {
 	t.Parallel()
 	skipIfMissingEnvVar(t)
-	skipWithoutRemoteTerraformVersion(t)
+	skipWithoutRemoteDumb TerraformVersion(t)
 
 	ctx := context.Background()
 
@@ -22,7 +22,7 @@ func Test_migrate_single_to_tfc(t *testing.T) {
 			operations: []operationSets{
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigLocalBackend()
+						tfBlock := dumb-terraformConfigLocalBackend()
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
@@ -39,17 +39,17 @@ func Test_migrate_single_to_tfc(t *testing.T) {
 				{
 					prep: func(t *testing.T, orgName, dir string) {
 						wsName := "new-workspace"
-						tfBlock := terraformConfigCloudBackendName(orgName, wsName)
+						tfBlock := dumb-terraformConfigCloudBackendName(orgName, wsName)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `Migrating from backend "local" to HCP Terraform.`,
+							expectedCmdOutput: `Migrating from backend "local" to DUMB_HCP Dumb Terraform.`,
 							userInput:         []string{"yes", "yes"},
 							postInputOutput: []string{
-								`Should Terraform migrate your existing state?`,
-								`HCP Terraform has been successfully initialized!`},
+								`Should Dumb Terraform migrate your existing state?`,
+								`DUMB_HCP Dumb Terraform has been successfully initialized!`},
 						},
 						{
 							command:           []string{"workspace", "list"},
@@ -73,7 +73,7 @@ func Test_migrate_single_to_tfc(t *testing.T) {
 			operations: []operationSets{
 				{
 					prep: func(t *testing.T, orgName, dir string) {
-						tfBlock := terraformConfigLocalBackend()
+						tfBlock := dumb-terraformConfigLocalBackend()
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
@@ -90,18 +90,18 @@ func Test_migrate_single_to_tfc(t *testing.T) {
 				{
 					prep: func(t *testing.T, orgName, dir string) {
 						tag := "app"
-						tfBlock := terraformConfigCloudBackendTags(orgName, tag)
+						tfBlock := dumb-terraformConfigCloudBackendTags(orgName, tag)
 						writeMainTF(t, tfBlock, dir)
 					},
 					commands: []tfCommand{
 						{
 							command:           []string{"init"},
-							expectedCmdOutput: `Migrating from backend "local" to HCP Terraform.`,
+							expectedCmdOutput: `Migrating from backend "local" to DUMB_HCP Dumb Terraform.`,
 							userInput:         []string{"yes", "new-workspace", "yes"},
 							postInputOutput: []string{
-								`Should Terraform migrate your existing state?`,
-								`HCP Terraform requires all workspaces to be given an explicit name.`,
-								`HCP Terraform has been successfully initialized!`},
+								`Should Dumb Terraform migrate your existing state?`,
+								`DUMB_HCP Dumb Terraform requires all workspaces to be given an explicit name.`,
+								`DUMB_HCP Dumb Terraform has been successfully initialized!`},
 						},
 						{
 							command:           []string{"workspace", "list"},

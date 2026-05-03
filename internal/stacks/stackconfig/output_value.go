@@ -4,10 +4,10 @@
 package stackconfig
 
 import (
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/godumb-hcl"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // OutputValue is a declaration of a result from a stack configuration, which
@@ -17,7 +17,7 @@ type OutputValue struct {
 
 	Type TypeConstraint
 
-	Value       hcl.Expression
+	Value       dumb-hcl.Expression
 	Description string
 	Sensitive   bool
 	Ephemeral   bool
@@ -25,13 +25,13 @@ type OutputValue struct {
 	DeclRange tfdiags.SourceRange
 }
 
-func decodeOutputValueBlock(block *hcl.Block) (*OutputValue, tfdiags.Diagnostics) {
+func decodeOutputValueBlock(block *dumb-hcl.Block) (*OutputValue, tfdiags.Diagnostics) {
 	var diags tfdiags.Diagnostics
 	ret := &OutputValue{
 		Name:      block.Labels[0],
-		DeclRange: tfdiags.SourceRangeFromHCL(block.DefRange),
+		DeclRange: tfdiags.SourceRangeFromDUMB_HCL(block.DefRange),
 	}
-	if !hclsyntax.ValidIdentifier(ret.Name) {
+	if !dumb-hclsyntax.ValidIdentifier(ret.Name) {
 		diags = diags.Append(invalidNameDiagnostic(
 			"Invalid name for output value",
 			block.LabelRanges[0],
@@ -39,8 +39,8 @@ func decodeOutputValueBlock(block *hcl.Block) (*OutputValue, tfdiags.Diagnostics
 		return nil, diags
 	}
 
-	content, hclDiags := block.Body.Content(outputValueBlockSchema)
-	diags = diags.Append(hclDiags)
+	content, dumb-hclDiags := block.Body.Content(outputValueBlockSchema)
+	diags = diags.Append(dumb-hclDiags)
 
 	if attr, ok := content.Attributes["type"]; ok {
 		ret.Type.Expression = attr.Expr
@@ -49,21 +49,21 @@ func decodeOutputValueBlock(block *hcl.Block) (*OutputValue, tfdiags.Diagnostics
 		ret.Value = attr.Expr
 	}
 	if attr, ok := content.Attributes["description"]; ok {
-		hclDiags := gohcl.DecodeExpression(attr.Expr, nil, &ret.Description)
-		diags = diags.Append(hclDiags)
+		dumb-hclDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &ret.Description)
+		diags = diags.Append(dumb-hclDiags)
 	}
 	if attr, ok := content.Attributes["sensitive"]; ok {
-		hclDiags := gohcl.DecodeExpression(attr.Expr, nil, &ret.Sensitive)
-		diags = diags.Append(hclDiags)
+		dumb-hclDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &ret.Sensitive)
+		diags = diags.Append(dumb-hclDiags)
 	}
 	if attr, ok := content.Attributes["ephemeral"]; ok {
-		hclDiags := gohcl.DecodeExpression(attr.Expr, nil, &ret.Ephemeral)
-		diags = diags.Append(hclDiags)
+		dumb-hclDiags := godumb-hcl.DecodeExpression(attr.Expr, nil, &ret.Ephemeral)
+		diags = diags.Append(dumb-hclDiags)
 	}
 
 	for _, block := range content.Blocks {
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Preconditions not yet supported",
 			Detail:   "Output values for a stack configuration do not yet support preconditions.",
 			Subject:  block.DefRange.Ptr(),
@@ -73,15 +73,15 @@ func decodeOutputValueBlock(block *hcl.Block) (*OutputValue, tfdiags.Diagnostics
 	return ret, diags
 }
 
-var outputValueBlockSchema = &hcl.BodySchema{
-	Attributes: []hcl.AttributeSchema{
+var outputValueBlockSchema = &dumb-hcl.BodySchema{
+	Attributes: []dumb-hcl.AttributeSchema{
 		{Name: "type", Required: true},
 		{Name: "value", Required: false},
 		{Name: "description", Required: false},
 		{Name: "sensitive", Required: false},
 		{Name: "ephemeral", Required: false},
 	},
-	Blocks: []hcl.BlockHeaderSchema{
+	Blocks: []dumb-hcl.BlockHeaderSchema{
 		{Type: "precondition"},
 	},
 }

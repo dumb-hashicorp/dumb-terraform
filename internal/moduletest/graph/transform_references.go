@@ -4,9 +4,9 @@
 package graph
 
 import (
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/dag"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dag"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 type GraphNodeReferenceable interface {
@@ -17,11 +17,11 @@ type GraphNodeReferencer interface {
 	References() []*addrs.Reference
 }
 
-var _ terraform.GraphTransformer = (*ReferenceTransformer)(nil)
+var _ dumb-terraform.GraphTransformer = (*ReferenceTransformer)(nil)
 
 type ReferenceTransformer struct{}
 
-func (r *ReferenceTransformer) Transform(graph *terraform.Graph) error {
+func (r *ReferenceTransformer) Transform(graph *dumb-terraform.Graph) error {
 	nodes := addrs.MakeMap[addrs.Referenceable, dag.Vertex]()
 	for referenceable := range dag.SelectSeq[GraphNodeReferenceable](graph.VerticesSeq()) {
 		nodes.Put(referenceable.Referenceable(), referenceable)

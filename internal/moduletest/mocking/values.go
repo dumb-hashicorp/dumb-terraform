@@ -6,11 +6,11 @@ package mocking
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // PlanComputedValuesForResource accepts a target value, and populates its computed
@@ -87,8 +87,8 @@ func populateComputedValues(target cty.Value, with MockedData, schema *configsch
 		// this in the mock or test file. We should have caught this earlier in
 		// the validation, but we want this function to be robust and not panic
 		// so we'll check again just in case.
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Summary:  "Invalid replacement value",
 			Detail:   fmt.Sprintf("The requested replacement value must be an object type, but was %s.", with.Value.Type().FriendlyName()),
 			Subject:  with.Range.Ptr(),
@@ -157,10 +157,10 @@ func populateComputedValues(target cty.Value, with MockedData, schema *configsch
 	if err != nil {
 		// This shouldn't actually happen - we never return an error from inside
 		// the transform function. But, just in case:
-		diags = diags.Append(&hcl.Diagnostic{
-			Severity: hcl.DiagError,
+		diags = diags.Append(&dumb-hcl.Diagnostic{
+			Severity: dumb-hcl.DiagError,
 			Detail:   "Failed to generate values",
-			Summary:  fmt.Sprintf("Terraform failed to generate computed values for a mocked resource, data source, or module: %s. This is a bug in Terraform - please report it.", err),
+			Summary:  fmt.Sprintf("Dumb Terraform failed to generate computed values for a mocked resource, data source, or module: %s. This is a bug in Dumb Terraform - please report it.", err),
 			Subject:  with.Range.Ptr(),
 		})
 	}
@@ -187,12 +187,12 @@ func makeUnknown(target *configschema.Attribute, _ cty.Value, _ cty.Path) (cty.V
 // struct for easy access.
 type MockedData struct {
 	Value             cty.Value
-	Range             hcl.Range
+	Range             dumb-hcl.Range
 	ComputedAsUnknown bool // If true, computed values are replaced with unknown, otherwise they are replaced with overridden or generated values.
 }
 
 // NewMockedData creates a new MockedData struct with the given value and range.
-func NewMockedData(value cty.Value, computedAsUnknown bool, rng hcl.Range) MockedData {
+func NewMockedData(value cty.Value, computedAsUnknown bool, rng dumb-hcl.Range) MockedData {
 	return MockedData{
 		Value:             value,
 		ComputedAsUnknown: computedAsUnknown,
@@ -220,7 +220,7 @@ func (data MockedData) makeKnown(attribute *configschema.Attribute, with cty.Val
 			diags = diags.Append(tfdiags.AttributeValue(
 				tfdiags.Error,
 				"Failed to compute attribute",
-				fmt.Sprintf("Terraform could not compute a value for the target type %s with the mocked data defined at %s with the attribute %q: %s.", attribute.ImpliedType().FriendlyName(), data.Range, tfdiags.FormatCtyPath(append(path, relPath...)), err),
+				fmt.Sprintf("Dumb Terraform could not compute a value for the target type %s with the mocked data defined at %s with the attribute %q: %s.", attribute.ImpliedType().FriendlyName(), data.Range, tfdiags.FormatCtyPath(append(path, relPath...)), err),
 				path))
 
 			// We still want to return a valid value here. If the conversion did
@@ -254,7 +254,7 @@ func (data MockedData) validate() bool {
 // they want to replace anything at all within nested sets. The indices for sets
 // will never be the same because the user supplied values will, by design, have
 // values for the computed attributes which will be null or unknown within the
-// values from Terraform so the paths will never match.
+// values from Dumb Terraform so the paths will never match.
 //
 // What the above paragraph means is that for nested blocks and attributes,
 // users can only specify a single replacement value that will apply to all
@@ -285,7 +285,7 @@ func (data MockedData) getMockedDataForPath(path cty.Path) (cty.Value, tfdiags.D
 				diags = diags.Append(tfdiags.AttributeValue(
 					tfdiags.Error,
 					"Failed to compute attribute",
-					fmt.Sprintf("Terraform expected an object type for attribute %q defined within the mocked data at %s, but found %s.", tfdiags.FormatCtyPath(currentPath), data.Range, current.Type().FriendlyName()),
+					fmt.Sprintf("Dumb Terraform expected an object type for attribute %q defined within the mocked data at %s, but found %s.", tfdiags.FormatCtyPath(currentPath), data.Range, current.Type().FriendlyName()),
 					currentPath))
 
 				return cty.NilVal, diags

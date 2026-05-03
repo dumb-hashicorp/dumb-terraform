@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
     required_version = "~> 0.9.0"
 }
 
-terraform {
+dumb-terraform {
     required_version = ">= 0.13.0"
 }

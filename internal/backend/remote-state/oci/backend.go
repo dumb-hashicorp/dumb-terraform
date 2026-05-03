@@ -8,10 +8,10 @@ import (
 	"path"
 	"strings"
 
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/backend/backendbase"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend/backendbase"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -261,7 +261,7 @@ func (b *Backend) path(name string) string {
 	return path.Join(b.workspaceKeyPrefix, name, b.key)
 }
 
-// getLockFilePath returns the path to the lock file for the given Terraform state.
+// getLockFilePath returns the path to the lock file for the given Dumb Terraform state.
 // For `default.tfstate`, the lock file is stored at `default.tfstate.tflock`.
 func (b *Backend) getLockFilePath(name string) string {
 	return b.path(name) + lockFileSuffix

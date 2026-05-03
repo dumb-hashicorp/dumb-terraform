@@ -1,5 +1,5 @@
 
-terraform {
+dumb-terraform {
   backend "example" {
     foo = "bar"
 

@@ -4,14 +4,14 @@
 package providers
 
 import (
-	terraformProvider "github.com/hashicorp/terraform/internal/builtin/providers/terraform"
-	provider "github.com/hashicorp/terraform/internal/providers"
+	dumb-terraformProvider "github.com/dumb-hashicorp/dumb-terraform/internal/builtin/providers/dumb-terraform"
+	provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers"
 )
 
 func BuiltInProviders() map[string]provider.Factory {
 	return map[string]provider.Factory{
-		"terraform": func() (provider.Interface, error) {
-			return terraformProvider.NewProvider(), nil
+		"dumb-terraform": func() (provider.Interface, error) {
+			return dumb-terraformProvider.NewProvider(), nil
 		},
 	}
 }

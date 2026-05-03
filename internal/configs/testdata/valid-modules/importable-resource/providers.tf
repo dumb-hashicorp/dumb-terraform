@@ -1,7 +1,7 @@
-terraform {
+dumb-terraform {
   required_providers {
     local = {
-      source = "hashicorp/local"
+      source = "dumb-hashicorp/local"
     }
   }
 }

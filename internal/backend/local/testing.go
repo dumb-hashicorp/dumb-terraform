@@ -9,15 +9,15 @@ import (
 
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/backend"
-	"github.com/hashicorp/terraform/internal/configs/configschema"
-	"github.com/hashicorp/terraform/internal/providers"
-	testing_provider "github.com/hashicorp/terraform/internal/providers/testing"
-	"github.com/hashicorp/terraform/internal/states"
-	"github.com/hashicorp/terraform/internal/states/statemgr"
-	"github.com/hashicorp/terraform/internal/terraform"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/backend"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/configs/configschema"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/providers"
+	testing_provider "github.com/dumb-hashicorp/dumb-terraform/internal/providers/testing"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states/statemgr"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // TestLocal returns a configured Local struct with temporary paths and
@@ -37,7 +37,7 @@ func TestLocal(t *testing.T) *Local {
 	local.StateOutPath = filepath.Join(tempDir, "state.tfstate")
 	local.StateBackupPath = filepath.Join(tempDir, "state.tfstate.bak")
 	local.StateWorkspaceDir = filepath.Join(tempDir, "state.tfstate.d")
-	local.ContextOpts = &terraform.ContextOpts{}
+	local.ContextOpts = &dumb-terraform.ContextOpts{}
 
 	return local
 }
@@ -91,7 +91,7 @@ func TestLocalProvider(t *testing.T, b *Local, name string, schema providers.Pro
 
 	// Initialize the opts
 	if b.ContextOpts == nil {
-		b.ContextOpts = &terraform.ContextOpts{}
+		b.ContextOpts = &dumb-terraform.ContextOpts{}
 	}
 
 	// Set up our provider

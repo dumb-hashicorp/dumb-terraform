@@ -4,14 +4,14 @@
 package graph
 
 import (
-	"github.com/hashicorp/terraform/internal/dag"
-	"github.com/hashicorp/terraform/internal/terraform"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dag"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/dumb-terraform"
 )
 
 // CloseTestGraphTransformer is a GraphTransformer that adds a closing node to the graph.
 type CloseTestGraphTransformer struct{}
 
-func (t *CloseTestGraphTransformer) Transform(g *terraform.Graph) error {
+func (t *CloseTestGraphTransformer) Transform(g *dumb-terraform.Graph) error {
 	closeRoot := &nodeCloseTest{}
 	g.Add(closeRoot)
 

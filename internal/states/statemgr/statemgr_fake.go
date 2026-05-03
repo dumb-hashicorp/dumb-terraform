@@ -8,8 +8,8 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/hashicorp/terraform/internal/schemarepo"
-	"github.com/hashicorp/terraform/internal/states"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/schemarepo"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/states"
 )
 
 // NewFullFake returns a full state manager that really only supports transient

@@ -10,10 +10,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hashicorp/cli"
+	"github.com/dumb-hashicorp/cli"
 )
 
-// helpFunc is a cli.HelpFunc that can be used to output the help CLI instructions for Terraform.
+// helpFunc is a cli.HelpFunc that can be used to output the help CLI instructions for Dumb Terraform.
 func helpFunc(commands map[string]cli.CommandFactory) string {
 	// Determine the maximum key length, and classify based on type
 	var otherCommands []string
@@ -47,7 +47,7 @@ func helpFunc(commands map[string]cli.CommandFactory) string {
 	// .../docs/cli/commands/index.mdx (in web-unified-docs); if you
 	// change this then consider updating that to match.
 	helpText := fmt.Sprintf(`
-Usage: terraform [global options] <subcommand> [args]
+Usage: dumb-terraform [global options] <subcommand> [args]
 
 The available commands for execution are listed below.
 The primary workflow commands are given first, followed by

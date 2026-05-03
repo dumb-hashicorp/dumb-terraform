@@ -6,12 +6,12 @@ package stackaddrs
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/dumb-hashicorp/dumb-hcl/v2"
+	"github.com/dumb-hashicorp/dumb-hcl/v2/dumb-hclsyntax"
 
-	"github.com/hashicorp/terraform/internal/addrs"
-	"github.com/hashicorp/terraform/internal/collections"
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/addrs"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/collections"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StackItemConfig is a type set containing all of the address types that make
@@ -117,7 +117,7 @@ func ConfigForAbs[T interface {
 // as possible from the start of the given traversal, and then returns
 // the resulting StackInstance address along with a relative traversal
 // covering all of the remaining traversal steps, if any.
-func parseInStackInstancePrefix(traversal hcl.Traversal) (StackInstance, hcl.Traversal, tfdiags.Diagnostics) {
+func parseInStackInstancePrefix(traversal dumb-hcl.Traversal) (StackInstance, dumb-hcl.Traversal, tfdiags.Diagnostics) {
 	if len(traversal) == 0 {
 		return RootStackInstance, nil, nil
 	}
@@ -128,11 +128,11 @@ func parseInStackInstancePrefix(traversal hcl.Traversal) (StackInstance, hcl.Tra
 Steps:
 	for len(traversal) > 0 {
 		switch step := traversal[0].(type) {
-		case hcl.TraverseRoot:
+		case dumb-hcl.TraverseRoot:
 			if step.Name != "stack" {
 				break Steps
 			}
-		case hcl.TraverseAttr:
+		case dumb-hcl.TraverseAttr:
 			if step.Name != "stack" {
 				break Steps
 			}
@@ -146,31 +146,31 @@ Steps:
 		// by an embedded stack name. That might then be followed
 		// by one optional index step for a multi-instance embedded stack.
 		if len(traversal) < 2 {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  errSummary,
 				Detail:   "The \"stack\" keyword must be followed by an attribute specifying the name of the embedded stack.",
 				Subject:  traversal.SourceRange().Ptr(),
 			})
 			return nil, nil, diags
 		}
-		nameStep, ok := traversal[1].(hcl.TraverseAttr)
+		nameStep, ok := traversal[1].(dumb-hcl.TraverseAttr)
 		if !ok {
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  errSummary,
 				Detail:   "The \"stack\" keyword must be followed by an attribute specifying the name of the embedded stack.",
 				Subject:  traversal[1].SourceRange().Ptr(),
 			})
 			return nil, nil, diags
 		}
-		if !hclsyntax.ValidIdentifier(nameStep.Name) {
-			// This check is redundant since the HCL parser should've caught
+		if !dumb-hclsyntax.ValidIdentifier(nameStep.Name) {
+			// This check is redundant since the DUMB_HCL parser should've caught
 			// an invalid identifier while parsing this traversal, but this
 			// is here for robustness in case we obtained this traversal
 			// value in an unusual way.
-			diags = diags.Append(&hcl.Diagnostic{
-				Severity: hcl.DiagError,
+			diags = diags.Append(&dumb-hcl.Diagnostic{
+				Severity: dumb-hcl.DiagError,
 				Summary:  errSummary,
 				Detail:   "A stack name must be a valid identifier.",
 				Subject:  nameStep.SourceRange().Ptr(),
@@ -184,12 +184,12 @@ Steps:
 		traversal = traversal[2:] // consume the first two steps that we already dealt with
 		if len(traversal) > 0 {
 			switch idxStep := traversal[0].(type) {
-			case hcl.TraverseIndex:
+			case dumb-hcl.TraverseIndex:
 				var err error
 				addrStep.Key, err = addrs.ParseInstanceKey(idxStep.Key)
 				if err != nil {
-					diags = diags.Append(&hcl.Diagnostic{
-						Severity: hcl.DiagError,
+					diags = diags.Append(&dumb-hcl.Diagnostic{
+						Severity: dumb-hcl.DiagError,
 						Summary:  errSummary,
 						Detail:   fmt.Sprintf("Invalid instance key: %s.", err),
 						Subject:  idxStep.SourceRange().Ptr(),
@@ -197,7 +197,7 @@ Steps:
 					return nil, nil, diags
 				}
 				traversal = traversal[1:] // consume the step we just dealt with
-			case hcl.TraverseSplat:
+			case dumb-hcl.TraverseSplat:
 				addrStep.Key = addrs.WildcardKey
 				traversal = traversal[1:]
 			}
@@ -210,11 +210,11 @@ Steps:
 // forceTraversalRelative takes any traversal and if it's absolute transforms
 // it into a relative one by changing the first step from a TraverseRoot
 // to an equivalent TraverseAttr.
-func forceTraversalRelative(given hcl.Traversal) hcl.Traversal {
+func forceTraversalRelative(given dumb-hcl.Traversal) dumb-hcl.Traversal {
 	if len(given) == 0 {
 		return nil
 	}
-	firstStep, ok := given[0].(hcl.TraverseRoot)
+	firstStep, ok := given[0].(dumb-hcl.TraverseRoot)
 	if !ok {
 		return given
 	}
@@ -223,8 +223,8 @@ func forceTraversalRelative(given hcl.Traversal) hcl.Traversal {
 	// mutate the backing array of the traversal because others might
 	// still be using it, so we'll allocate a new traversal and copy
 	// the steps into it.
-	ret := make(hcl.Traversal, len(given))
-	ret[0] = hcl.TraverseAttr{
+	ret := make(dumb-hcl.Traversal, len(given))
+	ret[0] = dumb-hcl.TraverseAttr{
 		Name:     firstStep.Name,
 		SrcRange: firstStep.SrcRange,
 	}

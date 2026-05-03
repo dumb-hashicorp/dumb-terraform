@@ -6,7 +6,7 @@ package arguments
 import (
 	"time"
 
-	"github.com/hashicorp/terraform/internal/tfdiags"
+	"github.com/dumb-hashicorp/dumb-terraform/internal/tfdiags"
 )
 
 // StateReplaceProvider represents the command-line arguments for the state
@@ -18,7 +18,7 @@ type StateReplaceProvider struct {
 	// AutoApprove, if true, skips the interactive approval step.
 	AutoApprove bool
 
-	// BackupPath is the path where Terraform should write the backup state.
+	// BackupPath is the path where Dumb Terraform should write the backup state.
 	BackupPath string
 
 	// StateLock, if true, requests that the backend lock the state for this
@@ -32,7 +32,7 @@ type StateReplaceProvider struct {
 	StatePath string
 
 	// IgnoreRemoteVersion, if true, continues even if remote and local
-	// Terraform versions are incompatible.
+	// Dumb Terraform versions are incompatible.
 	IgnoreRemoteVersion bool
 
 	// FromProviderAddr is the provider address to replace.
@@ -58,7 +58,7 @@ func ParseStateReplaceProvider(args []string) (*StateReplaceProvider, tfdiags.Di
 	cmdFlags.BoolVar(&rp.StateLock, "lock", true, "lock states")
 	cmdFlags.DurationVar(&rp.StateLockTimeout, "lock-timeout", 0, "lock timeout")
 	cmdFlags.StringVar(&rp.StatePath, "state", "", "path")
-	cmdFlags.BoolVar(&rp.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Terraform versions are incompatible")
+	cmdFlags.BoolVar(&rp.IgnoreRemoteVersion, "ignore-remote-version", false, "continue even if remote and local Dumb Terraform versions are incompatible")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		diags = diags.Append(tfdiags.Sourceless(
